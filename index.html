@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="FixForward helps Victorian households check recalls and warning signs before comparing repair and replacement costs.">
+  <title>FixForward — a clearer next step for a broken appliance</title>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="src/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="FixForward home">
+      <span class="brand-mark" aria-hidden="true">F</span>
+      <span>FixForward</span>
+    </a>
+    <div class="header-actions">
+      <span class="privacy-note"><span data-icon="lock"></span> Private by design</span>
+      <button class="text-button" id="restart-button" type="button">Restart</button>
+    </div>
+  </header>
+
+  <div class="progress-shell" aria-label="Assessment progress">
+    <ol class="progress" id="progress">
+      <li data-phase="identify"><span>1</span> Appliance</li>
+      <li data-phase="safety"><span>2</span> Safety & recall</li>
+      <li data-phase="pathway"><span>3</span> Next pathway</li>
+      <li data-phase="cost"><span>4</span> Cost comparison</li>
+    </ol>
+  </div>
+
+  <main id="main" tabindex="-1">
+    <noscript><div class="notice danger">FixForward needs JavaScript to run this private, in-browser assessment.</div></noscript>
+    <div id="app" aria-live="polite"></div>
+  </main>
+
+  <footer class="site-footer">
+    <div>
+      <strong>FixForward</strong>
+      <p>Screening and guidance only — no diagnosis, guarantee or financial advice.</p>
+    </div>
+    <div class="footer-meta">
+      <span>Iteration 1 · v1.0.0</span>
+      <span>Public data snapshot: 1 Sep 2026</span>
+      <button class="text-button" id="sources-button" type="button">Sources & privacy</button>
+    </div>
+  </footer>
+
+  <dialog id="sources-dialog" aria-labelledby="sources-title">
+    <div class="dialog-head">
+      <div><p class="eyebrow">Evidence & privacy</p><h2 id="sources-title">What this assessment uses</h2></div>
+      <button class="icon-button" id="close-sources" type="button" aria-label="Close">×</button>
+    </div>
+    <div id="sources-content"></div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
