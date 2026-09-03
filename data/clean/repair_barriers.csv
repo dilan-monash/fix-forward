@@ -1,0 +1,57 @@
+appliance_family,appliance_category,barrier,occurrence_count,geography
+Air treatment,Dehumidifier and portable air conditioner,Spare parts not available,48,global_fallback
+Air treatment,Dehumidifier and portable air conditioner,Repair information not available,31,global_fallback
+Air treatment,Dehumidifier and portable air conditioner,Spare parts too expensive,28,global_fallback
+Air treatment,Dehumidifier and portable air conditioner,No way to open product,23,global_fallback
+Air treatment,Dehumidifier and portable air conditioner,Item too worn out,20,global_fallback
+Air treatment,Dehumidifier and portable air conditioner,Lack of equipment,18,global_fallback
+Air treatment,Fan,Item too worn out,5,AU
+Air treatment,Fan,No way to open product,3,AU
+Air treatment,Fan,Spare parts not available,2,AU
+Air treatment,Fan,Lack of equipment,1,AU
+Cleaning,Vacuum cleaner,Item too worn out,9,AU
+Cleaning,Vacuum cleaner,No way to open product,5,AU
+Cleaning,Vacuum cleaner,Spare parts not available,4,AU
+Cleaning,Vacuum cleaner,Spare parts too expensive,2,AU
+Cleaning,Vacuum cleaner,Lack of equipment,2,AU
+Cleaning,Vacuum cleaner,Repair information not available,1,AU
+Complex kitchen,Air fryer and other complex kitchen,No way to open product,10,AU
+Complex kitchen,Air fryer and other complex kitchen,Spare parts too expensive,5,AU
+Complex kitchen,Air fryer and other complex kitchen,Spare parts not available,5,AU
+Complex kitchen,Air fryer and other complex kitchen,Item too worn out,5,AU
+Complex kitchen,Air fryer and other complex kitchen,Lack of equipment,1,AU
+Complex kitchen,Coffee machine,No way to open product,13,AU
+Complex kitchen,Coffee machine,Item too worn out,4,AU
+Complex kitchen,Coffee machine,Repair information not available,3,AU
+Complex kitchen,Coffee machine,Spare parts not available,2,AU
+Complex kitchen,Coffee machine,Spare parts too expensive,2,AU
+Complex kitchen,Coffee machine,Lack of equipment,1,AU
+Heating and simple cooking,Kettle,Repair information not available,2,AU
+Heating and simple cooking,Kettle,Spare parts not available,2,AU
+Heating and simple cooking,Kettle,Spare parts too expensive,2,AU
+Heating and simple cooking,Kettle,Item too worn out,2,AU
+Heating and simple cooking,Kettle,No way to open product,1,AU
+Heating and simple cooking,Rice cooker and small kitchen appliances,No way to open product,10,AU
+Heating and simple cooking,Rice cooker and small kitchen appliances,Spare parts too expensive,5,AU
+Heating and simple cooking,Rice cooker and small kitchen appliances,Spare parts not available,5,AU
+Heating and simple cooking,Rice cooker and small kitchen appliances,Item too worn out,5,AU
+Heating and simple cooking,Rice cooker and small kitchen appliances,Lack of equipment,1,AU
+Heating and simple cooking,Toaster,Item too worn out,7,AU
+Heating and simple cooking,Toaster,No way to open product,5,AU
+Heating and simple cooking,Toaster,Spare parts not available,4,AU
+Heating and simple cooking,Toaster,Repair information not available,3,AU
+Heating and simple cooking,Toaster,Spare parts too expensive,1,AU
+Motorised kitchen,Blender mixer and food processor,Item too worn out,10,AU
+Motorised kitchen,Blender mixer and food processor,No way to open product,9,AU
+Motorised kitchen,Blender mixer and food processor,Spare parts not available,9,AU
+Motorised kitchen,Blender mixer and food processor,Lack of equipment,3,AU
+Motorised kitchen,Blender mixer and food processor,Spare parts too expensive,2,AU
+Personal care,Hair and beauty appliances,Spare parts not available,3,AU
+Personal care,Hair and beauty appliances,No way to open product,2,AU
+Personal care,Hair and beauty appliances,Item too worn out,2,AU
+Personal care,Hair dryer,No way to open product,120,global_fallback
+Personal care,Hair dryer,Spare parts not available,94,global_fallback
+Personal care,Hair dryer,Item too worn out,64,global_fallback
+Personal care,Hair dryer,Spare parts too expensive,45,global_fallback
+Personal care,Hair dryer,Lack of equipment,23,global_fallback
+Personal care,Hair dryer,Repair information not available,20,global_fallback

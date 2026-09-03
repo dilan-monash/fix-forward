@@ -1,0 +1,1065 @@
+{
+  "source": "OpenStreetMap via Overpass API",
+  "licence": "ODbL (Open Database License) \u2014 attribution required",
+  "query_region": "Victoria, Australia",
+  "element_count": 70,
+  "elements": [
+    {
+      "type": "node",
+      "id": 1038001124,
+      "lat": -37.8148809,
+      "lon": 144.9603568,
+      "tags": {
+        "addr:housenumber": "155",
+        "addr:postcode": "3000",
+        "addr:street": "Queen Street",
+        "addr:suburb": "Melbourne",
+        "computer:repair": "yes",
+        "craft": "electronics_repair",
+        "name": "Fix\u00a0To\u00a0Go",
+        "website": "https://fixtogo.com.au/",
+        "wheelchair": "yes"
+      }
+    },
+    {
+      "type": "node",
+      "id": 1475665464,
+      "lat": -36.3931408,
+      "lon": 145.4009849,
+      "tags": {
+        "name": "Shepparton Washing Machine Service",
+        "shop": "repair"
+      }
+    },
+    {
+      "type": "node",
+      "id": 2927330701,
+      "lat": -37.7170676,
+      "lon": 145.1394556,
+      "tags": {
+        "addr:country": "AU",
+        "addr:housenumber": "15",
+        "addr:postcode": "3095",
+        "addr:state": "VIC",
+        "addr:street": "Brisbane Street",
+        "addr:suburb": "Eltham",
+        "addr:unit": "2",
+        "name": "David Brown Mechanical Repair",
+        "shop": "repair",
+        "source": "vicmap"
+      }
+    },
+    {
+      "type": "node",
+      "id": 3649875723,
+      "lat": -37.7341512,
+      "lon": 145.0135302,
+      "tags": {
+        "addr:housenumber": "547",
+        "addr:street": "Plenty Road",
+        "craft": "electronics_repair",
+        "name": "Renewd Laptop Repair Service",
+        "phone:AU": "1800 849 151",
+        "website": "https://renewd.com.au/"
+      }
+    },
+    {
+      "type": "node",
+      "id": 3922903661,
+      "lat": -37.810179,
+      "lon": 144.9956476,
+      "tags": {
+        "craft": "electronics_repair"
+      }
+    },
+    {
+      "type": "node",
+      "id": 4654385369,
+      "lat": -37.7660351,
+      "lon": 145.2401149,
+      "tags": {
+        "addr:housenumber": "69",
+        "addr:street": "Croydon Road",
+        "name": "JMAC Mechanical",
+        "shop": "repair"
+      }
+    },
+    {
+      "type": "node",
+      "id": 4796207994,
+      "lat": -37.8129534,
+      "lon": 145.0811699,
+      "tags": {
+        "addr:housenumber": "236",
+        "addr:postcode": "3103",
+        "addr:street": "Whitehorse Road",
+        "addr:suburb": "Balwyn",
+        "craft": "electronics_repair",
+        "name": "Pentagon Digital",
+        "source": "local knowledge"
+      }
+    },
+    {
+      "type": "node",
+      "id": 6180386396,
+      "lat": -37.7992732,
+      "lon": 144.8943113,
+      "tags": {
+        "craft": "electronics_repair",
+        "name": "Footscray Electronics TV Repairs"
+      }
+    },
+    {
+      "type": "node",
+      "id": 6471387910,
+      "lat": -34.1839719,
+      "lon": 142.1600182,
+      "tags": {
+        "addr:housenumber": "58",
+        "addr:postcode": "3500",
+        "addr:state": "VIC",
+        "addr:street": "Lime Avenue",
+        "addr:suburb": "Mildura",
+        "craft": "electronics_repair",
+        "email": "info@techlab.net.au",
+        "name": "TechLab",
+        "opening_hours": "Mo-Fr 08:30-17:30; Sa 09:30-14:00",
+        "phone": "+61 3 5022 2592",
+        "website": "https://techlab.net.au/"
+      }
+    },
+    {
+      "type": "node",
+      "id": 7903782693,
+      "lat": -38.1848897,
+      "lon": 145.08962,
+      "tags": {
+        "addr:housenumber": "89",
+        "addr:postcode": "3930",
+        "addr:state": "VIC",
+        "addr:street": "Mount Eliza Way",
+        "addr:suburb": "Mount Eliza",
+        "check_date:opening_hours": "2024-10-30",
+        "craft": "electronics_repair",
+        "name": "eTechFix",
+        "opening_hours:signed": "no",
+        "phone": "+61 410 575 669",
+        "wheelchair": "yes"
+      }
+    },
+    {
+      "type": "node",
+      "id": 8862133692,
+      "lat": -34.2088283,
+      "lon": 142.1383007,
+      "tags": {
+        "addr:housenumber": "840",
+        "addr:postcode": "3500",
+        "addr:state": "VIC",
+        "addr:street": "Fifteenth Street",
+        "addr:suburb": "Mildura",
+        "addr:unit": "7",
+        "check_date": "2021-06-24",
+        "craft": "electronics_repair",
+        "level": "0",
+        "name": "iFix Mildura iPhone Repair",
+        "phone": "+61 427 507 888",
+        "website": "https://www.facebook.com/ifixmildura/"
+      }
+    },
+    {
+      "type": "node",
+      "id": 8953081170,
+      "lat": -34.1770012,
+      "lon": 142.1522355,
+      "tags": {
+        "addr:postcode": "3500",
+        "addr:state": "VIC",
+        "addr:street": "Ontario Avenue",
+        "addr:suburb": "Mildura",
+        "craft": "electronics_repair",
+        "email": "phil@philfixit.info",
+        "name": "Phil'll Fix IT Computer Services",
+        "operator": "Phil",
+        "phone": "+61 447 645 534",
+        "website": "http://philfixit.info/"
+      }
+    },
+    {
+      "type": "node",
+      "id": 9292890916,
+      "lat": -38.1671004,
+      "lon": 145.9432249,
+      "tags": {
+        "addr:housenumber": "177",
+        "addr:street": "Queen Street",
+        "craft": "electronics_repair",
+        "name": "Warragul Washing Machine Service",
+        "phone": "+61 418 171 218",
+        "source": "survey"
+      }
+    },
+    {
+      "type": "node",
+      "id": 9574992214,
+      "lat": -37.9586582,
+      "lon": 145.0554687,
+      "tags": {
+        "brand": "Mister Minit",
+        "brand:wikidata": "Q1939269",
+        "brand:wikipedia": "de:Mister Minit",
+        "level": "0",
+        "name": "Mister Minit",
+        "payment:afterpay": "yes",
+        "payment:mastercard": "yes",
+        "payment:visa": "yes",
+        "phone": "+61 478 765 915",
+        "shop": "repair",
+        "website": "https://www.minit.com.au/"
+      }
+    },
+    {
+      "type": "node",
+      "id": 9574996318,
+      "lat": -37.9582733,
+      "lon": 145.0549778,
+      "tags": {
+        "craft": "electronics_repair",
+        "level": "0",
+        "name": "Australia GSM World",
+        "phone": "+61 3 9585 8885"
+      }
+    },
+    {
+      "type": "node",
+      "id": 9579466412,
+      "lat": -37.9583947,
+      "lon": 145.0515706,
+      "tags": {
+        "level": "0",
+        "name": "Montre Shoe Repairs",
+        "phone": "+61 3 8524 7850",
+        "shop": "repair"
+      }
+    },
+    {
+      "type": "node",
+      "id": 9962790243,
+      "lat": -37.813046,
+      "lon": 144.9679913,
+      "tags": {
+        "addr:housenumber": "143",
+        "addr:postcode": "3000",
+        "addr:state": "VIC",
+        "addr:street": "Russell Street",
+        "addr:suburb": "Melbourne",
+        "check_date:opening_hours": "2025-08-02",
+        "craft": "electronics_repair",
+        "name": "Repair Buddy",
+        "opening_hours:signed": "no"
+      }
+    },
+    {
+      "type": "node",
+      "id": 10160870703,
+      "lat": -37.7044926,
+      "lon": 145.1030216,
+      "tags": {
+        "craft": "electronics_repair",
+        "name": "Eascom Electrical"
+      }
+    },
+    {
+      "type": "node",
+      "id": 10174722273,
+      "lat": -37.6515444,
+      "lon": 145.0892622,
+      "tags": {
+        "name": "Northern Mobile Repairs",
+        "shop": "repair"
+      }
+    },
+    {
+      "type": "node",
+      "id": 10219084171,
+      "lat": -38.0513123,
+      "lon": 144.1479973,
+      "tags": {
+        "name": "Bannockburn Sandblasting",
+        "shop": "repair"
+      }
+    },
+    {
+      "type": "node",
+      "id": 10566587800,
+      "lat": -37.6024637,
+      "lon": 145.0996331,
+      "tags": {
+        "craft": "electronics_repair",
+        "name": "MyFone Repairs"
+      }
+    },
+    {
+      "type": "node",
+      "id": 10612731003,
+      "lat": -37.7307572,
+      "lon": 144.7433432,
+      "tags": {
+        "addr:housenumber": "29-35",
+        "addr:postcode": "3023",
+        "addr:state": "VIC",
+        "addr:street": "Lake Street",
+        "addr:suburb": "Caroline Springs",
+        "addr:unit": "Kiosk 13",
+        "craft": "electronics_repair",
+        "name": "eFix Electronics Repairs & Accessories",
+        "opening_hours": "Mo-Su 09:00-21:00",
+        "phone": "+61 468 868 145",
+        "website": "https://efix.business.site/"
+      }
+    },
+    {
+      "type": "node",
+      "id": 10616690936,
+      "lat": -37.7318428,
+      "lon": 144.7430607,
+      "tags": {
+        "addr:housenumber": "29-35",
+        "addr:postcode": "3023",
+        "addr:state": "VIC",
+        "addr:street": "Lake Street",
+        "addr:suburb": "Caroline Springs",
+        "addr:unit": "Kiosk 3",
+        "craft": "electronics_repair",
+        "name": "Mobile King",
+        "opening_hours": "Mo-We 09:00-17:30; Th-Fr 09:00-19:00; Sa 09:00-17:00; Su 10:00-17:00",
+        "phone": "+61 406 391 318",
+        "website": "https://mobile-king.com.au/"
+      }
+    },
+    {
+      "type": "node",
+      "id": 10617857299,
+      "lat": -37.7324622,
+      "lon": 144.7429047,
+      "tags": {
+        "addr:housenumber": "29-35",
+        "addr:postcode": "3023",
+        "addr:state": "VIC",
+        "addr:street": "Lake Street",
+        "addr:suburb": "Caroline Springs",
+        "addr:unit": "Kiosk 15",
+        "craft": "electronics_repair",
+        "email": "murtaza@myfonerepairs.com.au",
+        "name": "My Fone Repairs",
+        "opening_hours": "Mo-We 09:00-17:30; Th-Fr 09:00-20:00; Sa 09:00-17:00; Su 10:00-17:00",
+        "phone": "+61 466 338 377",
+        "website": "https://www.myfonerepairs.com.au/"
+      }
+    },
+    {
+      "type": "node",
+      "id": 10679494527,
+      "lat": -37.8383419,
+      "lon": 145.2786171,
+      "tags": {
+        "addr:housenumber": "868",
+        "addr:postcode": "3153",
+        "addr:state": "VIC",
+        "addr:street": "Mountain Highway",
+        "addr:suburb": "Bayswater",
+        "name": "Trik Trailers",
+        "opening_hours": "Mo-Fr 08:00-17:00; Sa 08:00-13:00",
+        "phone": "+61 3 9720 0100",
+        "shop": "repair",
+        "website": "https://www.triktrailers.com.au/"
+      }
+    },
+    {
+      "type": "node",
+      "id": 10736056334,
+      "lat": -37.922078,
+      "lon": 145.0831901,
+      "tags": {
+        "craft": "electronics_repair",
+        "name": "EB Mobile and Repair"
+      }
+    },
+    {
+      "type": "node",
+      "id": 10781500036,
+      "lat": -37.8760688,
+      "lon": 145.0375522,
+      "tags": {
+        "craft": "electronics_repair",
+        "electronics_repair": "mobile_phone",
+        "name": "Phone Tech",
+        "note": "Estimated location from survey"
+      }
+    },
+    {
+      "type": "node",
+      "id": 11034048940,
+      "lat": -38.1480897,
+      "lon": 144.361761,
+      "tags": {
+        "contact:facebook": "https://facebook.com/Phone-Nation-Geelong-105840784737188",
+        "craft": "electronics_repair",
+        "electronics_repair": "phone",
+        "level": "0",
+        "name": "Phone Nation",
+        "phone": "+61 3 5224 1980",
+        "shop": "mobile_phone"
+      }
+    },
+    {
+      "type": "node",
+      "id": 11229946791,
+      "lat": -37.9140064,
+      "lon": 145.0072162,
+      "tags": {
+        "addr:housenumber": "828",
+        "addr:street": "Hampton Street",
+        "craft": "electronics_repair"
+      }
+    },
+    {
+      "type": "node",
+      "id": 11776427002,
+      "lat": -37.8161868,
+      "lon": 144.9554142,
+      "tags": {
+        "craft": "electronics_repair",
+        "name": "Mister Click",
+        "wheelchair": "no"
+      }
+    },
+    {
+      "type": "node",
+      "id": 12152649846,
+      "lat": -37.8471985,
+      "lon": 144.9942385,
+      "tags": {
+        "craft": "electronics_repair",
+        "name": "Fonecast"
+      }
+    },
+    {
+      "type": "node",
+      "id": 12175777442,
+      "lat": -37.8104772,
+      "lon": 144.9630144,
+      "tags": {
+        "level": "-1",
+        "name": "Repair Pro",
+        "repair": "computer;electronics;mobile_phone",
+        "shop": "repair",
+        "wheelchair": "yes"
+      }
+    },
+    {
+      "type": "node",
+      "id": 12401585373,
+      "lat": -37.5669764,
+      "lon": 143.811648,
+      "tags": {
+        "addr:housenumber": "155A",
+        "addr:postcode": "3350",
+        "addr:state": "VIC",
+        "addr:street": "Learmonth Street",
+        "addr:suburb": "Alfredton",
+        "name": "Scobies Service Centre",
+        "phone": "+61 3 5334 2150",
+        "shop": "repair"
+      }
+    },
+    {
+      "type": "node",
+      "id": 12488946860,
+      "lat": -37.6854091,
+      "lon": 144.5671137,
+      "tags": {
+        "craft": "electronics_repair",
+        "mobile_phone:repair": "yes",
+        "name": "MyFone Repairs"
+      }
+    },
+    {
+      "type": "node",
+      "id": 12489031937,
+      "lat": -37.6866084,
+      "lon": 144.5616245,
+      "tags": {
+        "craft": "electronics_repair",
+        "mobile_phone:repair": "yes",
+        "name": "Express iRepair"
+      }
+    },
+    {
+      "type": "node",
+      "id": 12735703763,
+      "lat": -37.5126425,
+      "lon": 143.8446731,
+      "tags": {
+        "name": "Ballarat Caravan & Trailer Repairs",
+        "shop": "repair"
+      }
+    },
+    {
+      "type": "node",
+      "id": 12908670120,
+      "lat": -36.1275849,
+      "lon": 146.8640679,
+      "tags": {
+        "craft": "electronics_repair",
+        "electronics_repair": "phone",
+        "name": "Gadget Masters Birallee",
+        "shop": "mobile_phone"
+      }
+    },
+    {
+      "type": "node",
+      "id": 13228815130,
+      "lat": -38.2449128,
+      "lon": 145.0470473,
+      "tags": {
+        "check_date:opening_hours": "2025-10-13",
+        "craft": "electronics_repair",
+        "name": "Happy Mobile",
+        "opening_hours:signed": "no",
+        "wheelchair": "yes"
+      }
+    },
+    {
+      "type": "node",
+      "id": 13230396729,
+      "lat": -38.0881009,
+      "lon": 147.0693544,
+      "tags": {
+        "addr:housenumber": "67-69",
+        "addr:street": "Princes Highway",
+        "name": "Mckay Automotive & Sale Brake Specialists",
+        "opening_hours": "08:00-17:30; Sa 09:00-12:00; Su off",
+        "payment:apple_pay": "yes",
+        "payment:cash": "yes",
+        "payment:credit_cards": "yes",
+        "payment:debit_cards": "yes",
+        "payment:google_pay": "yes",
+        "payment:mastercard": "yes",
+        "payment:visa": "yes",
+        "phone": "+61 3 5143 0555",
+        "shop": "repair"
+      }
+    },
+    {
+      "type": "node",
+      "id": 13232243534,
+      "lat": -38.0990702,
+      "lon": 147.0967863,
+      "tags": {
+        "addr:housenumber": "247",
+        "addr:street": "Somerton Park Road",
+        "name": "Jet Aviation",
+        "opening_hours": "Mo-Fr 08:30-16:30; Sa-Su off",
+        "payment:apple_pay": "yes",
+        "payment:credit_cards": "yes",
+        "payment:debit_cards": "yes",
+        "payment:google_pay": "yes",
+        "payment:mastercard": "yes",
+        "payment:visa": "yes",
+        "phone": "+61 3 5143 3223",
+        "shop": "repair",
+        "website": "https://www.jetaviation.com/"
+      }
+    },
+    {
+      "type": "node",
+      "id": 13257008201,
+      "lat": -37.8362564,
+      "lon": 145.1825232,
+      "tags": {
+        "addr:housenumber": "476",
+        "addr:postcode": "3131",
+        "addr:street": "Canterbury Road",
+        "craft": "electronics_repair",
+        "email": "support@stw.com.au",
+        "name": "Stuff That Works",
+        "opening_hours": "Mo-Fr 08:30-17:30",
+        "phone": "+61 3 8820 3000",
+        "website": "https://www.stw.com.au/"
+      }
+    },
+    {
+      "type": "node",
+      "id": 14067691167,
+      "lat": -37.6823648,
+      "lon": 145.0132233,
+      "tags": {
+        "craft": "electronics_repair",
+        "name": "Game Freaks Game Console Service Centre"
+      }
+    },
+    {
+      "type": "node",
+      "id": 14068781718,
+      "lat": -37.8311179,
+      "lon": 145.0568953,
+      "tags": {
+        "addr:housenumber": "560",
+        "addr:street": "Burke Road",
+        "craft": "electronics_repair",
+        "name": "MKC Repairs",
+        "website": "https://mkccamberwell.com.au/"
+      }
+    },
+    {
+      "type": "node",
+      "id": 14072810447,
+      "lat": -37.830452,
+      "lon": 145.0567277,
+      "tags": {
+        "contact:instagram": "https://www.instagram.com/lottomobile/",
+        "craft": "electronics_repair",
+        "electronics_repair": "phone",
+        "lottery": "yes",
+        "name": "Camberwell Lotto & Mobile",
+        "shop": "yes"
+      }
+    },
+    {
+      "type": "node",
+      "id": 14091821248,
+      "lat": -37.7669538,
+      "lon": 144.9241814,
+      "tags": {
+        "craft": "electronics_repair",
+        "name": "Phone life"
+      }
+    },
+    {
+      "type": "node",
+      "id": 14091887065,
+      "lat": -37.7670617,
+      "lon": 144.9232008,
+      "tags": {
+        "craft": "electronics_repair",
+        "name": "A Phone"
+      }
+    },
+    {
+      "type": "node",
+      "id": 14100829896,
+      "lat": -37.7654725,
+      "lon": 144.9227253,
+      "tags": {
+        "craft": "electronics_repair",
+        "name": "MPC Repairs"
+      }
+    },
+    {
+      "type": "way",
+      "id": 266740028,
+      "center": {
+        "lat": -38.1417851,
+        "lon": 144.336002
+      },
+      "tags": {
+        "addr:housenumber": "229",
+        "addr:street": "Autumn Street",
+        "building": "retail",
+        "craft": "electronics_repair",
+        "height": "4.667",
+        "name": "Robertson's Electronic Services",
+        "opening_hours": "Mo-Fr 09:00-17:00; Sa,Su off",
+        "phone": "+61 3 5223 3577",
+        "website": "https://robertsonselectronicrepairs.com.au"
+      }
+    },
+    {
+      "type": "way",
+      "id": 266754367,
+      "center": {
+        "lat": -38.1227256,
+        "lon": 144.3437247
+      },
+      "tags": {
+        "addr:housenumber": "156",
+        "addr:street": "Victoria Street",
+        "addr:unit": "3",
+        "building": "warehouse",
+        "craft": "electronics_repair",
+        "electronics_repair": "appliance",
+        "height": "5.391",
+        "name": "Geelong Appliance Spares",
+        "phone": "+61 3 5278 7701",
+        "website": "https://geelongappliancespares.com.au"
+      }
+    },
+    {
+      "type": "way",
+      "id": 266754852,
+      "center": {
+        "lat": -38.1209128,
+        "lon": 144.3284934
+      },
+      "tags": {
+        "addr:housenumber": "91-93",
+        "addr:street": "Vines Road",
+        "building": "retail",
+        "craft": "electronics_repair",
+        "height": "4.318",
+        "name": "Morgan Electrics and Gas",
+        "phone": "+61 3 5278 9537",
+        "website": "https://morganelectricsandgas.com.au"
+      }
+    },
+    {
+      "type": "way",
+      "id": 266792582,
+      "center": {
+        "lat": -38.0229799,
+        "lon": 144.4077019
+      },
+      "tags": {
+        "addr:housenumber": "8",
+        "addr:street": "The Centreway",
+        "branch": "Lara",
+        "brand": "The iPhone Guy",
+        "building": "retail",
+        "contact:facebook": "theiphoneguyau",
+        "contact:instagram": "theiphoneguyau",
+        "contact:twitter": "theiphoneguyau",
+        "craft": "electronics_repair",
+        "height": "3.416",
+        "mobile_phone:repair": "yes",
+        "name": "The iPhone Guy Lara",
+        "opening_hours": "Mo-Fr 09:00-13:30, 14:30-18:00",
+        "phone": "+61 403 976 742",
+        "shop": "mobile_phone",
+        "website": "https://theiphoneguy.com.au"
+      }
+    },
+    {
+      "type": "way",
+      "id": 475168223,
+      "center": {
+        "lat": -38.037164,
+        "lon": 145.2072445
+      },
+      "tags": {
+        "building": "industrial",
+        "name": "Royan Transport Accident Repairs",
+        "shop": "repair"
+      }
+    },
+    {
+      "type": "way",
+      "id": 539840725,
+      "center": {
+        "lat": -37.6726394,
+        "lon": 145.0179329
+      },
+      "tags": {
+        "building": "yes",
+        "craft": "electronics_repair",
+        "name": "JTech Mobile"
+      }
+    },
+    {
+      "type": "way",
+      "id": 617504774,
+      "center": {
+        "lat": -37.7647844,
+        "lon": 144.9992784
+      },
+      "tags": {
+        "addr:housenumber": "519",
+        "addr:postcode": "3070",
+        "addr:state": "VIC",
+        "addr:street": "High Street",
+        "addr:suburb": "Northcote",
+        "building": "yes",
+        "craft": "electronics_repair",
+        "name": "Abar Computer",
+        "phone": "+61 3 9489 8827"
+      }
+    },
+    {
+      "type": "way",
+      "id": 628745003,
+      "center": {
+        "lat": -37.8420154,
+        "lon": 145.069243
+      },
+      "tags": {
+        "addr:housenumber": "515",
+        "addr:postcode": "3124",
+        "addr:state": "VIC",
+        "addr:street": "Camberwell Road",
+        "addr:suburb": "Camberwell",
+        "building": "commercial",
+        "description": "Luggage repair service",
+        "name": "Walkalong Expert Repairs",
+        "shop": "repair",
+        "website": "https://new.walkalong.com.au/"
+      }
+    },
+    {
+      "type": "way",
+      "id": 640788734,
+      "center": {
+        "lat": -37.9310404,
+        "lon": 145.1556013
+      },
+      "tags": {
+        "addr:country": "AU",
+        "addr:housenumber": "897",
+        "addr:postcode": "3170",
+        "addr:street": "Springvale Road",
+        "addr:suburb": "Mulgrave",
+        "building": "retail",
+        "craft": "electronics_repair",
+        "name": "Early Bird Tv & Electronic Repairs",
+        "opening_hours": "Mo-Fr 09:30-18:00; Sa 09:30-14:30"
+      }
+    },
+    {
+      "type": "way",
+      "id": 687468939,
+      "center": {
+        "lat": -34.1818358,
+        "lon": 142.1598485
+      },
+      "tags": {
+        "addr:housenumber": "35",
+        "addr:street": "Pine Avenue",
+        "building": "yes",
+        "craft": "electronics_repair",
+        "name": "Murray Valley Electrics"
+      }
+    },
+    {
+      "type": "way",
+      "id": 688256759,
+      "center": {
+        "lat": -34.1891482,
+        "lon": 142.1624374
+      },
+      "tags": {
+        "building": "yes",
+        "contact:website": "www.excelbusiness.com.au",
+        "craft": "electronics_repair",
+        "name": "Excel Business Electronics"
+      }
+    },
+    {
+      "type": "way",
+      "id": 1000231821,
+      "center": {
+        "lat": -37.8108546,
+        "lon": 145.2886299
+      },
+      "tags": {
+        "building": "yes",
+        "name": "Kilmont Radio & TV Repair Services",
+        "shop": "repair"
+      }
+    },
+    {
+      "type": "way",
+      "id": 1022221793,
+      "center": {
+        "lat": -37.883307,
+        "lon": 145.2972606
+      },
+      "tags": {
+        "addr:housenumber": "44",
+        "addr:postcode": "3156",
+        "addr:state": "VIC",
+        "addr:street": "Forest Road",
+        "addr:suburb": "Ferntree Gully",
+        "building": "yes",
+        "name": "Pick me up Mowers",
+        "phone": "+61 3 9725 3380",
+        "shop": "repair"
+      }
+    },
+    {
+      "type": "way",
+      "id": 1044623469,
+      "center": {
+        "lat": -37.8257773,
+        "lon": 145.2143483
+      },
+      "tags": {
+        "addr:housenumber": "87-91",
+        "addr:postcode": "3134",
+        "addr:state": "VIC",
+        "addr:street": "Heatherdale Road",
+        "addr:suburb": "Ringwood",
+        "addr:unit": "16",
+        "building": "yes",
+        "name": "The Original PC Doctor",
+        "opening_hours": "Mo-Fr 09:00-17:30",
+        "shop": "repair",
+        "website": "https://www.thepcdoctor.com.au/"
+      }
+    },
+    {
+      "type": "way",
+      "id": 1119512084,
+      "center": {
+        "lat": -37.7849068,
+        "lon": 145.3145248
+      },
+      "tags": {
+        "addr:housenumber": "79A",
+        "addr:postcode": "3138",
+        "addr:state": "VIC",
+        "addr:street": "Brice Avenue",
+        "addr:suburb": "Mooroolbark",
+        "building": "retail",
+        "building:levels": "1",
+        "craft": "electronics_repair",
+        "height": "4",
+        "name": "Phone Repair Guy"
+      }
+    },
+    {
+      "type": "way",
+      "id": 1227034442,
+      "center": {
+        "lat": -36.8051416,
+        "lon": 144.3494946
+      },
+      "tags": {
+        "addr:housenumber": "10",
+        "addr:postcode": "3551",
+        "addr:state": "VIC",
+        "addr:street": "Warne Court",
+        "addr:suburb": "Strathfieldsaye",
+        "building": "house",
+        "craft": "electronics_repair",
+        "name": "Tackas Phone Repairs",
+        "opening_hours": "Th-Su 09:30-17:30; Mo 08:00-18:30; Tu 10:00-17:30; We 08:00-18:00",
+        "phone": "+61 408 522 277"
+      }
+    },
+    {
+      "type": "way",
+      "id": 1283637067,
+      "center": {
+        "lat": -38.2321183,
+        "lon": 143.1479907
+      },
+      "tags": {
+        "building": "yes",
+        "name": "JD Race Parts",
+        "shop": "repair"
+      }
+    },
+    {
+      "type": "way",
+      "id": 1319812607,
+      "center": {
+        "lat": -37.9107852,
+        "lon": 145.0338446
+      },
+      "tags": {
+        "fixme": "Driveway of repair shop. Unsure how to map.",
+        "shop": "repair"
+      }
+    },
+    {
+      "type": "way",
+      "id": 1337970122,
+      "center": {
+        "lat": -37.7858164,
+        "lon": 145.3137699
+      },
+      "tags": {
+        "addr:housenumber": "66-74",
+        "addr:postcode": "3138",
+        "addr:state": "VIC",
+        "addr:street": "Brice Avenue",
+        "addr:suburb": "Mooroolbark",
+        "addr:unit": "29",
+        "building": "retail",
+        "craft": "electronics_repair",
+        "indoor": "room",
+        "level": "0",
+        "name": "Stay Tuned Electrics",
+        "room": "shop"
+      }
+    },
+    {
+      "type": "way",
+      "id": 1348645256,
+      "center": {
+        "lat": -37.7572464,
+        "lon": 145.3134769
+      },
+      "tags": {
+        "addr:housenumber": "239-241",
+        "addr:postcode": "3116",
+        "addr:state": "VIC",
+        "addr:street": "Maroondah Highway",
+        "addr:suburb": "Chirnside Park",
+        "brand": "Mister Minit",
+        "brand:wikidata": "Q1939269",
+        "building": "retail",
+        "level": "0",
+        "name": "Mister Minit",
+        "room": "shop",
+        "shop": "repair"
+      }
+    },
+    {
+      "type": "way",
+      "id": 1463370824,
+      "center": {
+        "lat": -38.3394363,
+        "lon": 143.5838027
+      },
+      "tags": {
+        "addr:housenumber": "201",
+        "addr:street": "Murray Street",
+        "building": "retail",
+        "craft": "electronics_repair",
+        "name": "BuzzTech",
+        "phone": "+61 475 671 426",
+        "website": "https://buzztech.com.au/colac"
+      }
+    },
+    {
+      "type": "way",
+      "id": 1505852614,
+      "center": {
+        "lat": -37.7959043,
+        "lon": 145.2810229
+      },
+      "tags": {
+        "addr:housenumber": "93B",
+        "addr:street": "Main Street",
+        "building": "yes",
+        "facebook": "https://www.facebook.com/p/AOAO-Mobile-Phone-Repair-Services-100076435503803/",
+        "name": "AOAO Phone Repair",
+        "opening_hours": "Mo-Fr 10:00-18:30; Sa 10:00-17:30",
+        "phone": "+61 451 123 889",
+        "shop": "repair"
+      }
+    },
+    {
+      "type": "way",
+      "id": 1539768466,
+      "center": {
+        "lat": -36.7517079,
+        "lon": 144.2643024
+      },
+      "tags": {
+        "building": "yes",
+        "shop": "repair"
+      }
+    }
+  ]
+}
