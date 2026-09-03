@@ -1,0 +1,7 @@
+# Python packages for the FixForward data pipeline (Iteration 1)
+python-dotenv>=1.0.0
+psycopg[binary]>=3.1.0
+pandas>=2.0.0
+feedparser>=6.0.0
+# Reads the ABS ASGS shapefiles in 06_load_abs_suburbs.py (pure Python, no GDAL)
+pyshp>=2.3.0

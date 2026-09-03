@@ -1,0 +1,147 @@
+{
+  "generated_at": "2026-09-03T13:10:32.714677+00:00",
+  "checks": {
+    "source_provenance": {
+      "locations_total": 729,
+      "with_source_url": 729,
+      "with_source_url_pct": 100.0,
+      "with_source_retrieved_at": 729,
+      "with_data_source_id": 729,
+      "meaning": "The dataset this row was imported from. Says nothing about the facility itself."
+    },
+    "facility_verification": {
+      "with_facility_evidence": 0,
+      "with_facility_evidence_pct": 0.0,
+      "status_verified": 0,
+      "status_partially_verified": 0,
+      "status_unverified": 729,
+      "with_verification_notes": 729,
+      "meaning": "A facility-specific page that was actually checked, plus the date it was checked.",
+      "warning": "Dataset URLs are counted under source_provenance and are NEVER counted here."
+    },
+    "appliance_acceptance": {
+      "rows_recorded": 0,
+      "confirmed": 0,
+      "not_accepted": 0,
+      "explicit_unknown": 0,
+      "locations_with_any_record": 0,
+      "household_electrical_relevant_locations": 299,
+      "active_categories": 11,
+      "possible_location_category_pairs": 3289,
+      "coverage_pct": 0.0,
+      "meaning": "Whether a specific location accepts a specific appliance category.",
+      "note": "A missing row means unknown. It never means the item is refused."
+    },
+    "public_access": {
+      "acceptance_rows_confirmed_public": 0,
+      "acceptance_rows_confirmed_not_public": 0,
+      "acceptance_rows_with_public_access": 0,
+      "location_level_column": "dropped",
+      "note": "locations.public_access was removed. Public access is per location and per appliance category. Not inferred from facility type, provider type or coordinates."
+    },
+    "recall_matching": {
+      "recalls_in_snapshot": 100,
+      "active_patterns": 81,
+      "candidates": 1,
+      "confirmed": 0,
+      "false_positives": 0,
+      "unreviewed": 1,
+      "candidates_without_a_pattern": 0,
+      "candidates_without_matched_field": 0,
+      "snapshot_coverage_start": "2026-04-16",
+      "snapshot_coverage_end": "2026-08-27",
+      "snapshot_retrieved": "2026-09-03",
+      "official_search": "https://www.productsafety.gov.au/recalls",
+      "warning": "No match does NOT prove a product is recall-free. This is a limited snapshot."
+    },
+    "safety_rules": {
+      "active_rules": 14,
+      "with_primary_source": 14,
+      "without_primary_source": 0,
+      "total_citations": 19,
+      "homepage_only_urls": 0,
+      "note": "Screening is never a diagnosis and never certifies that an appliance is safe."
+    },
+    "coordinates_and_postcodes": {
+      "locations_missing_coordinates": 0,
+      "locations_invalid_coordinates": 0,
+      "locations_invalid_postcode_format": 0,
+      "locations_without_postcode": 51,
+      "suburbs_total": 2944,
+      "suburbs_invalid_coordinates": 0,
+      "suburbs_invalid_postcode_format": 0,
+      "suburbs_not_vic": 0,
+      "note": "Suburb coordinates are approximate polygon centroids, never exact locations."
+    },
+    "duplicates": {
+      "suburb_postcode": 0,
+      "appliance_categories": 0,
+      "recalls_by_official_url": 0,
+      "locations_same_name_and_point": 0
+    },
+    "recommendation_eligibility": {
+      "verified_recommendations": 0,
+      "unverified_candidates_requiring_disclaimer": 729,
+      "rows_violating_eligibility_rules": 0,
+      "confirmed_acceptance_without_evidence": 0,
+      "note": "Eligibility is derived by a view, not stored, so it cannot be set true by an UPDATE.",
+      "expected": "Zero verified recommendations is the correct result until facility evidence is gathered.",
+      "required_label_for_others": "Potential nearby service. Acceptance and public access have not been verified. Check before visiting."
+    },
+    "import_checksums": {
+      "sources_missing_checksum": []
+    }
+  },
+  "failures": [],
+  "remaining_unknowns": [
+    "729 of 729 locations have no facility-level verification. Neither DataVic nor OpenStreetMap publishes per-facility evidence, so this requires manual checking.",
+    "0 appliance acceptance records exist across 3289 possible location and category pairs. No free open source states which household appliances a Victorian facility accepts.",
+    "Public access is unknown for every location. It lives on location_appliance_acceptance, not on locations, and is not inferred from facility type or coordinates.",
+    "Recall coverage is a rolling ACCC RSS snapshot, not the full recall history.",
+    "Suburb coordinates are ABS polygon centroids. A suburb spanning several postcodes is reduced to the postcode containing its centroid.",
+    "Microwaves are out of Iteration 1 scope: ORA v0.3 has no microwave category, so there is no repair evidence to attach.",
+    "The Mistral vacuum recall candidate remains unreviewed until a named person compares it with the official ACCC notice via 06_review_recall_match.py."
+  ],
+  "data_sources": [
+    {
+      "name": "ABS ASGS Edition 3 \u2014 Suburbs and Localities (SAL) and Postal Areas (POA) 2021",
+      "licence": "Creative Commons Attribution 4.0 International (CC BY 4.0)"
+    },
+    {
+      "name": "ACCC Product Safety Recalls RSS",
+      "licence": "Australian Government open data (ACCC Product Safety)"
+    },
+    {
+      "name": "ACCC Product Safety \u2014 Recalls",
+      "licence": "Australian Government open data (ACCC Product Safety)."
+    },
+    {
+      "name": "CFA Victoria \u2014 Electrical safety factsheet",
+      "licence": "Crown copyright, Victorian Government. Referenced by link only; no content is copied."
+    },
+    {
+      "name": "CFA Victoria \u2014 Victorian fire agencies urge caution over lithium-ion battery fire risks",
+      "licence": "Crown copyright, Victorian Government. Referenced by link only; no content is copied."
+    },
+    {
+      "name": "Energy Safe Victoria \u2014 Using electricity safely",
+      "licence": "Crown copyright, Victorian Government. Referenced by link only; no content is copied."
+    },
+    {
+      "name": "OAIC \u2014 Tips to protect your privacy",
+      "licence": "Crown copyright, Commonwealth of Australia. Referenced by link only; no content is copied."
+    },
+    {
+      "name": "Open Repair Alliance aggregate dataset",
+      "licence": "CC BY-SA 4.0"
+    },
+    {
+      "name": "OpenStreetMap repair POIs (Victoria extract)",
+      "licence": "ODbL 1.0 (OpenStreetMap contributors)"
+    },
+    {
+      "name": "Victoria waste and resource recovery infrastructure (DataVic)",
+      "licence": "CC BY 4.0"
+    }
+  ]
+}

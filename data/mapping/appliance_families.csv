@@ -1,0 +1,12 @@
+family,category,ora_product_category,in_scope,aus_sample_size_202507,search_aliases,notes
+Heating and simple cooking,Kettle,Kettle,yes,52,electric kettle|jug|tea kettle|water boiler,ORA standard category
+Heating and simple cooking,Toaster,Toaster,yes,118,bread toaster|pop-up toaster|toaster oven,ORA standard category
+Heating and simple cooking,Rice cooker and small kitchen appliances,Small kitchen item,yes,169,rice cooker|rice maker|breadmaker|bread maker|sandwich press|sandwich maker|popcorn machine,"Includes rice cookers; ORA also lumps breadmakers etc."
+Motorised kitchen,Blender mixer and food processor,Food processor,yes,185,blender|stick blender|hand blender|food processor|juicer|hand mixer|stand mixer|immersion blender,"ORDS notes: blender juicer stick blender hand mixer"
+Complex kitchen,Coffee machine,Coffee maker,yes,89,coffee maker|espresso machine|nespresso|coffee pod machine|filter coffee machine,ORA category name is Coffee maker
+Complex kitchen,Air fryer and other complex kitchen,Small kitchen item,partial,169,air fryer|airfryer|deep fryer,"ORA cannot separate air fryer; share Small kitchen item bucket with care. Microwaves are out of Iteration 1 scope: ORA has no microwave category."
+Cleaning,Vacuum cleaner,Vacuum,yes,229,vacuum|hoover|stick vacuum|cylinder vacuum|robot vacuum|steam cleaner,Steam cleaners not a separate ORA category
+Personal care,Hair and beauty appliances,Hair & beauty item,yes,44,hair straightener|straighteners|curling iron|shaver|electric shaver|electric toothbrush|trimmer,"Straighteners shavers etc."
+Personal care,Hair dryer,Hair dryer,yes,26,hairdryer|blow dryer|blowdryer,"AU n<30; use global fallback or insufficient evidence label"
+Air treatment,Fan,Fan,yes,50,desk fan|pedestal fan|standing fan|cooling fan|fan heater,"ORDS notes include fan heaters"
+Air treatment,Dehumidifier and portable air conditioner,Aircon/dehumidifier,yes,8,dehumidifier|portable air conditioner|portable aircon|portable ac|evaporative cooler,"AU n<30; use global fallback or insufficient evidence label"

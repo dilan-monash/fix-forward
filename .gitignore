@@ -427,3 +427,32 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# --- FixForward: Python data pipeline (Iteration 1) ---
+.DS_Store
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.Python
+*.egg-info/
+dist/
+build/
+
+# Local SQLite (if used for experiments; primary DB is Neon)
+*.db
+*.sqlite
+*.sqlite3
+
+# Large raw open-data downloads (keep small committed snapshots + clean CSVs)
+data/raw/**
+!data/raw/.gitkeep
+!data/raw/accc/
+!data/raw/accc/**
+!data/raw/datavic/
+!data/raw/datavic/**
+!data/raw/osm/
+!data/raw/osm/**
+
+# Regenerable 10 MB ORA mapping output
+data/clean/ora_clean_mapped.csv
