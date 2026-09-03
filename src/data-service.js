@@ -18,7 +18,8 @@ const staticData = Object.freeze({
   safetyGroups: SAFETY_GROUPS,
   sources: SOURCES,
   repairEvidence: REPAIR_EVIDENCE,
-  locations: LOCATIONS
+  locations: LOCATIONS,
+  availability: Object.freeze({ recalls: false, sources: true, repairEvidence: false, locations: false })
 });
 
 function apiUrl(baseUrl, endpoint) {
@@ -41,19 +42,19 @@ function validateBackendData(payloads) {
   const [recallPayload, sourcePayload, evidencePayload, locationPayload] = payloads;
   if (!Array.isArray(recallPayload?.recalls)) throw new Error("Invalid recalls response");
   if (!Array.isArray(sourcePayload?.sources)) throw new Error("Invalid sources response");
-  if (!evidencePayload?.evidence || typeof evidencePayload.evidence !== "object") throw new Error("Invalid repair evidence response");
-  if (!Array.isArray(evidencePayload.evidence.statistics) || !Array.isArray(evidencePayload.evidence.barriers)) throw new Error("Invalid repair evidence collections");
-  if (!evidencePayload.evidence.context || typeof evidencePayload.evidence.context !== "object") throw new Error("Invalid repair evidence context");
+  if (!Array.isArray(evidencePayload?.evidence)) throw new Error("Invalid repair evidence response");
   if (!Array.isArray(locationPayload?.locations)) throw new Error("Invalid locations response");
   return {
-    meta: sourcePayload.meta || recallPayload.meta || STATIC_META,
+    // Recall metadata describes the coverage window used by the safety screen.
+    meta: recallPayload.meta || sourcePayload.meta || STATIC_META,
     families: FAMILIES,
     recalls: recallPayload.recalls,
     safetySigns: SAFETY_SIGNS,
     safetyGroups: SAFETY_GROUPS,
     sources: sourcePayload.sources,
     repairEvidence: evidencePayload.evidence,
-    locations: locationPayload.locations
+    locations: locationPayload.locations,
+    availability: { recalls: true, sources: true, repairEvidence: true, locations: true }
   };
 }
 
@@ -72,6 +73,8 @@ export async function loadPublicData(config = DATA_API_CONFIG, fetchImpl = globa
     ]);
     return { ...validateBackendData(payloads), mode: "backend", error: null };
   } catch (error) {
+    // Fail closed: the UI remains usable for safety guidance, but it receives no
+    // recall, repair or location fixtures that could be mistaken for live data.
     return { ...staticData, mode: "fallback", error: error instanceof Error ? error.message : "Public data unavailable" };
   } finally {
     clearTimeout(timeout);

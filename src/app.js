@@ -1,5 +1,6 @@
 import { loadPublicData } from "./data-service.js";
 import { validateAppliance, matchRecall, evaluateSafety, journeyDecision, compareCosts, getLocations } from "./logic.js";
+import { CATEGORY_CODE_BY_NAME, EVIDENCE_CATEGORY_CODE_BY_UI_CATEGORY } from "./data.js";
 import { icons } from "./icons.js";
 
 const publicData = await loadPublicData();
@@ -23,7 +24,7 @@ const toast = document.querySelector("#toast");
 
 const emptyState = () => ({
   screen: "identify",
-  appliance: { family: "", category: "" },
+  appliance: { family: "", category: "", categoryCode: "", brand: "", model: "" },
   recall: null,
   safety: {},
   safetyResult: null,
@@ -35,14 +36,30 @@ const emptyState = () => ({
 });
 
 let state = emptyState();
-// Frontend-only error switch used to exercise the unavailable-data UI.
-// No network request is made. The future backend adapter will provide this state.
-let publicDataAvailable = !new URLSearchParams(location.search).has("mock-data-error");
+// The query switch remains useful for demonstrating the fail-closed state.
+const backendRecallDataAvailable = publicData.availability?.recalls === true && publicData.mode === "backend";
+let publicDataAvailable = backendRecallDataAvailable && !new URLSearchParams(location.search).has("mock-data-error");
 
 function icon(name) { return icons[name] || ""; }
 function money(value) { return new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD" }).format(value); }
 function focusMain() { document.querySelector("#main")?.focus({ preventScroll: true }); window.scrollTo({ top: 0, behavior: "smooth" }); }
 function showToast(message) { toast.textContent = message; toast.classList.add("show"); setTimeout(() => toast.classList.remove("show"), 2600); }
+function formatCount(value) { return new Intl.NumberFormat("en-AU").format(Number(value) || 0); }
+
+function escapeHtml(value) {
+  return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+}
+
+function safeExternalUrl(value, allowedHosts = null) {
+  try {
+    const url = new URL(String(value || ""));
+    if (!["http:", "https:"].includes(url.protocol)) return null;
+    if (allowedHosts && !allowedHosts.includes(url.hostname.toLowerCase())) return null;
+    return url.href;
+  } catch {
+    return null;
+  }
+}
 
 function setPhase(phase) {
   const order = ["identify", "safety", "pathway", "cost"];
@@ -55,12 +72,13 @@ function setPhase(phase) {
 }
 
 function sourceLine(source = "ACCC Product Safety and Energy Safe Victoria") {
-  return `<p class="source-line">Source: ${source} · Data retrieved ${META.retrievalDate} · ${META.dataVersion}</p>`;
+  return `<p class="source-line">Source: ${escapeHtml(source)} · Data retrieved ${escapeHtml(META.retrievalDate || "not available")} · ${escapeHtml(META.dataVersion || "version not supplied")}</p>`;
 }
 
 function recallBanner() {
   if (state.recall?.status !== "possible") return "";
-  return `<aside class="recall-banner" role="alert">${icon("alert")}<div><strong>Possible recall match remains active</strong><p>${state.recall.match.title}. Verify the model and serial number on the <a href="${state.recall.match.noticeUrl}" target="_blank" rel="noopener">official ACCC notice</a>.</p></div></aside>`;
+  const noticeUrl = safeExternalUrl(state.recall.match.noticeUrl, ["productsafety.gov.au", "www.productsafety.gov.au"]);
+  return `<aside class="recall-banner" role="alert">${icon("alert")}<div><strong>Strong possible recall match remains active</strong><p>${escapeHtml(state.recall.match.title)}. Verify every identifier on ${noticeUrl ? `<a href="${escapeAttribute(noticeUrl)}" target="_blank" rel="noopener noreferrer">the official ACCC notice</a>` : "the official ACCC recall search"}.</p></div></aside>`;
 }
 
 function renderIdentify(errors = {}) {
@@ -82,19 +100,23 @@ function renderIdentify(errors = {}) {
     <form id="appliance-form" novalidate>
       <div class="section-head"><div><p class="eyebrow">Step 1 of 4</p><h2>What type of appliance is it?</h2></div><p>Select one of the six supported families, then choose its category.</p></div>
       <div class="family-grid" role="radiogroup" aria-describedby="family-error">
-        ${FAMILIES.map((family) => `<label class="choice-card"><input type="radio" name="family" value="${family.id}" ${family.id === state.appliance.family ? "checked" : ""}><strong>${family.name}</strong><small>${family.hint}</small></label>`).join("")}
+        ${FAMILIES.map((family) => `<label class="choice-card"><input type="radio" name="family" value="${escapeAttribute(family.id)}" ${family.id === state.appliance.family ? "checked" : ""}><strong>${escapeHtml(family.name)}</strong><small>${escapeHtml(family.hint)}</small></label>`).join("")}
       </div>
-      <p class="error" id="family-error">${errors.family || ""}</p>
+      <p class="error" id="family-error">${escapeHtml(errors.family || "")}</p>
       <div class="form-panel">
-        <label class="field"><span>Category <abbr title="required">*</abbr></span><select id="category" name="category" ${selectedFamily ? "" : "disabled"} aria-invalid="${Boolean(errors.category)}"><option value="">${selectedFamily ? "Choose a category" : "Choose a family first"}</option>${selectedFamily?.categories.map((category) => `<option ${category === state.appliance.category ? "selected" : ""}>${category}</option>`).join("") || ""}</select><span class="error">${errors.category || ""}</span></label>
-        <div class="notice warning" style="margin-top:1rem"><strong>Category-level recall screening</strong>Iteration 1 does not collect brand, model or serial details. Any possible match must be verified on the official ACCC notice.</div>
+        <label class="field"><span>Category <abbr title="required">*</abbr></span><select id="category" name="category" ${selectedFamily ? "" : "disabled"} aria-invalid="${Boolean(errors.category)}"><option value="">${selectedFamily ? "Choose a category" : "Choose a family first"}</option>${selectedFamily?.categories.map((category) => `<option ${category === state.appliance.category ? "selected" : ""}>${escapeHtml(category)}</option>`).join("") || ""}</select><span class="error">${escapeHtml(errors.category || "")}</span></label>
+        <div class="form-grid" style="margin-top:1rem">
+          <label class="field"><span>Brand <small>(optional)</small></span><input name="brand" maxlength="100" autocomplete="off" placeholder="e.g. Mistral" value="${escapeAttribute(state.appliance.brand)}" aria-invalid="${Boolean(errors.brand)}"><span class="error">${escapeHtml(errors.brand || "")}</span></label>
+          <label class="field"><span>Model number <small>(optional)</small></span><input name="model" maxlength="100" autocomplete="off" placeholder="e.g. BVC 160" value="${escapeAttribute(state.appliance.model)}" aria-invalid="${Boolean(errors.model)}"><span class="error">${escapeHtml(errors.model || "")}</span></label>
+        </div>
+        <div class="notice warning" style="margin-top:1rem"><strong>Why these details matter</strong>Family and category cannot identify a recalled product. An exact model can produce a strong possible match in FixForward's limited, manually reviewed index. Always verify the official notice.</div>
       </div>
       <div class="actions"><button class="button primary" type="submit">Check recall status ${icon("arrow")}</button><span class="source-line">Your entries stay in this browser tab and are not stored.</span></div>
     </form>
   </section>`;
 
   app.querySelectorAll('input[name="family"]').forEach((input) => input.addEventListener("change", () => {
-    captureApplianceForm(); state.appliance.family = input.value; state.appliance.category = ""; renderIdentify();
+    captureApplianceForm(); state.appliance.family = input.value; state.appliance.category = ""; state.appliance.categoryCode = ""; renderIdentify();
   }));
   app.querySelector("#appliance-form").addEventListener("submit", (event) => {
     event.preventDefault(); captureApplianceForm();
@@ -109,7 +131,14 @@ function captureApplianceForm() {
   const form = app.querySelector("#appliance-form");
   if (!form) return;
   const data = new FormData(form);
-  state.appliance = { family: data.get("family") || state.appliance.family || "", category: data.get("category") || "" };
+  const category = String(data.get("category") || "");
+  state.appliance = {
+    family: String(data.get("family") || state.appliance.family || ""),
+    category,
+    categoryCode: CATEGORY_CODE_BY_NAME[category] || "",
+    brand: String(data.get("brand") || "").trim(),
+    model: String(data.get("model") || "").trim()
+  };
 }
 
 function renderRecall() {
@@ -118,13 +147,23 @@ function renderRecall() {
   const result = state.recall;
   let panel;
   if (result.status === "possible") {
-    panel = `<div class="notice warning" role="alert"><strong>Possible category-level recall match — not a confirmed match</strong><p>${result.match.title}</p><p>Official publication date: ${result.match.published}</p><p>Iteration 1 does not collect brand, model or serial details. ${result.match.identifyingNote}</p><a class="button secondary" href="${result.match.noticeUrl}" target="_blank" rel="noopener">Open official ACCC notice ${icon("arrow")}</a></div>`;
+    const noticeUrl = safeExternalUrl(result.match.noticeUrl, ["productsafety.gov.au", "www.productsafety.gov.au"]);
+    const additionalMatches = result.matches.length > 1 ? `<p>${result.matches.length} notices share this identifier. Check every official notice; FixForward cannot select one for you.</p>` : "";
+    panel = `<div class="notice warning" role="alert"><strong>Strong possible match — not a confirmed recall verdict</strong><p>${escapeHtml(result.match.title)}</p><p>Official publication date: ${escapeHtml(result.match.published || "not supplied")}</p><p>The entered model exactly matches a manually reviewed identifier in FixForward's limited index. Confirm the product description, affected dates, serial range and remedy on the official notice.</p>${additionalMatches}${noticeUrl ? `<a class="button secondary" href="${escapeAttribute(noticeUrl)}" target="_blank" rel="noopener noreferrer">Open official ACCC notice ${icon("arrow")}</a>` : ""}</div>`;
   } else if (result.status === "unavailable") {
     panel = `<div class="notice danger" role="alert"><strong>Recall data is temporarily unavailable</strong><p>FixForward cannot complete the indexed check. Use the official ACCC recall search before continuing.</p><a class="button secondary" href="https://www.productsafety.gov.au/recalls" target="_blank" rel="noopener">Search official recalls ${icon("arrow")}</a></div>`;
+  } else if (result.status === "insufficient") {
+    const candidateLinks = result.matches?.length
+      ? `<p><strong>${result.matches.length} brand-level notice${result.matches.length === 1 ? "" : "s"} found.</strong> These are possible notices only; enter the exact model and check each official notice.</p><ul>${result.matches.slice(0, 5).map((candidate) => {
+          const url = safeExternalUrl(candidate.noticeUrl, ["productsafety.gov.au", "www.productsafety.gov.au"]);
+          return `<li>${url ? `<a href="${escapeAttribute(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(candidate.title)}</a>` : escapeHtml(candidate.title)}</li>`;
+        }).join("")}</ul>`
+      : "";
+    panel = `<div class="notice warning" role="status"><strong>More product information is needed</strong><p>${result.reason === "category-only" ? "A category such as Rice cooker describes many different products. It cannot show whether this appliance is recalled." : "Brand alone cannot identify an affected product. Add the exact model number from the appliance label."}</p>${candidateLinks}<a class="button secondary" href="https://www.productsafety.gov.au/recalls" target="_blank" rel="noopener noreferrer">Search official recalls ${icon("arrow")}</a></div>`;
   } else {
-    panel = `<div class="notice success"><strong>No matching recall category was identified in the available index</strong><p>This does not guarantee the appliance is recall-free. Iteration 1 uses family and category only, so confirm with the official ACCC search.</p></div>`;
+    panel = `<div class="notice success"><strong>No exact model match was found in FixForward's limited index</strong><p>This means “no match in the data checked,” not “this product is not recalled.” Search the official ACCC site and compare all identifying details.</p><a class="button secondary" href="https://www.productsafety.gov.au/recalls" target="_blank" rel="noopener noreferrer">Search official recalls ${icon("arrow")}</a></div>`;
   }
-  app.innerHTML = `<section class="screen"><p class="eyebrow">Step 2 of 4 · Recall check</p><h1>Recall status</h1><p class="lede">A potential match must be verified against the official notice using model, serial and other identifying details.</p><div style="margin-top:1.5rem">${panel}</div>${sourceLine("ACCC Product Safety recall index")}
+  app.innerHTML = `<section class="screen"><p class="eyebrow">Step 2 of 4 · Recall check</p><h1>Recall screening result</h1><p class="lede">FixForward narrows a limited index. Only the official recall notice can confirm whether your exact product is affected.</p><div style="margin-top:1.5rem">${panel}</div>${sourceLine("ACCC Product Safety recall index")}
     <div class="actions">${result.status === "unavailable" ? `<button class="button primary" id="restart-inline">Restart assessment</button>` : `<button class="button primary" id="continue-safety">Continue to safety questions ${icon("arrow")}</button>`}<button class="button secondary" id="edit-appliance">Edit appliance details</button></div></section>`;
   app.querySelector("#continue-safety")?.addEventListener("click", () => { renderSafety(); focusMain(); });
   app.querySelector("#edit-appliance").addEventListener("click", () => { renderIdentify(); focusMain(); });
@@ -220,15 +259,20 @@ function renderSafetyResult() {
   const high = state.safetyResult.status === "high";
   const uncertain = state.safetyResult.status === "uncertain";
   const possibleRecall = state.recall.status === "possible";
-  let title = "No listed warning signs or matching recall were identified";
-  let lead = "This screening does not confirm that the appliance is safe or free from internal faults.";
+  let title = "No listed warning signs were reported";
+  let lead = state.recall.status === "none"
+    ? "No exact model match was found in FixForward's limited recall index. Neither result guarantees that the appliance is safe or recall-free."
+    : "The recall screen remains inconclusive because there was not enough product information. This result does not confirm that the appliance is safe.";
   let iconClass = "";
   if (high) { title = possibleRecall ? "Stop using the appliance: recall and high-risk warning" : "Stop using the appliance"; lead = "A reported warning sign needs professional assessment. Unplug only when it is safe to do so."; iconClass = "danger"; }
   if (uncertain) { title = possibleRecall ? "Possible recall and uncertain safety status" : "Safety status is uncertain"; lead = "Because you selected “Not sure”, stop using the appliance until it has been professionally assessed."; iconClass = "warning"; }
   if (possibleRecall && !high && !uncertain) { title = "Possible recall match still requires action"; lead = "No listed warning signs were reported, but screening cannot rule out faults. Follow the official recall notice before any other pathway."; iconClass = "warning"; }
+  const recallGuidanceUrl = possibleRecall
+    ? safeExternalUrl(state.recall.match.noticeUrl, ["productsafety.gov.au", "www.productsafety.gov.au"]) || "https://www.productsafety.gov.au/recalls"
+    : null;
   app.innerHTML = `<section class="screen">${recallBanner()}<div class="result-card"><div class="result-icon ${iconClass}">${icon(high || uncertain || possibleRecall ? "alert" : "shield")}</div><p class="eyebrow">Safety & recall result</p><h1>${title}</h1><p class="lede">${lead}</p>${reportedList(high ? state.safetyResult.yes : state.safetyResult.unsure)}
-    ${!high && !uncertain && !possibleRecall ? `<div class="notice warning" style="margin-top:1.3rem"><strong>Important limitation</strong>No listed warning and no indexed recall match does not mean the appliance is safe, diagnosed or guaranteed fault-free.</div>` : ""}
-    ${sourceLine()}<div class="actions">${possibleRecall ? `<a class="button danger" href="${state.recall.match.noticeUrl}" target="_blank" rel="noopener">Follow official recall guidance ${icon("arrow")}</a>` : high || uncertain ? `<button class="button danger" id="to-professional">Explore professional assessment ${icon("arrow")}</button>` : `<button class="button primary" id="to-pathways">Choose next action ${icon("arrow")}</button>`}<button class="button secondary" id="restart-result">Restart</button></div></div></section>`;
+    ${!high && !uncertain && !possibleRecall ? `<div class="notice warning" style="margin-top:1.3rem"><strong>Important limitation</strong>No listed warning sign does not mean the appliance is safe or diagnosed. ${state.recall.status === "insufficient" ? "The recall screen also needs an exact model for a meaningful database match." : "A missing match only describes the limited data checked."}</div>` : ""}
+    ${sourceLine()}<div class="actions">${possibleRecall ? `<a class="button danger" href="${escapeAttribute(recallGuidanceUrl)}" target="_blank" rel="noopener noreferrer">Follow official recall guidance ${icon("arrow")}</a>` : high || uncertain ? `<button class="button danger" id="to-professional">Explore professional assessment ${icon("arrow")}</button>` : `<button class="button primary" id="to-pathways">Choose next action ${icon("arrow")}</button>`}<button class="button secondary" id="restart-result">Restart</button></div></div></section>`;
   app.querySelector("#to-pathways")?.addEventListener("click", () => { renderPathChoices(); focusMain(); });
   app.querySelector("#to-professional")?.addEventListener("click", () => { state.pathway = "professional"; renderPathway(); focusMain(); });
   app.querySelector("#restart-result").addEventListener("click", restart);
@@ -277,62 +321,69 @@ function renderQuoteCheck() {
   app.querySelector("#quote-back").addEventListener("click", () => { renderPathChoices(); focusMain(); });
 }
 
-function matchesSelectedEvidence(row) {
-  if (!row || row.applianceFamily !== state.appliance.family) return false;
-  return row.applianceCategory === state.appliance.category || (row.applianceCategory == null && row.documentedFamilyFallback === true);
-}
-
-function countLabel(value) {
-  return Number.isFinite(value) ? new Intl.NumberFormat("en-AU").format(value) : "Not available";
-}
-
-function renderRepairEvidence() {
-  const context = REPAIR_EVIDENCE.context || {};
-  const statistic = (REPAIR_EVIDENCE.statistics || []).find(matchesSelectedEvidence);
-  const barriers = (REPAIR_EVIDENCE.barriers || []).filter(matchesSelectedEvidence).sort((a, b) => (b.occurrenceCount || 0) - (a.occurrenceCount || 0));
-  const outcomes = statistic ? [
-    ["Fixed", statistic.fixedCount],
-    ["Repairable after further work", statistic.repairableCount],
-    ["End of life", statistic.endOfLifeCount]
-  ] : [];
-  const insufficient = REPAIR_EVIDENCE.status !== "available" || !statistic || statistic.insufficientEvidence === true;
-  const dataModeWarning = publicData.mode === "fallback" ? `<div class="notice warning"><strong>Live evidence data unavailable</strong>The public-data API could not be used, so this page is showing the reviewed static fallback.</div>` : "";
-  const evidenceNotice = insufficient ? `<div class="notice warning"><strong>Insufficient category-level evidence</strong>No strong repair conclusion is shown for ${escapeAttribute(state.appliance.category)}. This does not mean the appliance cannot be repaired; obtain a professional quote for the individual appliance.</div>` : `<div class="notice success"><strong>Historical category evidence available</strong>These are past event counts, not a prediction or personal repairability score.</div>`;
-  const outcomeMarkup = outcomes.length ? `<div class="evidence-metrics">${outcomes.map(([label, value]) => `<div><dt>${label}</dt><dd>${countLabel(value)}</dd></div>`).join("")}</div>` : `<p class="empty-evidence">No approved category-specific outcome counts are available in the current snapshot.</p>`;
-  const barrierMarkup = barriers.length ? `<ol class="barrier-list">${barriers.map((item) => `<li><span>${escapeAttribute(item.barrier)}</span><strong>${countLabel(item.occurrenceCount)} recorded events</strong></li>`).join("")}</ol>` : `<p class="empty-evidence">No documented category-specific repair barriers are available in the current snapshot.</p>`;
-  const confidence = statistic?.confidenceLevel || context.confidenceLevel || "Not assessed";
-  const sampleSize = statistic?.sampleSize ?? context.sampleSize;
-  const geography = statistic?.geography || context.geography || "Not available";
-  const limitations = statistic?.limitations || context.limitation || "No limitation statement supplied.";
-
-  return `<section class="evidence-panel" aria-labelledby="repair-evidence-title"><p class="eyebrow">Category-level context</p><h2 id="repair-evidence-title">Repair evidence for ${escapeAttribute(state.appliance.category)}</h2><p>Historical evidence can provide context, but it cannot predict the outcome or price for this appliance.</p>${dataModeWarning}${evidenceNotice}<div class="evidence-section"><h3>Past repair outcomes</h3><p class="source-line">Raw event counts only — not percentages or a personal score.</p><dl>${outcomeMarkup}</dl></div><div class="evidence-section"><h3>Common repair barriers</h3>${barrierMarkup}</div><div class="evidence-section"><h3>Evidence coverage</h3><dl class="evidence-coverage"><dt>Sample size</dt><dd>${countLabel(sampleSize)}</dd><dt>Geography</dt><dd>${escapeAttribute(geography)}</dd><dt>Confidence</dt><dd>${escapeAttribute(confidence)}</dd><dt>Source</dt><dd>${escapeAttribute(context.source || "Not available")}${context.updated ? `, updated ${escapeAttribute(context.updated)}` : ""}</dd><dt>Limitations</dt><dd>${escapeAttribute(limitations)}</dd></dl></div></section>`;
-}
-
 function renderPathway() {
   state.screen = "pathway";
   setPhase("pathway");
   const professional = state.pathway === "professional";
   const title = professional ? "Seek professional assessment before using it again." : state.pathway === "dispose" ? "Find a responsible e-waste pathway." : "Explore a professional repair pathway.";
-  const lead = professional ? "A high-risk or uncertain response needs professional assessment. A community Repair Café is not the primary option for a hazardous appliance." : state.pathway === "dispose" ? "Select an area manually. Confirm that the facility accepts your appliance before visiting." : "Select an area manually. Contact a provider before travelling; availability and appliance acceptance may change.";
-  app.innerHTML = `<section class="screen">${recallBanner()}<p class="eyebrow">${professional ? "Professional assessment" : state.pathway === "dispose" ? "Responsible disposal" : "Explore repair options"}</p><h1>${title}</h1><p class="lede">${lead}</p>${professional ? `<div class="notice danger" style="margin-top:1rem"><strong>Stop using the appliance</strong>Unplug only if safe. Do not open it or attempt an internal repair.</div>` : ""}${!professional && state.pathway === "repair" ? renderRepairEvidence() : ""}<div class="form-panel"><label class="field"><span>Area</span><select id="area"><option value="">Choose an area</option><option ${state.area === "Brunswick" ? "selected" : ""}>Brunswick</option><option ${state.area === "Footscray" ? "selected" : ""}>Footscray</option><option ${state.area === "Other" ? "selected" : ""}>Other / no local data</option></select><small>Manual selection only — device location is never requested or sent to the data API.</small></label><div id="location-results"></div></div><div class="actions">${!professional && state.pathway === "repair" ? `<button class="button primary" id="quote-obtained">I have a repair quote ${icon("arrow")}</button>` : ""}<button class="button secondary" id="back-paths">${professional ? "Restart assessment" : "Back to pathways"}</button></div>${sourceLine(state.pathway === "dispose" ? "Victorian e-waste guidance" : "Open Repair Alliance and current service directories")}</section>`;
-  const areaSelect = app.querySelector("#area");
-  areaSelect.addEventListener("change", () => { state.area = areaSelect.value; renderLocationResults(); });
+  const lead = professional ? "A high-risk or uncertain response needs professional assessment. A community Repair Café is not the primary option for a hazardous appliance." : state.pathway === "dispose" ? "Enter a suburb or postcode manually. Confirm that the facility accepts your appliance before visiting." : "Enter a suburb or postcode manually. Contact a provider before travelling; the source has not been independently verified by FixForward.";
+  const repairEvidence = selectedRepairEvidence();
+  app.innerHTML = `<section class="screen">${recallBanner()}<p class="eyebrow">${professional ? "Professional assessment" : state.pathway === "dispose" ? "Responsible disposal" : "Explore repair options"}</p><h1>${title}</h1><p class="lede">${lead}</p>${professional ? `<div class="notice danger" style="margin-top:1rem"><strong>Stop using the appliance</strong>Unplug only if safe. Do not open it or attempt an internal repair.</div>` : ""}<form id="location-form" class="form-panel"><label class="field"><span>Suburb or postcode</span><input id="area" name="area" autocomplete="postal-code" maxlength="80" placeholder="e.g. Brunswick or 3056" value="${escapeAttribute(state.area)}"><small>Filtering happens in this browser. Your search is not sent to the server.</small></label><div class="actions"><button class="button secondary" type="submit">Search locations</button></div><div id="location-results"></div></form>${!professional && state.pathway === "repair" ? renderRepairEvidence(repairEvidence) : ""}<div class="actions">${!professional && state.pathway === "repair" ? `<button class="button primary" id="quote-obtained">I have a repair quote ${icon("arrow")}</button>` : ""}<button class="button secondary" id="back-paths">${professional ? "Restart assessment" : "Back to pathways"}</button></div>${sourceLine(state.pathway === "dispose" ? "Victorian e-waste guidance" : "Open Repair Alliance and current service directories")}</section>`;
+  app.querySelector("#location-form").addEventListener("submit", (event) => {
+    event.preventDefault();
+    state.area = String(new FormData(event.currentTarget).get("area") || "").trim();
+    renderLocationResults();
+  });
   app.querySelector("#back-paths").addEventListener("click", () => professional ? restart() : (renderPathChoices(), focusMain()));
   app.querySelector("#quote-obtained")?.addEventListener("click", () => { renderCost(); focusMain(); });
   renderLocationResults();
 }
 
+function selectedRepairEvidence() {
+  const evidenceCode = EVIDENCE_CATEGORY_CODE_BY_UI_CATEGORY[state.appliance.categoryCode];
+  if (!evidenceCode) return null;
+  return REPAIR_EVIDENCE.find((item) => item.categoryCode === evidenceCode) || null;
+}
+
+function renderRepairEvidence(evidence) {
+  if (!publicData.availability?.repairEvidence) {
+    return `<section class="evidence-panel" aria-labelledby="repair-evidence-title"><p class="eyebrow">Category-level context</p><h2 id="repair-evidence-title">Repair evidence</h2><div class="notice warning"><strong>Repair evidence is unavailable</strong>FixForward will not substitute a demo statistic while the public-data API is unavailable.</div></section>`;
+  }
+  if (!evidence) {
+    return `<section class="evidence-panel" aria-labelledby="repair-evidence-title"><p class="eyebrow">Category-level context</p><h2 id="repair-evidence-title">Repair evidence for ${escapeHtml(state.appliance.category)}</h2><div class="notice warning"><strong>Insufficient category-level evidence</strong>No defensible Iteration 1 repair benchmark is mapped to this appliance category. This does not mean the appliance cannot be repaired; obtain a professional quote for the individual appliance.</div></section>`;
+  }
+  const outcomes = [
+    ["Fixed", evidence.fixedCount],
+    ["Repairable after further work", evidence.repairableCount],
+    ["End of life", evidence.endOfLifeCount],
+    ["Unclassified", evidence.unclassifiedCount]
+  ];
+  const outcomeMarkup = `<div class="evidence-metrics">${outcomes.map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${formatCount(value)}</dd></div>`).join("")}</div>`;
+  const barrierMarkup = evidence.barriers?.length
+    ? `<ol class="barrier-list">${evidence.barriers.slice(0, 5).map((barrier) => `<li><span>${escapeHtml(barrier.name)}</span><strong>${formatCount(barrier.occurrenceCount)} recorded events</strong></li>`).join("")}</ol>`
+    : `<p class="empty-evidence">No category-specific repair barriers are available in the current dataset.</p>`;
+  return `<section class="evidence-panel" aria-labelledby="repair-evidence-title"><p class="eyebrow">Category-level context</p><h2 id="repair-evidence-title">Repair evidence for ${escapeHtml(state.appliance.category)}</h2><p>Historical community repair evidence can provide context, but it cannot predict the outcome or price for this appliance.</p><div class="notice success"><strong>Historical category evidence available</strong>These are past event counts, not percentages, a personal score or a recommendation.</div><div class="evidence-section"><h3>Past repair outcomes</h3><p class="source-line">Raw event counts only — not percentages or a personal prediction.</p><dl>${outcomeMarkup}</dl></div><div class="evidence-section"><h3>Common repair barriers</h3>${barrierMarkup}</div><div class="evidence-section"><h3>Evidence coverage</h3><dl class="evidence-coverage"><dt>Evidence category</dt><dd>${escapeHtml(evidence.category)}</dd><dt>Sample size</dt><dd>${formatCount(evidence.sampleSize)} records</dd><dt>Geography</dt><dd>${escapeHtml(evidence.geography || "Not available")}</dd><dt>Confidence</dt><dd>${escapeHtml(evidence.confidenceLevel || "Not assessed")}</dd><dt>Source</dt><dd>Open Repair Alliance category aggregate</dd><dt>Limitations</dt><dd>${escapeHtml(evidence.limitation || "No limitation statement supplied.")}</dd></dl></div></section>`;
+}
+
 function renderLocationResults() {
   const root = app.querySelector("#location-results");
   if (!root) return;
-  if (!state.area) { root.innerHTML = ""; return; }
+  if (!state.area) { root.innerHTML = `<p class="source-line">Enter a suburb or postcode to search the downloaded public directory.</p>`; return; }
   const pathway = state.pathway === "dispose" ? "dispose" : "repair";
+  if (!publicData.availability?.locations) {
+    const href = pathway === "dispose" ? "https://www.sustainability.vic.gov.au/recycling-and-reducing-waste-at-home/recycling-at-home/e-waste" : "https://www.repaircafe.org/en/visit/";
+    root.innerHTML = `<div class="notice warning" style="margin-top:1rem"><strong>Location data is unavailable</strong>No cached provider results are shown.<div class="actions"><a class="button secondary" href="${href}" target="_blank" rel="noopener noreferrer">Open wider directory ${icon("arrow")}</a></div></div>`;
+    return;
+  }
   const matches = getLocations(state.area, pathway, LOCATIONS);
   if (!matches.length) {
     const href = pathway === "dispose" ? "https://www.sustainability.vic.gov.au/recycling-and-reducing-waste-at-home/recycling-at-home/e-waste" : "https://www.repaircafe.org/en/visit/";
-    root.innerHTML = `<div class="notice warning" style="margin-top:1rem"><strong>No verified local service information is currently available</strong>The current data contains no provider with confirmed public access and evidence that it accepts this appliance category. FixForward will not display unverified candidates as recommendations.<div class="actions"><a class="button secondary" href="${href}" target="_blank" rel="noopener">Open the wider official directory ${icon("arrow")}</a></div></div>`; return;
+    root.innerHTML = `<div class="notice warning" style="margin-top:1rem"><strong>No matching local service in this limited dataset</strong>Use the wider official/current search. FixForward will not display an unverified provider.<div class="actions"><a class="button secondary" href="${href}" target="_blank" rel="noopener">Open wider search ${icon("arrow")}</a></div></div>`; return;
   }
-  root.innerHTML = `<div class="location-list">${matches.map((location) => `<article class="location-card"><p class="mini-label">Verified listing · ${escapeAttribute(location.type)}</p><h3>${escapeAttribute(location.name)}</h3><p>${escapeAttribute(location.address)}</p><p><strong>Before you go:</strong> ${escapeAttribute(location.contact)}</p>${location.lastVerifiedAt ? `<p><strong>Last verified:</strong> ${escapeAttribute(location.lastVerifiedAt)}</p>` : ""}<a href="${escapeAttribute(location.url)}" target="_blank" rel="noopener">Open provider information ${icon("arrow")}</a></article>`).join("")}</div><div class="notice warning" style="margin-top:1rem"><strong>Confirm before travelling</strong>Verification can become out of date. Contact the provider and confirm appliance acceptance and public access before visiting.</div>`;
+  root.innerHTML = `<div class="location-list">${matches.map((location) => {
+    const providerUrl = safeExternalUrl(location.url || location.sourceUrl);
+    return `<article class="location-card"><p class="mini-label">${escapeHtml(location.type)} · ${escapeHtml(location.verificationStatus || "unverified")}</p><h3>${escapeHtml(location.name)}</h3><p>${escapeHtml(location.address)}</p><p>${escapeHtml(location.suburb)} ${escapeHtml(location.postcode)}</p>${location.phone ? `<p><strong>Phone:</strong> ${escapeHtml(location.phone)}</p>` : ""}<p><strong>Before you go:</strong> This directory record is unverified. Contact the provider and confirm appliance acceptance.</p>${providerUrl ? `<a href="${escapeAttribute(providerUrl)}" target="_blank" rel="noopener noreferrer">Open source listing ${icon("arrow")}</a>` : ""}</article>`;
+  }).join("")}</div><div class="notice warning" style="margin-top:1rem"><strong>Directory limitation</strong>These imported records have not been independently verified by FixForward and may be incomplete or out of date.</div>`;
 }
 
 function escapeAttribute(value) {
@@ -340,12 +391,16 @@ function escapeAttribute(value) {
 }
 
 function restart() {
-  state = emptyState(); history.replaceState(null, "", location.pathname); publicDataAvailable = true; renderIdentify(); focusMain(); showToast("Assessment cleared. No answers were saved.");
+  state = emptyState(); history.replaceState(null, "", location.pathname); publicDataAvailable = backendRecallDataAvailable; renderIdentify(); focusMain(); showToast("Assessment cleared. No answers were saved.");
 }
 
 function renderSources() {
-  const mode = publicData.mode === "backend" ? "Connected public-data API" : publicData.mode === "fallback" ? "Static fallback data (API unavailable)" : "Static frontend data";
-  sourcesContent.innerHTML = `<p>FixForward does not require login and does not create or store a user profile. Journey answers and cost values stay in page memory only. It uses no analytics, cookies, localStorage, camera, microphone or device location.</p><p><strong>Current data mode:</strong> ${mode}</p><ul class="source-list">${SOURCES.map((source) => `<li><a href="${source.url}" target="_blank" rel="noopener"><strong>${source.name}</strong></a><small>${source.use}</small></li>`).join("")}</ul><p class="source-line">Release ${META.releaseVersion} · Data version ${META.dataVersion} · Retrieved ${META.retrievalDate}</p>`;
+  const mode = publicData.mode === "backend" ? "Connected read-only public-data API" : publicData.mode === "fallback" ? "Public-data API unavailable; safety-only fallback" : "Static development mode";
+  sourcesContent.innerHTML = `<p>FixForward does not require login and does not create or store a user profile. Appliance details, safety answers, area searches and cost values stay in page memory only. It uses no analytics, cookies, localStorage, camera, microphone or device location.</p><p><strong>Current data mode:</strong> ${escapeHtml(mode)}</p><ul class="source-list">${SOURCES.map((source) => {
+    const url = safeExternalUrl(source.url);
+    const detail = source.use || [source.licence, source.version, source.retrievalDate, source.limitations].filter(Boolean).join(" · ");
+    return `<li>${url ? `<a href="${escapeAttribute(url)}" target="_blank" rel="noopener noreferrer"><strong>${escapeHtml(source.name)}</strong></a>` : `<strong>${escapeHtml(source.name)}</strong>`}<small>${escapeHtml(detail)}</small></li>`;
+  }).join("")}</ul><p class="source-line">Release ${escapeHtml(META.releaseVersion)} · Data version ${escapeHtml(META.dataVersion)} · Retrieved ${escapeHtml(META.retrievalDate)}</p>`;
 }
 
 restartButton.addEventListener("click", restart);

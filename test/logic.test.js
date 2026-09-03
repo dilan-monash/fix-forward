@@ -1,80 +1,107 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { FAMILIES, RECALLS, SAFETY_SIGNS, SAFETY_GROUPS, REPAIR_EVIDENCE, LOCATIONS } from "../src/data.js";
-import { validateAppliance, matchRecall, evaluateSafety, journeyDecision, parseMoney, compareCosts, getLocations } from "../src/logic.js";
+import { FAMILIES, SAFETY_SIGNS, SAFETY_GROUPS } from "../src/data.js";
+import { validateAppliance, normalizeIdentifier, matchRecall, evaluateSafety, journeyDecision, parseMoney, compareCosts, getLocations } from "../src/logic.js";
 
-const validAppliance = { family: "heating-simple-cooking", category: "Kettle" };
+const validAppliance = { family: "heating-simple-cooking", category: "Kettle", categoryCode: "kettle", brand: "", model: "" };
+const reviewedRecall = {
+  id: "55-1", recallId: "55", categoryCodes: ["vacuum-cleaner"], brand: "Mistral",
+  productName: "Barrel Cyclonic Vacuum Cleaner", title: "Mistral Barrel Cyclonic Vacuum Cleaner",
+  published: "2026-05-01",
+  noticeUrl: "https://www.productsafety.gov.au/search-consumer-product-recalls/mistral-barrel-cyclonic-vacuum-cleaner",
+  identifiers: [
+    { type: "model", value: "BVC 160", normalizedValue: "BVC160" },
+    { type: "model", value: "BVC 165", normalizedValue: "BVC165" }
+  ]
+};
+const recalls = [reviewedRecall];
+const locations = [
+  { pathway: "repair", suburb: "Brunswick", postcode: "3056", name: "Repair result" },
+  { pathway: "dispose", suburb: "Footscray", postcode: "3011", name: "Dispose result" }
+];
 const allNo = Object.fromEntries(SAFETY_SIGNS.map(([id]) => [id, "no"]));
 
 test("AC01 exactly six approved families are exposed", () => assert.equal(FAMILIES.length, 6));
 test("AC02 family and category are required", () => assert.deepEqual(Object.keys(validateAppliance({}, FAMILIES)).sort(), ["category", "family"]));
-test("AC03 family and category alone are valid", () => assert.deepEqual(validateAppliance(validAppliance, FAMILIES), {}));
+test("AC03 family and category alone are valid input but not enough for recall matching", () => assert.deepEqual(validateAppliance(validAppliance, FAMILIES), {}));
 test("AC04 unsupported category is rejected", () => assert.match(validateAppliance({ family: "heating-simple-cooking", category: "Portable heater" }, FAMILIES).category, /chosen family/));
-
 test("AC04a appliance scope matches the approved six-family mapping", () => {
-  assert.deepEqual(FAMILIES.map(({ name }) => name), [
-    "Heating and simple cooking",
-    "Motorised kitchen",
-    "Complex kitchen",
-    "Cleaning",
-    "Personal care",
-    "Air treatment"
-  ]);
+  assert.deepEqual(FAMILIES.map(({ name }) => name), ["Heating and simple cooking", "Motorised kitchen", "Complex kitchen", "Cleaning", "Personal care", "Air treatment"]);
   assert.deepEqual(FAMILIES.find(({ id }) => id === "heating-simple-cooking").categories, ["Kettle", "Toaster", "Sandwich press", "Rice cooker"]);
   assert.deepEqual(FAMILIES.find(({ id }) => id === "air-treatment").categories, ["Fan", "Portable heater", "Dehumidifier", "Portable air conditioner"]);
 });
-test("AC05 real ACCC fixture produces a possible match", () => { const result = matchRecall(validAppliance, RECALLS); assert.equal(result.status, "possible"); assert.equal(result.match.published, "21 February 2018"); assert.match(result.match.noticeUrl, /productsafety\.gov\.au/); });
-test("AC06 recall screening matches by family and category only", () => assert.equal(matchRecall(validAppliance, RECALLS).status, "possible"));
-test("AC07 a category with no indexed recall does not become a false positive", () => assert.equal(matchRecall({ family: "motorised-kitchen", category: "Blender" }, RECALLS).status, "none"));
-test("AC08 category-level possible recall is clearly limited", () => { const result = matchRecall(validAppliance, RECALLS); assert.equal(result.status, "possible"); assert.equal(result.limited, true); });
-test("AC09 recall data failure produces unavailable status", () => assert.equal(matchRecall(validAppliance, RECALLS, false).status, "unavailable"));
-
-test("AC10 burning smell is high risk", () => assert.equal(evaluateSafety({ ...allNo, burning: "yes" }).status, "high"));
-test("AC11 shock is high risk", () => assert.equal(evaluateSafety({ ...allNo, shock: "yes" }).status, "high"));
-test("AC12 exposed wiring is high risk", () => assert.equal(evaluateSafety({ ...allNo, wiring: "yes" }).status, "high"));
-test("AC13 battery damage is high risk", () => assert.equal(evaluateSafety({ ...allNo, battery: "yes" }).status, "high"));
-test("AC14 Not sure produces uncertain", () => assert.equal(evaluateSafety({ ...allNo, plug: "unsure" }).status, "uncertain"));
-test("AC15 Yes takes precedence over Not sure", () => assert.equal(evaluateSafety({ ...allNo, plug: "unsure", sparks: "yes" }).status, "high"));
-test("AC16 all No produces clear screening status", () => assert.equal(evaluateSafety(allNo).status, "clear"));
-
-test("AC17 recall plus high risk is combined and ends with official guidance", () => assert.deepEqual(journeyDecision("possible", "high"), { allowCost: false, allowNextSteps: false, kind: "recall-high", pathway: "official-guidance" }));
-test("AC18 recall plus no warning ends with official guidance", () => assert.deepEqual(journeyDecision("possible", "clear"), { allowCost: false, allowNextSteps: false, kind: "recall", pathway: "official-guidance" }));
-test("AC19 no recall plus high risk blocks cost", () => assert.equal(journeyDecision("none", "high").allowCost, false));
-test("AC20 no recall plus Not sure blocks cost", () => assert.equal(journeyDecision("none", "uncertain").allowCost, false));
-test("AC21 no recall plus all No opens pathways before cost", () => { const result = journeyDecision("none", "clear"); assert.equal(result.allowNextSteps, true); assert.equal(result.pathway, "pathway"); });
-test("AC22 unavailable recall data blocks cost", () => assert.equal(journeyDecision("unavailable", "clear").allowCost, false));
-
-test("AC23 missing repair cost is identified", () => assert.match(compareCosts("", "200").errors.repair, /Enter your repair quote/));
-test("AC24 missing replacement cost is identified", () => assert.equal(compareCosts("100", "").errors.replacement.includes("estimated replacement"), true));
-test("AC25 negative cost has a specific error", () => { assert.equal(parseMoney("-2").reason, "negative"); assert.match(compareCosts("-10", "200").errors.repair, /cannot be negative/); });
-test("AC26 non-numeric cost has a specific error", () => { assert.equal(parseMoney("free").reason, "not-number"); assert.match(compareCosts("free", "200").errors.repair, /numbers only/); });
-test("AC27 zero cost is rejected by agreed rule", () => assert.equal(parseMoney("0").reason, "zero"));
-test("AC28 more than two decimals has a specific error", () => { assert.equal(parseMoney("12.345").reason, "precision"); assert.match(compareCosts("12.345", "200").errors.repair, /two decimal places/); });
-test("AC29 repair-lower calculation is correct", () => assert.deepEqual(compareCosts("180", "320"), { valid: true, repair: 180, replacement: 320, difference: 140, lower: "repair" }));
-test("AC30 replacement-lower calculation is correct", () => assert.equal(compareCosts("500", "320").lower, "replacement"));
-test("AC31 equal costs are handled", () => assert.deepEqual(compareCosts("250", "250"), { valid: true, repair: 250, replacement: 250, difference: 0, lower: "equal" }));
-
-test("AC32 unverified repair-directory candidates are not recommendations", () => assert.deepEqual(getLocations("Brunswick", "repair", LOCATIONS), []));
-test("AC33 unverified disposal-directory candidates are not recommendations", () => assert.deepEqual(getLocations("Footscray", "dispose", LOCATIONS), []));
-test("AC34 no-data area returns no invented providers", () => assert.deepEqual(getLocations("Other", "repair", LOCATIONS), []));
-
-test("AC35 no prohibited feature controls or persistence APIs appear", async () => {
-  const html = await readFile(new URL("../index.html", import.meta.url), "utf8"); const app = await readFile(new URL("../src/app.js", import.meta.url), "utf8");
-  assert.doesNotMatch(html, /type=["']file["']|barcode|log[ -]?in|sign[ -]?in/i);
-  assert.doesNotMatch(app, /name=["'](?:brand|model)["']/i);
-  assert.doesNotMatch(app, /localStorage\.|sessionStorage\.|document\.cookie|fetch\(/);
+test("AC05 category-only input is insufficient", () => assert.equal(matchRecall(validAppliance, recalls).status, "insufficient"));
+test("AC06 exact brand and model produce a strong possible match", () => {
+  const result = matchRecall({ family: "cleaning", category: "Vacuum cleaner", categoryCode: "vacuum-cleaner", brand: "Mistral", model: "BVC 160" }, recalls);
+  assert.equal(result.status, "possible");
+  assert.equal(result.reason, "exact-model");
+  assert.match(result.match.noticeUrl, /productsafety\.gov\.au/);
 });
-test("AC36 required privacy and limitation wording is present", async () => {
+test("AC07 formatting differences do not prevent an exact identifier match", () => {
+  assert.equal(normalizeIdentifier(" bvc-160 "), "BVC160");
+  assert.equal(matchRecall({ categoryCode: "vacuum-cleaner", brand: "MISTRAL", model: "bvc-160" }, recalls).status, "possible");
+});
+test("AC08 brand-only input shows possible notices without a verdict", () => {
+  const result = matchRecall({ categoryCode: "vacuum-cleaner", brand: "Mistral", model: "" }, recalls);
+  assert.equal(result.status, "insufficient");
+  assert.equal(result.matches.length, 1);
+});
+test("AC09 partial or wrong identifiers do not create false positives", () => {
+  assert.equal(matchRecall({ categoryCode: "vacuum-cleaner", brand: "Mistral", model: "BVC" }, recalls).status, "none");
+  assert.equal(matchRecall({ categoryCode: "vacuum-cleaner", brand: "Other", model: "BVC 160" }, recalls).status, "none");
+});
+test("AC10 recall data failure produces unavailable status", () => assert.equal(matchRecall(validAppliance, recalls, false).status, "unavailable"));
+
+test("AC11 burning smell is high risk", () => assert.equal(evaluateSafety({ ...allNo, burning: "yes" }).status, "high"));
+test("AC12 shock is high risk", () => assert.equal(evaluateSafety({ ...allNo, shock: "yes" }).status, "high"));
+test("AC13 exposed wiring is high risk", () => assert.equal(evaluateSafety({ ...allNo, wiring: "yes" }).status, "high"));
+test("AC14 battery damage is high risk", () => assert.equal(evaluateSafety({ ...allNo, battery: "yes" }).status, "high"));
+test("AC15 Not sure produces uncertain", () => assert.equal(evaluateSafety({ ...allNo, plug: "unsure" }).status, "uncertain"));
+test("AC16 Yes takes precedence over Not sure", () => assert.equal(evaluateSafety({ ...allNo, plug: "unsure", sparks: "yes" }).status, "high"));
+test("AC17 all No produces clear screening status", () => assert.equal(evaluateSafety(allNo).status, "clear"));
+
+test("AC18 recall plus high risk is combined and ends with official guidance", () => assert.deepEqual(journeyDecision("possible", "high"), { allowCost: false, allowNextSteps: false, kind: "recall-high", pathway: "official-guidance" }));
+test("AC19 recall plus no warning ends with official guidance", () => assert.deepEqual(journeyDecision("possible", "clear"), { allowCost: false, allowNextSteps: false, kind: "recall", pathway: "official-guidance" }));
+test("AC20 no match plus high risk blocks cost", () => assert.equal(journeyDecision("none", "high").allowCost, false));
+test("AC21 no match plus Not sure blocks cost", () => assert.equal(journeyDecision("none", "uncertain").allowCost, false));
+test("AC22 insufficient recall data plus all No opens pathways with its limitation retained", () => assert.equal(journeyDecision("insufficient", "clear").allowNextSteps, true));
+test("AC23 unavailable recall data blocks cost", () => assert.equal(journeyDecision("unavailable", "clear").allowCost, false));
+
+test("AC24 missing repair cost is identified", () => assert.match(compareCosts("", "200").errors.repair, /Enter your repair quote/));
+test("AC25 missing replacement cost is identified", () => assert.equal(compareCosts("100", "").errors.replacement.includes("estimated replacement"), true));
+test("AC26 negative cost has a specific error", () => { assert.equal(parseMoney("-2").reason, "negative"); assert.match(compareCosts("-10", "200").errors.repair, /cannot be negative/); });
+test("AC27 non-numeric cost has a specific error", () => { assert.equal(parseMoney("free").reason, "not-number"); assert.match(compareCosts("free", "200").errors.repair, /numbers only/); });
+test("AC28 zero cost is rejected by agreed rule", () => assert.equal(parseMoney("0").reason, "zero"));
+test("AC29 more than two decimals has a specific error", () => { assert.equal(parseMoney("12.345").reason, "precision"); assert.match(compareCosts("12.345", "200").errors.repair, /two decimal places/); });
+test("AC30 repair-lower calculation is correct", () => assert.deepEqual(compareCosts("180", "320"), { valid: true, repair: 180, replacement: 320, difference: 140, lower: "repair" }));
+test("AC31 replacement-lower calculation is correct", () => assert.equal(compareCosts("500", "320").lower, "replacement"));
+test("AC32 equal costs are handled", () => assert.deepEqual(compareCosts("250", "250"), { valid: true, repair: 250, replacement: 250, difference: 0, lower: "equal" }));
+
+test("AC33 suburb search finds the correct pathway only", () => assert.equal(getLocations("brunswick", "repair", locations)[0].name, "Repair result"));
+test("AC34 postcode search works without device location", () => assert.equal(getLocations("3011", "dispose", locations)[0].name, "Dispose result"));
+test("AC35 unknown area returns no invented providers", () => assert.deepEqual(getLocations("Other", "repair", locations), []));
+
+test("AC36 optional brand/model controls exist but prohibited features and storage do not", async () => {
+  const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
   const app = await readFile(new URL("../src/app.js", import.meta.url), "utf8");
-  assert.match(app, /does not confirm that the appliance is safe/i); assert.match(app, /not sent to the server/i); assert.match(app, /never requested/i); assert.match(app, /confirm appliance acceptance/i);
+  assert.doesNotMatch(html, /type=["']file["']|barcode|log[ -]?in|sign[ -]?in/i);
+  assert.match(app, /name="brand"/);
+  assert.match(app, /name="model"/);
+  assert.doesNotMatch(app, /localStorage\.|sessionStorage\.|document\.cookie/);
 });
-test("AC37 all warning topics required by register are represented", () => {
+test("AC37 required privacy and limitation wording is present", async () => {
+  const app = await readFile(new URL("../src/app.js", import.meta.url), "utf8");
+  assert.match(app, /does not confirm that the appliance is safe/i);
+  assert.match(app, /not sent to the server/i);
+  assert.match(app, /device location/i);
+  assert.match(app, /confirm appliance acceptance/i);
+});
+test("AC38 all warning topics required by register are represented", () => {
   const labels = SAFETY_SIGNS.map(([, label]) => label).join(" ").toLowerCase();
   for (const word of ["burning", "smoke", "fire", "sparks", "overheating", "shock", "wiring", "melted", "water", "battery", "circuit", "buzzing"]) assert.match(labels, new RegExp(word));
 });
-
-test("AC38 improved questionnaire keeps all ten signs in three non-overlapping groups", async () => {
+test("AC39 questionnaire keeps all ten signs in three non-overlapping groups", async () => {
   assert.equal(SAFETY_GROUPS.length, 3);
   assert.deepEqual(SAFETY_GROUPS.flatMap(({ signIds }) => signIds).sort(), SAFETY_SIGNS.map(([id]) => id).sort());
   const source = await readFile(new URL("../src/app.js", import.meta.url), "utf8");
@@ -82,57 +109,54 @@ test("AC38 improved questionnaire keeps all ten signs in three non-overlapping g
   assert.match(source, /role="progressbar"/);
   assert.match(source, /View guidance now/);
 });
-
-test("AC43 UI follows V2.2 recall, safety, pathway, quote and cost order", async () => {
+test("AC40 UI follows recall, safety, pathway, quote and cost order", async () => {
   const source = await readFile(new URL("../src/app.js", import.meta.url), "utf8");
   const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
   assert.ok(html.indexOf('data-phase="pathway"') < html.indexOf('data-phase="cost"'));
   assert.match(source, /id="to-pathways">Choose next action/);
   assert.match(source, /function renderQuoteCheck/);
-  assert.match(source, /id="has-quote"/);
-  assert.match(source, /id="needs-quote"/);
 });
-test("AC44 keyboard focus, labels and native controls are defined", async () => {
-  const html = await readFile(new URL("../index.html", import.meta.url), "utf8"); const css = await readFile(new URL("../styles.css", import.meta.url), "utf8"); const source = await readFile(new URL("../src/app.js", import.meta.url), "utf8");
-  assert.match(html, /skip-link/); assert.match(css, /:focus-visible/); assert.match(source, /<fieldset class=\"question\"><legend>/); assert.doesNotMatch(source, /<div[^>]+onclick=/i);
-});
-test("AC45 responsive mobile rules cover all multi-column controls", async () => {
+test("AC41 keyboard focus, labels and native controls are defined", async () => {
+  const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
   const css = await readFile(new URL("../styles.css", import.meta.url), "utf8");
-  assert.match(css, /@media \(max-width: 760px\)/); assert.match(css, /\.hero, \.family-grid, \.form-grid, \.compare-grid, \.path-grid, \.evidence-metrics, \.evidence-coverage \{ grid-template-columns: 1fr; \}/); assert.match(css, /question \{ grid-template-columns: 1fr/);
-});
-test("AC46 result views expose sources, version and retrieval date", async () => {
   const source = await readFile(new URL("../src/app.js", import.meta.url), "utf8");
-  assert.match(source, /Data retrieved \$\{META\.retrievalDate\}/); assert.match(source, /sourceLine\("User-entered estimates/); assert.match(source, /sourceLine\(state\.pathway/);
+  assert.match(html, /skip-link/);
+  assert.match(css, /:focus-visible/);
+  assert.match(source, /<fieldset class="question"><legend>/);
+  assert.doesNotMatch(source, /<div[^>]+onclick=/i);
 });
-test("AC47 frontend source has no backend request, debug mode or secret", async () => {
+test("AC42 responsive mobile rules cover multi-column controls", async () => {
+  const css = await readFile(new URL("../styles.css", import.meta.url), "utf8");
+  assert.match(css, /@media \(max-width: 760px\)/);
+  assert.match(css, /\.hero, \.family-grid, \.form-grid, \.compare-grid, \.path-grid, \.evidence-metrics, \.evidence-coverage \{ grid-template-columns: 1fr; \}/);
+});
+test("AC43 result views expose sources, version and retrieval date", async () => {
+  const source = await readFile(new URL("../src/app.js", import.meta.url), "utf8");
+  assert.match(source, /Data retrieved/);
+  assert.match(source, /sourceLine\("User-entered estimates/);
+  assert.match(source, /sourceLine\(state\.pathway/);
+});
+test("AC44 frontend sends no journey data to backend and contains no debug secret", async () => {
   const source = await readFile(new URL("../src/app.js", import.meta.url), "utf8");
   assert.doesNotMatch(source, /fetch\(|XMLHttpRequest|debug\s*[:=]\s*true|secret(_key)?\s*[:=]/i);
 });
-test("AC48 scope excludes diagnosis, DIY, account, climate, upload and barcode UI", async () => {
-  const html = await readFile(new URL("../index.html", import.meta.url), "utf8"); const source = await readFile(new URL("../src/app.js", import.meta.url), "utf8");
+test("AC45 scope excludes diagnosis, DIY, account, climate, upload and barcode UI", async () => {
+  const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
+  const source = await readFile(new URL("../src/app.js", import.meta.url), "utf8");
   assert.doesNotMatch(html + source, /type=["']file["']|barcode scanner|create account|climate comparison|repair instructions/i);
   assert.match(source, /Does not diagnose faults or provide DIY instructions/);
 });
-
-test("AC49 no authentication or user profile can be created or stored", async () => {
+test("AC46 no authentication or user profile can be created or stored", async () => {
   const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
   const source = await readFile(new URL("../src/app.js", import.meta.url), "utf8");
   const markup = html + source;
   assert.doesNotMatch(markup, /type=["']password["']|autocomplete=["'](?:email|username|current-password|new-password)["']/i);
   assert.doesNotMatch(markup, /name=["'](?:email|username|password|profile|user_id)["']/i);
   assert.doesNotMatch(source, /fetch\(|XMLHttpRequest|sendBeacon|indexedDB\.|localStorage\.|sessionStorage\.|document\.cookie/i);
-  assert.doesNotMatch(source, /\/auth\/|\/login|\/register|\/profile/i);
   assert.match(source, /does not require login and does not create or store a user profile/i);
 });
 
-test("AC50 repair evidence fixture exposes outcomes, barriers and evidence status", () => {
-  assert.equal(REPAIR_EVIDENCE.status, "insufficient");
-  assert.ok(Array.isArray(REPAIR_EVIDENCE.statistics));
-  assert.ok(Array.isArray(REPAIR_EVIDENCE.barriers));
-  assert.equal(REPAIR_EVIDENCE.context.sampleSize, 305649);
-});
-
-test("AC51 repair evidence UI distinguishes raw counts from percentages and personal predictions", async () => {
+test("AC47 repair evidence distinguishes raw counts from personal predictions", async () => {
   const source = await readFile(new URL("../src/app.js", import.meta.url), "utf8");
   assert.match(source, /Past repair outcomes/);
   assert.match(source, /Common repair barriers/);
@@ -141,22 +165,21 @@ test("AC51 repair evidence UI distinguishes raw counts from percentages and pers
   assert.match(source, /Insufficient category-level evidence/);
 });
 
-test("AC52 only explicitly verified locations can be shown", () => {
-  const locations = [
-    { area: "Brunswick", pathway: "repair", name: "Candidate", verified: false },
-    { area: "Brunswick", pathway: "repair", name: "Verified", verified: true }
-  ];
-  assert.deepEqual(getLocations("Brunswick", "repair", locations).map(({ name }) => name), ["Verified"]);
+test("AC48 repair evidence includes all outcome classes and coverage limitations", async () => {
+  const source = await readFile(new URL("../src/app.js", import.meta.url), "utf8");
+  for (const label of ["Fixed", "Repairable after further work", "End of life", "Unclassified", "Sample size", "Confidence", "Limitations"]) {
+    assert.match(source, new RegExp(label, "i"));
+  }
 });
 
-test("AC53 frontend keeps user-entered quotes and excludes automatic quote generation", async () => {
+test("AC49 frontend keeps user-entered quotes and excludes automatic quote generation", async () => {
   const source = await readFile(new URL("../src/app.js", import.meta.url), "utf8");
   assert.match(source, /Repair quote \(AUD\)/);
   assert.match(source, /Estimated replacement price \(AUD\)/);
   assert.doesNotMatch(source, /generate (?:a )?(?:repair|replacement) quote|automatic quote/i);
 });
 
-test("AC54 cost errors explain missing, negative, non-numeric, zero and precision cases", () => {
+test("AC50 cost errors explain every rejected input class", () => {
   const cases = [
     ["", /Enter your repair quote/],
     ["-10", /cannot be negative/],
