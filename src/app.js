@@ -277,13 +277,44 @@ function renderQuoteCheck() {
   app.querySelector("#quote-back").addEventListener("click", () => { renderPathChoices(); focusMain(); });
 }
 
+function matchesSelectedEvidence(row) {
+  if (!row || row.applianceFamily !== state.appliance.family) return false;
+  return row.applianceCategory === state.appliance.category || (row.applianceCategory == null && row.documentedFamilyFallback === true);
+}
+
+function countLabel(value) {
+  return Number.isFinite(value) ? new Intl.NumberFormat("en-AU").format(value) : "Not available";
+}
+
+function renderRepairEvidence() {
+  const context = REPAIR_EVIDENCE.context || {};
+  const statistic = (REPAIR_EVIDENCE.statistics || []).find(matchesSelectedEvidence);
+  const barriers = (REPAIR_EVIDENCE.barriers || []).filter(matchesSelectedEvidence).sort((a, b) => (b.occurrenceCount || 0) - (a.occurrenceCount || 0));
+  const outcomes = statistic ? [
+    ["Fixed", statistic.fixedCount],
+    ["Repairable after further work", statistic.repairableCount],
+    ["End of life", statistic.endOfLifeCount]
+  ] : [];
+  const insufficient = REPAIR_EVIDENCE.status !== "available" || !statistic || statistic.insufficientEvidence === true;
+  const dataModeWarning = publicData.mode === "fallback" ? `<div class="notice warning"><strong>Live evidence data unavailable</strong>The public-data API could not be used, so this page is showing the reviewed static fallback.</div>` : "";
+  const evidenceNotice = insufficient ? `<div class="notice warning"><strong>Insufficient category-level evidence</strong>No strong repair conclusion is shown for ${escapeAttribute(state.appliance.category)}. This does not mean the appliance cannot be repaired; obtain a professional quote for the individual appliance.</div>` : `<div class="notice success"><strong>Historical category evidence available</strong>These are past event counts, not a prediction or personal repairability score.</div>`;
+  const outcomeMarkup = outcomes.length ? `<div class="evidence-metrics">${outcomes.map(([label, value]) => `<div><dt>${label}</dt><dd>${countLabel(value)}</dd></div>`).join("")}</div>` : `<p class="empty-evidence">No approved category-specific outcome counts are available in the current snapshot.</p>`;
+  const barrierMarkup = barriers.length ? `<ol class="barrier-list">${barriers.map((item) => `<li><span>${escapeAttribute(item.barrier)}</span><strong>${countLabel(item.occurrenceCount)} recorded events</strong></li>`).join("")}</ol>` : `<p class="empty-evidence">No documented category-specific repair barriers are available in the current snapshot.</p>`;
+  const confidence = statistic?.confidenceLevel || context.confidenceLevel || "Not assessed";
+  const sampleSize = statistic?.sampleSize ?? context.sampleSize;
+  const geography = statistic?.geography || context.geography || "Not available";
+  const limitations = statistic?.limitations || context.limitation || "No limitation statement supplied.";
+
+  return `<section class="evidence-panel" aria-labelledby="repair-evidence-title"><p class="eyebrow">Category-level context</p><h2 id="repair-evidence-title">Repair evidence for ${escapeAttribute(state.appliance.category)}</h2><p>Historical evidence can provide context, but it cannot predict the outcome or price for this appliance.</p>${dataModeWarning}${evidenceNotice}<div class="evidence-section"><h3>Past repair outcomes</h3><p class="source-line">Raw event counts only — not percentages or a personal score.</p><dl>${outcomeMarkup}</dl></div><div class="evidence-section"><h3>Common repair barriers</h3>${barrierMarkup}</div><div class="evidence-section"><h3>Evidence coverage</h3><dl class="evidence-coverage"><dt>Sample size</dt><dd>${countLabel(sampleSize)}</dd><dt>Geography</dt><dd>${escapeAttribute(geography)}</dd><dt>Confidence</dt><dd>${escapeAttribute(confidence)}</dd><dt>Source</dt><dd>${escapeAttribute(context.source || "Not available")}${context.updated ? `, updated ${escapeAttribute(context.updated)}` : ""}</dd><dt>Limitations</dt><dd>${escapeAttribute(limitations)}</dd></dl></div></section>`;
+}
+
 function renderPathway() {
   state.screen = "pathway";
   setPhase("pathway");
   const professional = state.pathway === "professional";
   const title = professional ? "Seek professional assessment before using it again." : state.pathway === "dispose" ? "Find a responsible e-waste pathway." : "Explore a professional repair pathway.";
   const lead = professional ? "A high-risk or uncertain response needs professional assessment. A community Repair Café is not the primary option for a hazardous appliance." : state.pathway === "dispose" ? "Select an area manually. Confirm that the facility accepts your appliance before visiting." : "Select an area manually. Contact a provider before travelling; availability and appliance acceptance may change.";
-  app.innerHTML = `<section class="screen">${recallBanner()}<p class="eyebrow">${professional ? "Professional assessment" : state.pathway === "dispose" ? "Responsible disposal" : "Explore repair options"}</p><h1>${title}</h1><p class="lede">${lead}</p>${professional ? `<div class="notice danger" style="margin-top:1rem"><strong>Stop using the appliance</strong>Unplug only if safe. Do not open it or attempt an internal repair.</div>` : ""}<div class="form-panel"><label class="field"><span>Area</span><select id="area"><option value="">Choose an area</option><option ${state.area === "Brunswick" ? "selected" : ""}>Brunswick</option><option ${state.area === "Footscray" ? "selected" : ""}>Footscray</option><option ${state.area === "Other" ? "selected" : ""}>Other / no local data</option></select><small>Manual selection only — device location is never requested.</small></label><div id="location-results"></div></div>${!professional && state.pathway === "repair" ? `<details open><summary>Repair evidence</summary><p>Repair may be worth investigating, but category evidence cannot predict an outcome for your appliance.</p><dl><dt>Sample</dt><dd>${REPAIR_EVIDENCE.sample}</dd><dt>Geography</dt><dd>${REPAIR_EVIDENCE.geography}</dd><dt>Source</dt><dd>${REPAIR_EVIDENCE.source}, updated ${REPAIR_EVIDENCE.updated}</dd><dt>Limitations</dt><dd>${REPAIR_EVIDENCE.limitation}</dd></dl></details>` : ""}<div class="actions">${!professional && state.pathway === "repair" ? `<button class="button primary" id="quote-obtained">I have a repair quote ${icon("arrow")}</button>` : ""}<button class="button secondary" id="back-paths">${professional ? "Restart assessment" : "Back to pathways"}</button></div>${sourceLine(state.pathway === "dispose" ? "Victorian e-waste guidance" : "Open Repair Alliance and current service directories")}</section>`;
+  app.innerHTML = `<section class="screen">${recallBanner()}<p class="eyebrow">${professional ? "Professional assessment" : state.pathway === "dispose" ? "Responsible disposal" : "Explore repair options"}</p><h1>${title}</h1><p class="lede">${lead}</p>${professional ? `<div class="notice danger" style="margin-top:1rem"><strong>Stop using the appliance</strong>Unplug only if safe. Do not open it or attempt an internal repair.</div>` : ""}${!professional && state.pathway === "repair" ? renderRepairEvidence() : ""}<div class="form-panel"><label class="field"><span>Area</span><select id="area"><option value="">Choose an area</option><option ${state.area === "Brunswick" ? "selected" : ""}>Brunswick</option><option ${state.area === "Footscray" ? "selected" : ""}>Footscray</option><option ${state.area === "Other" ? "selected" : ""}>Other / no local data</option></select><small>Manual selection only — device location is never requested or sent to the data API.</small></label><div id="location-results"></div></div><div class="actions">${!professional && state.pathway === "repair" ? `<button class="button primary" id="quote-obtained">I have a repair quote ${icon("arrow")}</button>` : ""}<button class="button secondary" id="back-paths">${professional ? "Restart assessment" : "Back to pathways"}</button></div>${sourceLine(state.pathway === "dispose" ? "Victorian e-waste guidance" : "Open Repair Alliance and current service directories")}</section>`;
   const areaSelect = app.querySelector("#area");
   areaSelect.addEventListener("change", () => { state.area = areaSelect.value; renderLocationResults(); });
   app.querySelector("#back-paths").addEventListener("click", () => professional ? restart() : (renderPathChoices(), focusMain()));
@@ -299,9 +330,9 @@ function renderLocationResults() {
   const matches = getLocations(state.area, pathway, LOCATIONS);
   if (!matches.length) {
     const href = pathway === "dispose" ? "https://www.sustainability.vic.gov.au/recycling-and-reducing-waste-at-home/recycling-at-home/e-waste" : "https://www.repaircafe.org/en/visit/";
-    root.innerHTML = `<div class="notice warning" style="margin-top:1rem"><strong>No matching local service in this limited dataset</strong>Use the wider official/current search. FixForward will not display an unverified provider.<div class="actions"><a class="button secondary" href="${href}" target="_blank" rel="noopener">Open wider search ${icon("arrow")}</a></div></div>`; return;
+    root.innerHTML = `<div class="notice warning" style="margin-top:1rem"><strong>No verified local service information is currently available</strong>The current data contains no provider with confirmed public access and evidence that it accepts this appliance category. FixForward will not display unverified candidates as recommendations.<div class="actions"><a class="button secondary" href="${href}" target="_blank" rel="noopener">Open the wider official directory ${icon("arrow")}</a></div></div>`; return;
   }
-  root.innerHTML = `<div class="location-list">${matches.map((location) => `<article class="location-card"><p class="mini-label">${location.type}</p><h3>${location.name}</h3><p>${location.address}</p><p><strong>Before you go:</strong> ${location.contact}</p><a href="${location.url}" target="_blank" rel="noopener">Open current search ${icon("arrow")}</a></article>`).join("")}</div><div class="notice warning" style="margin-top:1rem"><strong>Directory limitation</strong>Open directory data may be incomplete or out of date. Contact the provider and confirm appliance acceptance before travelling.</div>`;
+  root.innerHTML = `<div class="location-list">${matches.map((location) => `<article class="location-card"><p class="mini-label">Verified listing · ${escapeAttribute(location.type)}</p><h3>${escapeAttribute(location.name)}</h3><p>${escapeAttribute(location.address)}</p><p><strong>Before you go:</strong> ${escapeAttribute(location.contact)}</p>${location.lastVerifiedAt ? `<p><strong>Last verified:</strong> ${escapeAttribute(location.lastVerifiedAt)}</p>` : ""}<a href="${escapeAttribute(location.url)}" target="_blank" rel="noopener">Open provider information ${icon("arrow")}</a></article>`).join("")}</div><div class="notice warning" style="margin-top:1rem"><strong>Confirm before travelling</strong>Verification can become out of date. Contact the provider and confirm appliance acceptance and public access before visiting.</div>`;
 }
 
 function escapeAttribute(value) {

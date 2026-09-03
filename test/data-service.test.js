@@ -23,8 +23,8 @@ test("API02 enabled API accepts the documented read-only response contract", asy
   const payloadByPath = {
     "/api/recalls": { recalls: [{ id: "backend-recall" }] },
     "/api/sources": { meta: { releaseVersion: "backend", dataVersion: "db-1", retrievalDate: "today" }, sources: [{ name: "Backend source" }] },
-    "/api/repair-evidence": { evidence: { sample: "backend sample" } },
-    "/api/locations": { locations: [{ name: "Backend location" }] }
+    "/api/repair-evidence": { evidence: { status: "available", statistics: [{ applianceCategory: "Kettle", sampleSize: 10 }], barriers: [], context: { sampleSize: 10 } } },
+    "/api/locations": { locations: [{ name: "Backend location", verified: true }] }
   };
   const fetchMock = async (url, options) => {
     calls.push({ url, options });
@@ -35,8 +35,26 @@ test("API02 enabled API accepts the documented read-only response contract", asy
   assert.equal(data.mode, "backend");
   assert.equal(data.meta.dataVersion, "db-1");
   assert.equal(data.recalls[0].id, "backend-recall");
+  assert.equal(data.repairEvidence.statistics[0].sampleSize, 10);
+  assert.equal(data.locations[0].verified, true);
   assert.equal(calls.length, 4);
   assert.ok(calls.every(({ options }) => options.method === "GET" && !("body" in options)));
+});
+
+test("API04 incomplete repair evidence responses fall back safely", async () => {
+  const payloadByPath = {
+    "/api/recalls": { recalls: [] },
+    "/api/sources": { sources: [] },
+    "/api/repair-evidence": { evidence: { sample: "legacy shape" } },
+    "/api/locations": { locations: [] }
+  };
+  const data = await loadPublicData({ enabled: true, baseUrl: "http://localhost:5000", timeoutMs: 1000, endpoints }, async (url) => ({
+    ok: true,
+    status: 200,
+    json: async () => payloadByPath[new URL(url).pathname]
+  }));
+  assert.equal(data.mode, "fallback");
+  assert.match(data.error, /repair evidence/i);
 });
 
 test("API03 request or response failure falls back to static data", async () => {

@@ -47,18 +47,51 @@ No endpoint receives appliance selections, safety answers, costs, area selection
 
 ### `GET /api/repair-evidence`
 
+Returns the complete curated public evidence snapshot. The browser filters it by the appliance family and category already held in memory; it does not send the user's selection to this endpoint.
+
 ```json
 {
   "meta": {},
   "evidence": {
-    "sample": "string",
-    "geography": "string",
-    "source": "string",
-    "updated": "string",
-    "limitation": "string"
+    "status": "available",
+    "statistics": [
+      {
+        "applianceFamily": "heating-simple-cooking",
+        "applianceCategory": "Kettle",
+        "geography": "string",
+        "sampleSize": 100,
+        "fixedCount": 40,
+        "repairableCount": 20,
+        "endOfLifeCount": 40,
+        "insufficientEvidence": false,
+        "confidenceLevel": "moderate",
+        "limitations": "string",
+        "sourceId": "string"
+      }
+    ],
+    "barriers": [
+      {
+        "applianceFamily": "heating-simple-cooking",
+        "applianceCategory": "Kettle",
+        "barrier": "Parts unavailable",
+        "occurrenceCount": 12,
+        "geography": "string",
+        "sourceId": "string"
+      }
+    ],
+    "context": {
+      "sampleSize": 305649,
+      "geography": "string",
+      "confidenceLevel": "string",
+      "source": "string",
+      "updated": "string",
+      "limitation": "string"
+    }
   }
 }
 ```
+
+Outcome and barrier values are raw counts. The frontend must not convert barrier counts into percentages unless the backend later supplies a documented denominator. `insufficientEvidence: true` suppresses strong interpretations.
 
 ### `GET /api/locations`
 
@@ -73,7 +106,11 @@ No endpoint receives appliance selections, safety answers, costs, area selection
       "type": "string",
       "address": "string",
       "contact": "string",
-      "url": "https://..."
+      "url": "https://...",
+      "verified": true,
+      "verificationStatus": "verified",
+      "lastVerifiedAt": "2026-09-03",
+      "acceptanceEvidenceUrl": "https://..."
     }
   ]
 }
@@ -84,3 +121,4 @@ No endpoint receives appliance selections, safety answers, costs, area selection
 - Non-2xx responses, timeouts and invalid response shapes automatically fall back to `src/data.js`.
 - All requests use `GET`, contain no request body and use same-origin credentials only.
 - The backend should not log or accept private journey data through these endpoints.
+- Only rows with `verified: true`, public access and documented category acceptance may be presented as local service results. Unverified candidates remain pipeline/admin data and must not be exposed as recommendations.
