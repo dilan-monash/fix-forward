@@ -3,7 +3,7 @@ export const DATA_API_CONFIG = Object.freeze({
   // The Flask server hosts both the frontend and these same-origin endpoints.
   enabled: true,
   baseUrl: "",
-  timeoutMs: 6000,
+  timeoutMs: 30000,
   endpoints: Object.freeze({
     recalls: "/api/recalls",
     sources: "/api/sources",
