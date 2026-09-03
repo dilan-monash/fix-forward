@@ -83,9 +83,24 @@ def main() -> int:
 
     with psycopg.connect(database_url) as conn:
         with conn.cursor() as cur:
-            # Postcode is derived from the suburb name, so it is always
-            # recomputed against the current suburb table rather than kept from
-            # an earlier run against a different source.
+            # Postcode is derived from the suburb name. Always recompute
+            # against the current suburb table, and clear values that no
+            # longer match (leftovers from a previous suburb source).
+            cur.execute(
+                """
+                UPDATE locations
+                SET postcode = NULL
+                WHERE postcode IS NOT NULL
+                  AND (
+                    suburb IS NULL OR btrim(suburb) = ''
+                    OR NOT EXISTS (
+                        SELECT 1 FROM suburb_postcodes sp
+                        WHERE lower(locations.suburb) = lower(sp.suburb)
+                    )
+                  );
+                """
+            )
+            postcode_cleared = cur.rowcount
             cur.execute(
                 """
                 UPDATE locations AS loc
@@ -133,6 +148,7 @@ def main() -> int:
 
     print("SUCCESS: Location enrichment complete.")
     print(f"  postcode filled from suburb join: {postcode_updates}")
+    print(f"  stale postcodes cleared: {postcode_cleared}")
     print(f"  with postcode:      {with_postcode}/{total}")
     print(f"  with opening_hours: {with_hours}/{total}")
     print(f"  with provider_type: {with_ptype}/{total}")

@@ -87,7 +87,7 @@ problem this pipeline can solve.
 
 | Field | Source | Coverage |
 |---|---|---|
-| `postcode` | Join on suburb against ABS `suburb_postcodes` | 678 of 729 |
+| `postcode` | Join on suburb against ABS `suburb_postcodes` | 676 of 729 |
 | `provider_type` | Classified from `facility_type` and OSM labels | 729 of 729 |
 | `opening_hours` | Only when OpenStreetMap tags it | 14 of 729 |
 

@@ -126,7 +126,7 @@ been dropped. The only public-access column left is on
 1. Facility verification is 0% on all 729 locations.
 2. Appliance acceptance is unknown for every location and category pair.
 3. Public access is unknown. It is not inferred from facility type.
-4. 51 locations have no postcode (suburb name does not match an ABS locality).
+4. 53 locations have no postcode (suburb name does not match an ABS locality).
 5. Recall coverage is a rolling snapshot, not full ACCC history.
 6. The Mistral candidate is unreviewed until a named person signs it off.
 7. Microwaves are out of Iteration 1 scope.
