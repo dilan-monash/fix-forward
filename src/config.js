@@ -1,7 +1,7 @@
-// Keep disabled until the FixForward backend and public database are ready.
-// Switching `enabled` to true is the only frontend configuration change needed.
+// The backend and frontend are served from the same origin in Iteration 1.
 export const DATA_API_CONFIG = Object.freeze({
-  enabled: false,
+  // The Flask server hosts both the frontend and these same-origin endpoints.
+  enabled: true,
   baseUrl: "",
   timeoutMs: 6000,
   endpoints: Object.freeze({

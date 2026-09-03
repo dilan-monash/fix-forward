@@ -1,9 +1,10 @@
-// Frontend-only UI fixtures. Replace this module with a backend data adapter
-// when the public-data pipeline and API contract are ready.
+// Static UI definitions. Public recall, repair and location records come from
+// the backend; the fallback arrays below are intentionally empty so an API
+// outage can never produce a false recall result from an old demo fixture.
 export const META = Object.freeze({
-  releaseVersion: "iteration-1-v1.0.0",
-  dataVersion: "frontend-ui-fixture-2026-09-01",
-  retrievalDate: "1 September 2026"
+  releaseVersion: "iteration-1-v1.2.0",
+  dataVersion: "public-data-unavailable",
+  retrievalDate: "Check the Sources page"
 });
 
 export const FAMILIES = Object.freeze([
@@ -45,18 +46,54 @@ export const FAMILIES = Object.freeze([
   }
 ]);
 
-export const RECALLS = Object.freeze([
-  {
-    id: "accc-2018-16575",
-    family: "heating-simple-cooking",
-    category: "Kettle",
-    title: "KitchenAid Electric Kettle 1.7L",
-    published: "21 February 2018",
-    noticeUrl: "https://www.productsafety.gov.au/search-consumer-product-recalls/kitchenaid-electric-kettle-17l",
-    identifyingNote: "Affected serial numbers begin YA342XXXXX through YA724XXXXX. Compare the model and serial number on the official notice.",
-    source: "ACCC Product Safety"
-  }
-]);
+// Stable machine-readable codes connect the UI labels to the database.
+export const CATEGORY_CODE_BY_NAME = Object.freeze({
+  "Kettle": "kettle",
+  "Toaster": "toaster",
+  "Sandwich press": "sandwich-press",
+  "Rice cooker": "rice-cooker",
+  "Blender": "blender",
+  "Mixer": "mixer",
+  "Food processor": "food-processor",
+  "Coffee machine": "coffee-machine",
+  "Air fryer": "air-fryer",
+  "Microwave": "microwave",
+  "Vacuum cleaner": "vacuum-cleaner",
+  "Steam cleaner": "steam-cleaner",
+  "Hair dryer": "hair-dryer",
+  "Straightener": "straightener",
+  "Shaver": "shaver",
+  "Fan": "fan",
+  "Portable heater": "portable-heater",
+  "Dehumidifier": "dehumidifier",
+  "Portable air conditioner": "portable-air-conditioner"
+});
+
+// The repair dataset uses broader categories than the interface. A null value
+// means there is no defensible evidence mapping for that UI category yet.
+export const EVIDENCE_CATEGORY_CODE_BY_UI_CATEGORY = Object.freeze({
+  "kettle": "kettle",
+  "toaster": "toaster",
+  "sandwich-press": "rice_cooker_and_small_kitchen_appliances",
+  "rice-cooker": "rice_cooker_and_small_kitchen_appliances",
+  "blender": "blender_mixer_and_food_processor",
+  "mixer": "blender_mixer_and_food_processor",
+  "food-processor": "blender_mixer_and_food_processor",
+  "coffee-machine": "coffee_machine",
+  "air-fryer": "air_fryer_and_other_complex_kitchen",
+  "microwave": "air_fryer_and_other_complex_kitchen",
+  "vacuum-cleaner": "vacuum_cleaner",
+  "steam-cleaner": "vacuum_cleaner",
+  "hair-dryer": "hair_dryer",
+  "straightener": "hair_and_beauty_appliances",
+  "shaver": "hair_and_beauty_appliances",
+  "fan": "fan",
+  "portable-heater": null,
+  "dehumidifier": "dehumidifier_and_portable_air_conditioner",
+  "portable-air-conditioner": "dehumidifier_and_portable_air_conditioner"
+});
+
+export const RECALLS = Object.freeze([]);
 
 export const SAFETY_SIGNS = Object.freeze([
   ["burning", "Burning smell, smoke or fire"],
@@ -99,23 +136,6 @@ export const SOURCES = Object.freeze([
   { name: "Victorian e-waste guidance", url: "https://www.sustainability.vic.gov.au/recycling-and-reducing-waste-at-home/recycling-at-home/e-waste", use: "Responsible e-waste disposal guidance" }
 ]);
 
-export const REPAIR_EVIDENCE = Object.freeze({
-  status: "insufficient",
-  statistics: Object.freeze([]),
-  barriers: Object.freeze([]),
-  context: Object.freeze({
-    sampleSize: 305649,
-    geography: "Global community repair events; not a representative Australian household sample",
-    confidenceLevel: "Insufficient category-level evidence",
-    source: "Open Repair Alliance full dataset",
-    updated: "October 2025",
-    limitation: "Self-selected items brought to community repair events. No approved category mapping or denominator is available in this frontend fixture, so it cannot predict whether a specific appliance will be repairable."
-  })
-});
+export const REPAIR_EVIDENCE = Object.freeze([]);
 
-export const LOCATIONS = Object.freeze([
-  { area: "Brunswick", pathway: "repair", name: "Repair Café directory", type: "Community repair search", address: "Search for current events near Brunswick", contact: "Check organiser details before travelling", url: "https://www.repaircafe.org/en/visit/", verified: false, verificationStatus: "directory-only" },
-  { area: "Brunswick", pathway: "dispose", name: "Victorian e-waste drop-off finder", type: "Official disposal search", address: "Search for current drop-off points near Brunswick", contact: "Confirm the facility accepts your appliance before visiting", url: "https://www.sustainability.vic.gov.au/recycling-and-reducing-waste-at-home/recycling-at-home/e-waste", verified: false, verificationStatus: "directory-only" },
-  { area: "Footscray", pathway: "repair", name: "Repair Café directory", type: "Community repair search", address: "Search for current events near Footscray", contact: "Check organiser details before travelling", url: "https://www.repaircafe.org/en/visit/", verified: false, verificationStatus: "directory-only" },
-  { area: "Footscray", pathway: "dispose", name: "Victorian e-waste drop-off finder", type: "Official disposal search", address: "Search for current drop-off points near Footscray", contact: "Confirm the facility accepts your appliance before visiting", url: "https://www.sustainability.vic.gov.au/recycling-and-reducing-waste-at-home/recycling-at-home/e-waste", verified: false, verificationStatus: "directory-only" }
-]);
+export const LOCATIONS = Object.freeze([]);
