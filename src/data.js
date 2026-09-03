@@ -100,16 +100,22 @@ export const SOURCES = Object.freeze([
 ]);
 
 export const REPAIR_EVIDENCE = Object.freeze({
-  sample: "305,649 global electrical/electronic repair records",
-  geography: "Global community repair events; not a representative Australian household sample",
-  source: "Open Repair Alliance full dataset",
-  updated: "October 2025",
-  limitation: "Self-selected items brought to community repair events. This evidence cannot predict whether a specific model will be repairable."
+  status: "insufficient",
+  statistics: Object.freeze([]),
+  barriers: Object.freeze([]),
+  context: Object.freeze({
+    sampleSize: 305649,
+    geography: "Global community repair events; not a representative Australian household sample",
+    confidenceLevel: "Insufficient category-level evidence",
+    source: "Open Repair Alliance full dataset",
+    updated: "October 2025",
+    limitation: "Self-selected items brought to community repair events. No approved category mapping or denominator is available in this frontend fixture, so it cannot predict whether a specific appliance will be repairable."
+  })
 });
 
 export const LOCATIONS = Object.freeze([
-  { area: "Brunswick", pathway: "repair", name: "Repair Café directory", type: "Community repair search", address: "Search for current events near Brunswick", contact: "Check organiser details before travelling", url: "https://www.repaircafe.org/en/visit/" },
-  { area: "Brunswick", pathway: "dispose", name: "Victorian e-waste drop-off finder", type: "Official disposal search", address: "Search for current drop-off points near Brunswick", contact: "Confirm the facility accepts your appliance before visiting", url: "https://www.sustainability.vic.gov.au/recycling-and-reducing-waste-at-home/recycling-at-home/e-waste" },
-  { area: "Footscray", pathway: "repair", name: "Repair Café directory", type: "Community repair search", address: "Search for current events near Footscray", contact: "Check organiser details before travelling", url: "https://www.repaircafe.org/en/visit/" },
-  { area: "Footscray", pathway: "dispose", name: "Victorian e-waste drop-off finder", type: "Official disposal search", address: "Search for current drop-off points near Footscray", contact: "Confirm the facility accepts your appliance before visiting", url: "https://www.sustainability.vic.gov.au/recycling-and-reducing-waste-at-home/recycling-at-home/e-waste" }
+  { area: "Brunswick", pathway: "repair", name: "Repair Café directory", type: "Community repair search", address: "Search for current events near Brunswick", contact: "Check organiser details before travelling", url: "https://www.repaircafe.org/en/visit/", verified: false, verificationStatus: "directory-only" },
+  { area: "Brunswick", pathway: "dispose", name: "Victorian e-waste drop-off finder", type: "Official disposal search", address: "Search for current drop-off points near Brunswick", contact: "Confirm the facility accepts your appliance before visiting", url: "https://www.sustainability.vic.gov.au/recycling-and-reducing-waste-at-home/recycling-at-home/e-waste", verified: false, verificationStatus: "directory-only" },
+  { area: "Footscray", pathway: "repair", name: "Repair Café directory", type: "Community repair search", address: "Search for current events near Footscray", contact: "Check organiser details before travelling", url: "https://www.repaircafe.org/en/visit/", verified: false, verificationStatus: "directory-only" },
+  { area: "Footscray", pathway: "dispose", name: "Victorian e-waste drop-off finder", type: "Official disposal search", address: "Search for current drop-off points near Footscray", contact: "Confirm the facility accepts your appliance before visiting", url: "https://www.sustainability.vic.gov.au/recycling-and-reducing-waste-at-home/recycling-at-home/e-waste", verified: false, verificationStatus: "directory-only" }
 ]);

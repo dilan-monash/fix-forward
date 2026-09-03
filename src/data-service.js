@@ -42,6 +42,8 @@ function validateBackendData(payloads) {
   if (!Array.isArray(recallPayload?.recalls)) throw new Error("Invalid recalls response");
   if (!Array.isArray(sourcePayload?.sources)) throw new Error("Invalid sources response");
   if (!evidencePayload?.evidence || typeof evidencePayload.evidence !== "object") throw new Error("Invalid repair evidence response");
+  if (!Array.isArray(evidencePayload.evidence.statistics) || !Array.isArray(evidencePayload.evidence.barriers)) throw new Error("Invalid repair evidence collections");
+  if (!evidencePayload.evidence.context || typeof evidencePayload.evidence.context !== "object") throw new Error("Invalid repair evidence context");
   if (!Array.isArray(locationPayload?.locations)) throw new Error("Invalid locations response");
   return {
     meta: sourcePayload.meta || recallPayload.meta || STATIC_META,

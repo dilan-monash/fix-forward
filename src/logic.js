@@ -30,9 +30,13 @@ export function journeyDecision(recallStatus, safetyStatus) {
 export function parseMoney(value) {
   if (value === "" || value === null || value === undefined) return { valid: false, reason: "missing" };
   const cleaned = String(value).trim();
-  if (!/^\d+(\.\d{1,2})?$/.test(cleaned)) return { valid: false, reason: "invalid" };
+  if (!cleaned) return { valid: false, reason: "missing" };
+  if (!/^-?\d+(\.\d+)?$/.test(cleaned)) return { valid: false, reason: "not-number" };
   const amount = Number(cleaned);
-  if (!Number.isFinite(amount) || amount <= 0) return { valid: false, reason: amount < 0 ? "negative" : "zero" };
+  if (!Number.isFinite(amount)) return { valid: false, reason: "not-number" };
+  if (amount < 0) return { valid: false, reason: "negative" };
+  if (amount === 0) return { valid: false, reason: "zero" };
+  if ((cleaned.split(".")[1] || "").length > 2) return { valid: false, reason: "precision" };
   return { valid: true, amount };
 }
 
@@ -40,8 +44,24 @@ export function compareCosts(repairInput, replacementInput) {
   const repair = parseMoney(repairInput);
   const replacement = parseMoney(replacementInput);
   const errors = {};
-  if (!repair.valid) errors.repair = repair.reason === "missing" ? "A repair quote is required for a direct comparison. You can leave and return after obtaining one." : "Enter a repair quote greater than $0 using numbers only.";
-  if (!replacement.valid) errors.replacement = replacement.reason === "missing" ? "Enter an estimated replacement price before comparing." : "Enter a replacement price greater than $0 using numbers only.";
+  const messages = {
+    repair: {
+      missing: "Enter your repair quote before comparing costs.",
+      negative: "Repair quote cannot be negative. Enter an amount greater than $0.",
+      "not-number": "Repair quote must contain numbers only, for example 180 or 180.00.",
+      zero: "Repair quote must be greater than $0.",
+      precision: "Repair quote can have no more than two decimal places."
+    },
+    replacement: {
+      missing: "Enter an estimated replacement price before comparing costs.",
+      negative: "Replacement price cannot be negative. Enter an amount greater than $0.",
+      "not-number": "Replacement price must contain numbers only, for example 320 or 320.00.",
+      zero: "Replacement price must be greater than $0.",
+      precision: "Replacement price can have no more than two decimal places."
+    }
+  };
+  if (!repair.valid) errors.repair = messages.repair[repair.reason];
+  if (!replacement.valid) errors.replacement = messages.replacement[replacement.reason];
   if (Object.keys(errors).length) return { valid: false, errors };
   const difference = Math.abs(repair.amount - replacement.amount);
   const lower = repair.amount === replacement.amount ? "equal" : repair.amount < replacement.amount ? "repair" : "replacement";
@@ -49,5 +69,5 @@ export function compareCosts(repairInput, replacementInput) {
 }
 
 export function getLocations(area, pathway, locations) {
-  return locations.filter((location) => location.area === area && location.pathway === pathway);
+  return locations.filter((location) => location.area === area && location.pathway === pathway && location.verified === true);
 }
