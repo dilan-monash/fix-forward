@@ -136,7 +136,7 @@ summary { color: var(--blue); font-weight: 750; cursor: pointer; }
 .evidence-section { margin-top: 1.35rem; padding-top: 1.2rem; border-top: 1px solid var(--line); }
 .evidence-section h3 { margin-bottom: .45rem; }
 .evidence-section dl { margin: .7rem 0 0; }
-.evidence-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: .7rem; }
+.evidence-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: .7rem; }
 .evidence-metrics > div { padding: .9rem; border-radius: 10px; background: #f3f7f9; }
 .evidence-metrics dt, .evidence-coverage dt { color: var(--muted); font-size: .82rem; font-weight: 700; }
 .evidence-metrics dd { margin: .2rem 0 0; font-size: 1.35rem; font-weight: 800; }

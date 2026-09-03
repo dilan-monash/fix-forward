@@ -3,13 +3,52 @@ export function validateAppliance(input, families) {
   const errors = {};
   if (!family) errors.family = "Select one of the six supported appliance families.";
   if (!input.category || !family?.categories.includes(input.category)) errors.category = "Select an appliance category from the chosen family.";
+  if (String(input.brand || "").length > 100) errors.brand = "Brand must be 100 characters or fewer.";
+  if (String(input.model || "").length > 100) errors.model = "Model must be 100 characters or fewer.";
   return errors;
 }
 
+// Product identifiers appear with spaces, punctuation and mixed letter case.
+// Converting "BVC-160" and "bvc 160" to "BVC160" makes exact comparison
+// tolerant of formatting without allowing unsafe partial matches.
+export function normalizeIdentifier(value) {
+  return String(value || "").normalize("NFKC").toUpperCase().replace(/[^A-Z0-9]/g, "");
+}
+
+export function normalizeWords(value) {
+  return String(value || "").normalize("NFKC").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim().replace(/\s+/g, " ");
+}
+
 export function matchRecall(appliance, recalls, dataAvailable = true) {
-  if (!dataAvailable) return { status: "unavailable", match: null, limited: true };
-  const match = recalls.find((recall) => recall.family === appliance.family && recall.category === appliance.category);
-  return { status: match ? "possible" : "none", match: match || null, limited: Boolean(match) };
+  if (!dataAvailable) return { status: "unavailable", match: null, matches: [], limited: true, reason: "data-unavailable" };
+
+  const categoryCandidates = recalls.filter((recall) => recall.categoryCodes?.includes(appliance.categoryCode));
+  const brand = normalizeWords(appliance.brand);
+  const model = normalizeIdentifier(appliance.model);
+
+  // Category alone can only narrow the search; it cannot identify a product.
+  if (!brand && !model) {
+    return { status: "insufficient", match: null, matches: [], limited: true, reason: "category-only" };
+  }
+
+  const brandCandidates = brand
+    ? categoryCandidates.filter((recall) => normalizeWords(recall.brand) === brand)
+    : categoryCandidates;
+
+  // Brand-only results are possible notices, never a recalled/not-recalled verdict.
+  if (!model) {
+    return { status: "insufficient", match: null, matches: brandCandidates, limited: true, reason: "model-required" };
+  }
+
+  const exactMatches = brandCandidates.filter((recall) =>
+    (recall.identifiers || []).some((identifier) =>
+      ["model", "sku"].includes(identifier.type) && normalizeIdentifier(identifier.normalizedValue || identifier.value) === model
+    )
+  );
+
+  return exactMatches.length
+    ? { status: "possible", match: exactMatches[0], matches: exactMatches, limited: true, reason: "exact-model" }
+    : { status: "none", match: null, matches: [], limited: true, reason: "no-limited-dataset-match" };
 }
 
 export function evaluateSafety(answers) {
@@ -68,6 +107,15 @@ export function compareCosts(repairInput, replacementInput) {
   return { valid: true, repair: repair.amount, replacement: replacement.amount, difference, lower };
 }
 
-export function getLocations(area, pathway, locations) {
-  return locations.filter((location) => location.area === area && location.pathway === pathway && location.verified === true);
+export function getLocations(area, pathway, locations, limit = 8) {
+  const query = normalizeWords(area);
+  if (!query) return [];
+  return locations
+    .filter((location) => location.pathway === pathway)
+    .filter((location) => {
+      const suburb = normalizeWords(location.suburb || location.area);
+      const postcode = String(location.postcode || "").trim();
+      return suburb.includes(query) || postcode === String(area).trim();
+    })
+    .slice(0, limit);
 }
