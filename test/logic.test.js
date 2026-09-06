@@ -51,6 +51,11 @@ test("AC09 partial or wrong identifiers do not create false positives", () => {
   assert.equal(matchRecall({ categoryCode: "vacuum-cleaner", brand: "Mistral", model: "BVC" }, recalls).status, "none");
   assert.equal(matchRecall({ categoryCode: "vacuum-cleaner", brand: "Other", model: "BVC 160" }, recalls).status, "none");
 });
+test("AC09a an exact identifier never leaks into a different appliance category", () => {
+  const result = matchRecall({ categoryCode: "kettle", brand: "Mistral", model: "BVC 160" }, recalls);
+  assert.equal(result.status, "none");
+  assert.equal(result.matches.length, 0);
+});
 test("AC10 recall data failure produces unavailable status", () => assert.equal(matchRecall(validAppliance, recalls, false).status, "unavailable"));
 
 test("AC11 burning smell is high risk", () => assert.equal(evaluateSafety({ ...allNo, burning: "yes" }).status, "high"));
@@ -82,12 +87,16 @@ test("AC33 suburb search finds the correct pathway only", () => assert.equal(get
 test("AC34 postcode search works without device location", () => assert.equal(getLocations("3011", "dispose", locations)[0].name, "Dispose result"));
 test("AC35 unknown area returns no invented providers", () => assert.deepEqual(getLocations("Other", "repair", locations), []));
 
-test("AC36 optional brand/model controls exist but prohibited features and storage do not", async () => {
+test("AC36 optional brand/model refinement exists outside the initial two-choice flow", async () => {
   const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
   const app = await readFile(new URL("../src/app.js", import.meta.url), "utf8");
   assert.doesNotMatch(html, /type=["']file["']|barcode|log[ -]?in|sign[ -]?in/i);
   assert.match(app, /name="brand"/);
   assert.match(app, /name="model"/);
+  assert.match(app, /data-family/);
+  assert.match(app, /data-category/);
+  assert.match(app, /Know the model number\? Improve this check \(optional\)/);
+  assert.doesNotMatch(app, /id="appliance-form"/);
   assert.doesNotMatch(app, /localStorage\.|sessionStorage\.|document\.cookie/);
 });
 test("AC37 required privacy and limitation wording is present", async () => {
@@ -128,7 +137,10 @@ test("AC41 keyboard focus, labels and native controls are defined", async () => 
 test("AC42 responsive mobile rules cover multi-column controls", async () => {
   const css = await readFile(new URL("../styles.css", import.meta.url), "utf8");
   assert.match(css, /@media \(max-width: 760px\)/);
-  assert.match(css, /\.hero, \.family-grid, \.form-grid, \.compare-grid, \.path-grid, \.evidence-metrics, \.evidence-coverage \{ grid-template-columns: 1fr; \}/);
+  for (const selector of [".hero", ".journey-summary", ".family-grid", ".category-grid", ".form-grid", ".compare-grid", ".path-grid", ".evidence-metrics", ".evidence-coverage"]) {
+    assert.match(css, new RegExp(selector.replace(".", "\\.")));
+  }
+  assert.match(css, /grid-template-columns: 1fr/);
 });
 test("AC43 result views expose sources, version and retrieval date", async () => {
   const source = await readFile(new URL("../src/app.js", import.meta.url), "utf8");

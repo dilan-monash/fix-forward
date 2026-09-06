@@ -2,8 +2,8 @@
 
 FixForward is an anonymous decision-support application for Victorian households with a broken small appliance. Its journey is:
 
-1. Identify the appliance, with optional brand and model.
-2. Screen a limited, manually reviewed recall index.
+1. Identify the appliance with two quick card choices—family, then category.
+2. Screen a limited, manually reviewed recall index, with brand and model offered only as an optional refinement on the result page.
 3. Check ten observable safety warning signs.
 4. Explore professional repair/disposal pathways or compare user-entered costs.
 

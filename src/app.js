@@ -1,5 +1,5 @@
 import { loadPublicData } from "./data-service.js";
-import { validateAppliance, matchRecall, evaluateSafety, journeyDecision, compareCosts, getLocations } from "./logic.js";
+import { matchRecall, evaluateSafety, journeyDecision, compareCosts, getLocations } from "./logic.js";
 import { CATEGORY_CODE_BY_NAME, EVIDENCE_CATEGORY_CODE_BY_UI_CATEGORY } from "./data.js";
 import { icons } from "./icons.js";
 
@@ -81,7 +81,7 @@ function recallBanner() {
   return `<aside class="recall-banner" role="alert">${icon("alert")}<div><strong>Strong possible recall match remains active</strong><p>${escapeHtml(state.recall.match.title)}. Verify every identifier on ${noticeUrl ? `<a href="${escapeAttribute(noticeUrl)}" target="_blank" rel="noopener noreferrer">the official ACCC notice</a>` : "the official ACCC recall search"}.</p></div></aside>`;
 }
 
-function renderIdentify(errors = {}) {
+function renderIdentify() {
   state.screen = "identify";
   setPhase("identify");
   const selectedFamily = FAMILIES.find((family) => family.id === state.appliance.family);
@@ -90,58 +90,44 @@ function renderIdentify(errors = {}) {
       <div>
         <p class="eyebrow">Broken appliance? Start here.</p>
         <h1>Safety first. Then a clearer next step.</h1>
-        <p class="lede">Check for a possible official recall and immediate warning signs before privately comparing repair and replacement costs.</p>
+        <p class="lede">FixForward helps Victorian households understand what to do with an unwanted or faulty appliance: check recall information, notice safety risks, then explore repair or responsible e-waste options.</p>
       </div>
       <aside class="hero-panel">
         <strong>${icon("shield")} What FixForward does</strong>
-        <ul><li>Takes about 5–10 minutes</li><li>No login, account or user profile</li><li>No upload, tracking or saved journey history</li><li>Does not diagnose faults or provide DIY instructions</li></ul>
+        <ul><li>Helps you act safely before deciding what comes next</li><li>Makes repair evidence and local pathways easier to understand</li><li>Supports reuse and responsible recycling, which can keep e-waste out of landfill</li><li>Does not diagnose faults or provide DIY instructions</li><li>No login, upload, tracking or saved journey history</li></ul>
       </aside>
     </div>
-    <form id="appliance-form" novalidate>
-      <div class="section-head"><div><p class="eyebrow">Step 1 of 4</p><h2>What type of appliance is it?</h2></div><p>Select one of the six supported families, then choose its category.</p></div>
-      <div class="family-grid" role="radiogroup" aria-describedby="family-error">
-        ${FAMILIES.map((family) => `<label class="choice-card"><input type="radio" name="family" value="${escapeAttribute(family.id)}" ${family.id === state.appliance.family ? "checked" : ""}><strong>${escapeHtml(family.name)}</strong><small>${escapeHtml(family.hint)}</small></label>`).join("")}
+    <div class="journey-summary" aria-label="How FixForward helps">
+      <div><span>1</span><strong>Identify</strong><small>Choose the appliance</small></div>
+      <div><span>2</span><strong>Understand</strong><small>See recall and safety reasons</small></div>
+      <div><span>3</span><strong>Act</strong><small>Explore repair or recycling</small></div>
+    </div>
+    <div class="section-head"><div><p class="eyebrow">Step 1 of 4 · Two quick choices</p><h2>${selectedFamily ? "Now choose the appliance" : "What type of appliance is it?"}</h2></div><p>${selectedFamily ? "One more tap starts the recall check." : "Choose one of the six supported groups. No typing is needed."}</p></div>
+    <div class="family-grid" aria-label="Appliance families">
+        ${FAMILIES.map((family) => `<button type="button" class="choice-card" data-family="${escapeAttribute(family.id)}" aria-pressed="${family.id === state.appliance.family}"><strong>${escapeHtml(family.name)}</strong><small>${escapeHtml(family.hint)}</small></button>`).join("")}
       </div>
-      <p class="error" id="family-error">${escapeHtml(errors.family || "")}</p>
-      <div class="form-panel">
-        <label class="field"><span>Category <abbr title="required">*</abbr></span><select id="category" name="category" ${selectedFamily ? "" : "disabled"} aria-invalid="${Boolean(errors.category)}"><option value="">${selectedFamily ? "Choose a category" : "Choose a family first"}</option>${selectedFamily?.categories.map((category) => `<option ${category === state.appliance.category ? "selected" : ""}>${escapeHtml(category)}</option>`).join("") || ""}</select><span class="error">${escapeHtml(errors.category || "")}</span></label>
-        <div class="form-grid" style="margin-top:1rem">
-          <label class="field"><span>Brand <small>(optional)</small></span><input name="brand" maxlength="100" autocomplete="off" placeholder="e.g. Mistral" value="${escapeAttribute(state.appliance.brand)}" aria-invalid="${Boolean(errors.brand)}"><span class="error">${escapeHtml(errors.brand || "")}</span></label>
-          <label class="field"><span>Model number <small>(optional)</small></span><input name="model" maxlength="100" autocomplete="off" placeholder="e.g. BVC 160" value="${escapeAttribute(state.appliance.model)}" aria-invalid="${Boolean(errors.model)}"><span class="error">${escapeHtml(errors.model || "")}</span></label>
-        </div>
-        <div class="notice warning" style="margin-top:1rem"><strong>Why these details matter</strong>Family and category cannot identify a recalled product. An exact model can produce a strong possible match in FixForward's limited, manually reviewed index. Always verify the official notice.</div>
-      </div>
-      <div class="actions"><button class="button primary" type="submit">Check recall status ${icon("arrow")}</button><span class="source-line">Your entries stay in this browser tab and are not stored.</span></div>
-    </form>
+      ${selectedFamily ? `<section class="category-picker" aria-labelledby="category-title"><div><p class="mini-label">Selected group</p><h3 id="category-title">${escapeHtml(selectedFamily.name)}</h3></div><div class="category-grid">${[...selectedFamily.categories].sort((a, b) => a.localeCompare(b)).map((category) => `<button type="button" class="category-button" data-category="${escapeAttribute(category)}">${escapeHtml(category)} ${icon("arrow")}</button>`).join("")}</div><button class="text-button" type="button" id="change-family">Choose a different group</button></section>` : `<p class="selection-hint" role="status">Choose a group above to reveal only the appliances that belong to it.</p>`}
+      <p class="source-line">Your selection stays in this browser tab and is not stored.</p>
   </section>`;
 
-  app.querySelectorAll('input[name="family"]').forEach((input) => input.addEventListener("change", () => {
-    captureApplianceForm(); state.appliance.family = input.value; state.appliance.category = ""; state.appliance.categoryCode = ""; renderIdentify();
+  app.querySelectorAll("[data-family]").forEach((button) => button.addEventListener("click", () => {
+    state.appliance = { family: button.dataset.family, category: "", categoryCode: "", brand: "", model: "" };
+    renderIdentify();
+    app.querySelector(".category-picker")?.scrollIntoView({ block: "center", behavior: "smooth" });
   }));
-  app.querySelector("#appliance-form").addEventListener("submit", (event) => {
-    event.preventDefault(); captureApplianceForm();
-    const nextErrors = validateAppliance(state.appliance, FAMILIES);
-    if (Object.keys(nextErrors).length) { renderIdentify(nextErrors); app.querySelector(".error:not(:empty)")?.scrollIntoView({ block: "center" }); return; }
+  app.querySelectorAll("[data-category]").forEach((button) => button.addEventListener("click", () => {
+    state.appliance.category = button.dataset.category;
+    state.appliance.categoryCode = CATEGORY_CODE_BY_NAME[button.dataset.category] || "";
     state.recall = matchRecall(state.appliance, RECALLS, publicDataAvailable);
     renderRecall(); focusMain();
+  }));
+  app.querySelector("#change-family")?.addEventListener("click", () => {
+    state.appliance = { family: "", category: "", categoryCode: "", brand: "", model: "" };
+    renderIdentify(); focusMain();
   });
 }
 
-function captureApplianceForm() {
-  const form = app.querySelector("#appliance-form");
-  if (!form) return;
-  const data = new FormData(form);
-  const category = String(data.get("category") || "");
-  state.appliance = {
-    family: String(data.get("family") || state.appliance.family || ""),
-    category,
-    categoryCode: CATEGORY_CODE_BY_NAME[category] || "",
-    brand: String(data.get("brand") || "").trim(),
-    model: String(data.get("model") || "").trim()
-  };
-}
-
-function renderRecall() {
+function renderRecall(refineErrors = {}) {
   state.screen = "recall";
   setPhase("safety");
   const result = state.recall;
@@ -163,11 +149,33 @@ function renderRecall() {
   } else {
     panel = `<div class="notice success"><strong>No exact model match was found in FixForward's limited index</strong><p>This means “no match in the data checked,” not “this product is not recalled.” Search the official ACCC site and compare all identifying details.</p><a class="button secondary" href="https://www.productsafety.gov.au/recalls" target="_blank" rel="noopener noreferrer">Search official recalls ${icon("arrow")}</a></div>`;
   }
-  app.innerHTML = `<section class="screen"><p class="eyebrow">Step 2 of 4 · Recall check</p><h1>Recall screening result</h1><p class="lede">FixForward narrows a limited index. Only the official recall notice can confirm whether your exact product is affected.</p><div style="margin-top:1.5rem">${panel}</div>${sourceLine("ACCC Product Safety recall index")}
-    <div class="actions">${result.status === "unavailable" ? `<button class="button primary" id="restart-inline">Restart assessment</button>` : `<button class="button primary" id="continue-safety">Continue to safety questions ${icon("arrow")}</button>`}<button class="button secondary" id="edit-appliance">Edit appliance details</button></div></section>`;
+  const reason = result.status === "possible"
+    ? "The brand and model exactly matched an identifier in the limited index. This is still only a screening match."
+    : result.status === "unavailable"
+      ? "The public recall data could not be reached, so FixForward stopped instead of guessing."
+      : result.status === "insufficient"
+        ? "A product category covers many models. Without an exact model number, FixForward cannot identify a recalled product."
+        : "The entered brand and model did not exactly match a record in the limited index. This does not rule out a recall.";
+  const canRefine = result.status !== "unavailable" && result.status !== "possible";
+  const refinement = canRefine ? `<details class="recall-refine" ${Object.keys(refineErrors).length ? "open" : ""}><summary>Know the model number? Improve this check (optional)</summary><p>This is optional. You can skip it and continue to the safety questions.</p><form id="recall-refine-form" novalidate><div class="form-grid"><label class="field"><span>Brand <small>(optional)</small></span><input name="brand" maxlength="100" autocomplete="off" placeholder="e.g. Mistral" value="${escapeAttribute(state.appliance.brand)}" aria-invalid="${Boolean(refineErrors.brand)}"><span class="error">${escapeHtml(refineErrors.brand || "")}</span></label><label class="field"><span>Exact model number</span><input name="model" maxlength="100" autocomplete="off" placeholder="e.g. BVC 160" value="${escapeAttribute(state.appliance.model)}" aria-invalid="${Boolean(refineErrors.model)}"><span class="error">${escapeHtml(refineErrors.model || "")}</span></label></div><div class="actions"><button class="button secondary" type="submit">Check these details</button></div></form></details>` : "";
+  app.innerHTML = `<section class="screen"><p class="eyebrow">Step 2 of 4 · Recall check</p><h1>Recall screening result</h1><p class="lede">FixForward narrows a limited index. Only the official recall notice can confirm whether your exact product is affected.</p><div class="reason-card"><strong>Why you got this result</strong><p>${escapeHtml(reason)}</p></div><div style="margin-top:1rem">${panel}</div>${refinement}${sourceLine("ACCC Product Safety recall index")}
+    <div class="actions"><button class="button primary" id="continue-safety">Continue to safety questions ${icon("arrow")}</button><button class="button secondary" id="edit-appliance">Back to appliance selection</button>${result.status === "unavailable" ? `<button class="text-button" id="restart-inline">Restart assessment</button>` : ""}</div></section>`;
   app.querySelector("#continue-safety")?.addEventListener("click", () => { renderSafety(); focusMain(); });
   app.querySelector("#edit-appliance").addEventListener("click", () => { renderIdentify(); focusMain(); });
   app.querySelector("#restart-inline")?.addEventListener("click", restart);
+  app.querySelector("#recall-refine-form")?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    const brand = String(data.get("brand") || "").trim();
+    const model = String(data.get("model") || "").trim();
+    const errors = {};
+    if (!model) errors.model = brand ? "Enter the exact model number to check this brand." : "Enter a model number, or skip this optional check.";
+    if (Object.keys(errors).length) { renderRecall(errors); app.querySelector(".error:not(:empty)")?.scrollIntoView({ block: "center" }); return; }
+    state.appliance.brand = brand;
+    state.appliance.model = model;
+    state.recall = matchRecall(state.appliance, RECALLS, publicDataAvailable);
+    renderRecall(); focusMain();
+  });
 }
 
 function renderSafety(errorMessage = "") {
@@ -185,7 +193,7 @@ function renderSafety(errorMessage = "") {
     <form id="safety-form" novalidate><div class="safety-groups">${SAFETY_GROUPS.map((group) => {
       const groupAnswered = group.signIds.filter((id) => state.safety[id]).length;
       return `<section class="safety-group" data-safety-group="${group.id}"><div class="safety-group-head"><div><p class="mini-label">Group ${SAFETY_GROUPS.indexOf(group) + 1} of ${SAFETY_GROUPS.length}</p><h2>${group.title}</h2><p>${group.description}</p></div><div class="group-actions"><span data-group-count="${group.id}">${groupAnswered} of ${group.signIds.length} answered</span><button class="button compact" type="button" data-none-group="${group.id}">None of these signs</button></div></div><div class="question-list">${group.signIds.map((id) => `<fieldset class="question"><legend>${signNumber.get(id)}. ${signLabel.get(id)}</legend><div class="segmented">${[["yes","Yes"],["no","No"],["unsure","Not sure"]].map(([value,text]) => `<label><input type="radio" name="${id}" value="${value}" ${state.safety[id] === value ? "checked" : ""}><span>${text}</span></label>`).join("")}</div></fieldset>`).join("")}</div></section>`;
-    }).join("")}</div><p class="error" id="safety-error">${errorMessage}</p><div class="actions"><button class="button primary" type="submit">View safety result ${icon("arrow")}</button></div></form>${sourceLine("Energy Safe Victoria and CFA Victoria guidance")}</section>`;
+    }).join("")}</div><p class="error" id="safety-error">${errorMessage}</p><div class="actions"><button class="button primary" type="submit">View safety result ${icon("arrow")}</button><button class="button secondary" type="button" id="back-to-recall">Back to recall result</button></div></form>${sourceLine("Energy Safe Victoria and CFA Victoria guidance")}</section>`;
 
   app.querySelectorAll('#safety-form input[type="radio"]').forEach((input) => input.addEventListener("change", () => {
     state.safety[input.name] = input.value;
@@ -214,6 +222,7 @@ function renderSafety(errorMessage = "") {
     if (missing.length) { renderSafety(`Answer every question or use “None of these signs” for each group. ${missing.length} response${missing.length === 1 ? " is" : "s are"} still missing.`); app.querySelector("#safety-error").scrollIntoView({ block: "center" }); return; }
     completeSafetyAssessment();
   });
+  app.querySelector("#back-to-recall").addEventListener("click", () => { renderRecall(); focusMain(); });
 }
 
 function updateSafetyProgress() {
@@ -267,14 +276,34 @@ function renderSafetyResult() {
   if (high) { title = possibleRecall ? "Stop using the appliance: recall and high-risk warning" : "Stop using the appliance"; lead = "A reported warning sign needs professional assessment. Unplug only when it is safe to do so."; iconClass = "danger"; }
   if (uncertain) { title = possibleRecall ? "Possible recall and uncertain safety status" : "Safety status is uncertain"; lead = "Because you selected “Not sure”, stop using the appliance until it has been professionally assessed."; iconClass = "warning"; }
   if (possibleRecall && !high && !uncertain) { title = "Possible recall match still requires action"; lead = "No listed warning signs were reported, but screening cannot rule out faults. Follow the official recall notice before any other pathway."; iconClass = "warning"; }
+  if (state.recall.status === "unavailable" && !high && !uncertain) { title = "Safety check complete, but recall status is unavailable"; lead = "No listed warning signs were reported, but the recall database could not be checked. Use the official recall search before choosing another pathway."; iconClass = "warning"; }
   const recallGuidanceUrl = possibleRecall
     ? safeExternalUrl(state.recall.match.noticeUrl, ["productsafety.gov.au", "www.productsafety.gov.au"]) || "https://www.productsafety.gov.au/recalls"
     : null;
-  app.innerHTML = `<section class="screen">${recallBanner()}<div class="result-card"><div class="result-icon ${iconClass}">${icon(high || uncertain || possibleRecall ? "alert" : "shield")}</div><p class="eyebrow">Safety & recall result</p><h1>${title}</h1><p class="lede">${lead}</p>${reportedList(high ? state.safetyResult.yes : state.safetyResult.unsure)}
+  const reportedIds = high ? state.safetyResult.yes : uncertain ? state.safetyResult.unsure : [];
+  const resultReason = high
+    ? "You selected Yes for one or more warning signs listed below. Any one of these signs is enough to stop normal use and seek professional help."
+    : uncertain
+      ? "You selected Not sure for one or more warning signs. FixForward uses the cautious pathway because the risk could not be ruled out."
+      : state.recall.status === "unavailable"
+        ? "You answered No to all 10 warning signs, but FixForward could not reach the recall data. It cannot safely open the normal next-step pathway."
+      : possibleRecall
+        ? "No warning sign was reported, but the possible recall match still takes priority."
+        : "You answered No to all 10 visible warning signs. This is a screening result, not a diagnosis.";
+  const unavailableRecall = state.recall.status === "unavailable";
+  const primaryAction = possibleRecall
+    ? `<a class="button danger" href="${escapeAttribute(recallGuidanceUrl)}" target="_blank" rel="noopener noreferrer">Follow official recall guidance ${icon("arrow")}</a>`
+    : high || uncertain
+      ? `<button class="button danger" id="to-professional">Explore professional assessment ${icon("arrow")}</button>`
+      : unavailableRecall
+        ? `<a class="button primary" href="https://www.productsafety.gov.au/recalls" target="_blank" rel="noopener noreferrer">Search official recalls ${icon("arrow")}</a>`
+        : `<button class="button primary" id="to-pathways">Choose next action ${icon("arrow")}</button>`;
+  app.innerHTML = `<section class="screen">${recallBanner()}<div class="result-card"><div class="result-icon ${iconClass}">${icon(high || uncertain || possibleRecall || unavailableRecall ? "alert" : "shield")}</div><p class="eyebrow">Safety & recall result</p><h1>${title}</h1><p class="lede">${lead}</p><div class="reason-card"><strong>Why you got this result</strong><p>${resultReason}</p>${reportedList(reportedIds)}</div>
     ${!high && !uncertain && !possibleRecall ? `<div class="notice warning" style="margin-top:1.3rem"><strong>Important limitation</strong>No listed warning sign does not mean the appliance is safe or diagnosed. ${state.recall.status === "insufficient" ? "The recall screen also needs an exact model for a meaningful database match." : "A missing match only describes the limited data checked."}</div>` : ""}
-    ${sourceLine()}<div class="actions">${possibleRecall ? `<a class="button danger" href="${escapeAttribute(recallGuidanceUrl)}" target="_blank" rel="noopener noreferrer">Follow official recall guidance ${icon("arrow")}</a>` : high || uncertain ? `<button class="button danger" id="to-professional">Explore professional assessment ${icon("arrow")}</button>` : `<button class="button primary" id="to-pathways">Choose next action ${icon("arrow")}</button>`}<button class="button secondary" id="restart-result">Restart</button></div></div></section>`;
+    ${sourceLine()}<div class="actions">${primaryAction}<button class="button secondary" id="back-to-safety">Back to safety questions</button><button class="text-button" id="restart-result">Restart</button></div></div></section>`;
   app.querySelector("#to-pathways")?.addEventListener("click", () => { renderPathChoices(); focusMain(); });
   app.querySelector("#to-professional")?.addEventListener("click", () => { state.pathway = "professional"; renderPathway(); focusMain(); });
+  app.querySelector("#back-to-safety").addEventListener("click", () => { renderSafety(); focusMain(); });
   app.querySelector("#restart-result").addEventListener("click", restart);
 }
 
@@ -358,11 +387,12 @@ function renderRepairEvidence(evidence) {
     ["End of life", evidence.endOfLifeCount],
     ["Unclassified", evidence.unclassifiedCount]
   ];
-  const outcomeMarkup = `<div class="evidence-metrics">${outcomes.map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${formatCount(value)}</dd></div>`).join("")}</div>`;
+  const largestOutcome = Math.max(...outcomes.map(([, value]) => Number(value) || 0), 1);
+  const outcomeMarkup = `<div class="evidence-metrics">${outcomes.map(([label, value], index) => `<div><dt>${escapeHtml(label)}</dt><dd>${formatCount(value)}</dd><span class="evidence-bar" aria-hidden="true"><i style="width:${Math.round(((Number(value) || 0) / largestOutcome) * 100)}%" data-outcome="${index}"></i></span></div>`).join("")}</div>`;
   const barrierMarkup = evidence.barriers?.length
     ? `<ol class="barrier-list">${evidence.barriers.slice(0, 5).map((barrier) => `<li><span>${escapeHtml(barrier.name)}</span><strong>${formatCount(barrier.occurrenceCount)} recorded events</strong></li>`).join("")}</ol>`
     : `<p class="empty-evidence">No category-specific repair barriers are available in the current dataset.</p>`;
-  return `<section class="evidence-panel" aria-labelledby="repair-evidence-title"><p class="eyebrow">Category-level context</p><h2 id="repair-evidence-title">Repair evidence for ${escapeHtml(state.appliance.category)}</h2><p>Historical community repair evidence can provide context, but it cannot predict the outcome or price for this appliance.</p><div class="notice success"><strong>Historical category evidence available</strong>These are past event counts, not percentages, a personal score or a recommendation.</div><div class="evidence-section"><h3>Past repair outcomes</h3><p class="source-line">Raw event counts only — not percentages or a personal prediction.</p><dl>${outcomeMarkup}</dl></div><div class="evidence-section"><h3>Common repair barriers</h3>${barrierMarkup}</div><div class="evidence-section"><h3>Evidence coverage</h3><dl class="evidence-coverage"><dt>Evidence category</dt><dd>${escapeHtml(evidence.category)}</dd><dt>Sample size</dt><dd>${formatCount(evidence.sampleSize)} records</dd><dt>Geography</dt><dd>${escapeHtml(evidence.geography || "Not available")}</dd><dt>Confidence</dt><dd>${escapeHtml(evidence.confidenceLevel || "Not assessed")}</dd><dt>Source</dt><dd>Open Repair Alliance category aggregate</dd><dt>Limitations</dt><dd>${escapeHtml(evidence.limitation || "No limitation statement supplied.")}</dd></dl></div></section>`;
+  return `<section class="evidence-panel" aria-labelledby="repair-evidence-title"><p class="eyebrow">Category-level context</p><h2 id="repair-evidence-title">Repair evidence for ${escapeHtml(state.appliance.category)}</h2><p>Historical community repair evidence can provide context, but it cannot predict the outcome or price for this appliance.</p><div class="notice success"><strong>Historical category evidence available</strong>Compare the bars to see which outcomes appeared more often. These are past event counts, not percentages, a personal score or a recommendation.</div><div class="evidence-section"><h3>Past repair outcomes</h3><p class="source-line">Raw event counts only — the longest bar is the largest recorded group.</p><dl>${outcomeMarkup}</dl></div><div class="evidence-section"><h3>Common repair barriers</h3>${barrierMarkup}</div><details class="evidence-details"><summary>How reliable is this evidence?</summary><p>Open this section to see the sample, geography, confidence and known limits behind the chart.</p><dl class="evidence-coverage"><dt>Evidence category</dt><dd>${escapeHtml(evidence.category)}</dd><dt>Sample size</dt><dd>${formatCount(evidence.sampleSize)} records</dd><dt>Geography</dt><dd>${escapeHtml(evidence.geography || "Not available")}</dd><dt>Confidence</dt><dd>${escapeHtml(evidence.confidenceLevel || "Not assessed")}</dd><dt>Source</dt><dd>Open Repair Alliance category aggregate</dd><dt>Limitations</dt><dd>${escapeHtml(evidence.limitation || "No limitation statement supplied.")}</dd></dl></details></section>`;
 }
 
 function renderLocationResults() {

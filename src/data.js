@@ -97,14 +97,14 @@ export const RECALLS = Object.freeze([]);
 
 export const SAFETY_SIGNS = Object.freeze([
   ["burning", "Burning smell, smoke or fire"],
-  ["sparks", "Sparks or arcing"],
-  ["heat", "Unusual overheating"],
+  ["sparks", "Sparks or electrical arcing (electricity visibly jumping through the air)"],
   ["shock", "Electric shock or tingling"],
   ["wiring", "Exposed or damaged wiring"],
+  ["heat", "Unusual overheating"],
   ["plug", "Melted, scorched or damaged plug"],
+  ["trips", "Repeated circuit-breaker trips"],
   ["water", "Water or moisture damage"],
   ["battery", "Swollen, leaking or damaged battery"],
-  ["trips", "Repeated circuit-breaker trips"],
   ["sound", "Sudden unusual buzzing, popping or crackling"]
 ]);
 
