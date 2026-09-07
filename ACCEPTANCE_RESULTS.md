@@ -1,51 +1,61 @@
-# FixForward Iteration 1 v1.2.0 — Acceptance Results
+# FixForward Iteration 1 v1.4 goal-first prototype — Test Status
 
-Run date: 4 September 2026
+Build date: 7 September 2026
+Status: **prototype candidate — not evidence of production acceptance**
 
-## Automated result
+## Automated checks completed in the packaging environment
 
 | Check | Command | Result |
 |---|---|---|
-| Frontend syntax, decision logic and static acceptance checks | `npm run check` | **54 passed, 0 failed** |
-| Flask contracts, safe failures, protected files and transformations | `python -m unittest discover -s test_backend -v` | **9 passed, 0 failed** |
-| Python compilation | `python -m compileall -q backend app.py` | **Passed** |
+| Frontend decision/data/UX tests | `npm test` | **30 passed, 0 failed** |
+| JavaScript syntax + test suite | `npm run check` | **Passed** |
+| Python compile check | `python -m compileall -q backend app.py test_backend` | **Passed** |
+| Pure transformation tests | part of backend unittest discovery | transform tests passed before Flask import dependency stopped the complete suite |
+| Complete Flask backend suite | `python -m unittest discover -s test_backend -v` | **Not executed to completion in packaging environment** — Flask is not installed and external package download is unavailable |
 
-The automated suite verifies exact normalized model matching, category-only and brand-only limitations, wrong-brand/partial-model rejection, safety precedence, detailed cost errors, category repair evidence, browser-only area filtering, fail-closed API behavior, URL validation, generic database errors, security headers and responsive/accessibility source checks.
+The project team previously ran the v1.3 candidate locally with its complete backend suite passing. Because v1.4 changes the location contract and security headers, **the v1.4 backend suite must be rerun in the team's normal `.venv` before commit/deploy.**
 
-## Integration result
+## v1.4 automated frontend coverage
 
-The integrated candidate combines:
+The 30 Node tests include:
 
-- the latest team GitHub snapshot, including the existing `data/` pipeline;
-- the Flask read-only API and Render service definition;
-- optional brand/model collection and exact identifier matching;
-- the latest cost-validation and repair-evidence presentation improvements;
-- the documented, fail-closed production behavior.
+- independent API availability;
+- static safety fallback during API outage;
+- category-only recall limitation;
+- normalised exact model matching;
+- brand-conflict preservation;
+- one-character near model not promoted to recall match;
+- critical vs caution safety severity;
+- appliance-adaptive battery question;
+- high-risk cost/community-repair blocking;
+- cost validation;
+- manual area search;
+- distance calculation;
+- nearby sort/radius/provider filtering;
+- immediate loading UI;
+- goal-first landing choices;
+- plain-language recall explanation;
+- recall outage safety continuation;
+- high-risk no-Repair-Café behavior;
+- browser geolocation + in-app map contract;
+- memory-only location privacy contract;
+- service contact/directions-first cards;
+- no AI-invented price contract;
+- browser Back/restart/accessibility contract;
+- no account/upload/password/persistent journey storage.
 
-The older category-only recall verdict and static KitchenAid production fallback are not included.
+## Manual/live gates still required
 
-## Database evidence completed on the Neon development branch
+- Run full Python suite in the user's existing `.venv`.
+- Run local app against the Neon development branch.
+- Confirm `/api/health` and `/api/ready`.
+- Confirm `/api/locations` returns coordinates/provider fields against the actual schema.
+- Test geolocation allow and deny flows in Chrome over localhost and HTTPS preview.
+- Inspect DevTools Network: user coordinates must not be sent to Flask/Neon.
+- Test Leaflet/OSM load and map fallback.
+- Test Repair/Compare/Recycle landing shortcuts after clear safety gate.
+- Test BVC 160, BVC 161, recall outage, serious warning and uncertain warning.
+- Test mobile, keyboard, zoom and screen-reader announcements.
+- Record BA/mentor decision on whether geolocation/goal-first flow is accepted for final I1.
 
-| Evidence | Observed result |
-|---|---|
-| Branch | `iteration-1-backend-test` selected; migrations were not run on production |
-| UI category seed | 19 rows |
-| Recall application tables | Four expected tables present |
-| Reviewed identifier seed | Mistral `BVC 160`/`BVC160` and `BVC 165`/`BVC165` |
-| Application role | `fixforward_app` exists with all administrative flags false |
-| Table access | SELECT true; INSERT, UPDATE and DELETE false |
-| Owner credential | Administrator reported the previously exposed password rotated |
-
-## Manual release gates still required
-
-- Set the pooled `fixforward_app` URL as local `DATABASE_URL` without storing it in source control.
-- Start Flask and confirm `/api/health` reports `database: available`.
-- Inspect all four public-data endpoints against the live Neon development branch.
-- Complete the Rice cooker, Mistral/BVC 160, wrong model, high-risk, uncertain, cost and simulated-outage journeys.
-- Review the combined changes with the frontend and database contributors.
-- Apply the approved application migrations to the production database using the team process.
-- Configure the protected production `DATABASE_URL` and deploy the reviewed Git commit.
-- Recheck endpoints, security headers and the complete journey on the deployed HTTPS URL.
-- Personalize the AI-use acknowledgement and retain team-contribution evidence.
-
-This is a tested integrated candidate, not evidence of a live deployment.
+Do not mark this prototype “final” or “security accepted” solely from automated results.

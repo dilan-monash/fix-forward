@@ -56,13 +56,18 @@ class TransformTests(unittest.TestCase):
     def test_location_is_explicitly_labelled_unverified(self):
         location = build_location({
             "id": 7, "location_type": "repair", "name": "Example", "facility_type": "Repair",
-            "address": None, "suburb": "Brunswick", "postcode": "3056", "phone": "",
+            "address": None, "suburb": "Brunswick", "postcode": "3056", "phone": "03 9000 0000",
+            "latitude": -37.77, "longitude": 144.96, "opening_hours": "Sa 10:00-13:00",
+            "provider_type": "repair_cafe",
             "website": "javascript:alert(1)", "verification_status": None,
             "verification_notes": None, "source_notes": "Imported record", "source_url": None,
             "source_retrieved_at": date(2026, 8, 31),
         })
         self.assertEqual(location["verificationStatus"], "unverified")
         self.assertEqual(location["address"], "Address not provided")
+        self.assertEqual(location["latitude"], -37.77)
+        self.assertEqual(location["providerType"], "repair_cafe")
+        self.assertEqual(location["openingHours"], "Sa 10:00-13:00")
         self.assertIsNone(location["url"])
 
 

@@ -1,35 +1,35 @@
-# FixForward public-data API contract — v1.3 redesign
+# FixForward public-data API contract — v1.4 goal-first prototype
 
-All browser journey values remain client-side. Public API endpoints are read-only `GET` routes and receive no appliance answers, safety responses, suburb/postcode searches, quotes, login details or user profiles.
+The API returns read-only public/reference information. The browser does **not** send the user's selected goal, appliance details, safety answers, cost values, typed suburb or device coordinates to these endpoints.
 
 ## Liveness and readiness
 
 ### `GET /api/health`
 
-Fast process liveness. This endpoint deliberately does **not** query Neon.
+Fast Flask-process liveness. It deliberately does not query Neon.
 
 ```json
-{"status":"ok","service":"available","releaseVersion":"iteration-1-v1.3.0-redesign"}
+{"status":"ok","service":"available","releaseVersion":"iteration-1-v1.4.0-goal-first"}
 ```
 
 ### `GET /api/ready`
 
-Checks that the public database can be queried.
+Checks database readiness.
 
 ```json
-{"status":"ok","database":"available","releaseVersion":"iteration-1-v1.3.0-redesign"}
+{"status":"ok","database":"available","releaseVersion":"iteration-1-v1.4.0-goal-first"}
 ```
 
-Database failures return a generic `503` without infrastructure secrets.
+Database failure returns a generic `503` without credentials or infrastructure detail.
 
-## Public datasets
+## `GET /api/recalls`
 
-### `GET /api/recalls`
+Returns only manually reviewed structured recall products used by the conservative browser matcher.
 
 ```json
 {
   "meta": {
-    "releaseVersion": "iteration-1-v1.3.0-redesign",
+    "releaseVersion": "iteration-1-v1.4.0-goal-first",
     "dataVersion": "snapshot-version",
     "retrievalDate": "2026-09-03",
     "coverageStart": "2026-04-16",
@@ -52,11 +52,13 @@ Database failures return a generic `503` without infrastructure secrets.
 }
 ```
 
-### `GET /api/sources`
+## `GET /api/sources`
+
+Returns source register data for the expandable **About the information** area.
 
 ```json
 {
-  "meta": {"releaseVersion":"iteration-1-v1.3.0-redesign"},
+  "meta": {"releaseVersion":"iteration-1-v1.4.0-goal-first"},
   "sources": [{
     "name":"string",
     "url":"https://...",
@@ -68,62 +70,69 @@ Database failures return a generic `503` without infrastructure secrets.
 }
 ```
 
-### `GET /api/repair-evidence`
+## `GET /api/repair-evidence`
 
 ```json
 {
-  "meta": {"releaseVersion":"iteration-1-v1.3.0-redesign"},
+  "meta": {"releaseVersion":"iteration-1-v1.4.0-goal-first"},
   "evidence": [{
     "family":"Cleaning",
     "category":"Vacuum cleaner",
     "categoryCode":"vacuum_cleaner",
     "geography":"AU",
-    "sampleSize":100,
-    "fixedCount":40,
-    "repairableCount":20,
-    "endOfLifeCount":30,
-    "unclassifiedCount":10,
-    "confidenceLevel":"source field retained for provenance",
-    "limitation":"Not model-specific",
+    "sampleSize":169,
+    "fixedCount":73,
+    "repairableCount":32,
+    "endOfLifeCount":64,
+    "unclassifiedCount":0,
+    "confidenceLevel":"source field retained only",
+    "limitation":"Category-level community repair history",
     "barriers":[]
   }]
 }
 ```
 
-The frontend does not present `confidenceLevel` as scientific certainty. It shows sample size and explicitly states that representativeness is not established.
+The UI does not translate `confidenceLevel` into a scientific “high confidence” claim.
 
-### `GET /api/locations`
+## `GET /api/locations`
+
+v1.4 adds coordinates and optional practical service fields so the browser can render an in-app map and calculate distance locally.
 
 ```json
 {
-  "meta": {"releaseVersion":"iteration-1-v1.3.0-redesign"},
+  "meta": {"releaseVersion":"iteration-1-v1.4.0-goal-first"},
   "locations": [{
     "id":"1",
     "pathway":"repair",
     "name":"Example Repair Cafe",
     "type":"Community repair cafe",
+    "providerType":"repair_cafe",
     "address":"1 Example St",
     "suburb":"Ascot Vale",
     "postcode":"3032",
+    "latitude":-37.77,
+    "longitude":144.92,
     "phone":"",
+    "openingHours":"",
     "url":"https://...",
     "verificationStatus":"unverified",
     "verificationNote":"...",
+    "verificationUrl":null,
+    "lastVerifiedAt":null,
     "sourceUrl":"https://...",
     "sourceRetrievedAt":"2026-08-31"
   }]
 }
 ```
 
-The browser filters area locally. It must not call this dataset a verified professional-repair directory or a genuine distance-based “nearby” service.
+### Location privacy contract
+
+The API never receives browser geolocation. `/api/locations` returns public service coordinates; `distanceKm()` runs in JavaScript against the user's in-memory coordinates. Manual suburb/postcode matching also remains client-side.
+
+### Location truthfulness contract
+
+A card can show address/phone/opening hours only when those fields are present in the imported record. It must not claim professional qualification, current opening status or appliance acceptance unless separately verified evidence supports that claim.
 
 ## Independent failure behavior
 
-The frontend uses `Promise.allSettled()` and keeps separate availability for:
-
-- recalls;
-- sources;
-- repair evidence;
-- locations.
-
-A failure in one dataset must not disable unrelated functionality. In particular, recall data failure must leave static safety screening available while preserving an explicit “recall status unknown” warning.
+The frontend uses `Promise.allSettled()` and keeps separate availability for recalls, sources, repair evidence and locations. Failure of one public dataset must not make an unrelated dataset appear unavailable.

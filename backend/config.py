@@ -24,7 +24,7 @@ class Settings:
         return cls(
             database_url=os.getenv("DATABASE_URL", "").strip(),
             release_version=os.getenv(
-                "RELEASE_VERSION", "iteration-1-v1.2.0"
+                "RELEASE_VERSION", "iteration-1-v1.4.0-goal-first"
             ).strip(),
             db_connect_timeout=timeout,
         )

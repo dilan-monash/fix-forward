@@ -18,6 +18,8 @@ class AppTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"FixForward", response.data)
         self.assertIn("default-src 'self'", response.headers["Content-Security-Policy"])
+        self.assertEqual(response.headers["Referrer-Policy"], "strict-origin-when-cross-origin")
+        self.assertIn("geolocation=(self)", response.headers["Permissions-Policy"])
         blocked = self.client.get("/backend/config.py")
         self.assertEqual(blocked.status_code, 404)
         response.close()
@@ -80,7 +82,9 @@ class AppTests(unittest.TestCase):
         }]
         locations.return_value = [{
             "id": 1, "location_type": "recycling", "name": "Site", "facility_type": "Drop-off",
-            "address": "1 Road", "suburb": "Brunswick", "postcode": "3056", "phone": "",
+            "address": "1 Road", "suburb": "Brunswick", "postcode": "3056", "phone": "03 9000 0000",
+            "latitude": -37.77, "longitude": 144.96, "opening_hours": "Mo-Fr 09:00-17:00",
+            "provider_type": "recycling_facility",
             "website": None, "verification_status": "unverified", "verification_notes": "",
             "source_notes": "Imported", "source_url": "https://example.com/source",
             "source_retrieved_at": date(2026, 8, 31),
@@ -91,6 +95,8 @@ class AppTests(unittest.TestCase):
         self.assertEqual(source_response.json["sources"][0]["retrievalDate"], "2026-09-03")
         self.assertEqual(evidence_response.json["evidence"][0]["fixedCount"], 1)
         self.assertEqual(location_response.json["locations"][0]["pathway"], "dispose")
+        self.assertEqual(location_response.json["locations"][0]["latitude"], -37.77)
+        self.assertEqual(location_response.json["locations"][0]["providerType"], "recycling_facility")
 
 
 if __name__ == "__main__":

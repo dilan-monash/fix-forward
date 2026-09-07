@@ -1,139 +1,198 @@
-# FixForward — Iteration 1 v1.3.0 redesign candidate
+# FixForward — Iteration 1 v1.4 goal-first prototype
 
-FixForward is an anonymous decision-support web application for Victorian households deciding what to do with a faulty small appliance. This redesign implements the teaching-team/usability feedback as a coherent product journey rather than patching individual screens.
+FixForward is an anonymous decision-support web application for metropolitan Melbourne households with a faulty portable appliance. This **non-final prototype** explores a simpler product question:
 
-## Product story
+> **What do you want to do with the appliance?**
 
-**Identify -> Understand -> Act -> Compare**
+The user can start with **Repair it**, **Compare costs**, **Recycle it**, or **I'm not sure**. FixForward then runs a short, appliance-relevant safety check and a cautious recall check before allowing the requested pathway.
 
-1. **Identify** — choose one of six supported appliance families, then an alphabetised category.
-2. **Understand** — screen the limited recall index, optionally refine with brand/model, then answer category-relevant safety questions.
-3. **Act** — follow official recall guidance, professional safety assessment, community repair (only when appropriate), or responsible e-waste pathways.
-4. **Compare** — where safety/recall does not block it, compare a real repair quote against a user-supplied comparable replacement value. Automatic retail benchmarking is intentionally not claimed until the dataset is defensible.
+This candidate keeps the safety/reliability controls proved in v1.3 and changes the information architecture to reduce effort and technical language.
 
-The application is guidance only. It does not diagnose a fault, certify safety, provide recall clearance or give DIY repair instructions.
+## User experience
 
-## What changed in v1.3 redesign
+```text
+HOME
+  ├─ Repair it ───────┐
+  ├─ Compare costs ───┤
+  ├─ Recycle it ──────┤→ identify appliance → quick safety + recall gate
+  └─ I'm not sure ────┘                         │
+                                                 ├─ serious warning → stop-use guidance
+                                                 ├─ possible recall → official recall instructions
+                                                 ├─ chosen goal → go straight to that tool
+                                                 └─ unsure goal → show repair / compare / recycle choices
+```
 
-- Proper landing page explaining purpose, environmental value, coverage and privacy before the form.
-- Immediate loading screen so Render/Neon cold starts never look like a blank/broken website.
-- Independent public-data loading with `Promise.allSettled()`; one failed endpoint does not disable unrelated data.
-- Recall-index failure no longer prevents the static safety questionnaire.
-- Retry public data without restarting the assessment.
-- Model-first exact recall matching within the chosen category; brand mismatch is a warning, not a reason to hide an exact model hit.
-- One-character/near model identifiers are never promoted to exact recall matches.
-- Safety questions are tailored by appliance and split into critical vs caution severity; not every “Yes” becomes the same high-risk outcome.
-- High-risk/uncertain appliances can never be routed to a community Repair Cafe as professional safety assessment.
-- Repair evidence is explained in plain language with metrics and expandable limitations.
-- Location results render inside FixForward with verification labels and explicit Melbourne/exact-area limitations.
-- Dedicated Back buttons + browser Back support.
-- Restart confirmation after assessment progress exists.
-- Accessibility improvements: invalid focus, live location results, external-link new-tab labels, stronger contrast/visual hierarchy.
-- Grouped Sources/privacy dialog with infrastructure-aware privacy wording.
-- `/api/health` is process liveness; `/api/ready` checks Neon readiness.
-- Short public-response caching and explicit Gunicorn workers/threads reduce avoidable deployment pressure.
+### Plain-language design
+
+The main journey avoids terms such as *dataset*, *provenance*, *identifier* and *confidence level*. When “product recall” first appears, FixForward explains it in everyday language. Detailed evidence remains available under **About the information** or expandable evidence sections.
+
+### Goal-first shortcuts
+
+If the safety/recall gate does not override the journey:
+
+- **Repair it** goes directly to the repair map/service finder.
+- **Compare costs** goes directly to the cost tool.
+- **Recycle it** goes directly to recycling locations.
+- **I'm not sure** shows the three options with repair-history context.
+
+A user does not need to repeat a generic “choose next action” screen after already stating their goal.
+
+## Location experience
+
+The v1.4 prototype adds an **optional browser geolocation experiment** requested in teaching feedback/usability discussion.
+
+- The browser asks permission only after the user selects **Use my current location**.
+- Latitude/longitude stay in JavaScript memory and are **not sent to the FixForward API or Neon**. When the map is shown, OpenStreetMap still receives ordinary tile requests for the map area being viewed; FixForward does not claim otherwise.
+- Distances are calculated in the browser using service coordinates already returned by `/api/locations`.
+- Results can be filtered by radius and repair-provider type.
+- Leaflet renders the map in FixForward using OpenStreetMap tiles.
+- Service cards prioritise name, distance, address, phone, opening-hours data (when present), Call, Directions and Website.
+- Dataset/verification detail is moved into **About this listing** instead of dominating the user-facing card.
+
+**Scope note:** the previously approved I1 baseline used manual suburb entry. Therefore device geolocation is an **experimental scope change, not automatically an approved final-I1 feature**. It should be reviewed with the BA/mentor and security/privacy owners before final release. Manual suburb/postcode search remains available.
+
+## Recall and safety integrity
+
+Recall matching remains conservative:
+
+| Situation | User-facing behavior |
+|---|---|
+| Category only / no model | Explain that there is not enough product detail for a product-specific check |
+| Exact normalised model in selected category | “Your model may be affected by a product recall” + official notice |
+| Exact model but brand differs | Preserve possible model match and warn that the entered brand differs |
+| Near / one-character-different model | Ask user to re-check the label; never promote to an exact recall match |
+| No match | “We did not find your exact model in our current list” + explicitly state this does not prove no recall |
+| Recall API unavailable | Keep safety questions available and link to the official Australian recall search |
+| Serious warning | Stop-use guidance; community Repair Café pathway is not offered |
+| Caution / Not sure | Recommend appropriate assessment before ordinary cost/community repair pathways |
+
+Safety questions are adapted to the appliance category. A kettle does not receive a battery question; a battery-powered shaver can.
+
+## Repair evidence
+
+Open Repair Alliance category history is translated into plain language such as:
+
+> **73 of 169 recorded community repair attempts were fixed during the event.**
+
+The detailed sample, geography, broader-category mapping and limitations remain available in an expandable panel. FixForward does not present category history as a model-specific success probability.
+
+## Smart cost finder — prototype boundary
+
+The UI demonstrates the intended product-resolution hierarchy:
+
+1. exact brand + model;
+2. brand + appliance type;
+3. appliance type only.
+
+A future resolver may use fuzzy/AI-assisted identification to understand misspelled product names, but **AI must not invent repair or replacement prices**. Dollar values must come from governed evidence.
+
+The repository/audit previously contained a weak category-price snapshot (57 observations across 19 categories, three observations per category). It is deliberately **not promoted to a trustworthy automatic market benchmark** in this prototype because the sample is too concentrated and does not establish model-level repair prices.
+
+A manual two-value comparison remains as a fallback for users who already have a repair quote and replacement price.
 
 ## Architecture
 
 ```text
-Browser UI ──GET public data──> Flask API ──SELECT only──> Neon PostgreSQL
-    │
-    ├── family/category/brand/model remain in browser memory
-    ├── safety answers remain in browser memory
-    ├── suburb/postcode remains in browser memory
-    └── cost inputs remain in browser memory
+Browser SPA
+  │
+  ├─ user goal, appliance, safety answers, cost values: memory only
+  ├─ optional device latitude/longitude: memory only
+  ├─ local distance/filter logic
+  ├─ Leaflet map + OpenStreetMap tiles
+  │
+  └── GET public data ──> Flask API ── SELECT only ──> Neon PostgreSQL
+                         │
+                         ├─ /api/health  process liveness
+                         └─ /api/ready   database readiness
 ```
 
-See:
+Public datasets are loaded independently with `Promise.allSettled()`. A location failure does not disable recall screening, and a recall-data failure does not prevent static safety guidance.
 
-- `docs/ARCHITECTURE_I1_REDESIGN.md`
-- `docs/SECURE_ARCHITECTURE_I1.md`
-- `docs/TEACHING_FEEDBACK_ACTION_REGISTER.md`
-- `docs/KNOWN_LIMITATIONS_V1.3.md`
-- `docs/DEPLOYMENT_CHECKLIST_V1.3.md`
+## API endpoints
 
-## Recall safety rule
+- `GET /api/health`
+- `GET /api/ready`
+- `GET /api/recalls`
+- `GET /api/sources`
+- `GET /api/repair-evidence`
+- `GET /api/locations`
 
-| Input / condition | Result |
-|---|---|
-| Category only | Insufficient product information; never “recalled/not recalled” |
-| Brand only | Possible category notices may be visible; model still requested |
-| Exact normalized model in selected category | “Exact model identifier found”; verify official notice |
-| Exact model but entered brand differs | Preserve possible match + explicit brand-conflict warning |
-| One-character/partial model | No exact match; may show a re-check warning, never a recall verdict |
-| No exact match | No match in the limited index — never “not recalled” |
-| Recall API unavailable | Recall remains unknown; official ACCC link + safety screening continues |
-| Critical warning sign | Stop-use/professional guidance; community Repair Cafe hidden |
-| Caution/unsure warning | Assessment recommended; cost comparison blocked |
+See `API_CONTRACT.md`.
+
+## Security/privacy highlights
+
+- No user account, password, payment or saved-journey feature.
+- No journey-answer POST endpoint.
+- Application database access is read-only.
+- Dynamic text is HTML-escaped.
+- Recall notice URLs are restricted to official Product Safety hosts by the backend.
+- Content Security Policy is present.
+- Referrer policy is `strict-origin-when-cross-origin`, preserving origin-only Referer information required by the OpenStreetMap web tile service without exposing the full FixForward page URL.
+- Leaflet 1.9.4 CDN files are pinned with official Subresource Integrity hashes.
+- Geolocation is allowed only for the same-origin page and only after browser permission.
+- Exact user coordinates are not persisted or sent to Neon.
+- High-risk safety state cannot route to community repair results.
+- Technical failure is not presented as reassurance.
+
+See `docs/SECURE_ARCHITECTURE_I1.md` and `docs/V1.4_GOAL_FIRST_PROTOTYPE.md`.
 
 ## Local setup
 
-Requirements: Python 3.11+, Node.js 20+, and a PostgreSQL/Neon connection string for a SELECT-only application role.
+Requirements: Python 3.11+, Node.js 20+, and a PostgreSQL/Neon connection string for the application's read-only role.
 
-```sh
+```powershell
 python -m venv .venv
-```
-
-Activate it, then install:
-
-```sh
+.\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
 ```
 
-Set `DATABASE_URL` in the environment. Never commit or screenshot the credential.
+Set `DATABASE_URL` as an environment variable. Do **not** paste it into documentation, screenshots or Git.
 
-Start the integrated application:
-
-```sh
-flask --app app run --debug
+```powershell
+$env:RELEASE_VERSION = "iteration-1-v1.4.0-goal-first"
+python -m flask --app app run --debug
 ```
 
 Open `http://127.0.0.1:5000`.
 
 ## Tests
 
-Frontend/decision/UX contract:
+Frontend/decision/UX tests:
 
-```sh
+```powershell
 npm test
+npm run check
 ```
 
-Backend tests (after Python dependencies are installed):
+Backend tests after Python dependencies are installed:
 
-```sh
+```powershell
 python -m unittest discover -s test_backend -v
-```
-
-Syntax/compile check:
-
-```sh
 python -m compileall -q backend app.py test_backend
-node --check src/app.js
-node --check src/logic.js
-node --check src/data-service.js
 ```
 
-The redesign package currently passes all 23 Node tests. Live Render/Neon behavior is still a manual release gate and must be verified after deployment.
+In the build environment used to package this prototype, all **30 Node tests passed** and Python compilation passed. The complete Flask test module could not be executed there because external package installation was unavailable; run it in the project's normal `.venv` before committing. The prior v1.3 candidate was separately run by the project team with its backend suite passing.
 
 ## Demonstration recall case
 
-The existing seed data contains a narrow reviewed example:
+The narrow reviewed example remains:
 
 - Family: Cleaning
 - Category: Vacuum cleaner
 - Brand: Mistral
 - Model: BVC 160 or BVC 165
 
-Expected result: exact model identifier found, with official ACCC verification required. This is a demonstration subset, not complete Australian recall coverage.
+Expected: **possible recall match** with official verification required. It is not complete Australian recall coverage.
 
-## Data and scope limitations
+## Important prototype limits
 
-- Recall coverage is limited and curated.
-- Repair evidence is self-selected category-level historical evidence, not a personal prediction.
-- Melbourne service matching is exact suburb/postcode text matching, not genuine nearest-distance search.
-- Professional repair businesses are not currently represented by a verified directory.
-- Automatic geolocation is deferred until approved data/privacy design exists.
-- Assessment history remains out of scope because I1 intentionally stores no journey history.
-- Automatic retail-price benchmarking is not claimed without a sufficiently diverse, governed price dataset.
+1. Recall coverage remains deliberately limited.
+2. Location records may be incomplete/out of date; call/check before travelling.
+3. Facility-level qualification/appliance acceptance cannot be claimed unless the source proves it.
+4. Current-location mode is experimental and needs scope/privacy approval before final I1.
+5. OpenStreetMap tile service and the Leaflet CDN are third-party dependencies; production usage should be reviewed against their policies and availability requirements.
+6. Automatic model-level repair/replacement prices are not enabled until a stronger governed source exists.
+7. No saved assessment history is introduced.
+8. Live Render/Neon behavior remains a deployment release gate.
 
-Do not “solve” these gaps by inventing data or weakening the limitation wording.
+Do not “complete” these features by inventing provider details, appliance acceptance, recall results or prices.

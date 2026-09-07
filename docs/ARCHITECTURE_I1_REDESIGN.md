@@ -1,28 +1,30 @@
-# FixForward Iteration 1 - System Architecture (v1.3 redesign)
+# FixForward Iteration 1 — System Architecture (v1.4 goal-first prototype)
 
-## 1. User-facing flow
+## 1. User-facing architecture
 
 ```mermaid
 flowchart LR
-    A[Landing\nPurpose + coverage + privacy] --> B[Identify\nFamily -> category]
-    B --> C[Recall screening\nOptional brand/model]
-    C --> D[Safety questions\nCategory-tailored]
-    D --> E{Decision gate}
-    E -->|Possible recall| F[Official ACCC pathway]
-    E -->|Critical/uncertain safety| G[Professional assessment guidance]
-    E -->|No blocking condition| H[Repair / recycle / cost options]
-    H --> I[Repair evidence + Melbourne Repair Cafe search]
-    H --> J[E-waste location search]
-    H --> K[Manual cost fallback]
+    H[Home\nRepair / Compare / Recycle / Help me decide] --> I[Identify appliance\nFamily + category\noptional brand/model]
+    I --> Q[Quick safety + recall gate\nappliance-relevant questions]
+    Q --> D{Safe pathway gate}
+    D -->|Serious warning| S[Stop-use / professional safety guidance]
+    D -->|Possible recall| R[Official recall instructions]
+    D -->|Repair goal| M[In-app repair map + service cards]
+    D -->|Compare goal| C[Smart cost prototype + manual fallback]
+    D -->|Recycle goal| W[In-app e-waste map + service cards]
+    D -->|Help me decide| O[Repair / Compare / Recycle options]
 ```
+
+The goal selection is not a safety bypass. Recall/safety rules can override the requested pathway.
 
 ## 2. Data architecture
 
 ```mermaid
 flowchart TB
-    ACCC[ACCC recall source] --> PIPE[Governed data import / review]
-    ORA[Open Repair data] --> PIPE
-    VIC[Victorian / Melbourne location datasets] --> PIPE
+    ACCC[Official recall source] --> PIPE[Controlled import / review]
+    ORA[Open Repair Alliance] --> PIPE
+    VIC[Victorian waste data] --> PIPE
+    OSM[OpenStreetMap-derived repair locations] --> PIPE
     PIPE --> NEON[(Neon PostgreSQL\ncurated read model)]
     NEON --> API[Flask read-only API]
     API --> R[/api/recalls]
@@ -34,39 +36,52 @@ flowchart TB
     E --> WEB
     L --> WEB
     STATIC[Static family + safety rule definitions] --> WEB
+    GEO[Browser Geolocation\npermission only] --> LOCAL[Local distance calculation]
+    L --> LOCAL
+    LOCAL --> MAP[Leaflet map\nOpenStreetMap tiles]
 ```
 
-## 3. Dataset -> function traceability
+**Privacy boundary:** `GEO` never goes to `API` or `NEON`.
 
-| Data | Backend function | Endpoint | Frontend use |
+## 3. Dataset → function traceability
+
+| Data | Backend | Endpoint | Browser use |
 |---|---|---|---|
-| Reviewed recall products | `reviewed_recall_products()` | `/api/recalls` | `matchRecall()` / `renderRecall()` |
-| Recall metadata | `recall_metadata()` | `/api/recalls` | coverage/limitation wording |
-| Data source register | `sources()` | `/api/sources` | grouped Sources dialog |
-| Repair statistics | `repair_statistics()` | `/api/repair-evidence` | `repairEvidencePanel()` |
-| Repair barriers | `repair_barriers()` | `/api/repair-evidence` | evidence details |
-| Relevant locations | `relevant_locations()` | `/api/locations` | `getLocations()` / `renderLocationResults()` |
-| Safety definitions | static `data.js` | none | `applicableSafetySigns()` / `evaluateSafety()` |
+| Reviewed recall products | `reviewed_recall_products()` | `/api/recalls` | `matchRecall()` / `recallMiniCard()` |
+| Recall metadata | `recall_metadata()` | `/api/recalls` | limitation/coverage detail |
+| Source register | `sources()` | `/api/sources` | grouped About dialog |
+| Repair statistics | `repair_statistics()` | `/api/repair-evidence` | `repairEvidenceSummary()` |
+| Repair barriers | `repair_barriers()` | `/api/repair-evidence` | evidence detail |
+| Relevant locations + coordinates | `relevant_locations()` | `/api/locations` | `getLocations()`, `getNearbyLocations()`, `renderMap()` |
+| Static safety rules | `data.js` | none | `applicableSafetySigns()`, `evaluateSafety()` |
+| User coordinates | none | **none** | `navigator.geolocation` → `distanceKm()` only |
 
-## 4. Reliability behavior
+## 4. Goal-first routing
 
-- Browser renders a loading screen **before** network activity.
-- Public datasets load independently using `Promise.allSettled()`.
-- Failure of locations does not disable recall.
-- Failure of recall does not disable static safety screening.
-- The user can retry public data without clearing the assessment.
-- `/api/health` is process liveness and no longer depends on Neon.
+```text
+selected goal
+    ↓
+appliance
+    ↓
+quick safety/recall gate
+    ↓
+if blocked: safe override
+if clear: direct route to requested tool
+```
+
+This removes the redundant “choose next action” screen for users who already chose a goal on the landing page.
+
+## 5. Reliability behavior
+
+- Loading UI is rendered before network work.
+- Public datasets load independently with `Promise.allSettled()`.
+- Location failure does not disable recall.
+- Recall failure does not disable static safety questions.
+- Public data can be retried without resetting the journey.
+- `/api/health` checks process liveness.
 - `/api/ready` checks database readiness.
-- Public data responses allow short caching to reduce repeated Neon reads.
+- No user-coordinate network request is required for nearby sorting.
 
-## 5. Iteration boundary
+## 6. Prototype scope-change flag
 
-Still out of scope unless formally approved and supported by data/security design:
-
-- accounts and login;
-- stored assessment history;
-- barcode/OCR/image upload;
-- automatic geolocation-to-suburb mapping;
-- a verified professional repair-business directory;
-- complete Australian recall coverage;
-- authoritative automatic market-price benchmarking.
+Device geolocation changes the previously documented I1 manual-location boundary. The prototype implements it in the least-data way (browser permission + memory-only coordinates) so the team can usability-test the idea. It must be explicitly accepted or deferred before the final I1 scope is frozen.

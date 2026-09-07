@@ -1,25 +1,49 @@
-# FixForward v1.3.0 redesign integration notes
+# FixForward v1.4 goal-first prototype — integration notes
 
-This candidate is a deliberate redesign based on the 4 September teaching-team feedback, usability-test observations and the live-release audit. It changes user experience, decision logic and deployment behavior while preserving the existing data pipeline and read-only backend model.
+This candidate builds on the v1.3 safety/reliability redesign and explores a stronger ordinary-household experience. It is intentionally **not final scope**.
 
-## Key compatibility decisions
+## What changed from v1.3
 
-- No account, upload, OCR, barcode, analytics or saved journey history was added.
-- Existing Neon data schema/migrations are preserved; the redesign does not invent new production datasets.
-- Recall matching remains category-scoped and exact-model based, but model matching now occurs before brand confirmation so a brand-text variation cannot hide an exact identifier.
-- Safety behavior changed intentionally: warning rules now distinguish critical vs caution signals and appliance applicability.
-- Recall endpoint failure no longer blocks static safety screening.
-- High-risk/uncertain pathways never reuse community Repair Cafe results as professional assessment.
-- Cost comparison remains a transparent manual fallback until a governed retail benchmark dataset is available.
+- Landing page starts with user goals: Repair / Compare / Recycle / I'm not sure.
+- Repair/Compare/Recycle go directly to the requested tool after a clear safety/recall gate.
+- The safety/recall gate still overrides convenience when a serious warning or possible recall exists.
+- “Product recall” is explained in simple language rather than assumed knowledge.
+- Optional current-location mode calculates nearby results in the browser.
+- In-app Leaflet/OpenStreetMap map shows service positions.
+- Service cards lead with practical fields (distance/address/phone/hours/call/directions) rather than provenance labels.
+- Verification/source detail is still available under `About this listing`.
+- Repair-history context is visual and secondary to the service finder.
+- Smart-cost UX is demonstrated without inventing automatic prices.
 
-## Deployment behavior
+## Data compatibility
 
-- `render.yaml` now identifies `iteration-1-v1.3.0-redesign` and sets an explicit Gunicorn worker/thread/timeout configuration.
-- `/api/health` is liveness only.
-- `/api/ready` verifies Neon.
-- Public API responses use short caching to reduce repeated database pressure.
-- Server errors record safe path/type context while generic client messages remain unchanged.
+No new user-data table is introduced. Existing location columns already support latitude/longitude and optional provider/opening-hour fields through the existing migration set. `/api/locations` exposes those public fields so distance can be calculated locally.
 
-## Review before merge
+The browser **does not send device coordinates to Flask or Neon**.
 
-Use `docs/DEPLOYMENT_CHECKLIST_V1.3.md` and do not merge directly to production without a preview/staging walkthrough. The Node suite proves decision/UI contracts, but it does not prove Render cold-start behavior, Neon concurrency, mobile rendering or live accessibility.
+## Scope compatibility warning
+
+The earlier I1 source-of-truth documented manual suburb selection/no device geolocation. v1.4 implements geolocation as an experimental response to teaching feedback and subsequent usability thinking. Before final I1 merge, record one of these decisions:
+
+1. approve it for I1 and update LeanKit/AC/threat model/privacy evidence;
+2. defer it to I2 and retain manual location in the final I1 branch;
+3. reject it with documented rationale.
+
+Do not let prototype code silently redefine the assessed scope.
+
+## External map dependency
+
+Leaflet 1.9.4 is pinned to the stable CDN release with official SRI hashes. OpenStreetMap tile images are requested only when the map is displayed. The response policy is `strict-origin-when-cross-origin` so browser tile requests can include the origin Referer expected by the OSM tile service. The text service list remains the functional fallback if the map fails.
+
+For a production-grade handover, consider self-hosting the pinned Leaflet release and selecting a map tile service appropriate for expected usage.
+
+## Test/merge gate
+
+Use `docs/DEPLOYMENT_CHECKLIST_V1.4.md`. Do not merge directly into `main` before:
+
+- full backend suite passes in the team `.venv`;
+- Neon development branch contract is checked;
+- geolocation allow/deny and network privacy are verified;
+- map/CDN failure is tested;
+- mobile/keyboard/browser Back are checked;
+- BA/mentor scope decision is recorded.

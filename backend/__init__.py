@@ -55,17 +55,20 @@ def create_app(test_config=None):
     @app.after_request
     def add_security_headers(response):
         # Inline styles remain in the Iteration 1 UI, hence style-src unsafe-inline.
-        # Scripts are still restricted to files hosted by FixForward itself.
+        # Leaflet 1.9.4 is loaded only on the map screen and pinned with Subresource Integrity; all other scripts are local.
         response.headers["Content-Security-Policy"] = (
-            "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; "
-            "img-src 'self' data:; connect-src 'self'; object-src 'none'; "
+            "default-src 'self'; "
+            "script-src 'self' https://unpkg.com; "
+            "style-src 'self' 'unsafe-inline' https://unpkg.com; "
+            "img-src 'self' data: https://tile.openstreetmap.org https://unpkg.com; "
+            "connect-src 'self'; object-src 'none'; "
             "base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
         )
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
-        response.headers["Referrer-Policy"] = "no-referrer"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         response.headers["Permissions-Policy"] = (
-            "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+            "camera=(), microphone=(), geolocation=(self), payment=(), usb=()"
         )
         if request.is_secure:
             response.headers["Strict-Transport-Security"] = "max-age=31536000"

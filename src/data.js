@@ -1,52 +1,57 @@
 // Static UI definitions. Public recall, repair and location records come from
-// the backend; the fallback arrays below are intentionally empty so an API
-// outage can never produce a false recall result from an old demo fixture.
+// the backend. Fallback data arrays stay empty so an outage can never create a
+// false safety/recall or service result from stale demo data.
 export const META = Object.freeze({
-  releaseVersion: "iteration-1-v1.3.0-redesign",
+  releaseVersion: "iteration-1-v1.4.0-goal-first",
   dataVersion: "public-data-unavailable",
-  retrievalDate: "Check the Sources page"
+  retrievalDate: "See About the information"
 });
 
 export const FAMILIES = Object.freeze([
   {
     id: "heating-simple-cooking",
-    name: "Heating and simple cooking",
+    name: "Heating & simple cooking",
     hint: "Kettles, toasters, sandwich presses and rice cookers",
-    categories: ["Kettle", "Toaster", "Sandwich press", "Rice cooker"]
+    icon: "♨",
+    categories: ["Kettle", "Rice cooker", "Sandwich press", "Toaster"]
   },
   {
     id: "motorised-kitchen",
     name: "Motorised kitchen",
     hint: "Blenders, mixers and food processors",
-    categories: ["Blender", "Mixer", "Food processor"]
+    icon: "◉",
+    categories: ["Blender", "Food processor", "Mixer"]
   },
   {
     id: "complex-kitchen",
     name: "Complex kitchen",
     hint: "Coffee machines, air fryers and microwaves",
-    categories: ["Coffee machine", "Air fryer", "Microwave"]
+    icon: "◫",
+    categories: ["Air fryer", "Coffee machine", "Microwave"]
   },
   {
     id: "cleaning",
     name: "Cleaning",
     hint: "Vacuum cleaners and steam cleaners",
-    categories: ["Vacuum cleaner", "Steam cleaner"]
+    icon: "✦",
+    categories: ["Steam cleaner", "Vacuum cleaner"]
   },
   {
     id: "personal-care",
     name: "Personal care",
     hint: "Hair dryers, straighteners and shavers",
-    categories: ["Hair dryer", "Straightener", "Shaver"]
+    icon: "◇",
+    categories: ["Hair dryer", "Shaver", "Straightener"]
   },
   {
     id: "air-treatment",
     name: "Air treatment",
     hint: "Fans, portable heaters, dehumidifiers and portable air conditioners",
-    categories: ["Fan", "Portable heater", "Dehumidifier", "Portable air conditioner"]
+    icon: "◎",
+    categories: ["Dehumidifier", "Fan", "Portable air conditioner", "Portable heater"]
   }
 ]);
 
-// Stable machine-readable codes connect the UI labels to the database.
 export const CATEGORY_CODE_BY_NAME = Object.freeze({
   "Kettle": "kettle",
   "Toaster": "toaster",
@@ -69,8 +74,8 @@ export const CATEGORY_CODE_BY_NAME = Object.freeze({
   "Portable air conditioner": "portable-air-conditioner"
 });
 
-// The repair dataset uses broader categories than the interface. A null value
-// means there is no defensible evidence mapping for that UI category yet.
+// The Open Repair Alliance evidence uses broader categories than the UI. These
+// mappings are disclosed to users in the expandable "How we got this" panel.
 export const EVIDENCE_CATEGORY_CODE_BY_UI_CATEGORY = Object.freeze({
   "kettle": "kettle",
   "toaster": "toaster",
@@ -95,66 +100,48 @@ export const EVIDENCE_CATEGORY_CODE_BY_UI_CATEGORY = Object.freeze({
 
 export const RECALLS = Object.freeze([]);
 
+// The visible questions are intentionally written for ordinary household users.
+// Several older technical questions are combined where the same user action is
+// appropriate, reducing the safety check while keeping conservative routing.
 export const SAFETY_SIGNS = Object.freeze([
-  ["burning", "Burning smell, smoke or fire"],
-  ["sparks", "Sparks or electrical arcing (electricity visibly jumping through the air)"],
-  ["shock", "Electric shock or tingling"],
-  ["wiring", "Exposed or damaged wiring"],
-  ["heat", "Unusual overheating"],
-  ["plug", "Melted, scorched or damaged plug"],
-  ["trips", "Repeated circuit-breaker trips"],
-  ["water", "Water or moisture damage"],
-  ["battery", "Swollen, leaking or damaged battery"],
-  ["sound", "Sudden unusual buzzing, popping or crackling"]
+  ["burning", "Have you seen smoke, fire or smelled burning?"],
+  ["electrical", "Have you felt a shock, seen sparks, or found exposed/damaged wires?"],
+  ["plug", "Is the plug or power cord melted, scorched or badly damaged?"],
+  ["power", "Does it keep tripping the power, or make new popping/buzzing sounds?"],
+  ["heat", "Is it getting much hotter than normal?"],
+  ["water", "Has water or moisture got into it?"],
+  ["battery", "Is the battery swollen, leaking or damaged?"]
 ]);
 
-export const SAFETY_GROUPS = Object.freeze([
-  {
-    id: "obvious-danger",
-    title: "Obvious danger signs",
-    description: "Signs that may require immediate action",
-    signIds: ["burning", "sparks", "shock", "wiring"]
-  },
-  {
-    id: "power-heat",
-    title: "Power and heat",
-    description: "Changes around heat, plugs and electrical supply",
-    signIds: ["heat", "plug", "trips"]
-  },
-  {
-    id: "water-battery-sound",
-    title: "Water, battery and sound",
-    description: "Other warning signs you can safely observe",
-    signIds: ["water", "battery", "sound"]
-  }
-]);
-
-export const SOURCES = Object.freeze([
-  { name: "ACCC Product Safety recalls", url: "https://www.productsafety.gov.au/recalls", use: "Official recall notices and verification" },
-  { name: "Energy Safe Victoria", url: "https://www.energysafe.vic.gov.au/", use: "Electrical safety guidance" },
-  { name: "Open Repair Alliance", url: "https://openrepair.org/open-data/downloads/", use: "Category-level repair evidence" },
-  { name: "Victorian e-waste guidance", url: "https://www.sustainability.vic.gov.au/recycling-and-reducing-waste-at-home/recycling-at-home/e-waste", use: "Responsible e-waste disposal guidance" }
-]);
-
-export const REPAIR_EVIDENCE = Object.freeze([]);
-
-export const LOCATIONS = Object.freeze([]);
-
-// Safety rules separate immediate stop-use indicators from caution indicators.
-// This prevents every "Yes" answer from being treated as the same severity.
-// Applicability also keeps battery/water questions away from appliances where
-// they are not meaningful in Iteration 1.
 export const SAFETY_RULES = Object.freeze({
-  burning: Object.freeze({ severity: "critical", explanation: "Smoke, fire or a burning smell can indicate overheating or an electrical fault." }),
-  sparks: Object.freeze({ severity: "critical", explanation: "Visible sparks or arcing can indicate unsafe electrical contact." }),
-  shock: Object.freeze({ severity: "critical", explanation: "Any electric shock or tingling is an immediate safety concern." }),
-  wiring: Object.freeze({ severity: "critical", explanation: "Exposed or damaged wiring can create shock and fire risks." }),
-  heat: Object.freeze({ severity: "caution", explanation: "Unusual heat can have several causes. Stop and seek assessment if it is severe, worsening or accompanied by smell/smoke." }),
-  plug: Object.freeze({ severity: "critical", explanation: "A melted or scorched plug can indicate dangerous overheating or poor electrical contact." }),
-  trips: Object.freeze({ severity: "caution", explanation: "Repeated circuit-breaker trips can indicate an electrical fault and should be assessed before reuse." }),
-  water: Object.freeze({ severity: "caution", explanation: "Moisture around mains-powered equipment can create electrical risk. Do not energise a wet appliance." }),
-  battery: Object.freeze({ severity: "critical", explanation: "A swollen, leaking or damaged battery can present fire and chemical hazards." }),
-  sound: Object.freeze({ severity: "caution", explanation: "New buzzing, popping or crackling can indicate a developing fault." })
+  burning: Object.freeze({
+    severity: "critical",
+    explanation: "Smoke, fire or a burning smell can mean dangerous overheating or an electrical fault."
+  }),
+  electrical: Object.freeze({
+    severity: "critical",
+    explanation: "A shock, visible sparks or exposed wiring can create serious electric-shock or fire risk."
+  }),
+  plug: Object.freeze({
+    severity: "critical",
+    explanation: "A melted, scorched or badly damaged plug or cord can be unsafe to keep using."
+  }),
+  power: Object.freeze({
+    severity: "caution",
+    explanation: "Repeated power trips or new popping/buzzing sounds can point to a fault that should be checked."
+  }),
+  heat: Object.freeze({
+    severity: "caution",
+    explanation: "Unusual heat can have several causes. Stop and get it checked if it is severe, worsening or comes with smoke or smell."
+  }),
+  water: Object.freeze({
+    severity: "caution",
+    explanation: "Water or moisture around electrical equipment can be dangerous. Do not switch on a wet appliance."
+  }),
+  battery: Object.freeze({
+    severity: "critical",
+    explanation: "A swollen, leaking or damaged battery can create fire and chemical hazards."
+  })
 });
 
 export const SAFETY_APPLICABILITY = Object.freeze({
@@ -162,3 +149,49 @@ export const SAFETY_APPLICABILITY = Object.freeze({
   water: Object.freeze(["Kettle", "Rice cooker", "Coffee machine", "Steam cleaner", "Dehumidifier", "Portable air conditioner", "Shaver"]),
   heat: Object.freeze(["Kettle", "Toaster", "Sandwich press", "Rice cooker", "Coffee machine", "Air fryer", "Microwave", "Hair dryer", "Straightener", "Portable heater"])
 });
+
+export const SOURCES = Object.freeze([
+  { name: "ACCC Product Safety recalls", url: "https://www.productsafety.gov.au/recalls", use: "Official Australian product safety and recall notices" },
+  { name: "Energy Safe Victoria", url: "https://www.energysafe.vic.gov.au/", use: "Electrical safety guidance" },
+  { name: "Open Repair Alliance", url: "https://openrepair.org/open-data/downloads/", use: "Category-level community repair outcomes" },
+  { name: "Victorian e-waste guidance", url: "https://www.sustainability.vic.gov.au/recycling-and-reducing-waste-at-home/recycling-at-home/e-waste", use: "Responsible e-waste guidance" },
+  { name: "OpenStreetMap", url: "https://www.openstreetmap.org/copyright", use: "Base map tiles and map attribution for the prototype map" }
+]);
+
+export const REPAIR_EVIDENCE = Object.freeze([]);
+export const LOCATIONS = Object.freeze([]);
+
+export const GOALS = Object.freeze([
+  {
+    id: "repair",
+    icon: "🔧",
+    title: "I want to repair it",
+    description: "See how similar appliances have gone at repair events and find repair options near you.",
+    cta: "Find repair options"
+  },
+  {
+    id: "compare",
+    icon: "⚖",
+    title: "I want to compare costs",
+    description: "Check whether a repair quote is worth comparing with the price of replacing the appliance.",
+    cta: "Compare costs"
+  },
+  {
+    id: "recycle",
+    icon: "♻",
+    title: "I want to recycle it",
+    description: "Find places that take old electrical appliances for recycling and see them on a map.",
+    cta: "Find recycling"
+  },
+  {
+    id: "guide",
+    icon: "🧭",
+    title: "I’m not sure",
+    description: "Answer a few simple questions and FixForward will show the options that fit your situation.",
+    cta: "Help me decide"
+  }
+]);
+
+// Kept in the public data contract for backward compatibility with v1.3.
+// The goal-first UI no longer displays technical risk-group headings.
+export const SAFETY_GROUPS = Object.freeze([]);
