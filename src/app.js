@@ -23,7 +23,7 @@ const sourcesContent = document.querySelector("#sources-content");
 const toast = document.querySelector("#toast");
 
 const emptyState = () => ({
-  screen: "identify",
+  screen: "landing",
   appliance: { family: "", category: "", categoryCode: "", brand: "", model: "" },
   recall: null,
   safety: {},
@@ -81,16 +81,16 @@ function recallBanner() {
   return `<aside class="recall-banner" role="alert">${icon("alert")}<div><strong>Strong possible recall match remains active</strong><p>${escapeHtml(state.recall.match.title)}. Verify every identifier on ${noticeUrl ? `<a href="${escapeAttribute(noticeUrl)}" target="_blank" rel="noopener noreferrer">the official ACCC notice</a>` : "the official ACCC recall search"}.</p></div></aside>`;
 }
 
-function renderIdentify() {
-  state.screen = "identify";
+function renderLanding() {
+  state.screen = "landing";
   setPhase("identify");
-  const selectedFamily = FAMILIES.find((family) => family.id === state.appliance.family);
-  app.innerHTML = `<section class="screen">
+  app.innerHTML = `<section class="screen landing-screen">
     <div class="hero">
       <div>
         <p class="eyebrow">Broken appliance? Start here.</p>
         <h1>Safety first. Then a clearer next step.</h1>
         <p class="lede">FixForward helps Victorian households understand what to do with an unwanted or faulty appliance: check recall information, notice safety risks, then explore repair or responsible e-waste options.</p>
+        <div class="landing-actions"><button class="button primary" id="start-assessment">Start assessment ${icon("arrow")}</button><span>No account needed · Usually takes 5–10 minutes</span></div>
       </div>
       <aside class="hero-panel">
         <strong>${icon("shield")} What FixForward does</strong>
@@ -102,12 +102,21 @@ function renderIdentify() {
       <div><span>2</span><strong>Understand</strong><small>See recall and safety reasons</small></div>
       <div><span>3</span><strong>Act</strong><small>Explore repair or recycling</small></div>
     </div>
+  </section>`;
+  app.querySelector("#start-assessment").addEventListener("click", () => { renderIdentify(); focusMain(); });
+}
+
+function renderIdentify() {
+  state.screen = "identify";
+  setPhase("identify");
+  const selectedFamily = FAMILIES.find((family) => family.id === state.appliance.family);
+  app.innerHTML = `<section class="screen identify-screen">
     <div class="section-head"><div><p class="eyebrow">Step 1 of 4 · Two quick choices</p><h2>${selectedFamily ? "Now choose the appliance" : "What type of appliance is it?"}</h2></div><p>${selectedFamily ? "One more tap starts the recall check." : "Choose one of the six supported groups. No typing is needed."}</p></div>
     <div class="family-grid" aria-label="Appliance families">
         ${FAMILIES.map((family) => `<button type="button" class="choice-card" data-family="${escapeAttribute(family.id)}" aria-pressed="${family.id === state.appliance.family}"><strong>${escapeHtml(family.name)}</strong><small>${escapeHtml(family.hint)}</small></button>`).join("")}
       </div>
       ${selectedFamily ? `<section class="category-picker" aria-labelledby="category-title"><div><p class="mini-label">Selected group</p><h3 id="category-title">${escapeHtml(selectedFamily.name)}</h3></div><div class="category-grid">${[...selectedFamily.categories].sort((a, b) => a.localeCompare(b)).map((category) => `<button type="button" class="category-button" data-category="${escapeAttribute(category)}">${escapeHtml(category)} ${icon("arrow")}</button>`).join("")}</div><button class="text-button" type="button" id="change-family">Choose a different group</button></section>` : `<p class="selection-hint" role="status">Choose a group above to reveal only the appliances that belong to it.</p>`}
-      <p class="source-line">Your selection stays in this browser tab and is not stored.</p>
+      <div class="identify-footer"><button class="text-button" type="button" id="back-to-overview">Back to overview</button><p class="source-line">Your selection stays in this browser tab and is not stored.</p></div>
   </section>`;
 
   app.querySelectorAll("[data-family]").forEach((button) => button.addEventListener("click", () => {
@@ -125,6 +134,7 @@ function renderIdentify() {
     state.appliance = { family: "", category: "", categoryCode: "", brand: "", model: "" };
     renderIdentify(); focusMain();
   });
+  app.querySelector("#back-to-overview").addEventListener("click", () => { renderLanding(); focusMain(); });
 }
 
 function renderRecall(refineErrors = {}) {
@@ -421,7 +431,7 @@ function escapeAttribute(value) {
 }
 
 function restart() {
-  state = emptyState(); history.replaceState(null, "", location.pathname); publicDataAvailable = backendRecallDataAvailable; renderIdentify(); focusMain(); showToast("Assessment cleared. No answers were saved.");
+  state = emptyState(); history.replaceState(null, "", location.pathname); publicDataAvailable = backendRecallDataAvailable; renderLanding(); focusMain(); showToast("Assessment cleared. No answers were saved.");
 }
 
 function renderSources() {
@@ -439,4 +449,4 @@ document.querySelector("#close-sources").addEventListener("click", () => sources
 sourcesDialog.addEventListener("click", (event) => { if (event.target === sourcesDialog) sourcesDialog.close(); });
 document.querySelectorAll("[data-icon]").forEach((node) => { node.innerHTML = icon(node.dataset.icon); });
 
-renderIdentify();
+renderLanding();

@@ -95,6 +95,9 @@ test("AC36 optional brand/model refinement exists outside the initial two-choice
   assert.match(app, /name="model"/);
   assert.match(app, /data-family/);
   assert.match(app, /data-category/);
+  assert.match(app, /function renderLanding/);
+  assert.match(app, /id="start-assessment"/);
+  assert.match(app, /Back to overview/);
   assert.match(app, /Know the model number\? Improve this check \(optional\)/);
   assert.doesNotMatch(app, /id="appliance-form"/);
   assert.doesNotMatch(app, /localStorage\.|sessionStorage\.|document\.cookie/);
@@ -141,6 +144,16 @@ test("AC42 responsive mobile rules cover multi-column controls", async () => {
     assert.match(css, new RegExp(selector.replace(".", "\\.")));
   }
   assert.match(css, /grid-template-columns: 1fr/);
+});
+test("AC36a landing information and appliance choices are rendered on separate screens", async () => {
+  const app = await readFile(new URL("../src/app.js", import.meta.url), "utf8");
+  const landingStart = app.indexOf("function renderLanding");
+  const identifyStart = app.indexOf("function renderIdentify");
+  assert.ok(landingStart >= 0 && identifyStart > landingStart);
+  const landing = app.slice(landingStart, identifyStart);
+  assert.match(landing, /What FixForward does/);
+  assert.doesNotMatch(landing, /data-family/);
+  assert.match(app.slice(identifyStart), /data-family/);
 });
 test("AC43 result views expose sources, version and retrieval date", async () => {
   const source = await readFile(new URL("../src/app.js", import.meta.url), "utf8");
