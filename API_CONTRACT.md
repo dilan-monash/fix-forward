@@ -1,32 +1,54 @@
-# FixForward public-data API contract
+# FixForward public-data API contract — v1.3 redesign
 
-The frontend works without this API while `DATA_API_CONFIG.enabled` is `false`. When the backend and database are ready, implement the four read-only endpoints below, update `baseUrl` if necessary, and set `enabled: true` in `src/config.js`.
+All browser journey values remain client-side. Public API endpoints are read-only `GET` routes and receive no appliance answers, safety responses, suburb/postcode searches, quotes, login details or user profiles.
 
-No endpoint receives appliance selections, safety answers, costs, area selections, login details or user profiles.
+## Liveness and readiness
 
-## Endpoints
+### `GET /api/health`
+
+Fast process liveness. This endpoint deliberately does **not** query Neon.
+
+```json
+{"status":"ok","service":"available","releaseVersion":"iteration-1-v1.3.0-redesign"}
+```
+
+### `GET /api/ready`
+
+Checks that the public database can be queried.
+
+```json
+{"status":"ok","database":"available","releaseVersion":"iteration-1-v1.3.0-redesign"}
+```
+
+Database failures return a generic `503` without infrastructure secrets.
+
+## Public datasets
 
 ### `GET /api/recalls`
 
 ```json
 {
   "meta": {
-    "releaseVersion": "iteration-1-v1.0.0",
-    "dataVersion": "recalls-2026-09-01",
-    "retrievalDate": "1 September 2026"
+    "releaseVersion": "iteration-1-v1.3.0-redesign",
+    "dataVersion": "snapshot-version",
+    "retrievalDate": "2026-09-03",
+    "coverageStart": "2026-04-16",
+    "coverageEnd": "2026-08-27",
+    "recordCount": 1,
+    "limitation": "limited coverage text"
   },
-  "recalls": [
-    {
-      "id": "string",
-      "family": "heating-simple-cooking",
-      "category": "Kettle",
-      "title": "string",
-      "published": "string",
-      "noticeUrl": "https://www.productsafety.gov.au/...",
-      "identifyingNote": "string",
-      "source": "ACCC Product Safety"
-    }
-  ]
+  "recalls": [{
+    "id": "1",
+    "recallId": "55",
+    "categoryCodes": ["vacuum-cleaner"],
+    "brand": "Mistral",
+    "productName": "Barrel Cyclonic Vacuum Cleaner",
+    "title": "notice title",
+    "published": "2026-06-10",
+    "noticeUrl": "https://www.productsafety.gov.au/...",
+    "identifiers": [{"type":"model","value":"BVC 160","normalizedValue":"BVC160"}],
+    "source": "ACCC Product Safety"
+  }]
 }
 ```
 
@@ -34,91 +56,74 @@ No endpoint receives appliance selections, safety answers, costs, area selection
 
 ```json
 {
-  "meta": {
-    "releaseVersion": "iteration-1-v1.0.0",
-    "dataVersion": "public-data-2026-09-01",
-    "retrievalDate": "1 September 2026"
-  },
-  "sources": [
-    { "name": "string", "url": "https://...", "use": "string" }
-  ]
+  "meta": {"releaseVersion":"iteration-1-v1.3.0-redesign"},
+  "sources": [{
+    "name":"string",
+    "url":"https://...",
+    "licence":"string",
+    "retrievalDate":"2026-09-03",
+    "version":"string",
+    "limitations":"string"
+  }]
 }
 ```
 
 ### `GET /api/repair-evidence`
 
-Returns the complete curated public evidence snapshot. The browser filters it by the appliance family and category already held in memory; it does not send the user's selection to this endpoint.
-
 ```json
 {
-  "meta": {},
-  "evidence": {
-    "status": "available",
-    "statistics": [
-      {
-        "applianceFamily": "heating-simple-cooking",
-        "applianceCategory": "Kettle",
-        "geography": "string",
-        "sampleSize": 100,
-        "fixedCount": 40,
-        "repairableCount": 20,
-        "endOfLifeCount": 40,
-        "insufficientEvidence": false,
-        "confidenceLevel": "moderate",
-        "limitations": "string",
-        "sourceId": "string"
-      }
-    ],
-    "barriers": [
-      {
-        "applianceFamily": "heating-simple-cooking",
-        "applianceCategory": "Kettle",
-        "barrier": "Parts unavailable",
-        "occurrenceCount": 12,
-        "geography": "string",
-        "sourceId": "string"
-      }
-    ],
-    "context": {
-      "sampleSize": 305649,
-      "geography": "string",
-      "confidenceLevel": "string",
-      "source": "string",
-      "updated": "string",
-      "limitation": "string"
-    }
-  }
+  "meta": {"releaseVersion":"iteration-1-v1.3.0-redesign"},
+  "evidence": [{
+    "family":"Cleaning",
+    "category":"Vacuum cleaner",
+    "categoryCode":"vacuum_cleaner",
+    "geography":"AU",
+    "sampleSize":100,
+    "fixedCount":40,
+    "repairableCount":20,
+    "endOfLifeCount":30,
+    "unclassifiedCount":10,
+    "confidenceLevel":"source field retained for provenance",
+    "limitation":"Not model-specific",
+    "barriers":[]
+  }]
 }
 ```
 
-Outcome and barrier values are raw counts. The frontend must not convert barrier counts into percentages unless the backend later supplies a documented denominator. `insufficientEvidence: true` suppresses strong interpretations.
+The frontend does not present `confidenceLevel` as scientific certainty. It shows sample size and explicitly states that representativeness is not established.
 
 ### `GET /api/locations`
 
 ```json
 {
-  "meta": {},
-  "locations": [
-    {
-      "area": "Brunswick",
-      "pathway": "repair",
-      "name": "string",
-      "type": "string",
-      "address": "string",
-      "contact": "string",
-      "url": "https://...",
-      "verified": true,
-      "verificationStatus": "verified",
-      "lastVerifiedAt": "2026-09-03",
-      "acceptanceEvidenceUrl": "https://..."
-    }
-  ]
+  "meta": {"releaseVersion":"iteration-1-v1.3.0-redesign"},
+  "locations": [{
+    "id":"1",
+    "pathway":"repair",
+    "name":"Example Repair Cafe",
+    "type":"Community repair cafe",
+    "address":"1 Example St",
+    "suburb":"Ascot Vale",
+    "postcode":"3032",
+    "phone":"",
+    "url":"https://...",
+    "verificationStatus":"unverified",
+    "verificationNote":"...",
+    "sourceUrl":"https://...",
+    "sourceRetrievedAt":"2026-08-31"
+  }]
 }
 ```
 
-## Failure behavior
+The browser filters area locally. It must not call this dataset a verified professional-repair directory or a genuine distance-based “nearby” service.
 
-- Non-2xx responses, timeouts and invalid response shapes automatically fall back to `src/data.js`.
-- All requests use `GET`, contain no request body and use same-origin credentials only.
-- The backend should not log or accept private journey data through these endpoints.
-- Only rows with `verified: true`, public access and documented category acceptance may be presented as local service results. Unverified candidates remain pipeline/admin data and must not be exposed as recommendations.
+## Independent failure behavior
+
+The frontend uses `Promise.allSettled()` and keeps separate availability for:
+
+- recalls;
+- sources;
+- repair evidence;
+- locations.
+
+A failure in one dataset must not disable unrelated functionality. In particular, recall data failure must leave static safety screening available while preserving an explicit “recall status unknown” warning.

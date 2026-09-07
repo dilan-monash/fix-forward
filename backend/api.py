@@ -1,6 +1,6 @@
 """Read-only JSON endpoints consumed by the browser application."""
 
-from flask import Blueprint, current_app, jsonify
+from flask import Blueprint, current_app, jsonify, request
 
 from .db import DatabaseUnavailable
 from . import repository
@@ -25,9 +25,12 @@ def release_meta(extra=None):
 
 @api.after_request
 def public_api_headers(response):
-    # Public data can change between releases, so do not let browsers reuse a
-    # stale response during mentor testing.
-    response.headers["Cache-Control"] = "no-store"
+    # Public datasets change only when the governed import pipeline changes.
+    # Short caching reduces repeated Neon reads without hiding release updates.
+    if request.path in {"/api/health", "/api/ready"}:
+        response.headers["Cache-Control"] = "no-store"
+    else:
+        response.headers["Cache-Control"] = "public, max-age=120, stale-if-error=600"
     response.headers["Content-Type"] = "application/json; charset=utf-8"
     return response
 
@@ -46,7 +49,9 @@ def database_unavailable(_error):
 def unexpected_api_error(error):
     # Log only the exception class; database messages can contain infrastructure
     # details that should not be returned to users or routine application logs.
-    current_app.logger.error("API failure type=%s", type(error).__name__)
+    current_app.logger.exception(
+        "API failure path=%s type=%s", request.path, type(error).__name__
+    )
     return jsonify(
         error={
             "code": "internal_error",
@@ -57,6 +62,13 @@ def unexpected_api_error(error):
 
 @api.get("/health")
 def health():
+    """Liveness check: prove the Flask process can answer without depending on Neon."""
+    return jsonify(status="ok", service="available", **release_meta())
+
+
+@api.get("/ready")
+def ready():
+    """Readiness check: prove the public database can be queried."""
     repository.health_check()
     return jsonify(status="ok", database="available", **release_meta())
 

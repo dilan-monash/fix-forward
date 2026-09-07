@@ -23,9 +23,15 @@ class AppTests(unittest.TestCase):
         response.close()
         blocked.close()
 
-    @patch("backend.api.repository.health_check", return_value={"ok": 1})
-    def test_health_contract(self, _health_check):
+    def test_health_contract(self):
         response = self.client.get("/api/health")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json["service"], "available")
+        self.assertEqual(response.headers["Cache-Control"], "no-store")
+
+    @patch("backend.api.repository.health_check", return_value={"ok": 1})
+    def test_ready_contract(self, _health_check):
+        response = self.client.get("/api/ready")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json["database"], "available")
         self.assertEqual(response.headers["Cache-Control"], "no-store")
@@ -52,7 +58,7 @@ class AppTests(unittest.TestCase):
 
     @patch("backend.api.repository.health_check", side_effect=DatabaseUnavailable("hidden detail"))
     def test_database_failure_returns_generic_503(self, _health_check):
-        response = self.client.get("/api/health")
+        response = self.client.get("/api/ready")
         self.assertEqual(response.status_code, 503)
         self.assertEqual(response.json["error"]["code"], "data_unavailable")
         self.assertNotIn("hidden detail", response.get_data(as_text=True))

@@ -1,38 +1,70 @@
-# FixForward — Iteration 1 v1.2.0
+# FixForward — Iteration 1 v1.3.0 redesign candidate
 
-FixForward is an anonymous decision-support application for Victorian households with a broken small appliance. Its journey is:
+FixForward is an anonymous decision-support web application for Victorian households deciding what to do with a faulty small appliance. This redesign implements the teaching-team/usability feedback as a coherent product journey rather than patching individual screens.
 
-1. Identify the appliance with two quick card choices—family, then category.
-2. Screen a limited, manually reviewed recall index, with brand and model offered only as an optional refinement on the result page.
-3. Check ten observable safety warning signs.
-4. Explore professional repair/disposal pathways or compare user-entered costs.
+## Product story
 
-The application is guidance only. It does not diagnose a fault, confirm that a product is recalled, certify safety, or give DIY repair instructions.
+**Identify -> Understand -> Act -> Compare**
 
-## Current architecture
+1. **Identify** — choose one of six supported appliance families, then an alphabetised category.
+2. **Understand** — screen the limited recall index, optionally refine with brand/model, then answer category-relevant safety questions.
+3. **Act** — follow official recall guidance, professional safety assessment, community repair (only when appropriate), or responsible e-waste pathways.
+4. **Compare** — where safety/recall does not block it, compare a real repair quote against a user-supplied comparable replacement value. Automatic retail benchmarking is intentionally not claimed until the dataset is defensible.
+
+The application is guidance only. It does not diagnose a fault, certify safety, provide recall clearance or give DIY repair instructions.
+
+## What changed in v1.3 redesign
+
+- Proper landing page explaining purpose, environmental value, coverage and privacy before the form.
+- Immediate loading screen so Render/Neon cold starts never look like a blank/broken website.
+- Independent public-data loading with `Promise.allSettled()`; one failed endpoint does not disable unrelated data.
+- Recall-index failure no longer prevents the static safety questionnaire.
+- Retry public data without restarting the assessment.
+- Model-first exact recall matching within the chosen category; brand mismatch is a warning, not a reason to hide an exact model hit.
+- One-character/near model identifiers are never promoted to exact recall matches.
+- Safety questions are tailored by appliance and split into critical vs caution severity; not every “Yes” becomes the same high-risk outcome.
+- High-risk/uncertain appliances can never be routed to a community Repair Cafe as professional safety assessment.
+- Repair evidence is explained in plain language with metrics and expandable limitations.
+- Location results render inside FixForward with verification labels and explicit Melbourne/exact-area limitations.
+- Dedicated Back buttons + browser Back support.
+- Restart confirmation after assessment progress exists.
+- Accessibility improvements: invalid focus, live location results, external-link new-tab labels, stronger contrast/visual hierarchy.
+- Grouped Sources/privacy dialog with infrastructure-aware privacy wording.
+- `/api/health` is process liveness; `/api/ready` checks Neon readiness.
+- Short public-response caching and explicit Gunicorn workers/threads reduce avoidable deployment pressure.
+
+## Architecture
 
 ```text
 Browser UI ──GET public data──> Flask API ──SELECT only──> Neon PostgreSQL
     │
-    └── appliance, safety, suburb and cost inputs remain in page memory
+    ├── family/category/brand/model remain in browser memory
+    ├── safety answers remain in browser memory
+    ├── suburb/postcode remains in browser memory
+    └── cost inputs remain in browser memory
 ```
 
-The frontend and API are served by the same Flask application. There are no POST endpoints, accounts, cookies, analytics, user tables, uploads, geolocation requests or journey-data logs.
+See:
 
-## Recall rule
+- `docs/ARCHITECTURE_I1_REDESIGN.md`
+- `docs/SECURE_ARCHITECTURE_I1.md`
+- `docs/TEACHING_FEEDBACK_ACTION_REGISTER.md`
+- `docs/KNOWN_LIMITATIONS_V1.3.md`
+- `docs/DEPLOYMENT_CHECKLIST_V1.3.md`
 
-Family/category is never treated as a recall match. The browser compares an entered model against structured identifiers that were manually reviewed against the official ACCC notice.
+## Recall safety rule
 
-| Input | Result |
+| Input / condition | Result |
 |---|---|
-| Category only | Insufficient information |
-| Brand only | Show possible notices; request model |
-| Exact model, optionally narrowed by brand | Strong possible match; verify official notice |
-| No exact match | No match in the limited dataset—not “not recalled” |
-| API/database unavailable | Stop the indexed check; link to official search |
-| Serious warning sign | Stop-use guidance overrides the normal journey |
-
-The imported `recalls` table is unstructured discovery data. Only rows represented in `recall_products`, `recall_category_links` and `recall_identifiers` with `manually_reviewed = true` are exposed for matching.
+| Category only | Insufficient product information; never “recalled/not recalled” |
+| Brand only | Possible category notices may be visible; model still requested |
+| Exact normalized model in selected category | “Exact model identifier found”; verify official notice |
+| Exact model but entered brand differs | Preserve possible match + explicit brand-conflict warning |
+| One-character/partial model | No exact match; may show a re-check warning, never a recall verdict |
+| No exact match | No match in the limited index — never “not recalled” |
+| Recall API unavailable | Recall remains unknown; official ACCC link + safety screening continues |
+| Critical warning sign | Stop-use/professional guidance; community Repair Cafe hidden |
+| Caution/unsure warning | Assessment recommended; cost comparison blocked |
 
 ## Local setup
 
@@ -42,23 +74,13 @@ Requirements: Python 3.11+, Node.js 20+, and a PostgreSQL/Neon connection string
 python -m venv .venv
 ```
 
-Activate the environment:
-
-- macOS/Linux: `source .venv/bin/activate`
-- Windows PowerShell: `.venv\Scripts\Activate.ps1`
-
-Then:
+Activate it, then install:
 
 ```sh
 python -m pip install -r requirements.txt
 ```
 
-Set `DATABASE_URL` in your terminal or copy `.env.example` to an ignored local `.env` and load it with your preferred environment tool. The application does not read `.env` by itself. Never paste a real password into source files, screenshots, LeanKit or the PGP.
-
-Run the database scripts in order on a Neon development branch:
-
-1. `database/001_i1_recall_matching.sql`
-2. `database/002_seed_verified_mistral_vacuum.sql`
+Set `DATABASE_URL` in the environment. Never commit or screenshot the credential.
 
 Start the integrated application:
 
@@ -66,77 +88,52 @@ Start the integrated application:
 flask --app app run --debug
 ```
 
-Open `http://127.0.0.1:5000`. Use `/?mock-data-error=1` to demonstrate the fail-closed recall state.
+Open `http://127.0.0.1:5000`.
 
-## Demonstration case
+## Tests
 
-The seed script adds one verified example from the team's imported ACCC snapshot:
+Frontend/decision/UX contract:
+
+```sh
+npm test
+```
+
+Backend tests (after Python dependencies are installed):
+
+```sh
+python -m unittest discover -s test_backend -v
+```
+
+Syntax/compile check:
+
+```sh
+python -m compileall -q backend app.py test_backend
+node --check src/app.js
+node --check src/logic.js
+node --check src/data-service.js
+```
+
+The redesign package currently passes all 23 Node tests. Live Render/Neon behavior is still a manual release gate and must be verified after deployment.
+
+## Demonstration recall case
+
+The existing seed data contains a narrow reviewed example:
 
 - Family: Cleaning
 - Category: Vacuum cleaner
 - Brand: Mistral
 - Model: BVC 160 or BVC 165
 
-Expected result: strong possible match with an official notice link. It is deliberately one narrow demonstration record, not full Australian recall coverage. For a rice cooker, category alone returns insufficient information; the current recent RSS snapshot contains no reviewed rice-cooker identifier.
+Expected result: exact model identifier found, with official ACCC verification required. This is a demonstration subset, not complete Australian recall coverage.
 
-## Tests
+## Data and scope limitations
 
-```sh
-npm run check
-python -m unittest discover -s test_backend -v
-python -m compileall -q backend app.py
-```
+- Recall coverage is limited and curated.
+- Repair evidence is self-selected category-level historical evidence, not a personal prediction.
+- Melbourne service matching is exact suburb/postcode text matching, not genuine nearest-distance search.
+- Professional repair businesses are not currently represented by a verified directory.
+- Automatic geolocation is deferred until approved data/privacy design exists.
+- Assessment history remains out of scope because I1 intentionally stores no journey history.
+- Automatic retail-price benchmarking is not claimed without a sufficiently diverse, governed price dataset.
 
-The Node suite covers recall branches, safety precedence, cost validation, local area filtering, privacy constraints and static accessibility/responsive checks. The Python suite covers API contracts, safe failure responses, security headers, protected backend files and data transformations without requiring Neon.
-
-The integrated v1.2.0 release also preserves the latest GitHub snapshot's clearer cost-validation messages and expanded category-level repair-evidence presentation. The original unsafe category-only recall fixture was not retained.
-
-Live Neon connectivity, migration execution, interactive browser testing and deployed security-header checks remain manual release gates. See `ACCEPTANCE_RESULTS.md`.
-
-## Deployment
-
-`render.yaml` defines a Render web service using Gunicorn. Before deployment:
-
-1. Rotate any owner credential that has been shared in chat or screenshots.
-2. Create a separate SELECT-only database role using SQL—not Neon's Console Add role action, which creates a privileged role.
-3. Run both migrations on a Neon development branch and verify the seed result.
-4. Add the pooled read-only `DATABASE_URL` as a protected hosting secret.
-5. Deploy, then test `/api/health`, every API response, the complete user journey and security headers.
-
-## Project map
-
-- `app.py` — Gunicorn/Flask entry point
-- `backend/` — application factory, routes, SQL repository and safe transformations
-- `database/` — idempotent Iteration 1 recall schema and verified seed
-- `data/` — the team's existing source snapshots, cleaning/import scripts, migrations and data-quality evidence
-- `src/app.js` — UI screens and in-memory journey state
-- `src/logic.js` — pure recall, safety, cost and location rules
-- `src/data-service.js` — four GET requests and fail-closed fallback
-- `src/data.js` — static UI taxonomy, safety questions and category mappings
-- `test/` — frontend/decision tests
-- `test_backend/` — backend contract and transformation tests
-- `API_CONTRACT.md` — exact API response shapes
-- `LEARNING_GUIDE.md` — plain-language walkthrough and mentor questions
-- `AI_USE_ACKNOWLEDGEMENT.md` — disclosure draft requiring student review
-- `ACCEPTANCE_RESULTS.md` — executed checks and remaining manual gates
-
-## Existing data pipeline
-
-The `data/` directory is preserved from the latest team GitHub snapshot. It contains committed ACCC, DataVic and OSM source snapshots, cleaning/import scripts, the ORA aggregation workflow and the earlier database migrations. Do not rerun downloads or rebuild production data merely to start the Flask app.
-
-For data-pipeline details, use:
-
-- `data/docs/REBUILD_VERIFICATION.md`
-- `data/docs/TEAM_API_CONTRACT.md`
-- `data/docs/data_dictionary.md`
-- `data/docs/RECALL_COVERAGE_SCOPE.md`
-
-The two scripts under `database/` are the additional, narrow application migrations already applied to the Neon development branch. They create the UI-category mapping and the manually reviewed identifier layer used by the Flask API.
-
-## Important data limitations
-
-- Recall coverage is the team's recent ACCC RSS snapshot, not complete recall history.
-- Only manually reviewed structured product identifiers are matchable.
-- Repair evidence describes self-selected community repair records and is not model-specific.
-- Location records are imported directory records and are currently marked unverified.
-- “No match” never means “not recalled,” and “no warning reported” never means “safe.”
+Do not “solve” these gaps by inventing data or weakening the limitation wording.

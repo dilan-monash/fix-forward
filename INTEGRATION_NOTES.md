@@ -1,35 +1,25 @@
-# FixForward v1.2.0 integration notes
+# FixForward v1.3.0 redesign integration notes
 
-## Purpose
+This candidate is a deliberate redesign based on the 4 September teaching-team feedback, usability-test observations and the live-release audit. It changes user experience, decision logic and deployment behavior while preserving the existing data pipeline and read-only backend model.
 
-This release combines the latest team GitHub snapshot with the separately developed Flask/public-data integration. It is intended for review on a feature branch before any production merge.
+## Key compatibility decisions
 
-## Preserved from the latest team snapshot
+- No account, upload, OCR, barcode, analytics or saved journey history was added.
+- Existing Neon data schema/migrations are preserved; the redesign does not invent new production datasets.
+- Recall matching remains category-scoped and exact-model based, but model matching now occurs before brand confirmation so a brand-text variation cannot hide an exact identifier.
+- Safety behavior changed intentionally: warning rules now distinguish critical vs caution signals and appliance applicability.
+- Recall endpoint failure no longer blocks static safety screening.
+- High-risk/uncertain pathways never reuse community Repair Cafe results as professional assessment.
+- Cost comparison remains a transparent manual fallback until a governed retail benchmark dataset is available.
 
-- The full `data/` directory, source snapshots, import/quality scripts and data documentation.
-- The clearer invalid-cost messages for missing, negative, non-numeric, zero and over-precision values.
-- The expanded presentation of historical repair outcomes, barriers and evidence coverage.
-- Existing responsive, accessibility and safety-questionnaire work.
+## Deployment behavior
 
-## Added or restored by the integration
+- `render.yaml` now identifies `iteration-1-v1.3.0-redesign` and sets an explicit Gunicorn worker/thread/timeout configuration.
+- `/api/health` is liveness only.
+- `/api/ready` verifies Neon.
+- Public API responses use short caching to reduce repeated database pressure.
+- Server errors record safe path/type context while generic client messages remain unchanged.
 
-- Flask application factory, API routes, database repository and safe transformations.
-- Same-origin frontend/API deployment using Gunicorn.
-- Optional brand and exact model input.
-- Manually reviewed recall-product and identifier tables.
-- Category-only and brand-only insufficient-information results.
-- Exact normalized model matching without fuzzy or partial matching.
-- Fail-closed handling when public data is unavailable.
-- Read-only role/migration instructions, backend tests, learning guide, security-plan draft and AI-use acknowledgement.
+## Review before merge
 
-## Important review points
-
-- Do not replace exact-model matching with family/category matching.
-- Do not reintroduce a static recall or provider fixture as a production outage fallback.
-- Do not describe an unmatched search as proof that a product is not recalled.
-- Do not describe imported location records as verified providers or confirmed appliance acceptance.
-- Keep user appliance, warning, area and cost values in browser memory; the API remains GET-only.
-
-## Contribution record
-
-The student must update the final contribution log using team evidence. The GitHub uploader is not automatically the author of every file in the snapshot. Record Haochen's frontend contribution, Dilan's database/data work, and the student's own review/integration/testing changes accurately.
+Use `docs/DEPLOYMENT_CHECKLIST_V1.3.md` and do not merge directly to production without a preview/staging walkthrough. The Node suite proves decision/UI contracts, but it does not prove Render cold-start behavior, Neon concurrency, mobile rendering or live accessibility.

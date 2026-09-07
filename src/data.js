@@ -2,7 +2,7 @@
 // the backend; the fallback arrays below are intentionally empty so an API
 // outage can never produce a false recall result from an old demo fixture.
 export const META = Object.freeze({
-  releaseVersion: "iteration-1-v1.2.0",
+  releaseVersion: "iteration-1-v1.3.0-redesign",
   dataVersion: "public-data-unavailable",
   retrievalDate: "Check the Sources page"
 });
@@ -139,3 +139,26 @@ export const SOURCES = Object.freeze([
 export const REPAIR_EVIDENCE = Object.freeze([]);
 
 export const LOCATIONS = Object.freeze([]);
+
+// Safety rules separate immediate stop-use indicators from caution indicators.
+// This prevents every "Yes" answer from being treated as the same severity.
+// Applicability also keeps battery/water questions away from appliances where
+// they are not meaningful in Iteration 1.
+export const SAFETY_RULES = Object.freeze({
+  burning: Object.freeze({ severity: "critical", explanation: "Smoke, fire or a burning smell can indicate overheating or an electrical fault." }),
+  sparks: Object.freeze({ severity: "critical", explanation: "Visible sparks or arcing can indicate unsafe electrical contact." }),
+  shock: Object.freeze({ severity: "critical", explanation: "Any electric shock or tingling is an immediate safety concern." }),
+  wiring: Object.freeze({ severity: "critical", explanation: "Exposed or damaged wiring can create shock and fire risks." }),
+  heat: Object.freeze({ severity: "caution", explanation: "Unusual heat can have several causes. Stop and seek assessment if it is severe, worsening or accompanied by smell/smoke." }),
+  plug: Object.freeze({ severity: "critical", explanation: "A melted or scorched plug can indicate dangerous overheating or poor electrical contact." }),
+  trips: Object.freeze({ severity: "caution", explanation: "Repeated circuit-breaker trips can indicate an electrical fault and should be assessed before reuse." }),
+  water: Object.freeze({ severity: "caution", explanation: "Moisture around mains-powered equipment can create electrical risk. Do not energise a wet appliance." }),
+  battery: Object.freeze({ severity: "critical", explanation: "A swollen, leaking or damaged battery can present fire and chemical hazards." }),
+  sound: Object.freeze({ severity: "caution", explanation: "New buzzing, popping or crackling can indicate a developing fault." })
+});
+
+export const SAFETY_APPLICABILITY = Object.freeze({
+  battery: Object.freeze(["Shaver"]),
+  water: Object.freeze(["Kettle", "Rice cooker", "Coffee machine", "Steam cleaner", "Dehumidifier", "Portable air conditioner", "Shaver"]),
+  heat: Object.freeze(["Kettle", "Toaster", "Sandwich press", "Rice cooker", "Coffee machine", "Air fryer", "Microwave", "Hair dryer", "Straightener", "Portable heater"])
+});
