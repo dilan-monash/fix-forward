@@ -1,53 +1,69 @@
-# Copy this v1.4 prototype into your feature branch
+# Copy this v1.5 prototype into a separate feature branch
 
-This package is a **prototype candidate**, not a final release. Do not overwrite `main` directly.
+This package is a **non-final prototype candidate**. Preserve v1.4 before copying it and do not overwrite `main` directly.
 
-## 1. Confirm your branch
+## 1. Preserve your current v1.4 work
 
-In your real Git clone:
+In the real Git clone:
 
 ```powershell
 cd C:\Users\sansk\Downloads\FixForward-I1-Redesign
-git switch feature/i1-feedback-redesign
 git status
+git branch -vv
 ```
 
-The working tree should be clean before copying a new candidate. If it is not clean, commit/stash the work you want to preserve first.
+If `feature/i1-goal-first-v1.4` contains uncommitted work you want to keep, test/commit/push that checkpoint first.
 
-## 2. Copy the package contents
-
-Copy the **contents of this folder** into the root of your Git clone. Do not copy an outer wrapper folder and do not touch `.git`.
-
-## 3. Test before committing
+## 2. Create the v1.5 branch
 
 ```powershell
+git switch feature/i1-goal-first-v1.4
+git switch -c feature/i1-human-first-v1.5
+```
+
+## 3. Copy this package
+
+Copy the **contents of `fixforward_human_first_v1_5`** into the root of your Git clone. Replace matching project files. Do not delete/copy over `.git` or your `.venv`.
+
+## 4. Test before staging
+
+```powershell
+npm test
 npm run check
-.\.venv\Scripts\Activate.ps1
 python -m unittest discover -s test_backend -v
 python -m compileall -q backend app.py test_backend
 ```
 
-Then set your development Neon `DATABASE_URL` in the current terminal and run:
+Expected Node result for this package: **46 passed, 0 failed**.
+
+Set the development Neon connection only in your current shell, never in Git:
 
 ```powershell
-$env:RELEASE_VERSION = "iteration-1-v1.4.0-goal-first"
+$env:RELEASE_VERSION = "iteration-1-v1.5.0-human-first"
 python -m flask --app app run --debug
 ```
 
-Test `http://127.0.0.1:5000/api/health` and `http://127.0.0.1:5000/api/ready`.
+Check:
 
-## 4. Test the real user journeys
-
-Use `docs/USABILITY_TEST_SCRIPT_V1.4.md` and `docs/DEPLOYMENT_CHECKLIST_V1.4.md`. In particular, test recall BVC 160/BVC 161, serious warning paths, denied/allowed geolocation, map failure fallback, manual suburb search, mobile/keyboard access and the cost prototype.
-
-## 5. Only then stage/commit/push
-
-Do this only after you and your team have reviewed the diff and live behaviour:
-
-```powershell
-git add .
-git commit -m "Prototype goal-first FixForward v1.4 UX"
-git push -u origin feature/i1-feedback-redesign
+```text
+http://127.0.0.1:5000/
+http://127.0.0.1:5000/api/health
+http://127.0.0.1:5000/api/ready
 ```
 
-Create a non-production Render preview before merging to `main`.
+Then follow `docs/USABILITY_TEST_SCRIPT_V1.5.md` and `docs/V1.5_USABILITY_AUDIT_AND_FIXES.md`.
+
+## 5. Do not commit until the local journeys look right
+
+After local/manual testing:
+
+```powershell
+git status
+git diff --check
+git add -A
+git diff --cached --check
+git commit -m "Prototype human-first FixForward v1.5 UX"
+git push -u origin feature/i1-human-first-v1.5
+```
+
+Use a non-production Render preview before considering a merge into `main`.

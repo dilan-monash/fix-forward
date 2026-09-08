@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { loadPublicData } from "../src/data-service.js";
+import { loadPublicData, getStaticSnapshot } from "../src/data-service.js";
 
 const endpoints = { recalls: "/api/recalls", sources: "/api/sources", repairEvidence: "/api/repair-evidence", locations: "/api/locations" };
 
@@ -34,4 +34,12 @@ test("API03 disabled API makes no request", async () => {
   const data = await loadPublicData({ enabled: false }, async () => { calls += 1; });
   assert.equal(calls, 0);
   assert.equal(data.mode, "static");
+});
+
+
+test("API04 static snapshot makes the first screen usable before backend data arrives", () => {
+  const data = getStaticSnapshot();
+  assert.equal(data.families.length, 6);
+  assert.ok(data.safetySigns.length > 0);
+  assert.equal(data.availability.recalls, false);
 });

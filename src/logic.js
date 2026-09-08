@@ -1,4 +1,4 @@
-import { SAFETY_RULES, SAFETY_APPLICABILITY } from "./data.js";
+import { SAFETY_RULES, SAFETY_APPLICABILITY, CATEGORY_SAFETY_PRIORITY, SAFETY_PLAN_LIMITS } from "./data.js";
 
 export function normalizeIdentifier(value) {
   return String(value || "").normalize("NFKC").toUpperCase().replace(/[^A-Z0-9]/g, "");
@@ -79,6 +79,27 @@ export function applicableSafetySigns(category, signs) {
     const limitedTo = SAFETY_APPLICABILITY[id];
     return !limitedTo || limitedTo.includes(category);
   });
+}
+
+/**
+ * Return a short, goal-specific safety plan. All selected question IDs must be
+ * valid for the chosen appliance. The direct paths deliberately ask fewer
+ * questions than the guided path, while still keeping the most consequential
+ * warning signs first.
+ */
+export function safetyPlanFor(category, intent, signs) {
+  const applicable = applicableSafetySigns(category, signs);
+  const byId = new Map(applicable.map((entry) => [entry[0], entry]));
+  const availableIds = applicable.map(([id]) => id);
+  const categoryPriority = CATEGORY_SAFETY_PRIORITY[category] || [];
+  const core = intent === "recycle"
+    ? ["burning", ...(byId.has("battery") ? ["battery"] : ["electrical"])]
+    : ["burning", "electrical"];
+  const ordered = [...core, ...categoryPriority, ...availableIds]
+    .filter((id, index, all) => all.indexOf(id) === index)
+    .filter((id) => byId.has(id));
+  const limit = SAFETY_PLAN_LIMITS[intent] || SAFETY_PLAN_LIMITS.guide;
+  return ordered.slice(0, limit).map((id) => byId.get(id));
 }
 
 export function evaluateSafety(answers, rules = SAFETY_RULES) {

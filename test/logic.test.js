@@ -8,7 +8,8 @@ import {
   getLocations,
   getNearbyLocations,
   distanceKm,
-  applicableSafetySigns
+  applicableSafetySigns,
+  safetyPlanFor
 } from "../src/logic.js";
 import { SAFETY_SIGNS } from "../src/data.js";
 
@@ -61,6 +62,32 @@ test("S03 adaptive questions hide battery for a kettle but keep it for a shaver"
   assert.equal(shaver.includes("battery"), true);
 });
 
+
+
+test("S06 direct repair plan stays short and keeps appliance-relevant questions", () => {
+  const plan = safetyPlanFor("Shaver", "repair", SAFETY_SIGNS).map(([id]) => id);
+  assert.ok(plan.length <= 4);
+  assert.deepEqual(plan.slice(0, 2), ["burning", "electrical"]);
+  assert.ok(plan.includes("battery"));
+});
+
+test("S07 recycle plan is intentionally shorter and prioritises a damaged battery for a shaver", () => {
+  const plan = safetyPlanFor("Shaver", "recycle", SAFETY_SIGNS).map(([id]) => id);
+  assert.deepEqual(plan, ["burning", "battery"]);
+});
+
+test("S08 compare plan for a kettle asks only three questions and includes water ingress", () => {
+  const plan = safetyPlanFor("Kettle", "compare", SAFETY_SIGNS).map(([id]) => id);
+  assert.equal(plan.length, 3);
+  assert.deepEqual(plan, ["burning", "electrical", "water"]);
+});
+
+test("S09 guided plan can ask more than the direct compare plan", () => {
+  const guided = safetyPlanFor("Kettle", "guide", SAFETY_SIGNS);
+  const compare = safetyPlanFor("Kettle", "compare", SAFETY_SIGNS);
+  assert.ok(guided.length > compare.length);
+  assert.ok(guided.length <= 5);
+});
 test("S04 recall outage does not block ordinary options after a clear warning check", () => {
   const decision = journeyDecision("unavailable", "clear");
   assert.equal(decision.allowNextSteps, true);
@@ -104,4 +131,10 @@ test("L03 nearby search sorts by distance and respects radius/provider filter", 
   const result = getNearbyLocations(user, "repair", data, { radiusKm: 5, providerType: "repair_cafe" });
   assert.equal(result.total, 1);
   assert.equal(result.matches[0].id, "near");
+});
+
+test("S10 water ingress remains a serious stop-use warning under the I1 safety baseline", () => {
+  const result = evaluateSafety({ water: "yes" });
+  assert.equal(result.status, "high");
+  assert.deepEqual(result.critical, ["water"]);
 });

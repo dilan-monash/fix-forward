@@ -13,7 +13,7 @@ import { DATA_API_CONFIG } from "./config.js";
 
 const DATASET_NAMES = ["recalls", "sources", "repairEvidence", "locations"];
 
-function safeStaticSnapshot() {
+export function getStaticSnapshot() {
   return {
     meta: STATIC_META,
     families: FAMILIES,
@@ -88,7 +88,7 @@ function extractDataset(name, payload) {
  * outage must never prevent the static safety questionnaire from rendering.
  */
 export async function loadPublicData(config = DATA_API_CONFIG, fetchImpl = globalThis.fetch) {
-  const base = safeStaticSnapshot();
+  const base = getStaticSnapshot();
   if (!config.enabled) return { ...base, mode: "static" };
 
   const controller = new AbortController();

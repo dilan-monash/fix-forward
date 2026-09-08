@@ -1,6 +1,8 @@
-# FixForward public-data API contract — v1.4 goal-first prototype
+# FixForward public-data API contract — v1.5 human-first prototype
 
 The API returns read-only public/reference information. The browser does **not** send the user's selected goal, appliance details, safety answers, cost values, typed suburb or device coordinates to these endpoints.
+
+v1.5 changes the browser experience, not the core public-data schema: the static landing/app definitions render first and these datasets load independently in the background.
 
 ## Liveness and readiness
 
@@ -9,7 +11,7 @@ The API returns read-only public/reference information. The browser does **not**
 Fast Flask-process liveness. It deliberately does not query Neon.
 
 ```json
-{"status":"ok","service":"available","releaseVersion":"iteration-1-v1.4.0-goal-first"}
+{"status":"ok","service":"available","releaseVersion":"iteration-1-v1.5.0-human-first"}
 ```
 
 ### `GET /api/ready`
@@ -17,7 +19,7 @@ Fast Flask-process liveness. It deliberately does not query Neon.
 Checks database readiness.
 
 ```json
-{"status":"ok","database":"available","releaseVersion":"iteration-1-v1.4.0-goal-first"}
+{"status":"ok","database":"available","releaseVersion":"iteration-1-v1.5.0-human-first"}
 ```
 
 Database failure returns a generic `503` without credentials or infrastructure detail.
@@ -29,7 +31,7 @@ Returns only manually reviewed structured recall products used by the conservati
 ```json
 {
   "meta": {
-    "releaseVersion": "iteration-1-v1.4.0-goal-first",
+    "releaseVersion": "iteration-1-v1.5.0-human-first",
     "dataVersion": "snapshot-version",
     "retrievalDate": "2026-09-03",
     "coverageStart": "2026-04-16",
@@ -52,13 +54,15 @@ Returns only manually reviewed structured recall products used by the conservati
 }
 ```
 
+The browser must never turn category-only input, a one-character near match or an API outage into recall clearance.
+
 ## `GET /api/sources`
 
-Returns source register data for the expandable **About the information** area.
+Returns source-register data for **About the information**.
 
 ```json
 {
-  "meta": {"releaseVersion":"iteration-1-v1.4.0-goal-first"},
+  "meta": {"releaseVersion":"iteration-1-v1.5.0-human-first"},
   "sources": [{
     "name":"string",
     "url":"https://...",
@@ -74,7 +78,7 @@ Returns source register data for the expandable **About the information** area.
 
 ```json
 {
-  "meta": {"releaseVersion":"iteration-1-v1.4.0-goal-first"},
+  "meta": {"releaseVersion":"iteration-1-v1.5.0-human-first"},
   "evidence": [{
     "family":"Cleaning",
     "category":"Vacuum cleaner",
@@ -92,15 +96,15 @@ Returns source register data for the expandable **About the information** area.
 }
 ```
 
-The UI does not translate `confidenceLevel` into a scientific “high confidence” claim.
+v1.5 turns these counts into a three-part visual **after** the practical repair finder. It does not translate `confidenceLevel` into a scientific confidence claim and does not present category history as a model-specific repair probability.
 
 ## `GET /api/locations`
 
-v1.4 adds coordinates and optional practical service fields so the browser can render an in-app map and calculate distance locally.
+Returns public repair/recycling location fields. Coordinates allow the browser to render an in-app map and calculate straight-line distance locally.
 
 ```json
 {
-  "meta": {"releaseVersion":"iteration-1-v1.4.0-goal-first"},
+  "meta": {"releaseVersion":"iteration-1-v1.5.0-human-first"},
   "locations": [{
     "id":"1",
     "pathway":"repair",
@@ -127,12 +131,16 @@ v1.4 adds coordinates and optional practical service fields so the browser can r
 
 ### Location privacy contract
 
-The API never receives browser geolocation. `/api/locations` returns public service coordinates; `distanceKm()` runs in JavaScript against the user's in-memory coordinates. Manual suburb/postcode matching also remains client-side.
+The API never receives browser geolocation. `/api/locations` returns public service coordinates; `distanceKm()` runs in JavaScript against in-memory user coordinates. Manual suburb/postcode matching also remains client-side.
+
+The in-app map is not loaded until there is a useful set of results to plot. Denying geolocation must leave manual suburb/postcode search usable.
 
 ### Location truthfulness contract
 
-A card can show address/phone/opening hours only when those fields are present in the imported record. It must not claim professional qualification, current opening status or appliance acceptance unless separately verified evidence supports that claim.
+A card can show address, phone or opening information only when those fields are present in the imported record. It must not claim professional qualification, current opening status or appliance acceptance unless separately verified evidence supports that claim. The main card therefore tells users to call/check before travelling rather than displaying a technical verification label as the primary message.
 
 ## Independent failure behavior
 
 The frontend uses `Promise.allSettled()` and keeps separate availability for recalls, sources, repair evidence and locations. Failure of one public dataset must not make an unrelated dataset appear unavailable.
+
+The static first screen and static safety definitions remain usable while public datasets are still loading. A recall result initially marked unavailable can be re-evaluated when recall data arrives; service results can refresh when location data arrives without clearing a typed area.

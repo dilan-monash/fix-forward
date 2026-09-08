@@ -1,4 +1,4 @@
-# FixForward — Iteration 1 v1.4 goal-first prototype
+# FixForward — Iteration 1 v1.5 human-first usability prototype
 
 FixForward is an anonymous decision-support web application for metropolitan Melbourne households with a faulty portable appliance. This **non-final prototype** explores a simpler product question:
 
@@ -33,13 +33,13 @@ If the safety/recall gate does not override the journey:
 - **Repair it** goes directly to the repair map/service finder.
 - **Compare costs** goes directly to the cost tool.
 - **Recycle it** goes directly to recycling locations.
-- **I'm not sure** shows the three options with repair-history context.
+- **I'm not sure** uses the fuller quick-check plan and then shows the three next-step choices. Repair history appears later on the repair screen, after the map and service results.
 
 A user does not need to repeat a generic “choose next action” screen after already stating their goal.
 
 ## Location experience
 
-The v1.4 prototype adds an **optional browser geolocation experiment** requested in teaching feedback/usability discussion.
+The v1.5 prototype adds an **optional browser geolocation experiment** requested in teaching feedback/usability discussion.
 
 - The browser asks permission only after the user selects **Use my current location**.
 - Latitude/longitude stay in JavaScript memory and are **not sent to the FixForward API or Neon**. When the map is shown, OpenStreetMap still receives ordinary tile requests for the map area being viewed; FixForward does not claim otherwise.
@@ -66,15 +66,11 @@ Recall matching remains conservative:
 | Serious warning | Stop-use guidance; community Repair Café pathway is not offered |
 | Caution / Not sure | Recommend appropriate assessment before ordinary cost/community repair pathways |
 
-Safety questions are adapted to the appliance category. A kettle does not receive a battery question; a battery-powered shaver can.
+Safety questions are adapted to both the appliance and the user’s chosen goal. Repair uses up to four questions, Compare up to three, Recycle up to two, and the guided “I’m not sure” path can use up to five. A kettle does not receive a battery question; a battery-powered shaver can. If a user answers Yes or Not sure, that answer is already enough to change the safer next step, so the user can stop without completing the remaining questions. Every question has an on-demand plain-language help panel and visual cue.
 
 ## Repair evidence
 
-Open Repair Alliance category history is translated into plain language such as:
-
-> **73 of 169 recorded community repair attempts were fixed during the event.**
-
-The detailed sample, geography, broader-category mapping and limitations remain available in an expandable panel. FixForward does not present category history as a model-specific success probability.
+Open Repair Alliance category history is shown as a three-part horizontal outcome visual: **fixed during the event**, **repairable after more work**, and **other recorded outcomes**. It appears after the repair map/service results so practical action comes first. The detailed sample, geography, broader-category mapping and limitations remain available in an expandable panel. FixForward does not present category history as a model-specific success probability.
 
 ## Smart cost finder — prototype boundary
 
@@ -134,7 +130,7 @@ See `API_CONTRACT.md`.
 - High-risk safety state cannot route to community repair results.
 - Technical failure is not presented as reassurance.
 
-See `docs/SECURE_ARCHITECTURE_I1.md` and `docs/V1.4_GOAL_FIRST_PROTOTYPE.md`.
+See `docs/SECURE_ARCHITECTURE_I1.md` and `docs/V1.5_HUMAN_FIRST_UX.md`.
 
 ## Local setup
 
@@ -149,7 +145,7 @@ python -m pip install -r requirements.txt
 Set `DATABASE_URL` as an environment variable. Do **not** paste it into documentation, screenshots or Git.
 
 ```powershell
-$env:RELEASE_VERSION = "iteration-1-v1.4.0-goal-first"
+$env:RELEASE_VERSION = "iteration-1-v1.5.0-human-first"
 python -m flask --app app run --debug
 ```
 
@@ -171,7 +167,7 @@ python -m unittest discover -s test_backend -v
 python -m compileall -q backend app.py test_backend
 ```
 
-In the build environment used to package this prototype, all **30 Node tests passed** and Python compilation passed. The complete Flask test module could not be executed there because external package installation was unavailable; run it in the project's normal `.venv` before committing. The prior v1.3 candidate was separately run by the project team with its backend suite passing.
+In the build environment used to package this prototype, all **46 Node tests passed** and Python compilation passed. The complete Flask test module could not be executed there because external package installation was unavailable; run it in the project's normal `.venv` before committing. The prior v1.3 candidate was separately run by the project team with its backend suite passing.
 
 ## Demonstration recall case
 

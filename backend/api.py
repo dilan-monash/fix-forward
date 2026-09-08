@@ -49,7 +49,9 @@ def database_unavailable(_error):
 def unexpected_api_error(error):
     # Log only the exception class; database messages can contain infrastructure
     # details that should not be returned to users or routine application logs.
-    current_app.logger.exception(
+    # Do not attach the traceback here: unexpected exception messages can
+    # contain database hostnames, SQL fragments or other infrastructure detail.
+    current_app.logger.error(
         "API failure path=%s type=%s", request.path, type(error).__name__
     )
     return jsonify(

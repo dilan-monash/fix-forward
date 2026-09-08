@@ -1,21 +1,23 @@
-# FixForward Iteration 1 — System Architecture (v1.4 goal-first prototype)
+# FixForward Iteration 1 — System Architecture (v1.5 human-first prototype)
 
 ## 1. User-facing architecture
 
 ```mermaid
 flowchart LR
     H[Home\nRepair / Compare / Recycle / Help me decide] --> I[Identify appliance\nFamily + category\noptional brand/model]
-    I --> Q[Quick safety + recall gate\nappliance-relevant questions]
-    Q --> D{Safe pathway gate}
-    D -->|Serious warning| S[Stop-use / professional safety guidance]
+    I --> Q[Short product + goal safety plan\n2–5 plain questions]
+    Q --> D{Safety / recall gate}
+    D -->|Serious warning| S[Stop use\nqualified repairer/electrician + official guidance]
+    D -->|Uncertain| U[Stop checking\ncautious guidance]
     D -->|Possible recall| R[Official recall instructions]
-    D -->|Repair goal| M[In-app repair map + service cards]
-    D -->|Compare goal| C[Smart cost prototype + manual fallback]
-    D -->|Recycle goal| W[In-app e-waste map + service cards]
-    D -->|Help me decide| O[Repair / Compare / Recycle options]
+    D -->|Repair clear| M[In-app repair map + practical service cards]
+    D -->|Compare clear| C[Manual cost comparison\nfuture governed smart cost]
+    D -->|Recycle clear| W[In-app e-waste map + service cards]
+    D -->|Guided clear| O[Repair / Compare / Recycle options]
+    U -->|Recycle intent only; no recall| WC[Contact-first recycling listings]
 ```
 
-The goal selection is not a safety bypass. Recall/safety rules can override the requested pathway.
+The goal selection is **not** a safety bypass. A possible recall or serious warning overrides convenience. A Yes/Not sure answer can end the question sequence early so users are not encouraged to inspect or re-test an appliance.
 
 ## 2. Data architecture
 
@@ -31,57 +33,74 @@ flowchart TB
     API --> S[/api/sources]
     API --> E[/api/repair-evidence]
     API --> L[/api/locations]
-    R --> WEB[Browser SPA]
+    STATIC[Static families + safety definitions] --> WEB[Browser SPA renders immediately]
+    R --> WEB
     S --> WEB
     E --> WEB
     L --> WEB
-    STATIC[Static family + safety rule definitions] --> WEB
-    GEO[Browser Geolocation\npermission only] --> LOCAL[Local distance calculation]
+    GEO[Browser geolocation\npermission on user action] --> LOCAL[Memory-only distance calculation]
     L --> LOCAL
-    LOCAL --> MAP[Leaflet map\nOpenStreetMap tiles]
+    LOCAL --> MAP[Leaflet map\ncreated only for useful results]
 ```
 
-**Privacy boundary:** `GEO` never goes to `API` or `NEON`.
+**Privacy boundary:** `GEO` never goes to `API` or `NEON` in this prototype.
 
-## 3. Dataset → function traceability
+## 3. Static-first / background-data behavior
+
+```text
+HTML + JS + static appliance/safety definitions
+                  ↓
+          landing renders now
+                  ↓
+recalls / sources / repair history / locations load independently
+                  ↓
+available datasets enhance the current screen
+```
+
+A cold Render/Neon connection therefore does not blank the landing page. If recall data arrives after a fast user starts, an earlier `unavailable` recall state can be re-evaluated. If location data arrives while the service screen is open, the screen refreshes while preserving typed area text.
+
+## 4. Dataset → function traceability
 
 | Data | Backend | Endpoint | Browser use |
 |---|---|---|---|
 | Reviewed recall products | `reviewed_recall_products()` | `/api/recalls` | `matchRecall()` / `recallMiniCard()` |
 | Recall metadata | `recall_metadata()` | `/api/recalls` | limitation/coverage detail |
 | Source register | `sources()` | `/api/sources` | grouped About dialog |
-| Repair statistics | `repair_statistics()` | `/api/repair-evidence` | `repairEvidenceSummary()` |
-| Repair barriers | `repair_barriers()` | `/api/repair-evidence` | evidence detail |
+| Repair statistics | `repair_statistics()` | `/api/repair-evidence` | `repairEvidenceSummary()` stacked visual |
+| Repair barriers | `repair_barriers()` | `/api/repair-evidence` | expandable evidence detail |
 | Relevant locations + coordinates | `relevant_locations()` | `/api/locations` | `getLocations()`, `getNearbyLocations()`, `renderMap()` |
-| Static safety rules | `data.js` | none | `applicableSafetySigns()`, `evaluateSafety()` |
+| Static safety rules | `data.js` | none | `applicableSafetySigns()`, `safetyPlanFor()`, `evaluateSafety()` |
 | User coordinates | none | **none** | `navigator.geolocation` → `distanceKm()` only |
 
-## 4. Goal-first routing
+## 5. Goal/product safety planning
 
-```text
-selected goal
-    ↓
-appliance
-    ↓
-quick safety/recall gate
-    ↓
-if blocked: safe override
-if clear: direct route to requested tool
-```
+`safetyPlanFor(category, intent, signs)` first removes questions not applicable to the appliance, then applies a category priority and a goal limit.
 
-This removes the redundant “choose next action” screen for users who already chose a goal on the landing page.
+Current prototype maximums:
 
-## 5. Reliability behavior
+| Goal | Max questions |
+|---|---:|
+| Repair | 4 |
+| Compare | 3 |
+| Recycle | 2 |
+| Help me decide | 5 |
 
-- Loading UI is rendered before network work.
+This is a UX prototype decision requiring final BA/safety acceptance. It does not change the rule that severe warning signs override the requested route.
+
+## 6. Reliability behavior
+
+- Useful static landing renders before public-data network work completes.
 - Public datasets load independently with `Promise.allSettled()`.
 - Location failure does not disable recall.
 - Recall failure does not disable static safety questions.
 - Public data can be retried without resetting the journey.
+- Service cold-start can auto-refresh without clearing typed search text.
+- Leaflet/OSM is not loaded until a useful result set exists to plot.
+- Map failure leaves the text service list usable.
 - `/api/health` checks process liveness.
 - `/api/ready` checks database readiness.
-- No user-coordinate network request is required for nearby sorting.
+- Changing appliance family/category clears stale safety, decision and cost-result state.
 
-## 6. Prototype scope-change flag
+## 7. Prototype scope-change flags
 
-Device geolocation changes the previously documented I1 manual-location boundary. The prototype implements it in the least-data way (browser permission + memory-only coordinates) so the team can usability-test the idea. It must be explicitly accepted or deferred before the final I1 scope is frozen.
+Device geolocation, goal-first shortcuts, goal-specific safety depth, early-stop behavior and uncertainty-to-contact-first recycling are not assumed to be final I1 requirements. Record an explicit approve/defer/reject decision before final scope freeze.

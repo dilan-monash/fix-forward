@@ -2,7 +2,7 @@
 // the backend. Fallback data arrays stay empty so an outage can never create a
 // false safety/recall or service result from stale demo data.
 export const META = Object.freeze({
-  releaseVersion: "iteration-1-v1.4.0-goal-first",
+  releaseVersion: "iteration-1-v1.5.0-human-first",
   dataVersion: "public-data-unavailable",
   retrievalDate: "See About the information"
 });
@@ -135,7 +135,7 @@ export const SAFETY_RULES = Object.freeze({
     explanation: "Unusual heat can have several causes. Stop and get it checked if it is severe, worsening or comes with smoke or smell."
   }),
   water: Object.freeze({
-    severity: "caution",
+    severity: "critical",
     explanation: "Water or moisture around electrical equipment can be dangerous. Do not switch on a wet appliance."
   }),
   battery: Object.freeze({
@@ -149,6 +149,88 @@ export const SAFETY_APPLICABILITY = Object.freeze({
   water: Object.freeze(["Kettle", "Rice cooker", "Coffee machine", "Steam cleaner", "Dehumidifier", "Portable air conditioner", "Shaver"]),
   heat: Object.freeze(["Kettle", "Toaster", "Sandwich press", "Rice cooker", "Coffee machine", "Air fryer", "Microwave", "Hair dryer", "Straightener", "Portable heater"])
 });
+
+// Human-first question copy. The main question stays short; the explanation and
+// examples are hidden behind an info button so users who already understand it
+// are not forced to read a paragraph before every answer.
+export const SAFETY_HELP = Object.freeze({
+  burning: Object.freeze({
+    question: "Any smoke, fire or burning smell?",
+    title: "What does this mean?",
+    meaning: "Look for visible smoke or flame, or a new smell like burnt plastic or hot electrical parts.",
+    example: "You do not need to turn the appliance on again to check.",
+    pictogram: "🔥"
+  }),
+  electrical: Object.freeze({
+    question: "Any shock, sparks or damaged wires?",
+    title: "What does this mean?",
+    meaning: "This includes a tingling/electric shock, a quick blue or white spark, or wire that you can see through damaged insulation.",
+    example: "Only answer from something you already noticed. Do not touch a damaged wire to check it.",
+    pictogram: "⚡"
+  }),
+  plug: Object.freeze({
+    question: "Is the plug or power cord badly damaged?",
+    title: "What should I look for?",
+    meaning: "Look for melting, black/scorched marks, deep cuts, crushed cable or wire showing through.",
+    example: "Small surface marks are different from exposed wire or melted plastic.",
+    pictogram: "🔌"
+  }),
+  power: Object.freeze({
+    question: "Does it trip the power or make new popping/buzzing sounds?",
+    title: "What does this mean?",
+    meaning: "Examples include the circuit breaker switching off repeatedly, a new loud buzz, crackle or popping sound.",
+    example: "Do not keep resetting the power just to test the appliance.",
+    pictogram: "💡"
+  }),
+  heat: Object.freeze({
+    question: "Is it getting much hotter than normal?",
+    title: "How hot is 'too hot'?",
+    meaning: "Think about a new or unusual level of heat, especially if the casing, plug or cord becomes very hot.",
+    example: "Normal cooking heat is different from unexpected heat in the plug, cord or outer casing.",
+    pictogram: "🌡️"
+  }),
+  water: Object.freeze({
+    question: "Has water or moisture got inside it?",
+    title: "What counts as water getting inside?",
+    meaning: "Examples include a spill into vents, the appliance being dropped in water, or visible moisture inside electrical parts.",
+    example: "Do not switch on a wet appliance to see whether it still works.",
+    pictogram: "💧"
+  }),
+  battery: Object.freeze({
+    question: "Is the battery swollen, leaking or damaged?",
+    title: "What should I look for?",
+    meaning: "The case may look pushed outward, unusually rounded, split open, leaking or much hotter than usual while not in use.",
+    example: "Do not press, puncture or open the battery to inspect it.",
+    pictogram: "🔋"
+  })
+});
+
+// Questions are deliberately prioritised by appliance instead of showing every
+// generic warning to every user. Direct Repair/Compare/Recycle paths stay short;
+// 'I'm not sure' can ask a slightly fuller set.
+export const CATEGORY_SAFETY_PRIORITY = Object.freeze({
+  "Kettle": Object.freeze(["water", "plug", "heat", "power"]),
+  "Rice cooker": Object.freeze(["water", "plug", "heat", "power"]),
+  "Sandwich press": Object.freeze(["plug", "heat", "power"]),
+  "Toaster": Object.freeze(["plug", "heat", "power"]),
+  "Blender": Object.freeze(["plug", "power"]),
+  "Food processor": Object.freeze(["plug", "power"]),
+  "Mixer": Object.freeze(["plug", "power"]),
+  "Coffee machine": Object.freeze(["water", "plug", "heat", "power"]),
+  "Air fryer": Object.freeze(["plug", "heat", "power"]),
+  "Microwave": Object.freeze(["plug", "heat", "power"]),
+  "Vacuum cleaner": Object.freeze(["plug", "power"]),
+  "Steam cleaner": Object.freeze(["water", "plug", "power"]),
+  "Hair dryer": Object.freeze(["plug", "heat", "power"]),
+  "Straightener": Object.freeze(["plug", "heat", "power"]),
+  "Shaver": Object.freeze(["battery", "water", "power"]),
+  "Fan": Object.freeze(["plug", "power"]),
+  "Portable heater": Object.freeze(["plug", "heat", "power"]),
+  "Dehumidifier": Object.freeze(["water", "plug", "power"]),
+  "Portable air conditioner": Object.freeze(["water", "plug", "power"])
+});
+
+export const SAFETY_PLAN_LIMITS = Object.freeze({ repair: 4, compare: 3, recycle: 2, guide: 5 });
 
 export const SOURCES = Object.freeze([
   { name: "ACCC Product Safety recalls", url: "https://www.productsafety.gov.au/recalls", use: "Official Australian product safety and recall notices" },

@@ -1,49 +1,57 @@
-# FixForward v1.4 goal-first prototype — integration notes
+# FixForward v1.5 human-first prototype — integration notes
 
-This candidate builds on the v1.3 safety/reliability redesign and explores a stronger ordinary-household experience. It is intentionally **not final scope**.
+This candidate builds on the v1.4 goal-first prototype and applies another usability pass focused on ordinary household users. It is intentionally **not final assessed scope**.
 
-## What changed from v1.3
+## What changed from v1.4
 
-- Landing page starts with user goals: Repair / Compare / Recycle / I'm not sure.
-- Repair/Compare/Recycle go directly to the requested tool after a clear safety/recall gate.
-- The safety/recall gate still overrides convenience when a serious warning or possible recall exists.
-- “Product recall” is explained in simple language rather than assumed knowledge.
-- Optional current-location mode calculates nearby results in the browser.
-- In-app Leaflet/OpenStreetMap map shows service positions.
-- Service cards lead with practical fields (distance/address/phone/hours/call/directions) rather than provenance labels.
-- Verification/source detail is still available under `About this listing`.
-- Repair-history context is visual and secondary to the service finder.
-- Smart-cost UX is demonstrated without inventing automatic prices.
+- Repair / Compare / Recycle / Help me decide are visible immediately in the hero.
+- Static landing and appliance definitions render immediately; public data loads in the background.
+- Direct routes ask a short goal- and appliance-specific safety plan: Repair up to 4, Compare up to 3, Recycle up to 2; guided Help me decide up to 5.
+- A Yes/Not sure answer can end the check early; users are not forced to inspect the appliance further.
+- Added **I'm not able to check this safely**.
+- Every safety question has plain-language help, a pictogram, a concrete example and a do-not-test warning.
+- Water/moisture ingress remains a serious stop-use result under the conservative I1 safety baseline; heat/power warnings remain differentiated caution cases.
+- Repair history is a stacked outcome visual shown after practical map/list results.
+- Service cards lead with useful fields and actions; provenance remains under **About this listing**.
+- The map/CDN is not loaded until there are useful results to plot.
+- Uncertain recycling can continue to contact-first facility listings, while serious/high-risk cases still cannot enter ordinary service/cost routes.
+- Appliance changes clear stale safety/decision/cost-result state.
+- The cost page leads with the usable manual comparison and does not invent automatic model prices.
 
 ## Data compatibility
 
-No new user-data table is introduced. Existing location columns already support latitude/longitude and optional provider/opening-hour fields through the existing migration set. `/api/locations` exposes those public fields so distance can be calculated locally.
+No new user-data table is introduced. Existing location columns support latitude/longitude and optional provider/opening-hour fields. `/api/locations` exposes those public fields so distance can be calculated locally.
 
-The browser **does not send device coordinates to Flask or Neon**.
+The browser **does not send device coordinates to Flask or Neon**. Safety answers, typed costs and appliance selections also remain client-side in the current design.
 
 ## Scope compatibility warning
 
-The earlier I1 source-of-truth documented manual suburb selection/no device geolocation. v1.4 implements geolocation as an experimental response to teaching feedback and subsequent usability thinking. Before final I1 merge, record one of these decisions:
+The earlier I1 source of truth documented manual suburb selection/no device geolocation and a fixed safety flow. v1.5 contains prototype scope changes based on teaching feedback and usability reasoning:
 
-1. approve it for I1 and update LeanKit/AC/threat model/privacy evidence;
-2. defer it to I2 and retain manual location in the final I1 branch;
-3. reject it with documented rationale.
+- goal-first shortcuts;
+- browser geolocation;
+- different safety depth by goal/product;
+- early stop after a decisive Yes/Not sure;
+- cautious contact-first recycling after uncertainty.
 
-Do not let prototype code silently redefine the assessed scope.
+Before final I1 merge, the BA/team/mentor must explicitly approve, defer or reject these changes and update LeanKit, acceptance criteria, threat model and privacy evidence. Prototype code must not silently redefine assessed scope.
 
 ## External map dependency
 
-Leaflet 1.9.4 is pinned to the stable CDN release with official SRI hashes. OpenStreetMap tile images are requested only when the map is displayed. The response policy is `strict-origin-when-cross-origin` so browser tile requests can include the origin Referer expected by the OSM tile service. The text service list remains the functional fallback if the map fails.
+Leaflet 1.9.4 is pinned with SRI hashes. OpenStreetMap tile requests occur only when a result map is actually created. The service list remains the functional fallback if the map/CDN fails.
 
-For a production-grade handover, consider self-hosting the pinned Leaflet release and selecting a map tile service appropriate for expected usage.
+For production-scale use, review tile-provider terms/expected traffic and consider self-hosting the pinned Leaflet files or using an appropriate managed tile service.
 
 ## Test/merge gate
 
-Use `docs/DEPLOYMENT_CHECKLIST_V1.4.md`. Do not merge directly into `main` before:
+Use `docs/DEPLOYMENT_CHECKLIST_V1.5.md`. Do not merge directly into `main` before:
 
-- full backend suite passes in the team `.venv`;
+- all JavaScript checks pass;
+- complete backend suite passes in the team's `.venv`;
 - Neon development branch contract is checked;
-- geolocation allow/deny and network privacy are verified;
-- map/CDN failure is tested;
-- mobile/keyboard/browser Back are checked;
-- BA/mentor scope decision is recorded.
+- direct and guided safety routes are manually exercised;
+- BVC 160 / BVC 161 / recall-outage behavior is retested;
+- geolocation Allow/Deny/timeout and browser network/storage behavior are verified;
+- map load and forced map failure are tested;
+- mobile, 200% zoom, keyboard, screen-reader spot checks and browser Back are completed;
+- BA/mentor scope decisions are recorded.
