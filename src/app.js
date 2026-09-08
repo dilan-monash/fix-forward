@@ -7,15 +7,23 @@ import {
   getLocations,
   getNearbyLocations,
   safetyPlanFor,
-  locationHasCoordinates
+  locationHasCoordinates,
+  validateBrand,
+  validateModel,
+  validateProblem,
+  classifyProblem,
+  findSuburbSuggestions,
+  resolveAreaInput
 } from "./logic.js";
 import {
   CATEGORY_CODE_BY_NAME,
   EVIDENCE_CATEGORY_CODE_BY_UI_CATEGORY,
   SAFETY_RULES,
   SAFETY_HELP,
-  GOALS
+  GOALS,
+  COST_CONTEXT_SOURCES
 } from "./data.js";
+import { SUBURB_POSTCODES } from "./suburb-index.js";
 import { icons } from "./icons.js";
 
 const app = document.querySelector("#app");
@@ -49,11 +57,17 @@ const emptyState = () => ({
   serviceSafetyMode: "clear",
   safetyOptOut: false,
   area: "",
+  areaSelection: null,
+  areaSuggestions: [],
+  areaActiveIndex: -1,
   userLocation: null,
   geoStatus: "idle",
   filters: { radiusKm: 10, providerType: "all" },
   costs: { repair: "", replacement: "" },
   comparison: null,
+  problem: "",
+  problemContext: null,
+  fromRepairHub: false,
   touched: false
 });
 let state = emptyState();
@@ -275,8 +289,8 @@ function renderIdentify() {
     ${state.appliance.category ? `<section class="product-details-card">
       <div><p class="eyebrow">Optional</p><h2>Do you know the brand or model?</h2><p>This can help us spot a possible product safety notice. It is okay if you do not know.</p></div>
       <div class="form-grid">
-        <label>Brand<input name="brand" maxlength="100" value="${escapeAttr(state.appliance.brand)}" autocomplete="off" placeholder="e.g. Dyson, Breville, Mistral"></label>
-        <label>Model number<input name="model" maxlength="100" value="${escapeAttr(state.appliance.model)}" autocomplete="off" placeholder="e.g. BVC 160"><small>Spaces, dashes and slashes are okay.</small></label>
+        <label>Brand<input name="brand" maxlength="60" value="${escapeAttr(state.appliance.brand)}" autocomplete="off" placeholder="e.g. Dyson, Breville, Mistral" aria-describedby="brand-error"><small class="field-hint">Optional · up to 60 characters</small><small class="field-error" id="brand-error"></small></label>
+        <label>Model number<input name="model" maxlength="50" value="${escapeAttr(state.appliance.model)}" autocomplete="off" placeholder="e.g. BVC 160" aria-describedby="model-error"><small>Spaces, dashes, dots and slashes are okay. Numeric-only model numbers are allowed.</small><small class="field-error" id="model-error"></small></label>
       </div>
       <details class="plain-details model-help"><summary>Where can I find the model number?</summary><div class="model-help-body"><div class="model-label-demo" role="img" aria-label="Example appliance rating label showing brand and model number"><span>APPLIANCE LABEL</span><strong>Brand: Example</strong><b>Model: ABC-123</b><small>230–240 V · 50 Hz</small></div><p>Look for a sticker or rating label on the bottom, back, underside, inside an easy-to-open battery compartment or near the power cord. The model may be labelled <strong>Model</strong>, <strong>Model No.</strong> or <strong>M/N</strong>. <strong>Do not open the appliance or remove screws to find it.</strong></p></div></details>
       <div class="continue-row"><button class="button primary large" id="continue-check" type="button">Continue — ${checkCount} quick question${checkCount === 1 ? "" : "s"} ${icon("arrow")}</button><span>Then we take you to ${escapeHtml(destinationAfterCheck())}.</span></div>
@@ -294,6 +308,14 @@ function renderIdentify() {
     state.serviceSafetyMode = "clear";
     state.costs = { repair: "", replacement: "" };
     state.comparison = null;
+    state.problem = "";
+    state.problemContext = null;
+    state.area = "";
+    state.areaSelection = null;
+    state.areaSuggestions = [];
+    state.areaActiveIndex = -1;
+    state.userLocation = null;
+    state.fromRepairHub = false;
     renderIdentify();
     app.querySelector(".category-panel")?.scrollIntoView({ block: "center", behavior: "smooth" });
   }));
@@ -308,16 +330,41 @@ function renderIdentify() {
     state.serviceSafetyMode = "clear";
     state.costs = { repair: "", replacement: "" };
     state.comparison = null;
+    state.problem = "";
+    state.problemContext = null;
+    state.area = "";
+    state.areaSelection = null;
+    state.areaSuggestions = [];
+    state.areaActiveIndex = -1;
+    state.userLocation = null;
+    state.fromRepairHub = false;
     renderIdentify();
     app.querySelector(".product-details-card")?.scrollIntoView({ block: "center", behavior: "smooth" });
   }));
   app.querySelector("#continue-check")?.addEventListener("click", () => {
-    const nextBrand = app.querySelector('[name="brand"]')?.value.trim() || "";
-    const nextModel = app.querySelector('[name="model"]')?.value.trim() || "";
+    const brandInput = app.querySelector('[name="brand"]');
+    const modelInput = app.querySelector('[name="model"]');
+    const brandResult = validateBrand(brandInput?.value || "");
+    const modelResult = validateModel(modelInput?.value || "");
+    const validation = [["brand", brandInput, brandResult], ["model", modelInput, modelResult]];
+    validation.forEach(([name, input, result]) => {
+      const error = app.querySelector(`#${name}-error`);
+      if (error) error.textContent = result.valid ? "" : result.message;
+      input?.setAttribute("aria-invalid", String(!result.valid));
+    });
+    const firstInvalid = validation.find(([, , result]) => !result.valid);
+    if (firstInvalid) { firstInvalid[1]?.focus(); return; }
+
+    const nextBrand = brandResult.value;
+    const nextModel = modelResult.value;
     const identityChanged = nextBrand !== state.appliance.brand || nextModel !== state.appliance.model;
     state.appliance.brand = nextBrand;
     state.appliance.model = nextModel;
-    if (identityChanged) state.comparison = null;
+    if (identityChanged) {
+      state.comparison = null;
+      state.problem = "";
+      state.problemContext = null;
+    }
     state.recall = matchRecall(state.appliance, recalls(), availability("recalls"));
     state.safetyOptOut = false;
     navigate("check");
@@ -383,7 +430,7 @@ function questionCard(id, index) {
     <div class="question-help-panel" id="${escapeAttr(helpId)}" hidden>
       ${safetyVisual(id)}
       <div class="help-copy"><h3 tabindex="-1">${escapeHtml(help.title || "What does this mean?")}</h3><p>${escapeHtml(help.meaning || SAFETY_RULES[id]?.explanation || "")}</p><p class="help-example">${escapeHtml(help.example || "Only answer from what you already noticed.")}</p><div class="do-not-test"><strong>Do not test it just to answer.</strong><span>You do not need to switch it on, open it, touch damaged parts or remove screws.</span></div></div>
-      <div class="help-resolve"><span>After reading this:</span><button type="button" class="text-choice" data-resolve-question="${escapeAttr(id)}" data-resolve-value="yes">Yes, I noticed this</button><button type="button" class="text-choice" data-resolve-question="${escapeAttr(id)}" data-resolve-value="no">No, I did not</button><button type="button" class="text-choice safer-choice" data-stop-uncertain="${escapeAttr(id)}">I’m still not sure — show a safer next step</button></div>
+      <div class="help-resolve"><span>After reading this:</span><button type="button" class="text-choice" data-resolve-question="${escapeAttr(id)}" data-resolve-value="yes">Yes, I noticed this</button><button type="button" class="text-choice" data-resolve-question="${escapeAttr(id)}" data-resolve-value="no">No, I did not</button><button type="button" class="text-choice safer-choice" data-keep-unsure="${escapeAttr(id)}">I’m still not sure — keep this answer</button></div>
     </div>
   </fieldset>`;
 }
@@ -395,28 +442,27 @@ function flaggedSafetyAnswers(signs = relevantSigns()) {
 function updateSafetyFooter() {
   const signs = relevantSigns();
   const answered = signs.filter(([id]) => state.safety[id]).length;
-  const flagged = flaggedSafetyAnswers(signs);
   const footer = app.querySelector(".simple-sticky");
   if (!footer) return;
   const strong = footer.querySelector("strong");
   const copy = footer.querySelector("span");
   const button = footer.querySelector('button[type="submit"]');
-  if (flagged.length) {
-    if (strong) strong.textContent = "You can stop here.";
-    if (copy) copy.textContent = "This answer is enough to change the safer next step. You do not need to inspect the appliance further.";
-    if (button) button.textContent = "Show safer next step";
-    return;
-  }
+  const hasCriticalYes = signs.some(([id]) => state.safety[id] === "yes" && SAFETY_RULES[id]?.severity === "critical");
   if (strong) strong.textContent = answered === signs.length ? "Quick check complete" : `${answered} of ${signs.length} answered`;
-  if (copy) copy.textContent = answered === signs.length ? `Continue to ${destinationAfterCheck()}.` : "Answer only from what you already know. Use the info button if a question is unclear.";
-  if (button) button.textContent = answered === signs.length ? `Continue to ${destinationAfterCheck()}` : "Continue";
+  if (copy) {
+    copy.textContent = answered === signs.length
+      ? `Continue to see the next step.`
+      : hasCriticalYes
+        ? "A serious warning is already recorded. Finish only the remaining questions you can answer from what you already know — do not test the appliance."
+        : "Not sure is okay. Keep going with the remaining questions you can answer from what you already know.";
+  }
+  if (button) button.textContent = answered === signs.length ? "See my next step" : "Continue";
 }
 
 function finishSafetyCheck({ allowIncomplete = false } = {}) {
   const signs = relevantSigns();
-  const flagged = flaggedSafetyAnswers(signs);
   const missing = signs.filter(([id]) => !state.safety[id]);
-  if (!allowIncomplete && !flagged.length && missing.length) {
+  if (!allowIncomplete && missing.length) {
     const error = app.querySelector("#safety-error");
     if (error) error.textContent = `Please answer the remaining ${missing.length} question${missing.length === 1 ? "" : "s"}, or choose “I’m not able to check this safely”.`;
     app.querySelector(`[name="${missing[0][0]}"]`)?.focus();
@@ -428,11 +474,11 @@ function finishSafetyCheck({ allowIncomplete = false } = {}) {
     : evaluateSafety(state.safety);
   state.decision = journeyDecision(state.recall?.status || "insufficient", state.safetyResult.status);
 
-  const blockedBySafety = ["high", "uncertain"].includes(state.safetyResult.status);
+  const blockedBySafety = ["high", "uncertain", "caution"].includes(state.safetyResult.status);
   const blockedByRecall = state.recall?.status === "possible";
   if (!blockedBySafety && !blockedByRecall) {
     state.serviceSafetyMode = "clear";
-    if (state.intent === "repair") { state.pathway = "repair"; navigate("services"); return; }
+    if (state.intent === "repair") { state.pathway = "repair"; state.fromRepairHub = false; navigate("repair-hub"); return; }
     if (state.intent === "recycle") { state.pathway = "dispose"; navigate("services"); return; }
     if (state.intent === "compare") { state.pathway = "cost"; navigate("cost"); return; }
   }
@@ -510,13 +556,21 @@ function renderCheck() {
     input?.focus();
   }));
 
-  app.querySelectorAll("[data-stop-uncertain]").forEach((button) => button.addEventListener("click", () => {
-    const id = button.dataset.stopUncertain;
+  app.querySelectorAll("[data-keep-unsure]").forEach((button) => button.addEventListener("click", () => {
+    const id = button.dataset.keepUnsure;
     state.safetyOptOut = false;
     state.safetyResult = null;
     state.decision = null;
     state.safety[id] = "unsure";
-    finishSafetyCheck({ allowIncomplete: true });
+    const input = app.querySelector(`input[name="${id}"][value="unsure"]`);
+    if (input) input.checked = true;
+    const panel = app.querySelector(`#help-${id}`);
+    const toggle = app.querySelector(`[data-help-toggle="${id}"]`);
+    if (panel) panel.hidden = true;
+    toggle?.setAttribute("aria-expanded", "false");
+    updateSafetyFooter();
+    const next = relevantSigns().find(([questionId]) => !state.safety[questionId]);
+    app.querySelector(`[name="${next?.[0] || id}"]`)?.focus();
   }));
 
   app.querySelector("#safety-form")?.addEventListener("submit", (event) => {
@@ -578,6 +632,25 @@ function resultActionCard(id, iconText, title, description, cta, featured = fals
   return `<article class="result-action ${featured ? "featured" : ""}"><span class="result-action-icon" aria-hidden="true">${iconText}</span><h2>${escapeHtml(title)}</h2><p>${escapeHtml(description)}</p><button class="button ${featured ? "primary" : "secondary"}" type="button" data-action="${escapeAttr(id)}">${escapeHtml(cta)} ${icon("arrow")}</button></article>`;
 }
 
+function renderRepairHub() {
+  setStage("options");
+  state.pathway = "repair";
+  app.innerHTML = `<section class="screen repair-hub-screen">
+    ${renderBack("Back to quick check")}
+    <div class="result-hero repair-hub-hero"><div><p class="eyebrow">Repair · next step</p><h1>What would help you most now?</h1><p>Choose the practical next step. You can find a repair option nearby or look at the money side first.</p></div><div class="appliance-pill"><span>↻</span><div><small>Your appliance</small><strong>${escapeHtml([state.appliance.brand, state.appliance.model].filter(Boolean).join(" ") || state.appliance.category)}</strong><em>${escapeHtml(state.appliance.category)}</em></div></div></div>
+    ${quickCheckPassedBanner()}
+    ${subtleRecallStatus()}
+    <div class="repair-hub-grid">
+      <article class="repair-hub-card"><span class="result-action-icon" aria-hidden="true">⌖</span><p class="mini-label">Nearby help</p><h2>Find a repair option</h2><p>Use your current location or type a suburb/postcode. See the map, available phone details, directions and opening information inside FixForward.</p><button class="button primary" id="hub-find-repair" type="button">Find repair near me ${icon("arrow")}</button></article>
+      <article class="repair-hub-card"><span class="result-action-icon" aria-hidden="true">$</span><p class="mini-label">Money side</p><h2>Estimate & compare costs</h2><p>Use your appliance details and a short problem description to see the cost evidence FixForward can support, then compare real prices if you have them.</p><button class="button secondary" id="hub-cost" type="button">Estimate repair vs replace ${icon("arrow")}</button></article>
+    </div>
+    <section class="repair-hub-evidence"><div class="section-heading compact-heading"><p class="eyebrow">Background repair history</p><h2>Have similar appliances been repaired before?</h2><p>This comes after the practical choices because it is context, not your answer.</p></div>${repairEvidenceSummary()}</section>
+  </section>`;
+  bindBack();
+  app.querySelector("#hub-find-repair")?.addEventListener("click", () => { state.pathway = "repair"; state.fromRepairHub = true; navigate("services"); });
+  app.querySelector("#hub-cost")?.addEventListener("click", () => { state.pathway = "cost"; state.fromRepairHub = true; navigate("cost"); });
+}
+
 function renderResults() {
   setStage("options");
   const safety = state.safetyResult || evaluateSafety(state.safety);
@@ -587,31 +660,48 @@ function renderResults() {
   const possibleRecall = state.recall?.status === "possible";
 
   if (safety.status === "high") {
+    const disposalPlan = !possibleRecall ? `<div class="hazard-disposal-card"><h2>Need to get rid of it?</h2><p>You can plan a recycling location, but <strong>do not transport it while it is hot, smoking, leaking or actively damaged.</strong> Contact the facility or an appropriate safety service before moving it.</p><button class="button secondary" id="high-recycle" type="button">Plan recycling / disposal ${icon("arrow")}</button></div>` : "";
     app.innerHTML = `<section class="screen narrow result-screen">
       ${renderBack("Back to safety questions")}
       <div class="urgent-card"><span class="urgent-icon">!</span><p class="eyebrow">Serious safety warning</p><h1>Stop using this appliance for now.</h1><p>You told us about a warning sign that could be unsafe. Switch it off and unplug it <strong>only if it is safe to do so</strong>. Do not keep testing it.</p><div class="reported-simple">${safety.critical.map((id) => `<span>${escapeHtml(SAFETY_HELP[id]?.question || SAFETY_RULES[id]?.explanation || id)}</span>`).join("")}</div></div>
       ${possibleRecall ? `<div class="priority-card"><strong>A product recall may also apply.</strong><p>Check the official recall instructions before deciding to repair, replace or recycle it.</p>${externalLink(state.recall?.match?.noticeUrl || "https://www.productsafety.gov.au/recalls", "See official recall instructions", "button danger")}</div>` : ""}
       <div class="next-now"><h2>What should I do now?</h2><div class="next-steps"><article><span>1</span><div><strong>Do not use it again for now</strong><p>A serious warning sign needs a safer next step than a community repair event.</p></div></article><article><span>2</span><div><strong>Have it checked by a qualified appliance repairer or electrician</strong><p>Tell them what you noticed. Do not keep switching the appliance on to test it yourself.</p></div></article></div><div class="button-row">${externalLink("https://www.energysafe.vic.gov.au/", "Energy Safe Victoria guidance", "button primary")}${externalLink("https://www.productsafety.gov.au/recalls", "Check recalls", "button secondary")}</div></div>
+      ${disposalPlan}
     </section>`;
-    bindBack(); return;
+    bindBack();
+    app.querySelector("#high-recycle")?.addEventListener("click", () => { state.pathway = "dispose"; state.serviceSafetyMode = "high"; state.fromRepairHub = false; navigate("services"); });
+    return;
+  }
+
+  if (safety.status === "caution") {
+    const cautionItems = safety.caution.map((id) => `<span>${escapeHtml(SAFETY_HELP[id]?.question || SAFETY_RULES[id]?.explanation || id)}</span>`).join("");
+    app.innerHTML = `<section class="screen narrow result-screen">
+      ${renderBack("Back to safety questions")}
+      <div class="attention-card"><span class="urgent-icon">i</span><p class="eyebrow">Needs attention</p><h1>Something should be checked before ordinary repair.</h1><p>You reported a warning such as unusual heat, repeated power trips or a new noise. That is different from smoke, shock or exposed wiring, but it still deserves assessment.</p><div class="reported-simple">${cautionItems}</div></div>
+      ${possibleRecall ? `<div class="priority-card"><strong>A product recall may also apply.</strong><p>Check the official recall instructions first. The recall notice takes priority over ordinary cost or repair planning.</p>${externalLink(state.recall?.match?.noticeUrl || "https://www.productsafety.gov.au/recalls", "See official recall instructions", "button danger")}</div>` : `<div class="caution-actions"><h2>What can you do next?</h2><p>Do not use a community Repair Café as a substitute for checking a possible fault. You can still look at the money side or plan responsible recycling while arranging advice.</p><div class="button-row"><button class="button primary" id="caution-cost" type="button">Estimate & compare costs</button><button class="button secondary" id="caution-recycle-plan" type="button">Plan recycling</button>${externalLink("https://www.energysafe.vic.gov.au/", "Electrical safety guidance", "button ghost")}</div></div>`}
+    </section>`;
+    bindBack();
+    app.querySelector("#caution-cost")?.addEventListener("click", () => { state.pathway = "cost"; state.fromRepairHub = false; navigate("cost"); });
+    app.querySelector("#caution-recycle-plan")?.addEventListener("click", () => { state.pathway = "dispose"; state.serviceSafetyMode = "caution"; state.fromRepairHub = false; navigate("services"); });
+    return;
   }
 
   if (safety.status === "uncertain") {
     const unsureCopy = state.safetyOptOut
-      ? "That is okay. You do not need to inspect, open or test the appliance. Because we could not complete the quick check, FixForward will use a more cautious next step."
-      : "One of your answers was ‘Not sure’ or described a warning that should be checked. You do not need to answer any more safety questions or test the appliance again.";
-    const recycleContact = state.intent === "recycle" && !possibleRecall
+      ? "That is okay. You chose not to inspect the appliance further. Because the quick check could not be completed, FixForward will use a cautious next step."
+      : "You completed the short check, but one or more answers were ‘Not sure’. That does not mean something is definitely wrong, and it does not mean the appliance is safe. Do not test it again just to get a clearer answer.";
+    const recycleContact = (state.intent === "recycle" || state.intent === "guide") && !possibleRecall
       ? `<div class="caution-recycle"><h2>You can still look for a recycling place to contact.</h2><p>We will show recycling listings, but contact the facility before moving the appliance and tell them about the possible warning. If it is hot, smoking, leaking or actively damaged, do not transport it until you have appropriate safety advice.</p><button class="button secondary" id="caution-recycle" type="button">Find recycling places to contact ${icon("arrow")}</button></div>`
       : "";
     app.innerHTML = `<section class="screen narrow result-screen">
       ${renderBack("Back to quick check")}
-      <div class="caution-card"><span class="urgent-icon">?</span><p class="eyebrow">That’s enough checking</p><h1>Get advice before using it again.</h1><p>${escapeHtml(unsureCopy)}</p></div>
+      <div class="caution-card"><span class="urgent-icon">?</span><p class="eyebrow">Some uncertainty remains</p><h1>Get advice before using it again.</h1><p>${escapeHtml(unsureCopy)}</p></div>
       ${possibleRecall ? `<div class="priority-card"><strong>A product recall may also apply.</strong><p>Check the official recall instructions first.</p>${externalLink(state.recall?.match?.noticeUrl || "https://www.productsafety.gov.au/recalls", "See official recall instructions", "button danger")}</div>` : ""}
       ${recycleContact}
       <div class="button-row">${externalLink("https://www.energysafe.vic.gov.au/", "Electrical safety guidance", "button primary")}${externalLink("https://www.productsafety.gov.au/recalls", "Check recalls", "button secondary")}</div>
     </section>`;
     bindBack();
-    app.querySelector("#caution-recycle")?.addEventListener("click", () => { state.pathway = "dispose"; state.serviceSafetyMode = "caution"; navigate("services"); });
+    app.querySelector("#caution-recycle")?.addEventListener("click", () => { state.pathway = "dispose"; state.serviceSafetyMode = "caution"; state.fromRepairHub = false; navigate("services"); });
     return;
   }
 
@@ -638,8 +728,10 @@ function renderResults() {
   bindBack();
   app.querySelectorAll("[data-action]").forEach((button) => button.addEventListener("click", () => {
     const action = button.dataset.action;
-    if (action === "compare") { state.pathway = "cost"; navigate("cost"); return; }
-    state.pathway = action === "dispose" ? "dispose" : "repair";
+    if (action === "compare") { state.pathway = "cost"; state.fromRepairHub = false; navigate("cost"); return; }
+    if (action === "repair") { state.pathway = "repair"; state.fromRepairHub = false; navigate("repair-hub"); return; }
+    state.pathway = "dispose";
+    state.fromRepairHub = false;
     navigate("services");
   }));
 }
@@ -685,7 +777,9 @@ function renderServiceCard(item, isRepair, index) {
 
 function currentServiceResult() {
   if (!availability("locations")) return { matches: [], total: 0, mode: "unavailable" };
-  if (state.userLocation) return getNearbyLocations(state.userLocation, state.pathway, locations(), { radiusKm: state.filters.radiusKm, providerType: state.pathway === "repair" ? state.filters.providerType : "all", limit: 12 });
+  const providerType = state.pathway === "repair" ? state.filters.providerType : "all";
+  if (state.userLocation) return getNearbyLocations(state.userLocation, state.pathway, locations(), { radiusKm: state.filters.radiusKm, providerType, limit: 12 });
+  if (state.areaSelection) return getNearbyLocations(state.areaSelection, state.pathway, locations(), { radiusKm: state.filters.radiusKm, providerType, limit: 12 });
   if (state.area) return getLocations(state.area, state.pathway, locations(), 12);
   return { matches: [], total: 0, mode: "empty" };
 }
@@ -719,6 +813,16 @@ function ensureLeaflet() {
   if (leafletPromise) return leafletPromise;
 
   leafletPromise = new Promise((resolve) => {
+    let settled = false;
+    const finish = (value) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      if (!value) leafletPromise = null;
+      resolve(value);
+    };
+    const timer = setTimeout(() => finish(false), 8000);
+
     const existingCss = document.querySelector('link[data-fixforward-leaflet]');
     if (!existingCss) {
       const css = document.createElement("link");
@@ -730,13 +834,20 @@ function ensureLeaflet() {
       document.head.append(css);
     }
 
+    const existingScript = document.querySelector('script[data-fixforward-leaflet]');
+    if (existingScript) {
+      existingScript.addEventListener("load", () => finish(Boolean(globalThis.L)), { once: true });
+      existingScript.addEventListener("error", () => finish(false), { once: true });
+      return;
+    }
+
     const script = document.createElement("script");
     script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
     script.integrity = "sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=";
     script.crossOrigin = "anonymous";
     script.dataset.fixforwardLeaflet = "true";
-    script.onload = () => resolve(Boolean(globalThis.L));
-    script.onerror = () => { leafletPromise = null; resolve(false); };
+    script.onload = () => finish(Boolean(globalThis.L));
+    script.onerror = () => finish(false);
     document.head.append(script);
   });
   return leafletPromise;
@@ -774,8 +885,10 @@ async function renderMap(result) {
 
   const defaultCentre = state.userLocation
     ? [state.userLocation.latitude, state.userLocation.longitude]
-    : [mappable[0].item.latitude, mappable[0].item.longitude];
-  mapInstance = globalThis.L.map(mapEl, { scrollWheelZoom: false }).setView(defaultCentre, state.userLocation ? 12 : 11);
+    : state.areaSelection
+      ? [state.areaSelection.latitude, state.areaSelection.longitude]
+      : [mappable[0].item.latitude, mappable[0].item.longitude];
+  mapInstance = globalThis.L.map(mapEl, { scrollWheelZoom: false }).setView(defaultCentre, (state.userLocation || state.areaSelection) ? 12 : 11);
   globalThis.L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
@@ -786,6 +899,10 @@ async function renderMap(result) {
     const point = [state.userLocation.latitude, state.userLocation.longitude];
     bounds.push(point);
     globalThis.L.circleMarker(point, { radius: 9, weight: 3, color: "#0b3a32", fillColor: "#ffffff", fillOpacity: 1 }).addTo(mapInstance).bindPopup("Your approximate location");
+  } else if (state.areaSelection) {
+    const point = [state.areaSelection.latitude, state.areaSelection.longitude];
+    bounds.push(point);
+    globalThis.L.circleMarker(point, { radius: 8, weight: 3, color: "#0b3a32", fillColor: "#ffffff", fillOpacity: 1 }).addTo(mapInstance).bindPopup(`Selected area: ${escapeHtml(state.areaSelection.label)}`);
   }
 
   mappable.forEach(({ item, resultIndex }) => {
@@ -807,10 +924,19 @@ async function renderMap(result) {
 function renderServiceResults(result, isRepair) {
   if (result.mode === "empty") return `<div class="service-empty"><span>⌖</span><h2>Use your location or type a suburb to see options.</h2><p>If you choose current location, it is used in this browser to sort nearby places and is not saved to FixForward's database.</p></div>`;
   if (!result.matches.length) {
-    const context = result.mode === "nearby" ? `within ${state.filters.radiusKm} km` : `for ${escapeHtml(state.area)}`;
+    const context = result.mode === "nearby"
+      ? state.areaSelection
+        ? `within ${state.filters.radiusKm} km of ${escapeHtml(state.areaSelection.label)}`
+        : `within ${state.filters.radiusKm} km of your location`
+      : `for ${escapeHtml(state.area)}`;
     return `<div class="service-empty"><span>⌖</span><h2>No matching place found ${context}.</h2><p>Try a wider distance, another suburb/postcode, or use the official wider-search option below. FixForward will not invent a provider.</p></div>`;
   }
-  return `<div class="results-head"><strong>${formatCount(result.total)} option${result.total === 1 ? "" : "s"} found</strong><span>${result.mode === "nearby" ? `Nearest first · within ${state.filters.radiusKm} km` : "Results for the area you typed"}</span></div><div class="service-list">${result.matches.map((item, index) => renderServiceCard(item, isRepair, index)).join("")}</div>`;
+  const context = result.mode === "nearby"
+    ? state.areaSelection
+      ? `Nearest to ${escapeHtml(state.areaSelection.label)} · within ${state.filters.radiusKm} km`
+      : `Nearest first · within ${state.filters.radiusKm} km`
+    : "Results for the area you typed";
+  return `<div class="results-head"><strong>${formatCount(result.total)} option${result.total === 1 ? "" : "s"} found</strong><span>${context}</span></div><div class="service-list">${result.matches.map((item, index) => renderServiceCard(item, isRepair, index)).join("")}</div>`;
 }
 
 function quickCheckPassedBanner() {
@@ -818,15 +944,78 @@ function quickCheckPassedBanner() {
 }
 
 function serviceSafetyBanner() {
+  if (state.serviceSafetyMode === "high") {
+    return `<div class="service-danger-banner"><span aria-hidden="true">!</span><div><strong>Do not transport it while it is hot, smoking, leaking or actively damaged.</strong><p>You reported a serious warning sign. These recycling results are for planning only. Contact the facility or an appropriate safety service before moving the appliance.</p></div></div>`;
+  }
   if (state.serviceSafetyMode === "caution") {
-    return `<div class="service-caution-banner"><span aria-hidden="true">!</span><div><strong>Contact the facility before moving this appliance.</strong><p>You were unsure about a safety warning. Tell the facility what you noticed. If the appliance is hot, smoking, leaking or actively damaged, do not transport it until you have appropriate safety advice.</p></div></div>`;
+    return `<div class="service-caution-banner"><span aria-hidden="true">!</span><div><strong>Contact the facility before moving this appliance.</strong><p>A warning or uncertainty was reported. Tell the facility what you noticed. If the appliance is hot, smoking, leaking or actively damaged, do not transport it until you have appropriate safety advice.</p></div></div>`;
   }
   return quickCheckPassedBanner();
 }
 
 function optionBackLabel() {
-  if (state.serviceSafetyMode === "caution") return "Back to safety guidance";
+  if (state.serviceSafetyMode === "high" || state.serviceSafetyMode === "caution") return "Back to safety guidance";
+  if (state.fromRepairHub) return "Back to repair options";
   return state.intent === "guide" ? "Back to my options" : "Back to quick check";
+}
+
+function areaSuggestionsHtml() {
+  if (!state.areaSuggestions.length) return "";
+  return `<div id="area-suggestions" class="area-suggestions" role="listbox" aria-label="Matching Melbourne suburbs and postcodes">${state.areaSuggestions.map((item, index) => `<button type="button" class="area-option ${index === state.areaActiveIndex ? "active" : ""}" role="option" id="area-option-${index}" aria-selected="${index === state.areaActiveIndex}" data-area-index="${index}"><strong>${escapeHtml(item.postcode)}</strong><span>${escapeHtml(item.suburb)}</span></button>`).join("")}</div>`;
+}
+
+function refreshAreaSuggestions(value) {
+  state.area = String(value || "").slice(0, 50);
+  state.areaSelection = null;
+  state.areaSuggestions = findSuburbSuggestions(state.area, SUBURB_POSTCODES, 8);
+  state.areaActiveIndex = state.areaSuggestions.length ? 0 : -1;
+  const input = app.querySelector("#area");
+  const box = app.querySelector("#area-suggestions-wrap");
+  if (input) {
+    input.setAttribute("aria-expanded", String(state.areaSuggestions.length > 0));
+    input.setAttribute("aria-activedescendant", state.areaActiveIndex >= 0 ? `area-option-${state.areaActiveIndex}` : "");
+  }
+  if (box) box.innerHTML = areaSuggestionsHtml();
+  bindAreaSuggestionClicks();
+}
+
+function bindAreaSuggestionClicks() {
+  app.querySelectorAll("[data-area-index]").forEach((button) => button.addEventListener("click", () => chooseAreaSuggestion(Number(button.dataset.areaIndex))));
+}
+
+function chooseAreaSuggestion(index) {
+  const item = state.areaSuggestions[index];
+  if (!item) return;
+  state.area = item.label;
+  state.areaSelection = { latitude: Number(item.latitude), longitude: Number(item.longitude), postcode: String(item.postcode), suburb: item.suburb, label: item.label };
+  state.areaSuggestions = [];
+  state.areaActiveIndex = -1;
+  state.userLocation = null;
+  state.geoStatus = "idle";
+  renderServices();
+}
+
+function submitAreaSearch() {
+  const input = app.querySelector("#area");
+  const value = input?.value.trim() || "";
+  const resolved = resolveAreaInput(value, SUBURB_POSTCODES);
+  const error = app.querySelector("#area-error");
+  if (!resolved.valid) {
+    state.area = value.slice(0, 50);
+    state.areaSelection = null;
+    if (error) error.textContent = resolved.message;
+    input?.setAttribute("aria-invalid", "true");
+    input?.focus();
+    refreshAreaSuggestions(state.area);
+    return;
+  }
+  state.area = resolved.label;
+  state.areaSelection = resolved;
+  state.areaSuggestions = [];
+  state.areaActiveIndex = -1;
+  state.userLocation = null;
+  state.geoStatus = "idle";
+  renderServices();
 }
 
 function renderServices() {
@@ -834,6 +1023,7 @@ function renderServices() {
   const isRepair = state.pathway === "repair";
   const result = currentServiceResult();
   const dataAvailable = availability("locations");
+  const hasSearchCentre = Boolean(state.userLocation || state.areaSelection);
   app.innerHTML = `<section class="screen services-screen">
     ${renderBack(optionBackLabel())}
     <div class="services-hero"><div><p class="eyebrow">${isRepair ? "Repair" : "Recycle"} · Melbourne</p><h1>${isRepair ? "Find repair options near you." : "Find places that take old electrical appliances near you."}</h1><p>${isRepair ? "See repair listings on a map, then call before visiting to check they can help with your appliance." : "These are often called e-waste or electrical-appliance recycling locations. Check that the place accepts your appliance before travelling."}</p><div class="appliance-inline"><span aria-hidden="true">↻</span><strong>${escapeHtml(state.appliance.category)}</strong>${state.appliance.brand || state.appliance.model ? `<small>${escapeHtml([state.appliance.brand, state.appliance.model].filter(Boolean).join(" "))}</small>` : ""}</div></div><div class="privacy-location">${icon("lock")}<p><strong>Your location is optional.</strong><span>Use it to sort nearby results, or type a suburb/postcode instead. FixForward does not save your exact coordinates.</span></p></div></div>
@@ -844,10 +1034,19 @@ function renderServices() {
       <div class="location-actions">
         <button class="button primary location-button" id="use-location" type="button" ${state.geoStatus === "loading" ? "disabled" : ""}>⌖ ${state.geoStatus === "loading" ? "Finding your location…" : state.userLocation ? "Update my location" : "Use my current location"}</button>
         <span>or</span>
-        <form id="area-form" class="inline-search" novalidate><label class="sr-only" for="area">Suburb or postcode</label><input id="area" name="area" maxlength="80" value="${escapeAttr(state.area)}" placeholder="Type suburb or postcode" autocomplete="postal-code"><button class="button secondary" type="submit">Search</button></form>
+        <form id="area-form" class="inline-search area-combobox" novalidate>
+          <label class="sr-only" for="area">Suburb or postcode</label>
+          <div class="area-input-wrap">
+            <input id="area" name="area" maxlength="50" value="${escapeAttr(state.area)}" placeholder="Start typing, e.g. 312 or Richmond" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="${state.areaSuggestions.length > 0}" aria-controls="area-suggestions" aria-activedescendant="${state.areaActiveIndex >= 0 ? `area-option-${state.areaActiveIndex}` : ""}" aria-describedby="area-error">
+            <div id="area-suggestions-wrap">${areaSuggestionsHtml()}</div>
+            <small id="area-error" class="field-error" role="alert"></small>
+          </div>
+          <button class="button secondary" type="submit">Search</button>
+        </form>
       </div>
       ${state.geoStatus === "denied" ? `<p class="geo-message">Location permission was not available. That is okay — type your suburb or postcode instead.</p>` : ""}
-      ${state.userLocation ? `<div class="filter-row"><label>Distance<select id="radius-filter"><option value="5" ${state.filters.radiusKm === 5 ? "selected" : ""}>Within 5 km</option><option value="10" ${state.filters.radiusKm === 10 ? "selected" : ""}>Within 10 km</option><option value="25" ${state.filters.radiusKm === 25 ? "selected" : ""}>Within 25 km</option><option value="50" ${state.filters.radiusKm === 50 ? "selected" : ""}>Within 50 km</option></select></label>${isRepair ? `<label>Type<select id="provider-filter">${providerOptions().map(([value,label]) => `<option value="${value}" ${state.filters.providerType === value ? "selected" : ""}>${label}</option>`).join("")}</select></label>` : ""}</div>` : ""}
+      ${state.areaSelection ? `<p class="selected-area"><strong>Using:</strong> ${escapeHtml(state.areaSelection.label)} <span>· nearby results, not exact-address tracking</span></p>` : ""}
+      ${hasSearchCentre ? `<div class="filter-row"><label>Distance<select id="radius-filter"><option value="5" ${state.filters.radiusKm === 5 ? "selected" : ""}>Within 5 km</option><option value="10" ${state.filters.radiusKm === 10 ? "selected" : ""}>Within 10 km</option><option value="25" ${state.filters.radiusKm === 25 ? "selected" : ""}>Within 25 km</option><option value="50" ${state.filters.radiusKm === 50 ? "selected" : ""}>Within 50 km</option></select></label>${isRepair ? `<label>Type<select id="provider-filter">${providerOptions().map(([value,label]) => `<option value="${value}" ${state.filters.providerType === value ? "selected" : ""}>${label}</option>`).join("")}</select></label>` : ""}</div>` : ""}
     </div>`}
 
     <div class="map-and-list">
@@ -861,16 +1060,39 @@ function renderServices() {
   </section>`;
 
   bindBack();
+  bindAreaSuggestionClicks();
   app.querySelector("#retry-data")?.addEventListener("click", async () => { await reloadPublicData({ announce: true }); state.screen = "services"; renderServices(); });
   app.querySelector("#use-location")?.addEventListener("click", requestUserLocation);
-  app.querySelector("#area")?.addEventListener("input", (event) => { state.area = event.target.value; });
-  app.querySelector("#area-form")?.addEventListener("submit", (event) => {
-    event.preventDefault();
-    state.area = app.querySelector("#area")?.value.trim() || "";
-    state.userLocation = null;
-    state.geoStatus = "idle";
-    renderServices();
+  const areaInput = app.querySelector("#area");
+  areaInput?.addEventListener("input", (event) => {
+    const error = app.querySelector("#area-error");
+    if (error) error.textContent = "";
+    event.target.setAttribute("aria-invalid", "false");
+    refreshAreaSuggestions(event.target.value);
   });
+  areaInput?.addEventListener("keydown", (event) => {
+    if (!state.areaSuggestions.length) return;
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+      const delta = event.key === "ArrowDown" ? 1 : -1;
+      state.areaActiveIndex = (state.areaActiveIndex + delta + state.areaSuggestions.length) % state.areaSuggestions.length;
+      const box = app.querySelector("#area-suggestions-wrap");
+      if (box) box.innerHTML = areaSuggestionsHtml();
+      areaInput.setAttribute("aria-activedescendant", `area-option-${state.areaActiveIndex}`);
+      bindAreaSuggestionClicks();
+    } else if (event.key === "Enter" && state.areaActiveIndex >= 0) {
+      event.preventDefault();
+      chooseAreaSuggestion(state.areaActiveIndex);
+    } else if (event.key === "Escape") {
+      state.areaSuggestions = [];
+      state.areaActiveIndex = -1;
+      const box = app.querySelector("#area-suggestions-wrap");
+      if (box) box.innerHTML = "";
+      areaInput.setAttribute("aria-expanded", "false");
+      areaInput.setAttribute("aria-activedescendant", "");
+    }
+  });
+  app.querySelector("#area-form")?.addEventListener("submit", (event) => { event.preventDefault(); submitAreaSearch(); });
   app.querySelector("#radius-filter")?.addEventListener("change", (event) => { state.filters.radiusKm = Number(event.target.value); renderServices(); });
   app.querySelector("#provider-filter")?.addEventListener("change", (event) => { state.filters.providerType = event.target.value; renderServices(); });
   app.querySelectorAll("[data-show-map]").forEach((button) => button.addEventListener("click", () => focusMapLocation(button.dataset.showMap)));
@@ -890,6 +1112,9 @@ function requestUserLocation() {
     (position) => {
       state.userLocation = { latitude: position.coords.latitude, longitude: position.coords.longitude, accuracyMetres: position.coords.accuracy };
       state.area = "";
+      state.areaSelection = null;
+      state.areaSuggestions = [];
+      state.areaActiveIndex = -1;
       state.geoStatus = "granted";
       renderServices();
       showToast("Nearby options updated.");
@@ -909,6 +1134,29 @@ function productMatchLevel() {
   return { label: "Appliance-type request", copy: state.appliance.category };
 }
 
+function costSafetyBanner() {
+  if (state.safetyResult?.status === "caution") {
+    return `<div class="service-caution-banner"><span aria-hidden="true">!</span><div><strong>You reported something that needs attention.</strong><p>You can use cost information for planning, but do not use a lower price as a reason to keep using an appliance that should be checked.</p></div></div>`;
+  }
+  return quickCheckPassedBanner();
+}
+
+function costContextResultHtml() {
+  if (!state.problemContext) return "";
+  const identity = [state.appliance.brand, state.appliance.model].filter(Boolean).join(" ");
+  const identityNote = state.appliance.brand && state.appliance.model
+    ? `<strong>Brand + model supplied:</strong> ${escapeHtml(identity)}. FixForward has not verified a model-specific repair price, so the figures below remain provider service-fee examples.`
+    : state.appliance.brand
+      ? `<strong>Brand supplied:</strong> ${escapeHtml(state.appliance.brand)}. The figures below are not brand-specific quotes.`
+      : `<strong>Appliance type only:</strong> ${escapeHtml(state.appliance.category)}. The figures below are not product-specific quotes.`;
+  const cards = COST_CONTEXT_SOURCES.map((item) => `<article class="price-source-card"><p class="mini-label">Published service-fee example</p><h3>${escapeHtml(item.provider)}</h3><p class="price-context-amount">${money(item.amount)}${item.secondaryAmount ? `<small> · labour cap ${money(item.secondaryAmount)}</small>` : ""}</p><strong>${escapeHtml(item.label)}</strong><p>${escapeHtml(item.note)}</p>${externalLink(item.url, "See provider pricing", "text-link")}</article>`).join("");
+  return `<section class="cost-context-result" aria-live="polite">
+    <div class="context-summary"><p class="eyebrow">What we can support right now</p><h2>Published service-fee context — not a repair quote</h2><p>${identityNote}</p><p>From your description, we grouped the issue as <strong>${escapeHtml(state.problemContext.label)}</strong>. That grouping only helps organise information; it is not a diagnosis.</p></div>
+    <div class="price-source-grid">${cards}</div>
+    <aside class="replacement-evidence-card"><span aria-hidden="true">$</span><div><strong>Replacement price</strong><h3>Not enough verified model-level price evidence yet.</h3><p>FixForward will not invent a replacement value or silently scrape a retailer. If you already found a comparable replacement price, use the manual comparison below.</p></div></aside>
+  </section>`;
+}
+
 function renderCost() {
   setStage("options");
   const c = state.comparison;
@@ -916,27 +1164,59 @@ function renderCost() {
   const maxCost = c?.valid ? Math.max(c.repair, c.replacement) : 0;
   const repairWidth = c?.valid && maxCost ? (c.repair / maxCost) * 100 : 0;
   const replacementWidth = c?.valid && maxCost ? (c.replacement / maxCost) * 100 : 0;
+  const canShowRepairFinder = state.safetyResult?.status !== "caution";
   app.innerHTML = `<section class="screen narrow cost-screen">
     ${renderBack(optionBackLabel())}
-    <div class="step-heading friendly-heading"><p class="eyebrow">Compare costs</p><h1>Compare the two prices you know.</h1><p>If you already have a repair quote and a replacement price, FixForward can show the upfront difference clearly. It will not tell you that the cheaper option is automatically the better choice.</p></div>
-    ${quickCheckPassedBanner()}
+    <div class="step-heading friendly-heading"><p class="eyebrow">Compare costs</p><h1>Start with what you know.</h1><p>Describe the problem in normal words. FixForward will show only the cost information our current evidence can support — and will clearly say when it cannot support an exact estimate.</p></div>
+    ${costSafetyBanner()}
     ${subtleRecallStatus()}
 
-    <section class="auto-price-status">
-      <div><span class="beta-pill">Automatic estimate · being built</span><h2>${escapeHtml(match.copy)}</h2><p>We are working toward automatic repair and replacement ranges for recognised products. <strong>We will not show a dollar estimate until the price evidence is trustworthy enough.</strong></p></div>
-      <details class="plain-details"><summary>Why can’t FixForward calculate this automatically yet?</summary><p>Matching a brand/model is only one part of the job. The dollar amounts still need enough current, comparable and genuine price observations. AI may later help understand a mistyped product name, but it must not invent the price.</p></details>
+    <section class="smart-cost-card">
+      <div class="smart-cost-head"><span class="beta-pill">Smart cost context · prototype</span><h2>${escapeHtml(match.copy)}</h2><p>Tell us what is going wrong. You do not need technical words.</p></div>
+      <form id="problem-form" class="cost-context-form" novalidate>
+        <label for="problem">What is the appliance doing?</label>
+        <textarea id="problem" name="problem" class="problem-input" minlength="5" maxlength="300" rows="4" aria-describedby="problem-hint problem-error" placeholder="e.g. It turns on but loses suction after a few minutes.">${escapeHtml(state.problem)}</textarea>
+        <div class="field-meta"><small id="problem-hint">5–300 characters. Do not open or switch the appliance on again just to describe it.</small><small id="problem-count">${String(state.problem || "").length}/300</small></div>
+        <small class="field-error" id="problem-error" role="alert"></small>
+        <button class="button primary" type="submit">Show cost context ${icon("arrow")}</button>
+      </form>
+      ${costContextResultHtml()}
+      <details class="plain-details"><summary>How does the smart part work?</summary><p>The prototype uses your appliance details and a simple problem category to organise verified pricing context. A future AI-assisted resolver may help with misspelled brands/models or messy problem descriptions, but the AI must not create the dollar values. Prices must come from traceable sources.</p></details>
     </section>
 
-    <section class="manual-cost-card"><div class="manual-cost-head"><p class="eyebrow">Use your own prices now</p><h2>Repair quote vs replacement price</h2><p>Enter the amounts you already have. These values stay in this browser tab and are not saved by FixForward.</p></div>
+    <section class="manual-cost-card"><div class="manual-cost-head"><p class="eyebrow">Already have real prices?</p><h2>Compare your repair quote with a replacement price</h2><p>Enter the amounts you already have. These values stay in this browser tab and are not saved by FixForward.</p></div>
       <form id="cost-form" class="cost-form" novalidate>
-        <label>Repair quote (AUD)<span>From a repairer or technician, if you have one</span><div class="money-input"><b>$</b><input name="repair" inputmode="decimal" maxlength="12" value="${escapeAttr(state.costs.repair)}" placeholder="e.g. 180" aria-describedby="repair-error"></div><small class="field-error" id="repair-error"></small></label>
-        <label>Replacement price (AUD)<span>For a reasonably similar replacement you found</span><div class="money-input"><b>$</b><input name="replacement" inputmode="decimal" maxlength="12" value="${escapeAttr(state.costs.replacement)}" placeholder="e.g. 320" aria-describedby="replacement-error"></div><small class="field-error" id="replacement-error"></small></label>
-        <button class="button primary" type="submit">Compare these prices</button>
+        <label>Repair quote (AUD)<span>From a repairer or technician, if you have one</span><div class="money-input"><b>$</b><input name="repair" inputmode="decimal" maxlength="10" value="${escapeAttr(state.costs.repair)}" placeholder="e.g. 180" aria-describedby="repair-error"></div><small class="field-error" id="repair-error"></small></label>
+        <label>Replacement price (AUD)<span>For a reasonably similar replacement you found</span><div class="money-input"><b>$</b><input name="replacement" inputmode="decimal" maxlength="10" value="${escapeAttr(state.costs.replacement)}" placeholder="e.g. 320" aria-describedby="replacement-error"></div><small class="field-error" id="replacement-error"></small></label>
+        <button class="button secondary" type="submit">Compare these prices</button>
       </form>
       ${c?.valid ? `<section class="comparison-result" aria-live="polite"><div class="comparison-summary"><p>${c.lower === "equal" ? "The two upfront prices are the same." : `<strong>${c.lower === "repair" ? "Repair" : "Replacement"}</strong> is <strong>${money(c.difference)}</strong> lower using the two prices you entered.`}</p></div><div class="cost-bars" role="img" aria-label="Repair quote ${money(c.repair)}. Replacement price ${money(c.replacement)}."><div><span>Repair</span><div class="cost-track"><i style="width:${repairWidth.toFixed(2)}%"></i></div><strong>${money(c.repair)}</strong></div><div><span>Replacement</span><div class="cost-track"><i style="width:${replacementWidth.toFixed(2)}%"></i></div><strong>${money(c.replacement)}</strong></div></div><div class="notice success"><strong>Price is only one part of the decision.</strong><p>Safety, recall instructions, whether repair is possible, the condition of the appliance and waste impact can also matter.</p></div></section>` : ""}
     </section>
+
+    <section class="cost-next-actions"><h2>What would you like to do next?</h2><div class="button-row">${canShowRepairFinder ? `<button class="button primary" id="cost-find-repair" type="button">Find repair options</button>` : ""}<button class="button secondary" id="cost-find-recycle" type="button">Find recycling options</button></div></section>
   </section>`;
   bindBack();
+  const problemInput = app.querySelector("#problem");
+  problemInput?.addEventListener("input", (event) => {
+    state.problem = event.target.value.slice(0, 300);
+    const count = app.querySelector("#problem-count");
+    if (count) count.textContent = `${state.problem.length}/300`;
+    app.querySelector("#problem-error").textContent = "";
+    event.target.setAttribute("aria-invalid", "false");
+  });
+  app.querySelector("#problem-form")?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const result = validateProblem(problemInput?.value || "");
+    if (!result.valid) {
+      app.querySelector("#problem-error").textContent = result.message;
+      problemInput?.setAttribute("aria-invalid", "true");
+      problemInput?.focus();
+      return;
+    }
+    state.problem = result.value;
+    state.problemContext = classifyProblem(result.value);
+    renderCost();
+  });
   app.querySelector("#cost-form")?.addEventListener("submit", (event) => {
     event.preventDefault();
     state.costs.repair = app.querySelector('[name="repair"]')?.value.trim() || "";
@@ -955,6 +1235,8 @@ function renderCost() {
     }
     renderCost();
   });
+  app.querySelector("#cost-find-repair")?.addEventListener("click", () => { state.pathway = "repair"; state.serviceSafetyMode = "clear"; state.fromRepairHub = true; navigate("services"); });
+  app.querySelector("#cost-find-recycle")?.addEventListener("click", () => { state.pathway = "dispose"; state.serviceSafetyMode = state.safetyResult?.status === "caution" ? "caution" : "clear"; state.fromRepairHub = false; navigate("services"); });
 }
 
 function bindBack() { app.querySelectorAll("[data-back]").forEach((button) => button.addEventListener("click", back)); }
@@ -966,6 +1248,7 @@ function renderScreen() {
   if (state.screen === "identify") return renderIdentify();
   if (state.screen === "check") return renderCheck();
   if (state.screen === "results") return renderResults();
+  if (state.screen === "repair-hub") return renderRepairHub();
   if (state.screen === "services") return renderServices();
   if (state.screen === "cost") return renderCost();
   return renderLanding();
@@ -990,7 +1273,7 @@ function renderAbout() {
     <div class="privacy-box"><h3>Your privacy</h3><p>FixForward does not intentionally store your appliance choices, safety answers, cost values or exact device coordinates. If you choose “Use my current location”, nearby sorting is calculated in the browser from service coordinates already loaded. Your browser/operating system handles the location permission, and OpenStreetMap receives ordinary requests for the map area displayed. The hosting provider may still process normal technical access logs such as IP address, time and requested page.</p></div>
     <div class="source-availability"><h3>What is working right now</h3>${[["Product safety information","recalls"],["Repair history","repairEvidence"],["Melbourne service locations","locations"]].map(([label,key]) => `<p><span class="status-dot ${availability(key) ? "ok" : "warn"}"></span><strong>${label}</strong> — ${availability(key) ? "loaded" : "currently unavailable/limited"}</p>`).join("")}</div>
     ${Object.entries(groups).map(([group, items]) => `<details class="source-group"><summary>${escapeHtml(group)} <span>${items.length}</span></summary><ul class="source-list">${items.map((source) => `<li><strong>${escapeHtml(source.name)}</strong><p>${escapeHtml(source.use || source.limitations || "Public information source")}</p><small>${source.retrievalDate ? `Retrieved ${escapeHtml(source.retrievalDate)}` : ""}${source.version ? ` · Version ${escapeHtml(source.version)}` : ""}</small>${source.url ? externalLink(source.url, "Open original source") : ""}</li>`).join("")}</ul></details>`).join("")}
-    <div class="privacy-box"><h3>Important limits</h3><p>FixForward currently has only a small product-specific recall list, so the official Australian recall search is still the complete place to check. Repair history describes similar appliance types, not your exact appliance. Service listings may be incomplete or out of date, so call/check before travelling. Automatic prices are not shown until enough trustworthy price information is connected.</p></div>`;
+    <div class="privacy-box"><h3>Important limits</h3><p>FixForward currently has only a small product-specific recall list, so the official Australian recall search is still the complete place to check. Repair history describes similar appliance types, not your exact appliance. Service listings may be incomplete or out of date, so call/check before travelling. Published service-fee context is shown when available, but exact model-level repair/replacement prices are not shown until trustworthy price evidence is connected.</p></div>`;
 }
 
 function doRestart() {

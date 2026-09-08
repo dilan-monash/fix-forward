@@ -8,6 +8,107 @@ export function normalizeWords(value) {
   return String(value || "").normalize("NFKC").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim().replace(/\s+/g, " ");
 }
 
+export function validateBrand(value) {
+  const text = String(value ?? "").trim();
+  if (!text) return { valid: true, value: "" };
+  if (text.length > 60) return { valid: false, reason: "too-long", message: "Keep the brand to 60 characters or fewer." };
+  if (!/\p{L}/u.test(text)) return { valid: false, reason: "needs-letter", message: "Enter a brand name with at least one letter, or leave it blank." };
+  if (!/^[\p{L}\p{N} &.'’()+\-]+$/u.test(text)) return { valid: false, reason: "characters", message: "Use letters, numbers, spaces and common brand punctuation only." };
+  return { valid: true, value: text };
+}
+
+export function validateModel(value) {
+  const text = String(value ?? "").trim();
+  if (!text) return { valid: true, value: "" };
+  if (text.length > 50) return { valid: false, reason: "too-long", message: "Keep the model number to 50 characters or fewer." };
+  if (!/[\p{L}\p{N}]/u.test(text)) return { valid: false, reason: "content", message: "Enter a model using letters or numbers, or leave it blank." };
+  if (!/^[\p{L}\p{N} ._\/#()+\-]+$/u.test(text)) return { valid: false, reason: "characters", message: "Use letters, numbers, spaces, dashes, dots or slashes for the model number." };
+  return { valid: true, value: text };
+}
+
+export function validateProblem(value) {
+  const text = String(value ?? "").trim();
+  if (text.length < 5) return { valid: false, reason: "too-short", message: "Tell us a little more — at least 5 characters." };
+  if (text.length > 300) return { valid: false, reason: "too-long", message: "Keep the problem description to 300 characters or fewer." };
+  if ((text.match(/\p{L}/gu) || []).length < 3) return { valid: false, reason: "not-meaningful", message: "Use a few normal words to describe what is going wrong." };
+  if (/[\u0000-\u001F\u007F]/.test(text)) return { valid: false, reason: "control", message: "Remove unsupported control characters." };
+  return { valid: true, value: text };
+}
+
+export function classifyProblem(value) {
+  const text = normalizeWords(value);
+  const groups = [
+    ["battery / charging", ["battery", "charge", "charging", "charger", "swollen"]],
+    ["water / leak", ["leak", "leaking", "water", "wet", "moisture", "drip"]],
+    ["heat / temperature", ["hot", "heat", "overheat", "cold", "temperature", "warm"]],
+    ["noise / movement", ["noise", "noisy", "rattle", "vibrate", "vibration", "spin", "motor", "suction", "movement", "moving"]],
+    ["power / electrical", ["power", "start", "turn on", "switch", "electric", "trip", "breaker", "spark", "fuse"]]
+  ];
+  for (const [label, words] of groups) {
+    if (words.some((word) => text.includes(word))) return { code: label.split(" /")[0].replace(/ /g, "-"), label };
+  }
+  return { code: "general", label: "general performance" };
+}
+
+export function findSuburbSuggestions(query, index, limit = 8) {
+  const raw = String(query ?? "").trim();
+  if (raw.length < 2) return [];
+  const numeric = /^\d+$/.test(raw);
+  const q = normalizeWords(raw);
+  const rows = Array.isArray(index) ? index : [];
+  const ranked = rows
+    .map((item) => {
+      const suburb = normalizeWords(item.suburb);
+      const postcode = String(item.postcode || "");
+      let score = 99;
+      if (numeric && postcode.startsWith(raw)) score = postcode === raw ? 0 : 1;
+      else if (!numeric && suburb === q) score = 0;
+      else if (!numeric && suburb.startsWith(q)) score = 1;
+      else if (!numeric && suburb.includes(q)) score = 2;
+      return { ...item, score, label: `${postcode} — ${item.suburb}` };
+    })
+    .filter((item) => item.score < 99)
+    .sort((a, b) => a.score - b.score || String(a.postcode).localeCompare(String(b.postcode)) || String(a.suburb).localeCompare(String(b.suburb)));
+  const seen = new Set();
+  const output = [];
+  for (const item of ranked) {
+    const key = `${item.postcode}|${normalizeWords(item.suburb)}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    output.push(item);
+    if (output.length >= limit) break;
+  }
+  return output;
+}
+
+export function resolveAreaInput(query, index) {
+  const raw = String(query ?? "").trim();
+  if (!raw) return { valid: false, reason: "missing", message: "Type a suburb or 4-digit postcode." };
+  if (raw.length > 50) return { valid: false, reason: "too-long", message: "Keep the suburb or postcode to 50 characters or fewer." };
+  const rows = Array.isArray(index) ? index : [];
+  const postcodeMatch = raw.match(/^(\d{4})(?:\s*[—-]\s*(.+))?$/);
+  let matches = [];
+  if (postcodeMatch) {
+    matches = rows.filter((item) => String(item.postcode) === postcodeMatch[1]);
+    if (postcodeMatch[2]) {
+      const name = normalizeWords(postcodeMatch[2]);
+      matches = matches.filter((item) => normalizeWords(item.suburb) === name);
+    }
+  } else if (/^\d+$/.test(raw)) {
+    return { valid: false, reason: "partial-postcode", message: "Enter all 4 postcode digits or choose a suggestion." };
+  } else {
+    const q = normalizeWords(raw.replace(/^\d{4}\s*[—-]\s*/, ""));
+    if (!q || !/\p{L}/u.test(raw)) return { valid: false, reason: "format", message: "Enter a suburb name or 4-digit postcode." };
+    matches = rows.filter((item) => normalizeWords(item.suburb) === q);
+  }
+  if (!matches.length) return { valid: false, reason: "not-found", message: "Choose a suburb/postcode from the suggestions so we can place it on the map." };
+  const latitude = matches.reduce((sum, item) => sum + Number(item.latitude), 0) / matches.length;
+  const longitude = matches.reduce((sum, item) => sum + Number(item.longitude), 0) / matches.length;
+  const postcode = String(matches[0].postcode);
+  const suburb = matches.length === 1 ? matches[0].suburb : "";
+  return { valid: true, latitude, longitude, postcode, suburb, label: suburb ? `${postcode} — ${suburb}` : postcode };
+}
+
 function levenshtein(a, b) {
   const left = normalizeIdentifier(a);
   const right = normalizeIdentifier(b);
@@ -116,7 +217,7 @@ export function evaluateSafety(answers, rules = SAFETY_RULES) {
       unsure.push(id);
     }
   });
-  const status = critical.length ? "high" : (caution.length || unsure.length) ? "uncertain" : "clear";
+  const status = critical.length ? "high" : unsure.length ? "uncertain" : caution.length ? "caution" : "clear";
   return { status, yes, unsure, critical, caution };
 }
 
@@ -137,6 +238,15 @@ export function journeyDecision(recallStatus, safetyStatus) {
       allowNextSteps: true,
       kind: recallStatus === "possible" ? "recall-uncertain" : "uncertain",
       pathway: recallStatus === "possible" ? "official-guidance" : "professional"
+    };
+  }
+  if (safetyStatus === "caution") {
+    return {
+      allowCost: recallStatus !== "possible",
+      allowCommunityRepair: false,
+      allowNextSteps: true,
+      kind: recallStatus === "possible" ? "recall-caution" : "caution",
+      pathway: recallStatus === "possible" ? "official-guidance" : "assessment"
     };
   }
   if (recallStatus === "possible") {

@@ -2,7 +2,7 @@
 // the backend. Fallback data arrays stay empty so an outage can never create a
 // false safety/recall or service result from stale demo data.
 export const META = Object.freeze({
-  releaseVersion: "iteration-1-v1.5.0-human-first",
+  releaseVersion: "iteration-1-v1.6.0-usability-lab",
   dataVersion: "public-data-unavailable",
   retrievalDate: "See About the information"
 });
@@ -238,6 +238,42 @@ export const SOURCES = Object.freeze([
   { name: "Open Repair Alliance", url: "https://openrepair.org/open-data/downloads/", use: "Category-level community repair outcomes" },
   { name: "Victorian e-waste guidance", url: "https://www.sustainability.vic.gov.au/recycling-and-reducing-waste-at-home/recycling-at-home/e-waste", use: "Responsible e-waste guidance" },
   { name: "OpenStreetMap", url: "https://www.openstreetmap.org/copyright", use: "Base map tiles and map attribution for the prototype map" }
+]);
+
+
+
+// Published service-pricing examples used only as transparent cost context.
+// They are deliberately kept separate because the providers use different
+// service models; FixForward must not merge them into a fake repair quote.
+export const COST_CONTEXT_SOURCES = Object.freeze([
+  Object.freeze({
+    id: "national-small-workshop",
+    provider: "National Appliance Repairs",
+    label: "Workshop drop-off inspection",
+    amount: 99,
+    note: "Standard small-appliance workshop inspection/diagnosis. Parts, extra labour and return delivery are quoted separately.",
+    url: "https://www.nationalappliancerepairs.com.au/pricing/",
+    retrieved: "2026-09-08"
+  }),
+  Object.freeze({
+    id: "national-small-pickup",
+    provider: "National Appliance Repairs",
+    label: "Workshop pick-up inspection",
+    amount: 198,
+    note: "Standard small-appliance pick-up inspection/diagnosis. Parts, extra labour and return delivery are quoted separately.",
+    url: "https://www.nationalappliancerepairs.com.au/pricing/",
+    retrieved: "2026-09-08"
+  }),
+  Object.freeze({
+    id: "onetouch-callout",
+    provider: "One Touch Appliance Repairs",
+    label: "Melbourne mobile call-out",
+    amount: 129,
+    note: "Published call-out/service fee. If a repair proceeds, labour including the call-out is published as capped at $229; parts are separate.",
+    secondaryAmount: 229,
+    url: "https://1touchappliancerepairs.com.au/services/",
+    retrieved: "2026-09-08"
+  })
 ]);
 
 export const REPAIR_EVIDENCE = Object.freeze([]);

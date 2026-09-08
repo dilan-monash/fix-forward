@@ -9,9 +9,16 @@ import {
   getNearbyLocations,
   distanceKm,
   applicableSafetySigns,
-  safetyPlanFor
+  safetyPlanFor,
+  validateBrand,
+  validateModel,
+  validateProblem,
+  classifyProblem,
+  findSuburbSuggestions,
+  resolveAreaInput
 } from "../src/logic.js";
 import { SAFETY_SIGNS } from "../src/data.js";
+import { SUBURB_POSTCODES } from "../src/suburb-index.js";
 
 const recall = [{
   id: "1", categoryCodes: ["vacuum-cleaner"], brand: "Mistral", title: "Vacuum recall",
@@ -49,9 +56,9 @@ test("S01 critical signs create a high-risk result", () => {
   assert.deepEqual(result.critical, ["burning"]);
 });
 
-test("S02 caution-only signs do not become the same as immediate danger", () => {
+test("S02 caution-only signs get a distinct caution result", () => {
   const result = evaluateSafety({ heat: "yes", power: "no" });
-  assert.equal(result.status, "uncertain");
+  assert.equal(result.status, "caution");
   assert.deepEqual(result.caution, ["heat"]);
 });
 
@@ -137,4 +144,77 @@ test("S10 water ingress remains a serious stop-use warning under the I1 safety b
   const result = evaluateSafety({ water: "yes" });
   assert.equal(result.status, "high");
   assert.deepEqual(result.critical, ["water"]);
+});
+
+
+test("S11 a critical Yes wins even when other answers are No or Not sure", () => {
+  const result = evaluateSafety({ burning: "yes", electrical: "no", heat: "unsure" });
+  assert.equal(result.status, "high");
+  assert.deepEqual(result.critical, ["burning"]);
+});
+
+test("S12 Not sure remains uncertain after the rest of the quick check is answered", () => {
+  const result = evaluateSafety({ burning: "no", electrical: "unsure", water: "no" });
+  assert.equal(result.status, "uncertain");
+  assert.deepEqual(result.unsure, ["electrical"]);
+});
+
+test("S13 caution planning allows cost context but not community repair", () => {
+  const decision = journeyDecision("none", "caution");
+  assert.equal(decision.allowCost, true);
+  assert.equal(decision.allowCommunityRepair, false);
+  assert.equal(decision.pathway, "assessment");
+});
+
+test("V01 brand validation blocks very long or number-only brands", () => {
+  assert.equal(validateBrand("Dyson").valid, true);
+  assert.equal(validateBrand("12345").valid, false);
+  assert.equal(validateBrand("D".repeat(61)).valid, false);
+});
+
+test("V02 model validation allows numeric-only model numbers but caps length", () => {
+  assert.equal(validateModel("123456").valid, true);
+  assert.equal(validateModel("BVC-160/2").valid, true);
+  assert.equal(validateModel("1".repeat(51)).valid, false);
+});
+
+test("V03 problem description rejects meaningless or oversized input", () => {
+  assert.equal(validateProblem("won't start").valid, true);
+  assert.equal(validateProblem("12345").valid, false);
+  assert.equal(validateProblem("a".repeat(301)).valid, false);
+});
+
+test("V04 problem classifier organises plain language without diagnosing", () => {
+  assert.equal(classifyProblem("The battery will not charge anymore").label, "battery / charging");
+  assert.equal(classifyProblem("It makes a loud rattling noise").label, "noise / movement");
+});
+
+test("L04 postcode prefix suggestions include postcode and suburb labels", () => {
+  const suggestions = findSuburbSuggestions("312", SUBURB_POSTCODES, 20);
+  assert.ok(suggestions.length > 0);
+  assert.ok(suggestions.some((item) => String(item.postcode).startsWith("312")));
+  assert.ok(suggestions.every((item) => item.label.includes("—")));
+});
+
+test("L05 suburb-name autocomplete can resolve an exact suburb", () => {
+  const suggestions = findSuburbSuggestions("Rich", SUBURB_POSTCODES, 20);
+  assert.ok(suggestions.some((item) => /Richmond/i.test(item.suburb)));
+  const richmond = suggestions.find((item) => /^Richmond$/i.test(item.suburb));
+  if (richmond) {
+    const resolved = resolveAreaInput(richmond.label, SUBURB_POSTCODES);
+    assert.equal(resolved.valid, true);
+    assert.equal(resolved.suburb, "Richmond");
+  }
+});
+
+test("L06 a partial postcode must be completed or selected from suggestions", () => {
+  const result = resolveAreaInput("312", SUBURB_POSTCODES);
+  assert.equal(result.valid, false);
+  assert.equal(result.reason, "partial-postcode");
+});
+
+test("C02 manual cost validation rejects text, negative and implausibly large values", () => {
+  assert.equal(compareCosts("abc", "300").valid, false);
+  assert.equal(compareCosts("-20", "300").valid, false);
+  assert.equal(compareCosts("100001", "300").valid, false);
 });

@@ -9,4 +9,4 @@ services:
       - key: DATABASE_URL
         sync: false
       - key: RELEASE_VERSION
-        value: iteration-1-v1.5.0-human-first
+        value: iteration-1-v1.6.0-usability-lab

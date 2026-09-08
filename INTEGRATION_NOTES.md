@@ -1,57 +1,89 @@
-# FixForward v1.5 human-first prototype — integration notes
+# FixForward v1.6 usability-lab prototype — Integration Notes
 
-This candidate builds on the v1.4 goal-first prototype and applies another usability pass focused on ordinary household users. It is intentionally **not final assessed scope**.
+This candidate builds on v1.5 but changes several behaviors requested during the latest usability review. It is intentionally **not the final assessed scope**.
 
-## What changed from v1.4
+## Main changes from v1.5
 
-- Repair / Compare / Recycle / Help me decide are visible immediately in the hero.
-- Static landing and appliance definitions render immediately; public data loads in the background.
-- Direct routes ask a short goal- and appliance-specific safety plan: Repair up to 4, Compare up to 3, Recycle up to 2; guided Help me decide up to 5.
-- A Yes/Not sure answer can end the check early; users are not forced to inspect the appliance further.
-- Added **I'm not able to check this safely**.
-- Every safety question has plain-language help, a pictogram, a concrete example and a do-not-test warning.
-- Water/moisture ingress remains a serious stop-use result under the conservative I1 safety baseline; heat/power warnings remain differentiated caution cases.
-- Repair history is a stacked outcome visual shown after practical map/list results.
-- Service cards lead with useful fields and actions; provenance remains under **About this listing**.
-- The map/CDN is not loaded until there are useful results to plot.
-- Uncertain recycling can continue to contact-first facility listings, while serious/high-risk cases still cannot enter ordinary service/cost routes.
-- Appliance changes clear stale safety/decision/cost-result state.
-- The cost page leads with the usable manual comparison and does not invent automatic model prices.
+- **Not sure no longer ends the safety questionnaire.** The user answers the remaining relevant questions from what they already know.
+- The separate **I'm not able to check this safely** control remains the explicit early-exit path.
+- Any critical Yes still wins over mixed No/Not sure answers.
+- Serious-warning results now include a controlled recycling/disposal-planning option with a warning not to transport hot, smoking, leaking or actively damaged appliances.
+- Clear Repair flow now opens a hub with **Find repair options** and **Estimate & compare costs**.
+- Manual location search now provides postcode/suburb autocomplete; typing a prefix such as `312` can suggest matching postcode/suburb pairs.
+- Autocomplete supports keyboard selection and ARIA active-option state.
+- The in-app map now has an eight-second dependency timeout so a stalled CDN cannot leave users staring at “Loading map…” indefinitely.
+- Brand/model/problem/location/money inputs have explicit length/character/sanity validation.
+- The smart cost screen follows a low-friction repair-or-replace pattern, but it does not claim unsupported AI/model-price capability.
+- A typed model is labelled **not price-verified** until a governed product catalogue exists.
+- Published repair-service fees are shown as **separate examples**, not combined into an artificial `$99–$229` repair range.
+- Replacement pricing remains unavailable until a trustworthy current model/comparable-product source is approved.
 
 ## Data compatibility
 
-No new user-data table is introduced. Existing location columns support latitude/longitude and optional provider/opening-hour fields. `/api/locations` exposes those public fields so distance can be calculated locally.
+No new user-data table is introduced.
 
-The browser **does not send device coordinates to Flask or Neon**. Safety answers, typed costs and appliance selections also remain client-side in the current design.
+Existing public datasets still provide:
+
+- recall records/identifiers;
+- repair evidence;
+- service locations and coordinates;
+- source metadata.
+
+`src/suburbs.js` is a client-side lookup index generated from the project's cleaned Victorian suburb/postcode data and restricted to the prototype Melbourne-area scope. It powers autocomplete and approximate selected-area coordinates without sending partial user queries to an external geocoding service.
+
+The browser does **not** send device coordinates, safety answers, problem descriptions or cost values to Neon in the current design.
+
+## Smart cost integration boundary
+
+v1.6 does not call an external AI or live retailer search service. The current automatic result uses only:
+
+- validated appliance details;
+- deterministic fault grouping;
+- two source-linked published repair-service pricing examples;
+- an explicit “not enough verified replacement-price evidence” fallback.
+
+A future live cost engine would require new adapters/contracts for:
+
+- approved product identity catalogue;
+- repair cost/quote evidence;
+- replacement retail prices;
+- optional AI/entity-resolution service;
+- source freshness/licence/permission controls.
+
+The project's no-web-scraping boundary remains unless formally changed.
 
 ## Scope compatibility warning
 
-The earlier I1 source of truth documented manual suburb selection/no device geolocation and a fixed safety flow. v1.5 contains prototype scope changes based on teaching feedback and usability reasoning:
+Earlier Iteration-1 artefacts documented a fixed journey and manual suburb selection. The following v1.6 behaviors are **experiments**, not silently approved requirements:
 
-- goal-first shortcuts;
+- goal-first landing/shortcuts;
 - browser geolocation;
 - different safety depth by goal/product;
-- early stop after a decisive Yes/Not sure;
-- cautious contact-first recycling after uncertainty.
+- Not sure continuation behavior;
+- caution-level cost planning;
+- serious-warning recycling/disposal planning;
+- smart cost check with commercial pricing examples;
+- postcode/suburb autocomplete.
 
-Before final I1 merge, the BA/team/mentor must explicitly approve, defer or reject these changes and update LeanKit, acceptance criteria, threat model and privacy evidence. Prototype code must not silently redefine assessed scope.
+Before final I1 merge, BA/team/mentor must approve, defer or reject each change and update LeanKit, user stories, acceptance criteria, threat model, privacy notes and data-governance artefacts.
 
 ## External map dependency
 
-Leaflet 1.9.4 is pinned with SRI hashes. OpenStreetMap tile requests occur only when a result map is actually created. The service list remains the functional fallback if the map/CDN fails.
+Leaflet 1.9.4 is pinned with SRI hashes. OpenStreetMap tile requests occur only when a map is created for actual results. If the script fails or does not load within eight seconds, the map area falls back while the service-card list remains usable.
 
-For production-scale use, review tile-provider terms/expected traffic and consider self-hosting the pinned Leaflet files or using an appropriate managed tile service.
+Production-scale use still needs a tile-provider/traffic/policy decision.
 
-## Test/merge gate
+## Merge gate
 
-Use `docs/DEPLOYMENT_CHECKLIST_V1.5.md`. Do not merge directly into `main` before:
+Use `docs/DEPLOYMENT_CHECKLIST_V1.6.md`. Do not merge directly into `main` before:
 
-- all JavaScript checks pass;
-- complete backend suite passes in the team's `.venv`;
-- Neon development branch contract is checked;
-- direct and guided safety routes are manually exercised;
-- BVC 160 / BVC 161 / recall-outage behavior is retested;
-- geolocation Allow/Deny/timeout and browser network/storage behavior are verified;
-- map load and forced map failure are tested;
-- mobile, 200% zoom, keyboard, screen-reader spot checks and browser Back are completed;
+- all 73 Node checks pass;
+- complete Flask/backend suite passes in the team's `.venv`;
+- local Neon readiness is verified;
+- recall/safety mixed-answer scenarios are exercised;
+- autocomplete mouse + keyboard behavior is checked;
+- geolocation Allow/Deny/timeout is checked on HTTPS;
+- map failure fallback is verified;
+- smart cost source wording and all validation boundaries are checked;
+- mobile/zoom/keyboard/screen-reader checks are completed;
 - BA/mentor scope decisions are recorded.

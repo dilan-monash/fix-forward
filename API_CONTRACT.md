@@ -1,8 +1,8 @@
-# FixForward public-data API contract — v1.5 human-first prototype
+# FixForward public-data API contract — v1.6 usability-lab prototype
 
 The API returns read-only public/reference information. The browser does **not** send the user's selected goal, appliance details, safety answers, cost values, typed suburb or device coordinates to these endpoints.
 
-v1.5 changes the browser experience, not the core public-data schema: the static landing/app definitions render first and these datasets load independently in the background.
+v1.6 changes the browser experience, not the core public-data schema: the static landing/app definitions render first and these datasets load independently in the background.
 
 ## Liveness and readiness
 
@@ -11,7 +11,7 @@ v1.5 changes the browser experience, not the core public-data schema: the static
 Fast Flask-process liveness. It deliberately does not query Neon.
 
 ```json
-{"status":"ok","service":"available","releaseVersion":"iteration-1-v1.5.0-human-first"}
+{"status":"ok","service":"available","releaseVersion":"iteration-1-v1.6.0-usability-lab"}
 ```
 
 ### `GET /api/ready`
@@ -19,7 +19,7 @@ Fast Flask-process liveness. It deliberately does not query Neon.
 Checks database readiness.
 
 ```json
-{"status":"ok","database":"available","releaseVersion":"iteration-1-v1.5.0-human-first"}
+{"status":"ok","database":"available","releaseVersion":"iteration-1-v1.6.0-usability-lab"}
 ```
 
 Database failure returns a generic `503` without credentials or infrastructure detail.
@@ -31,7 +31,7 @@ Returns only manually reviewed structured recall products used by the conservati
 ```json
 {
   "meta": {
-    "releaseVersion": "iteration-1-v1.5.0-human-first",
+    "releaseVersion": "iteration-1-v1.6.0-usability-lab",
     "dataVersion": "snapshot-version",
     "retrievalDate": "2026-09-03",
     "coverageStart": "2026-04-16",
@@ -62,7 +62,7 @@ Returns source-register data for **About the information**.
 
 ```json
 {
-  "meta": {"releaseVersion":"iteration-1-v1.5.0-human-first"},
+  "meta": {"releaseVersion":"iteration-1-v1.6.0-usability-lab"},
   "sources": [{
     "name":"string",
     "url":"https://...",
@@ -78,7 +78,7 @@ Returns source-register data for **About the information**.
 
 ```json
 {
-  "meta": {"releaseVersion":"iteration-1-v1.5.0-human-first"},
+  "meta": {"releaseVersion":"iteration-1-v1.6.0-usability-lab"},
   "evidence": [{
     "family":"Cleaning",
     "category":"Vacuum cleaner",
@@ -96,7 +96,7 @@ Returns source-register data for **About the information**.
 }
 ```
 
-v1.5 turns these counts into a three-part visual **after** the practical repair finder. It does not translate `confidenceLevel` into a scientific confidence claim and does not present category history as a model-specific repair probability.
+v1.6 turns these counts into a three-part visual **after** the practical repair finder. It does not translate `confidenceLevel` into a scientific confidence claim and does not present category history as a model-specific repair probability.
 
 ## `GET /api/locations`
 
@@ -104,7 +104,7 @@ Returns public repair/recycling location fields. Coordinates allow the browser t
 
 ```json
 {
-  "meta": {"releaseVersion":"iteration-1-v1.5.0-human-first"},
+  "meta": {"releaseVersion":"iteration-1-v1.6.0-usability-lab"},
   "locations": [{
     "id":"1",
     "pathway":"repair",

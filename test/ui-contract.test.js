@@ -9,9 +9,9 @@ const css = await readFile(new URL("../styles.css", import.meta.url), "utf8");
 const backendInit = await readFile(new URL("../backend/__init__.py", import.meta.url), "utf8");
 const backendApi = await readFile(new URL("../backend/api.py", import.meta.url), "utf8");
 
-// v1.5 focuses on getting ordinary users to their goal quickly, reducing the
-// safety burden, explaining unfamiliar wording on demand, and moving evidence
-// behind the practical action rather than in front of it.
+// v1.6 usability-lab contracts: goal-first journeys, complete short safety checks,
+// postcode/suburb autocomplete, repair-hub choice, evidence-led smart cost context,
+// strict input validation and controlled recycling after serious warnings.
 test("UX01 landing renders immediately while public data loads in the background", () => {
   assert.match(app, /let publicData = getStaticSnapshot\(\)/);
   assert.match(app, /renderLanding\(\);\s*reloadPublicData\(\{ showLoading: false \}\)/s);
@@ -47,12 +47,12 @@ test("UX05 safety questions have on-demand plain-language help and visual cues",
   assert.match(data, /Do not switch on a wet appliance/);
 });
 
-test("UX06 users who are unsure can stop without answering the remaining questions", () => {
-  assert.match(app, /I’m still not sure — show a safer next step/);
+test("UX06 Not sure is a valid answer but does not prematurely end the remaining short check", () => {
+  assert.match(app, /I’m still not sure — keep this answer/);
   assert.match(app, /I’m not able to check this safely/);
-  assert.match(app, /flaggedSafetyAnswers/);
-  assert.match(app, /You can stop here/);
-  assert.match(app, /allowIncomplete: true/);
+  assert.match(app, /Not sure is okay\. Keep going with the remaining questions/);
+  assert.match(app, /Please answer the remaining/);
+  assert.doesNotMatch(app, /I’m still not sure — show a safer next step/);
 });
 
 test("UX07 direct goals use a short product-specific safety plan", () => {
@@ -106,10 +106,13 @@ test("UX13 map is in-app, lazy-loaded and the list remains usable if map loading
   assert.match(app, /tile\.openstreetmap\.org/);
 });
 
-test("UX14 cost screen shows the usable manual comparison first and never invents automatic prices", () => {
-  assert.match(app, /Compare the two prices you know/);
-  assert.match(app, /We will not show a dollar estimate until the price evidence is trustworthy enough/);
-  assert.match(app, /AI may later help understand a mistyped product name, but it must not invent the price/);
+test("UX14 smart cost context is automatic from user description but never invents model-level prices", () => {
+  assert.match(app, /Start with what you know/);
+  assert.match(app, /Smart cost context · prototype/);
+  assert.match(app, /What is the appliance doing\?/);
+  assert.match(app, /Published service-fee context — not a repair quote/);
+  assert.match(app, /Not enough verified model-level price evidence yet/);
+  assert.match(app, /AI must not create the dollar values/);
   assert.match(app, /Compare these prices/);
 });
 
@@ -119,10 +122,13 @@ test("UX15 model-number help includes a visible example label and tells users no
   assert.match(app, /Do not open the appliance or remove screws/);
 });
 
-test("UX16 direct Repair, Compare and Recycle routes continue straight to the selected goal after a clear check", () => {
-  assert.match(app, /state\.intent === "repair"[\s\S]*navigate\("services"\)/);
+test("UX16 clear Repair goes to a repair hub while Compare and Recycle go to their selected goals", () => {
+  assert.match(app, /state\.intent === "repair"[\s\S]*navigate\("repair-hub"\)/);
   assert.match(app, /state\.intent === "recycle"[\s\S]*navigate\("services"\)/);
   assert.match(app, /state\.intent === "compare"[\s\S]*navigate\("cost"\)/);
+  assert.match(app, /What would help you most now\?/);
+  assert.match(app, /Find a repair option/);
+  assert.match(app, /Estimate & compare costs/);
   assert.match(app, /blockedBySafety/);
   assert.match(app, /blockedByRecall/);
 });
@@ -169,4 +175,79 @@ test("UX23 unexpected API failures do not deliberately write exception traceback
   assert.doesNotMatch(backendApi, /logger\.exception\(/);
   assert.match(backendApi, /logger\.error\(/);
   assert.match(backendApi, /type\(error\)\.__name__/);
+});
+
+
+test("UX24 serious safety guidance offers controlled recycling planning without declaring disposal mandatory", () => {
+  assert.match(app, /Need to get rid of it\?/);
+  assert.match(app, /Plan recycling \/ disposal/);
+  assert.match(app, /do not transport it while it is hot, smoking, leaking or actively damaged/i);
+  assert.doesNotMatch(app, /you need to recycle/i);
+});
+
+test("UX25 mixed safety answers have distinct high, caution and uncertain outcomes", () => {
+  assert.match(app, /safety\.status === "high"/);
+  assert.match(app, /safety\.status === "caution"/);
+  assert.match(app, /safety\.status === "uncertain"/);
+  assert.match(app, /Needs attention/);
+  assert.match(app, /Some uncertainty remains/);
+});
+
+test("UX26 suburb and postcode search is an accessible autocomplete with keyboard support", () => {
+  assert.match(app, /role="combobox"/);
+  assert.match(app, /aria-autocomplete="list"/);
+  assert.match(app, /role="listbox"/);
+  assert.match(app, /Start typing, e\.g\. 312 or Richmond/);
+  assert.match(app, /findSuburbSuggestions/);
+  assert.match(app, /resolveAreaInput/);
+  assert.match(app, /ArrowDown/);
+  assert.match(app, /ArrowUp/);
+  assert.match(app, /event\.key === "Escape"/);
+});
+
+test("UX27 manual suburb selection becomes a nearby search centre with distance filters", () => {
+  assert.match(app, /state\.areaSelection/);
+  assert.match(app, /getNearbyLocations\(state\.areaSelection/);
+  assert.match(app, /Nearest to/);
+  assert.match(app, /nearby results, not exact-address tracking/);
+});
+
+test("UX28 brand, model, location, problem and cost inputs have explicit length limits", () => {
+  assert.match(app, /name="brand" maxlength="60"/);
+  assert.match(app, /name="model" maxlength="50"/);
+  assert.match(app, /name="area" maxlength="50"/);
+  assert.match(app, /name="problem"[\s\S]*maxlength="300"/);
+  assert.match(app, /name="repair"[\s\S]*maxlength="10"/);
+  assert.match(app, /name="replacement"[\s\S]*maxlength="10"/);
+});
+
+test("UX29 field-level validation focuses the first bad identity, location, problem or cost input", () => {
+  assert.match(app, /validateBrand/);
+  assert.match(app, /validateModel/);
+  assert.match(app, /validateProblem/);
+  assert.match(app, /resolveAreaInput/);
+  assert.match(app, /firstInvalid\[1\]\?\.focus/);
+  assert.match(app, /problemInput\?\.focus/);
+  assert.match(app, /input\?\.focus\(\)/);
+});
+
+test("UX30 published repair-fee examples remain separate instead of being merged into a fake range", () => {
+  assert.match(data, /National Appliance Repairs/);
+  assert.match(data, /One Touch Appliance Repairs/);
+  assert.match(data, /Workshop drop-off inspection/);
+  assert.match(data, /Melbourne mobile call-out/);
+  assert.doesNotMatch(app, /\$99\s*[–-]\s*\$229/);
+});
+
+test("UX31 repair history sits below the two practical Repair choices", () => {
+  const hub = app.indexOf('class="repair-hub-grid"');
+  const evidence = app.indexOf('class="repair-hub-evidence"');
+  assert.ok(hub >= 0 && evidence > hub);
+  assert.match(css, /\.repair-hub-grid/);
+});
+
+test("UX32 map loading has a bounded failure timeout and selected suburbs can centre the map", () => {
+  assert.match(app, /setTimeout\(\(\) => finish\(false\), 8000\)/);
+  assert.match(app, /Selected area:/);
+  assert.match(app, /state\.areaSelection\.latitude/);
 });

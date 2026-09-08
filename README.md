@@ -1,108 +1,152 @@
-# FixForward — Iteration 1 v1.5 human-first usability prototype
+# FixForward — Iteration 1 v1.6 usability-lab prototype
 
-FixForward is an anonymous decision-support web application for metropolitan Melbourne households with a faulty portable appliance. This **non-final prototype** explores a simpler product question:
+FixForward is an anonymous decision-support web application for metropolitan Melbourne households with a faulty portable appliance. This is a **non-final usability-lab candidate**. It is designed around the question an ordinary household user is most likely to have:
 
 > **What do you want to do with the appliance?**
 
-The user can start with **Repair it**, **Compare costs**, **Recycle it**, or **I'm not sure**. FixForward then runs a short, appliance-relevant safety check and a cautious recall check before allowing the requested pathway.
+The landing page offers **Repair it**, **Compare costs**, **Recycle it**, or **I'm not sure**. The chosen path still passes through a short, appliance-relevant safety and recall gate so convenience cannot become false reassurance.
 
-This candidate keeps the safety/reliability controls proved in v1.3 and changes the information architecture to reduce effort and technical language.
-
-## User experience
+## Human-first journey
 
 ```text
 HOME
   ├─ Repair it ───────┐
   ├─ Compare costs ───┤
-  ├─ Recycle it ──────┤→ identify appliance → quick safety + recall gate
+  ├─ Recycle it ──────┤→ identify appliance → quick product-specific safety check
   └─ I'm not sure ────┘                         │
-                                                 ├─ serious warning → stop-use guidance
-                                                 ├─ possible recall → official recall instructions
-                                                 ├─ chosen goal → go straight to that tool
-                                                 └─ unsure goal → show repair / compare / recycle choices
+                                                 ├─ critical warning → stop-use guidance
+                                                 │                    + controlled disposal planning
+                                                 ├─ possible recall → official recall instructions first
+                                                 ├─ uncertain answer → cautious assessment route
+                                                 ├─ caution answer → assessment/cost planning without community-cafe reassurance
+                                                 └─ clear route → requested Repair / Cost / Recycle tool
 ```
 
-### Plain-language design
+### Plain language first
 
-The main journey avoids terms such as *dataset*, *provenance*, *identifier* and *confidence level*. When “product recall” first appears, FixForward explains it in everyday language. Detailed evidence remains available under **About the information** or expandable evidence sections.
+The main journey avoids terms such as *dataset*, *provenance*, *identifier* and *confidence level*. When “product recall” first appears, FixForward explains it in everyday language. Technical evidence remains available under expandable **About the information**, **About this listing** and **How was this worked out?** panels.
 
-### Goal-first shortcuts
+## Safety behavior
 
-If the safety/recall gate does not override the journey:
+Safety questions are adapted to the appliance and the selected goal. Repair uses up to four questions, Compare up to three, Recycle up to two, and **I'm not sure** can use up to five.
 
-- **Repair it** goes directly to the repair map/service finder.
-- **Compare costs** goes directly to the cost tool.
-- **Recycle it** goes directly to recycling locations.
-- **I'm not sure** uses the fuller quick-check plan and then shows the three next-step choices. Repair history appears later on the repair screen, after the map and service results.
+- A kettle does not receive a battery question; a rechargeable shaver can.
+- Every question has **What does this mean?** help with a simple pictogram, concrete example and a warning not to turn on/open/test the appliance just to answer.
+- **Not sure is a valid answer and does not end the questionnaire.** The user can answer the remaining relevant questions from what they already know.
+- A separate **I'm not able to check this safely** action lets the user stop inspecting without pretending the appliance is safe.
+- One critical **Yes** is enough for the serious-warning route even if other answers are No.
+- Caution-only signs such as unusual heat or repeated power trips are not presented as identical to smoke, shock, exposed wiring, water ingress or damaged batteries.
+- A serious warning blocks ordinary cost/community-repair routes. If the user wants to dispose of the appliance, FixForward can still show a controlled recycling/disposal planning route with an explicit warning not to transport an appliance that is hot, smoking, leaking or actively damaged.
 
-A user does not need to repeat a generic “choose next action” screen after already stating their goal.
-
-## Location experience
-
-The v1.5 prototype adds an **optional browser geolocation experiment** requested in teaching feedback/usability discussion.
-
-- The browser asks permission only after the user selects **Use my current location**.
-- Latitude/longitude stay in JavaScript memory and are **not sent to the FixForward API or Neon**. When the map is shown, OpenStreetMap still receives ordinary tile requests for the map area being viewed; FixForward does not claim otherwise.
-- Distances are calculated in the browser using service coordinates already returned by `/api/locations`.
-- Results can be filtered by radius and repair-provider type.
-- Leaflet renders the map in FixForward using OpenStreetMap tiles.
-- Service cards prioritise name, distance, address, phone, opening-hours data (when present), Call, Directions and Website.
-- Dataset/verification detail is moved into **About this listing** instead of dominating the user-facing card.
-
-**Scope note:** the previously approved I1 baseline used manual suburb entry. Therefore device geolocation is an **experimental scope change, not automatically an approved final-I1 feature**. It should be reviewed with the BA/mentor and security/privacy owners before final release. Manual suburb/postcode search remains available.
-
-## Recall and safety integrity
+## Recall integrity
 
 Recall matching remains conservative:
 
-| Situation | User-facing behavior |
+| Situation | Behavior |
 |---|---|
 | Category only / no model | Explain that there is not enough product detail for a product-specific check |
 | Exact normalised model in selected category | “Your model may be affected by a product recall” + official notice |
-| Exact model but brand differs | Preserve possible model match and warn that the entered brand differs |
-| Near / one-character-different model | Ask user to re-check the label; never promote to an exact recall match |
-| No match | “We did not find your exact model in our current list” + explicitly state this does not prove no recall |
-| Recall API unavailable | Keep safety questions available and link to the official Australian recall search |
-| Serious warning | Stop-use guidance; community Repair Café pathway is not offered |
-| Caution / Not sure | Recommend appropriate assessment before ordinary cost/community repair pathways |
+| Exact model but brand differs | Preserve the model match and explain the brand difference |
+| One-character/near model | Ask the user to re-check the label; never silently turn it into an exact match |
+| No match | State that the exact model was not found in the current limited list; never claim “not recalled” |
+| Recall API unavailable | Keep static safety guidance available and link to the official Australian recall search |
+| Possible recall | Official notice takes priority over ordinary repair/cost/recycling choices |
 
-Safety questions are adapted to both the appliance and the user’s chosen goal. Repair uses up to four questions, Compare up to three, Recycle up to two, and the guided “I’m not sure” path can use up to five. A kettle does not receive a battery question; a battery-powered shaver can. If a user answers Yes or Not sure, that answer is already enough to change the safer next step, so the user can stop without completing the remaining questions. Every question has an on-demand plain-language help panel and visual cue.
+## Repair experience
 
-## Repair evidence
+After a clear Repair safety gate, the user sees a small **Repair hub** with two practical choices:
 
-Open Repair Alliance category history is shown as a three-part horizontal outcome visual: **fixed during the event**, **repairable after more work**, and **other recorded outcomes**. It appears after the repair map/service results so practical action comes first. The detailed sample, geography, broader-category mapping and limitations remain available in an expandable panel. FixForward does not present category history as a model-specific success probability.
+1. **Find repair options** — map/list, current location or suburb/postcode, filters and contact/directions actions.
+2. **Estimate & compare costs** — source-linked cost context plus a direct comparison when the user has real prices.
 
-## Smart cost finder — prototype boundary
+Repair history is supporting evidence, not the first screen. Open Repair Alliance outcomes are shown as a horizontal stacked visual for **fixed during the event**, **repairable with more work** and **other recorded outcomes**, with counts and percentages. Detailed sample/source limitations are expandable below the action-oriented content.
 
-The UI demonstrates the intended product-resolution hierarchy:
+## Location experience
 
-1. exact brand + model;
-2. brand + appliance type;
-3. appliance type only.
+The v1.6 prototype keeps both manual and optional current-location modes.
 
-A future resolver may use fuzzy/AI-assisted identification to understand misspelled product names, but **AI must not invent repair or replacement prices**. Dollar values must come from governed evidence.
+### Suburb/postcode autocomplete
 
-The repository/audit previously contained a weak category-price snapshot (57 observations across 19 categories, three observations per category). It is deliberately **not promoted to a trustworthy automatic market benchmark** in this prototype because the sample is too concentrated and does not establish model-level repair prices.
+The manual search supports partial input. For example, typing `312` can show matching Melbourne-area entries such as `3121 — Richmond`, `3122 — Hawthorn` and other matching postcode/suburb pairs from the project's cleaned suburb index.
 
-A manual two-value comparison remains as a fallback for users who already have a repair quote and replacement price.
+The autocomplete supports:
+
+- mouse/touch selection;
+- Arrow Up / Arrow Down navigation;
+- Enter to select;
+- Escape to close;
+- `aria-activedescendant` and selected-option state for keyboard/screen-reader use;
+- final validation before a location search is run.
+
+### Current location
+
+The browser asks permission only after the user chooses **Use my current location**.
+
+- Latitude/longitude remain in JavaScript memory.
+- Exact device coordinates are not sent to the FixForward API or Neon.
+- Nearby distance is calculated in the browser using public service coordinates already loaded.
+- Results can be filtered by radius and provider type.
+- Leaflet renders the in-app map with OpenStreetMap tiles only when there are useful results to plot.
+- If the map dependency does not load within eight seconds, the text/service-card list remains usable.
+
+**Scope note:** the earlier I1 baseline used manual suburb selection. Device geolocation is therefore an **experimental scope change** requiring BA/mentor/security/privacy approval before it can be called final assessed scope.
+
+## Smart cost check — v1.6 boundary
+
+The user asked for an experience inspired by fast repair-or-replace tools: enter appliance details, describe the problem briefly, and receive useful cost context without filling in a long form.
+
+FixForward v1.6 implements the **interaction pattern**, not a fabricated exact quote.
+
+### Current behavior
+
+- Brand/model/problem input is validated.
+- The problem description is grouped into a simple fault class such as power/electrical, heat/temperature, noise/movement, water/leak or battery/charging.
+- If brand + model are entered, the UI explicitly says the model is **not price-verified** because FixForward does not yet have a governed product-price catalogue. It falls back to brand + appliance-type context instead of pretending the model was found.
+- Published repair-service pricing examples are shown **separately**, because they represent different service models:
+  - National Appliance Repairs publishes a $99 drop-off inspection and $198 pick-up inspection for standard small appliances, with additional labour/parts quoted separately.
+  - One Touch Appliance Repairs publishes a $129 Melbourne mobile call-out and says labour including call-out is capped at $229, with parts separate.
+- These figures are **not combined into one repair-cost range** and are not presented as the user's repair quote.
+- A model-level replacement-price feed is not connected, so FixForward deliberately says there is not enough verified replacement-price evidence instead of inventing a value.
+- If the user already has a real repair quote and a comparable replacement price, the manual comparison validates the amounts and shows the lower upfront price neutrally.
+
+### Inspiration versus implementation
+
+Appliance911.ai demonstrates a low-friction repair-or-replace experience using appliance identification and cost/reliability information. FixForward uses that as UX inspiration only. It does **not** copy Appliance911's proprietary model database, photo-recognition workflow or claimed model-level cost capability.
+
+A future approved FixForward cost engine would require permitted price/repair data adapters, source dates, model/entity resolution, retailer/provider diversity and explicit evidence levels. AI may help resolve messy product names or classify a fault description, but **AI must never invent the dollar values**.
+
+See `docs/SMART_COST_ENGINE_DESIGN.md`.
+
+## Input validation
+
+The prototype treats user input as untrusted and gives plain field-level errors:
+
+- brand: optional, max 60 characters, must contain a letter if supplied, restricted to common brand punctuation;
+- model: optional, max 50 characters, realistic model punctuation only;
+- problem description: 5–300 characters, requires meaningful words rather than number/symbol junk;
+- suburb/postcode: max 50 characters, final postcode must be four digits, suburb must be plausible text;
+- cost fields: positive numeric amounts only, max two decimal places, sanity cap of AUD 100,000, max 10 typed characters;
+- family/category: must come from the approved six-family mapping.
+
+The model validator intentionally permits numeric models because some real product identifiers are numeric; validation should not reject a legitimate model merely because it contains no letters.
 
 ## Architecture
 
 ```text
 Browser SPA
   │
-  ├─ user goal, appliance, safety answers, cost values: memory only
+  ├─ user goal / appliance / safety answers / problem / costs: memory only
   ├─ optional device latitude/longitude: memory only
-  ├─ local distance/filter logic
-  ├─ Leaflet map + OpenStreetMap tiles
+  ├─ local validation, product-safe decision rules, autocomplete and distance filtering
+  ├─ Leaflet + OpenStreetMap map when useful
   │
-  └── GET public data ──> Flask API ── SELECT only ──> Neon PostgreSQL
-                         │
-                         ├─ /api/health  process liveness
-                         └─ /api/ready   database readiness
+  └── GET public reference data ──> Flask API ── parameterised SELECT ──> Neon PostgreSQL
+                                   │
+                                   ├─ /api/health  process liveness
+                                   └─ /api/ready   database readiness
 ```
 
-Public datasets are loaded independently with `Promise.allSettled()`. A location failure does not disable recall screening, and a recall-data failure does not prevent static safety guidance.
+Public datasets load independently with `Promise.allSettled()`. A location failure cannot masquerade as a recall failure, and a recall failure does not prevent the static safety questions from working.
 
 ## API endpoints
 
@@ -117,20 +161,22 @@ See `API_CONTRACT.md`.
 
 ## Security/privacy highlights
 
-- No user account, password, payment or saved-journey feature.
-- No journey-answer POST endpoint.
-- Application database access is read-only.
-- Dynamic text is HTML-escaped.
-- Recall notice URLs are restricted to official Product Safety hosts by the backend.
-- Content Security Policy is present.
-- Referrer policy is `strict-origin-when-cross-origin`, preserving origin-only Referer information required by the OpenStreetMap web tile service without exposing the full FixForward page URL.
-- Leaflet 1.9.4 CDN files are pinned with official Subresource Integrity hashes.
-- Geolocation is allowed only for the same-origin page and only after browser permission.
-- Exact user coordinates are not persisted or sent to Neon.
-- High-risk safety state cannot route to community repair results.
-- Technical failure is not presented as reassurance.
+- no accounts, passwords, payments, uploads or saved journey history;
+- no journey-answer POST endpoint;
+- read-only application database design;
+- parameterised SQL;
+- dynamic user/data text escaped before HTML insertion;
+- recall notice URLs restricted to official Product Safety hosts by the backend;
+- CSP and other response security headers;
+- pinned Leaflet 1.9.4 CDN assets with Subresource Integrity;
+- geolocation permission only after an explicit user action;
+- exact coordinates not persisted or sent to Neon;
+- high-risk state cannot route to community Repair Cafés or ordinary cost comparison;
+- stale appliance state is cleared when appliance details change;
+- technical/API failure never becomes “safe” or “not recalled” reassurance;
+- unexpected API errors are logged generically rather than deliberately attaching a traceback to application logs.
 
-See `docs/SECURE_ARCHITECTURE_I1.md` and `docs/V1.5_HUMAN_FIRST_UX.md`.
+See `docs/SECURE_ARCHITECTURE_I1.md`.
 
 ## Local setup
 
@@ -142,32 +188,35 @@ python -m venv .venv
 python -m pip install -r requirements.txt
 ```
 
-Set `DATABASE_URL` as an environment variable. Do **not** paste it into documentation, screenshots or Git.
+Set `DATABASE_URL` in the shell/environment only. Never paste the real connection string into Git, documentation, screenshots or chat messages.
 
 ```powershell
-$env:RELEASE_VERSION = "iteration-1-v1.5.0-human-first"
+$env:RELEASE_VERSION = "iteration-1-v1.6.0-usability-lab"
 python -m flask --app app run --debug
 ```
 
 Open `http://127.0.0.1:5000`.
 
-## Tests
-
-Frontend/decision/UX tests:
+## Tests completed while packaging
 
 ```powershell
 npm test
 npm run check
-```
-
-Backend tests after Python dependencies are installed:
-
-```powershell
-python -m unittest discover -s test_backend -v
 python -m compileall -q backend app.py test_backend
+python -m unittest test_backend.test_transform -v
 ```
 
-In the build environment used to package this prototype, all **46 Node tests passed** and Python compilation passed. The complete Flask test module could not be executed there because external package installation was unavailable; run it in the project's normal `.venv` before committing. The prior v1.3 candidate was separately run by the project team with its backend suite passing.
+Packaging-environment result for this candidate:
+
+- **66 Node decision/data/UX/security contract tests passed; 0 failed**.
+- JavaScript syntax checks passed.
+- Python compilation passed.
+- **4/4 pure backend transformation tests passed**.
+- A browser-flow heuristic harness had previously exercised 27 end-to-end usability assertions across landing, recall, repair, map/list, cost, safety, recycling, validation and mobile layout. It is an automated/heuristic audit, **not human-participant usability evidence**.
+- The final packaged candidate could not be re-driven through a local Chromium URL in this packaging environment because local/file URLs are blocked by environment policy; the Windows/Chrome walkthrough in `docs/DEPLOYMENT_CHECKLIST_V1.6.md` remains a release gate.
+- The complete Flask suite must still be rerun in the team's normal Windows `.venv` because Flask/psycopg are not installed in the packaging environment. Earlier candidates were successfully run there with the 10-test backend suite.
+
+See `ACCEPTANCE_RESULTS.md` and `docs/DEPLOYMENT_CHECKLIST_V1.6.md`.
 
 ## Demonstration recall case
 
@@ -182,13 +231,14 @@ Expected: **possible recall match** with official verification required. It is n
 
 ## Important prototype limits
 
-1. Recall coverage remains deliberately limited.
-2. Location records may be incomplete/out of date; call/check before travelling.
-3. Facility-level qualification/appliance acceptance cannot be claimed unless the source proves it.
-4. Current-location mode is experimental and needs scope/privacy approval before final I1.
-5. OpenStreetMap tile service and the Leaflet CDN are third-party dependencies; production usage should be reviewed against their policies and availability requirements.
-6. Automatic model-level repair/replacement prices are not enabled until a stronger governed source exists.
-7. No saved assessment history is introduced.
-8. Live Render/Neon behavior remains a deployment release gate.
+1. Recall coverage remains deliberately limited; no indexed match is not clearance.
+2. Repair/service locations can be incomplete or out of date; call/check before travelling.
+3. Provider qualification, opening status or appliance acceptance is not claimed unless the source proves it.
+4. Geolocation, goal-specific safety depth, caution-cost planning and controlled hazard-disposal planning are scope experiments requiring formal project approval.
+5. OpenStreetMap tiles and the Leaflet CDN are third-party dependencies; production usage must respect their policies and availability limits.
+6. Current published cost examples are service-fee signals, not a market benchmark, model repair quote or replacement quote.
+7. No live model-level product/retail price source or AI service is connected in v1.6.
+8. No saved history is introduced.
+9. Live Render/Neon behavior remains a release gate.
 
-Do not “complete” these features by inventing provider details, appliance acceptance, recall results or prices.
+Do not “complete” these features by inventing provider details, recall outcomes, qualification, appliance acceptance or prices.
