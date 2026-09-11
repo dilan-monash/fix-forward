@@ -118,8 +118,9 @@ def relevant_locations():
         """
         SELECT
             id, location_type, name, facility_type, address, suburb, postcode,
-            phone, website, verification_status, verification_notes,
-            source_notes, source_url, source_retrieved_at
+            latitude, longitude, phone, website, opening_hours, provider_type,
+            verification_status, verification_notes, verification_url,
+            last_verified_at, source_notes, source_url, source_retrieved_at
         FROM locations
         WHERE household_electrical_relevant = TRUE
         ORDER BY location_type, suburb NULLS LAST, name

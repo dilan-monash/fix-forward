@@ -10,7 +10,7 @@ from backend.db import DatabaseUnavailable
 
 class AppTests(unittest.TestCase):
     def setUp(self):
-        self.app = create_app({"TESTING": True, "DATABASE_URL": "unused-in-fake"})
+        self.app = create_app({"TESTING": True, "SITE_ACCESS_ENABLED": False, "DATABASE_URL": "unused-in-fake"})
         self.client = self.app.test_client()
 
     def test_frontend_is_served_but_backend_source_is_not_public(self):
@@ -18,14 +18,22 @@ class AppTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"FixForward", response.data)
         self.assertIn("default-src 'self'", response.headers["Content-Security-Policy"])
+        self.assertEqual(response.headers["Referrer-Policy"], "strict-origin-when-cross-origin")
+        self.assertIn("geolocation=(self)", response.headers["Permissions-Policy"])
         blocked = self.client.get("/backend/config.py")
         self.assertEqual(blocked.status_code, 404)
         response.close()
         blocked.close()
 
-    @patch("backend.api.repository.health_check", return_value={"ok": 1})
-    def test_health_contract(self, _health_check):
+    def test_health_contract(self):
         response = self.client.get("/api/health")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json["service"], "available")
+        self.assertEqual(response.headers["Cache-Control"], "no-store")
+
+    @patch("backend.api.repository.health_check", return_value={"ok": 1})
+    def test_ready_contract(self, _health_check):
+        response = self.client.get("/api/ready")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json["database"], "available")
         self.assertEqual(response.headers["Cache-Control"], "no-store")
@@ -52,10 +60,37 @@ class AppTests(unittest.TestCase):
 
     @patch("backend.api.repository.health_check", side_effect=DatabaseUnavailable("hidden detail"))
     def test_database_failure_returns_generic_503(self, _health_check):
-        response = self.client.get("/api/health")
+        response = self.client.get("/api/ready")
         self.assertEqual(response.status_code, 503)
         self.assertEqual(response.json["error"]["code"], "data_unavailable")
         self.assertNotIn("hidden detail", response.get_data(as_text=True))
+
+    @patch("backend.api.repository.health_check", return_value=None)
+    def test_ready_does_not_claim_success_without_query_result(self, _health_check):
+        response = self.client.get("/api/ready")
+        self.assertEqual(response.status_code, 503)
+        self.assertEqual(response.headers["Cache-Control"], "no-store")
+
+    @patch("backend.api.repository.sources", side_effect=DatabaseUnavailable("private URL"))
+    def test_dataset_outage_is_not_cached_and_can_recover(self, sources):
+        failed = self.client.get("/api/sources")
+        self.assertEqual(failed.status_code, 503)
+        self.assertEqual(failed.headers["Cache-Control"], "no-store")
+        self.assertNotIn("private URL", failed.get_data(as_text=True))
+        sources.side_effect = None
+        sources.return_value = []
+        recovered = self.client.get("/api/sources")
+        self.assertEqual(recovered.status_code, 200)
+        self.assertEqual(recovered.json["sources"], [])
+
+    def test_missing_database_never_silently_uses_local_data(self):
+        self.app.config["DATABASE_URL"] = ""
+        for path in ("/api/ready", "/api/recalls", "/api/sources", "/api/repair-evidence", "/api/locations"):
+            with self.subTest(path=path):
+                response = self.client.get(path)
+                self.assertEqual(response.status_code, 503)
+                self.assertEqual(response.json["error"]["code"], "data_unavailable")
+                self.assertEqual(response.headers["Cache-Control"], "no-store")
 
     @patch("backend.api.repository.relevant_locations")
     @patch("backend.api.repository.repair_barriers", return_value=[])
@@ -74,7 +109,9 @@ class AppTests(unittest.TestCase):
         }]
         locations.return_value = [{
             "id": 1, "location_type": "recycling", "name": "Site", "facility_type": "Drop-off",
-            "address": "1 Road", "suburb": "Brunswick", "postcode": "3056", "phone": "",
+            "address": "1 Road", "suburb": "Brunswick", "postcode": "3056", "phone": "03 9000 0000",
+            "latitude": -37.77, "longitude": 144.96, "opening_hours": "Mo-Fr 09:00-17:00",
+            "provider_type": "recycling_facility",
             "website": None, "verification_status": "unverified", "verification_notes": "",
             "source_notes": "Imported", "source_url": "https://example.com/source",
             "source_retrieved_at": date(2026, 8, 31),
@@ -85,6 +122,8 @@ class AppTests(unittest.TestCase):
         self.assertEqual(source_response.json["sources"][0]["retrievalDate"], "2026-09-03")
         self.assertEqual(evidence_response.json["evidence"][0]["fixedCount"], 1)
         self.assertEqual(location_response.json["locations"][0]["pathway"], "dispose")
+        self.assertEqual(location_response.json["locations"][0]["latitude"], -37.77)
+        self.assertEqual(location_response.json["locations"][0]["providerType"], "recycling_facility")
 
 
 if __name__ == "__main__":

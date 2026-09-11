@@ -1,9 +1,14 @@
 """Read-only JSON endpoints consumed by the browser application."""
 
-from flask import Blueprint, current_app, jsonify
+from flask import Blueprint, current_app, jsonify, request
 
 from .db import DatabaseUnavailable
 from . import repository
+from .price_catalogue import (
+    DEFAULT_DATABASE_PATH,
+    PriceCatalogueUnavailable,
+    read_catalogue,
+)
 from .transform import (
     build_location,
     build_recall_record,
@@ -25,9 +30,12 @@ def release_meta(extra=None):
 
 @api.after_request
 def public_api_headers(response):
-    # Public data can change between releases, so do not let browsers reuse a
-    # stale response during mentor testing.
-    response.headers["Cache-Control"] = "no-store"
+    # Public datasets change only when the governed import pipeline changes.
+    # Short caching reduces repeated Neon reads without hiding release updates.
+    if response.status_code >= 400 or request.path in {"/api/health", "/api/ready"}:
+        response.headers["Cache-Control"] = "no-store"
+    else:
+        response.headers["Cache-Control"] = "public, max-age=120, stale-if-error=600"
     response.headers["Content-Type"] = "application/json; charset=utf-8"
     return response
 
@@ -42,11 +50,25 @@ def database_unavailable(_error):
     ), 503
 
 
+@api.errorhandler(PriceCatalogueUnavailable)
+def price_catalogue_unavailable(_error):
+    return jsonify(
+        error={
+            "code": "price_catalogue_unavailable",
+            "message": "The reviewed replacement-price examples are temporarily unavailable. You can still enter a price yourself.",
+        }
+    ), 503
+
+
 @api.errorhandler(Exception)
 def unexpected_api_error(error):
     # Log only the exception class; database messages can contain infrastructure
     # details that should not be returned to users or routine application logs.
-    current_app.logger.error("API failure type=%s", type(error).__name__)
+    # Do not attach the traceback here: unexpected exception messages can
+    # contain database hostnames, SQL fragments or other infrastructure detail.
+    current_app.logger.error(
+        "API failure path=%s type=%s", request.path, type(error).__name__
+    )
     return jsonify(
         error={
             "code": "internal_error",
@@ -57,7 +79,16 @@ def unexpected_api_error(error):
 
 @api.get("/health")
 def health():
-    repository.health_check()
+    """Liveness check: prove the Flask process can answer without depending on Neon."""
+    return jsonify(status="ok", service="available", **release_meta())
+
+
+@api.get("/ready")
+def ready():
+    """Readiness check: prove the public database can be queried."""
+    result = repository.health_check()
+    if not result or result.get("ok") != 1:
+        raise DatabaseUnavailable("Database readiness query did not succeed")
     return jsonify(status="ok", database="available", **release_meta())
 
 
@@ -103,6 +134,17 @@ def repair_evidence():
     return jsonify(meta=release_meta(), evidence=evidence)
 
 
+@api.get("/replacement-prices")
+def replacement_prices():
+    # This is an explicit, independent public price snapshot. It never replaces
+    # Neon recalls, repair evidence or locations, and does not prove Neon health.
+    # Filtering by the user's brand/model happens locally in their browser.
+    payload = read_catalogue(
+        current_app.config.get("PRICE_CATALOGUE_PATH", DEFAULT_DATABASE_PATH)
+    )
+    return jsonify(meta=release_meta(payload["meta"]), prices=payload["prices"])
+
+
 @api.get("/locations")
 def locations():
     # User suburb/postcode filtering happens in browser memory. This endpoint
@@ -111,4 +153,3 @@ def locations():
     return jsonify(
         meta=release_meta(), locations=[build_location(row) for row in rows]
     )
-

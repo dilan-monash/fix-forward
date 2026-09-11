@@ -1,0 +1,157 @@
+/**
+ * TEST ONLY: localhost browser usability fixture server.
+ *
+ * Start: node test_helpers/serve-usability.mjs
+ * Open:  http://127.0.0.1:5501/
+ *
+ * Serves the current frontend with conspicuous synthetic-data labels. Public
+ * API responses are invented fixtures held in memory. It does not load .env,
+ * connect to a database, import production backend code, or save user data.
+ * This helper is deliberately outside test/ and is not a *.test.js file.
+ * Never deploy this server or treat its output as database-connection evidence.
+ */
+import http from "node:http";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const workspace = fileURLToPath(new URL("../", import.meta.url));
+const hostname = "127.0.0.1";
+const port = 5501;
+const marker = "SYNTHETIC USABILITY TEST DATA";
+const meta = Object.freeze({
+  releaseVersion: marker,
+  dataVersion: "test-only-fixtures-v1",
+  retrievalDate: "2026-09-11",
+  limitation: "Invented fixtures for local interface testing only. No real safety, repair or service claims.",
+  synthetic: true
+});
+const fixtureInfo = `http://${hostname}:${port}/test-fixture-info`;
+
+const recalls = [{
+  id: "SYNTHETIC-RECALL-ONLY",
+  categoryCodes: ["kettle"],
+  brand: "Test Brand",
+  productName: "SYNTHETIC TEST kettle — not a real recalled product",
+  title: "SYNTHETIC TEST recall — for interface testing only",
+  identifiers: [{ type: "model", value: "FF-TEST-42", normalizedValue: "FFTEST42" }],
+  noticeUrl: "https://www.productsafety.gov.au/recalls",
+  limitation: marker
+}];
+
+const evidence = [{
+  categoryCode: "kettle",
+  sampleSize: 100,
+  fixedCount: 60,
+  repairableCount: 25,
+  endOfLifeCount: 15,
+  unclassifiedCount: 0,
+  geography: "AU",
+  limitation: "SYNTHETIC TEST counts: 60 fixed, 25 repairable, 15 other. Not actual Open Repair Alliance records."
+}];
+
+const locations = [
+  {
+    id: "synthetic-community-event", name: "TEST ONLY — Richmond Community Repair Event",
+    pathway: "repair", providerType: "repair_cafe", type: "Synthetic community event",
+    latitude: -37.818, longitude: 145.001
+  },
+  {
+    id: "synthetic-repair-business", name: "TEST ONLY — Richmond Appliance Repair Business",
+    pathway: "repair", providerType: "repair_service", type: "Synthetic repair business",
+    latitude: -37.821, longitude: 145.003
+  },
+  {
+    id: "synthetic-electronics-business", name: "TEST ONLY — Richmond Electronics Repair Business",
+    pathway: "repair", providerType: "electronics_repair", type: "Synthetic electronics business",
+    latitude: -37.816, longitude: 144.998
+  },
+  {
+    id: "synthetic-recycling-facility", name: "TEST ONLY — Richmond Recycling Facility",
+    pathway: "dispose", providerType: "recycling", type: "Synthetic recycling location",
+    latitude: -37.825, longitude: 145.005
+  }
+].map((item) => ({
+  ...item,
+  suburb: "Richmond", postcode: "3121",
+  address: "Synthetic map point — do not visit",
+  openingHours: "TEST ONLY — no real opening hours",
+  verificationNote: "SYNTHETIC USABILITY TEST DATA. This business or facility does not exist. Do not contact or visit it.",
+  sourceRetrievedAt: "2026-09-11",
+  sourceUrl: fixtureInfo,
+  url: fixtureInfo
+}));
+
+const datasets = new Map([
+  ["/api/recalls", { meta, recalls }],
+  ["/api/sources", { meta, sources: [{
+    name: marker, url: fixtureInfo, version: meta.dataVersion,
+    retrievalDate: meta.retrievalDate,
+    use: "Invented recall, repair history and Richmond locations for local usability tests.",
+    limitations: meta.limitation
+  }] }],
+  ["/api/repair-evidence", { meta, evidence }],
+  ["/api/locations", { meta, locations }],
+  ["/api/health", { status: "ok", mode: "synthetic-test-only", database: "not-used", ...meta }]
+]);
+
+function send(request, response, status, body, type = "text/plain; charset=utf-8") {
+  response.writeHead(status, {
+    "Content-Type": type,
+    "Cache-Control": "no-store",
+    "X-Content-Type-Options": "nosniff",
+    "X-FixForward-Data-Mode": "SYNTHETIC-TEST-ONLY"
+  });
+  response.end(request.method === "HEAD" ? undefined : body);
+}
+
+const server = http.createServer(async (request, response) => {
+  if (!["GET", "HEAD"].includes(request.method)) {
+    send(request, response, 405, "Test server is read-only.");
+    return;
+  }
+  const route = new URL(request.url, `http://${hostname}:${port}`).pathname;
+  if (datasets.has(route)) {
+    send(request, response, 200, JSON.stringify(datasets.get(route)), "application/json; charset=utf-8");
+    return;
+  }
+  if (route === "/api/ready") {
+    send(request, response, 503, JSON.stringify({ status: "not-a-database-check", database: "not-connected", ...meta }), "application/json; charset=utf-8");
+    return;
+  }
+  if (route === "/test-fixture-info") {
+    send(request, response, 200,
+      `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${marker}</title><link rel="stylesheet" href="/styles.css"><body class="error-page"><main><p class="eyebrow">TEST ONLY</p><h1>${marker}</h1><p>These locations, repair counts and recall are invented solely to test the interface. No database is connected. No records are saved.</p><p>Recall test: select Kettle, brand Test Brand, model FF-TEST-42. Search Richmond or 3121 to display synthetic service results.</p><a class="button primary" href="/">Return to test app</a></main></body></html>`,
+      "text/html; charset=utf-8");
+    return;
+  }
+
+  // An explicit frontend allowlist prevents accidentally exposing credentials,
+  // backend files, local reports, fixtures or any file outside this workspace.
+  const permitted = route === "/" || ["/index.html", "/styles.css", "/404.html", "/500.html", "/favicon.svg"].includes(route)
+    || /^\/src\/[a-zA-Z0-9_-]+\.js$/.test(route);
+  if (!permitted) { send(request, response, 404, "Not found."); return; }
+  const relative = route === "/" ? "index.html" : route.slice(1);
+  try {
+    let content = await readFile(path.join(workspace, relative), "utf8");
+    const extension = path.extname(relative);
+    const type = extension === ".js" ? "text/javascript; charset=utf-8"
+      : extension === ".css" ? "text/css; charset=utf-8" : extension === ".svg" ? "image/svg+xml" : "text/html; charset=utf-8";
+    if (relative === "index.html") {
+      content = content.replace("<title>", "<title>[SYNTHETIC TEST] ");
+      content = content.replace("<body>", `<body><aside aria-label="Synthetic test environment" style="padding:12px 20px;background:#fff1d9;color:#071c49;border-bottom:2px solid #071c49;font:700 14px/1.5 sans-serif;">${marker} · Invented records · No database connected · Do not contact or visit test locations.</aside>`);
+    }
+    send(request, response, 200, content, type);
+  } catch {
+    send(request, response, 404, "Not found.");
+  }
+});
+
+server.listen(port, hostname, () => {
+  console.log(`${marker}: http://${hostname}:${port}/`);
+  console.log("Recall fixture: Kettle / Test Brand / FF-TEST-42. Search: Richmond or 3121.");
+  console.log("No database connection. No user data is saved. Stop this process after usability testing.");
+});
+server.on("error", (error) => { console.error(`Test server could not start: ${error.code}`); process.exitCode = 1; });
+process.on("SIGINT", () => server.close());
+process.on("SIGTERM", () => server.close());

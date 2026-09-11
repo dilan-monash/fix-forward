@@ -2,11 +2,17 @@ services:
   - type: web
     name: fixforward-iteration-1
     runtime: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn --bind 0.0.0.0:$PORT "app:app"
+    buildCommand: pip install -r requirements.txt && python data/scripts/build_price_catalogue.py
+    startCommand: gunicorn --workers 2 --threads 2 --timeout 60 --bind 0.0.0.0:$PORT "app:app"
     healthCheckPath: /api/health
     envVars:
       - key: DATABASE_URL
         sync: false
       - key: RELEASE_VERSION
-        value: iteration-1-v1.2.0
+        value: iteration-1-v1.6.0-usability-lab
+      - key: SITE_PASSWORD
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: SESSION_COOKIE_SECURE
+        value: "true"

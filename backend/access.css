@@ -1,0 +1,23 @@
+:root { font-family: "Avenir Next", "Trebuchet MS", ui-sans-serif, sans-serif; color: #071c49; background: #f4faff; }
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100vh; padding: clamp(1rem, 5vw, 3rem); display: grid; place-items: center; background: radial-gradient(circle at 90% 0%, #dff4fb, transparent 35rem); }
+main { width: min(100%, 33rem); padding: clamp(1.25rem, 5vw, 3rem); border: 1px solid #d6e5ef; border-radius: 24px; background: #fff; box-shadow: 0 20px 65px #061f5714; }
+.brand { display: flex; align-items: center; gap: .65rem; margin-bottom: 2rem; }
+.brand img { flex-shrink: 0; }
+.brand strong, .brand small { display: block; }
+.brand strong { color: #061f57; font-size: 1.4rem; letter-spacing: -.04em; }
+.brand small { margin-top: .1rem; color: #006b9f; font-size: .68rem; font-weight: 800; letter-spacing: .055em; text-transform: uppercase; }
+.eyebrow { color: #006b9f; font-size: .75rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+h1 { margin: .65rem 0 1rem; font-size: clamp(1.85rem, 7vw, 2.65rem); line-height: 1.1; letter-spacing: -.045em; overflow-wrap: anywhere; }
+p { line-height: 1.65; color: #5c6d85; }
+form { display: grid; gap: .7rem; margin-top: 1.5rem; }
+label { font-weight: 800; }
+input, button { font: inherit; width: 100%; min-width: 0; min-height: 48px; border-radius: 12px; padding: .8rem 1rem; }
+input { border: 1px solid #8196aa; background: #fff; color: #071c49; }
+input[aria-invalid="true"] { border: 2px solid #b93835; }
+button { margin-top: .3rem; border: 2px solid #061f57; color: #fff; background: #061f57; font-weight: 800; cursor: pointer; }
+button:hover { background: #0a2e70; }
+.secondary { display: flex; align-items: center; justify-content: center; min-height: 48px; padding: .7rem; color: #006b9f; text-underline-offset: 3px; font-weight: 800; }
+:focus-visible { outline: 3px solid #006b9f; outline-offset: 3px; }
+.error { padding: .8rem 1rem; border-left: 4px solid #b93835; border-radius: 4px; color: #8e2927; background: #fff0ee; }
+.footnote { margin-top: 1.5rem; margin-bottom: 0; font-size: .85rem; }

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">FixForward</title>
+  <rect width="64" height="64" rx="12" fill="#f4faff"/>
+  <g transform="translate(10 8) scale(.44 .48)">
+    <path d="M0 20 23 0H100L72 24H32L0 55Z" fill="#061f57"/>
+    <path d="M0 65 26 43H91L62 67H26L0 100Z" fill="#12b6f4"/>
+  </g>
+</svg>

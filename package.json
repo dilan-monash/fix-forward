@@ -1,13 +1,16 @@
 {
   "name": "fixforward-iteration-1",
-  "version": "1.2.0",
+  "version": "1.6.0",
   "private": true,
   "type": "module",
   "scripts": {
     "test": "node --test",
-    "check": "node --check src/app.js && node --check src/data-service.js && node --check src/data.js && node --check src/logic.js && node --test"
+    "check": "node --check src/app.js && node --check src/data-service.js && node --check src/data.js && node --check src/logic.js && node --check src/price-catalogue.js && node --check src/price-snapshot.js && node --test"
   },
   "engines": {
     "node": ">=20"
+  },
+  "devDependencies": {
+    "jsdom": "^30.0.1"
   }
 }
