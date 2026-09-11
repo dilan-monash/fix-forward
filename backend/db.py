@@ -27,12 +27,15 @@ def fetch_all(query, params=()):
             database_url,
             connect_timeout=current_app.config.get("DB_CONNECT_TIMEOUT", 5),
             row_factory=dict_row,
-            options="-c statement_timeout=10000",
         ) as connection:
             # Even if the credential is accidentally over-privileged, this
             # transaction rejects writes made through this API connection.
             connection.read_only = True
             with connection.cursor() as cursor:
+                # Neon's pooler rejects statement_timeout as a startup option.
+                # Apply it inside this read-only transaction so it expires before
+                # the pooled server connection is reused by another request.
+                cursor.execute("SET LOCAL statement_timeout = '10s'")
                 cursor.execute(query, params)
                 return list(cursor.fetchall())
     except Exception as error:
