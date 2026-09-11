@@ -50,6 +50,7 @@ let journeyId = 0;
 let geoGeneration = 0;
 let priceCatalogue = { ...PRICE_SNAPSHOT, mode: "saved-copy" };
 let priceRequest = null;
+let renderedScreen = null;
 
 const emptyState = () => ({
   screen: "landing",
@@ -1415,14 +1416,15 @@ function renderScreen() {
   const titles = { landing: "Home", identify: "Your appliance", check: "Quick safety check", results: "Your options", "repair-hub": "Repair options", services: state.pathway === "dispose" ? "Find recycling services" : "Find repair services", cost: "Compare repair and replacement costs" };
   document.title = `${titles[state.screen] || "Your options"} | FixForward`;
   if (!publicData) { renderLoading(); return; }
-  if (state.screen === "landing") return renderLanding();
-  if (state.screen === "identify") return renderIdentify();
-  if (state.screen === "check") return renderCheck();
-  if (state.screen === "results") return renderResults();
-  if (state.screen === "repair-hub") return renderRepairHub();
-  if (state.screen === "services") return renderServices();
-  if (state.screen === "cost") return renderCost();
-  return renderLanding();
+  const renderers = { landing: renderLanding, identify: renderIdentify, check: renderCheck, results: renderResults, "repair-hub": renderRepairHub, services: renderServices, cost: renderCost };
+  (renderers[state.screen] || renderLanding)();
+  // Animate navigation once, never a background refresh or an answer edit.
+  // Safety warnings stay still and immediately readable.
+  const changedScreen = renderedScreen !== state.screen;
+  renderedScreen = state.screen;
+  if (changedScreen && !app.querySelector(".urgent-card, .recall-result-card, .attention-card, .caution-card, .priority-card, .service-danger-banner")) {
+    app.firstElementChild?.classList.add("screen-enter");
+  }
 }
 
 function groupName(source) {

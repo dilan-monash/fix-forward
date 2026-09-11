@@ -758,3 +758,28 @@ dialog::backdrop { background: rgba(6,39,34,.7); backdrop-filter: blur(3px); }
 .retail-card-actions .button { white-space: normal; text-align: center; width: 100%; min-height: 44px; }
 .selected-price-note { padding: .8rem 1rem; border-left: 3px solid #347568; background: #eff7f4; font-size: .9rem; line-height: 1.6; }
 @media (max-width: 620px) { .retail-price-grid { grid-template-columns: minmax(0, 1fr); } }
+
+/* Brief feedback keeps the journey responsive without delaying any controls. */
+@media (prefers-reduced-motion: no-preference) {
+  .screen-enter { animation: ff-screen-enter 160ms ease-out; }
+  @keyframes ff-screen-enter {
+    from { opacity: .92; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .segmented span { transition: background-color 120ms ease-out, border-color 120ms ease-out, color 120ms ease-out; }
+  .button, .goal-button, .hero-quick-actions button, .choice-card, .category-button {
+    transition: transform 120ms ease-out, box-shadow 120ms ease-out, background-color 120ms ease-out, border-color 120ms ease-out;
+  }
+  .button:not([disabled]):not([aria-disabled="true"]):active,
+  .goal-button:not([disabled]):not([aria-disabled="true"]):active,
+  .hero-quick-actions button:not([disabled]):not([aria-disabled="true"]):active,
+  .choice-card:not([disabled]):not([aria-disabled="true"]):active,
+  .category-button:not([disabled]):not([aria-disabled="true"]):active { transform: translateY(1px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .goal-card:hover, .button:hover, .goal-button:hover svg,
+  .button:active, .goal-button:active, .hero-quick-actions button:active,
+  .choice-card:active, .category-button:active { transform: none; }
+}
