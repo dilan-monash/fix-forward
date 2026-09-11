@@ -443,6 +443,10 @@ build/
 *.db
 *.sqlite
 *.sqlite3
+!data/catalogue/replacement-prices.sqlite
+
+# Local QA captures and temporary servers
+tmp/
 
 # Large raw open-data downloads (keep small committed snapshots + clean CSVs)
 data/raw/**

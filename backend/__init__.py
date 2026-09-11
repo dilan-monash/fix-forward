@@ -6,7 +6,7 @@ from .config import Settings
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-FRONTEND_FILES = {"index.html", "styles.css", "404.html", "500.html"}
+FRONTEND_FILES = {"index.html", "styles.css", "favicon.svg", "404.html", "500.html"}
 
 
 def create_app(test_config=None):
@@ -21,6 +21,7 @@ def create_app(test_config=None):
     from werkzeug.middleware.proxy_fix import ProxyFix
 
     from .api import api
+    from .access import configure_access
 
     settings = Settings.from_environment()
     app = Flask(__name__, static_folder=None)
@@ -28,6 +29,10 @@ def create_app(test_config=None):
         DATABASE_URL=settings.database_url,
         RELEASE_VERSION=settings.release_version,
         DB_CONNECT_TIMEOUT=settings.db_connect_timeout,
+        SITE_PASSWORD=settings.site_password,
+        SECRET_KEY=settings.secret_key,
+        SITE_ACCESS_ENABLED=True,
+        SESSION_COOKIE_SECURE=settings.session_cookie_secure,
     )
     if test_config:
         app.config.update(test_config)
@@ -36,6 +41,7 @@ def create_app(test_config=None):
     # Trust exactly one proxy so Flask can still determine the original scheme/host.
     app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
     app.register_blueprint(api)
+    configure_access(app)
 
     @app.get("/")
     def index():
@@ -55,17 +61,20 @@ def create_app(test_config=None):
     @app.after_request
     def add_security_headers(response):
         # Inline styles remain in the Iteration 1 UI, hence style-src unsafe-inline.
-        # Scripts are still restricted to files hosted by FixForward itself.
+        # Leaflet 1.9.4 is loaded only on the map screen and pinned with Subresource Integrity; all other scripts are local.
         response.headers["Content-Security-Policy"] = (
-            "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; "
-            "img-src 'self' data:; connect-src 'self'; object-src 'none'; "
+            "default-src 'self'; "
+            "script-src 'self' https://unpkg.com; "
+            "style-src 'self' 'unsafe-inline' https://unpkg.com; "
+            "img-src 'self' data: https://tile.openstreetmap.org https://unpkg.com; "
+            "connect-src 'self'; object-src 'none'; "
             "base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
         )
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
-        response.headers["Referrer-Policy"] = "no-referrer"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         response.headers["Permissions-Policy"] = (
-            "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+            "camera=(), microphone=(), geolocation=(self), payment=(), usb=()"
         )
         if request.is_secure:
             response.headers["Strict-Transport-Security"] = "max-age=31536000"
@@ -94,4 +103,3 @@ def create_app(test_config=None):
         return send_from_directory(PROJECT_ROOT, "404.html"), 404
 
     return app
-

@@ -27,6 +27,7 @@ def fetch_all(query, params=()):
             database_url,
             connect_timeout=current_app.config.get("DB_CONNECT_TIMEOUT", 5),
             row_factory=dict_row,
+            options="-c statement_timeout=10000",
         ) as connection:
             # Even if the credential is accidentally over-privileged, this
             # transaction rejects writes made through this API connection.
@@ -43,4 +44,3 @@ def fetch_all(query, params=()):
 def fetch_one(query, params=()):
     rows = fetch_all(query, params)
     return rows[0] if rows else None
-

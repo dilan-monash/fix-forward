@@ -91,9 +91,14 @@ Copy the pooled Neon connection string for `fixforward_app` into the hosting pro
 
 ## 6. Connected checks
 
-- `/api/health` returns 200 and `database: available`.
+- `/api/health` returns 200 and `service: available`. This proves Flask is running, not that the database is connected.
+- `/api/ready` returns 200 and `database: available` only after a successful database query. A successful readiness query alone does not prove the imported schema and datasets are usable.
 - `/api/recalls` returns only manually reviewed records.
 - `/api/sources`, `/api/repair-evidence` and `/api/locations` return valid arrays.
 - The Mistral/BVC 160 journey produces a strong possible match.
 - Rice cooker with no model produces insufficient information.
 - An intentionally invalid database URL produces generic HTTP 503 without leaking connection details.
+
+For local setup, a read-only diagnostic that checks all four real dataset endpoints,
+and a clear distinction between a static preview and the Flask website, see
+[`docs/DATABASE_CONNECTION_CHECK.md`](../docs/DATABASE_CONNECTION_CHECK.md).

@@ -1,49 +1,142 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { loadPublicData } from "../src/data-service.js";
+import { loadPublicData, getStaticSnapshot } from "../src/data-service.js";
+import { matchRecall } from "../src/logic.js";
 
 const endpoints = { recalls: "/api/recalls", sources: "/api/sources", repairEvidence: "/api/repair-evidence", locations: "/api/locations" };
 
-test("API01 disabled API uses safe static UI data without making a request", async () => {
-  let calls = 0;
-  const data = await loadPublicData({ enabled: false }, async () => { calls += 1; throw new Error("must not be called"); });
-  assert.equal(data.mode, "static");
-  assert.equal(calls, 0);
-  assert.equal(data.families.length, 6);
-  assert.deepEqual(data.recalls, []);
-  assert.equal(data.availability.recalls, false);
-});
+function ok(payload) { return { ok: true, status: 200, json: async () => payload }; }
 
-test("API02 enabled API accepts the documented read-only response contract", async () => {
-  const calls = [];
-  const payloadByPath = {
-    "/api/recalls": { meta: { releaseVersion: "backend", dataVersion: "recall-db-1", retrievalDate: "today" }, recalls: [{ id: "backend-recall" }] },
-    "/api/sources": { meta: { releaseVersion: "backend" }, sources: [{ name: "Backend source" }] },
-    "/api/repair-evidence": { evidence: [{ categoryCode: "kettle" }] },
-    "/api/locations": { locations: [{ name: "Backend location" }] }
-  };
-  const fetchMock = async (url, options) => {
-    calls.push({ url, options });
+const validRecall = { id: "r", categoryCodes: ["kettle"], identifiers: [{ type: "model", value: "K100" }] };
+const validEvidence = { categoryCode: "kettle", sampleSize: 10, fixedCount: 5, repairableCount: 2, endOfLifeCount: 2, unclassifiedCount: 1 };
+const validLocation = { id: "l", name: "Example repairer", pathway: "repair", latitude: -37.8, longitude: 144.9 };
+const payloads = {
+  "/api/recalls": { recalls: [validRecall] },
+  "/api/sources": { sources: [{ name: "Example source" }] },
+  "/api/repair-evidence": { evidence: [validEvidence] },
+  "/api/locations": { locations: [validLocation] }
+};
+const config = { enabled: true, baseUrl: "https://example.test", timeoutMs: 1000, endpoints };
+
+test("API01 datasets load independently", async () => {
+  const fetchMock = async (url) => {
     const path = new URL(url).pathname;
-    return { ok: true, status: 200, json: async () => payloadByPath[path] };
+    if (path === "/api/locations") return { ok: false, status: 503, json: async () => ({}) };
+    if (path === "/api/recalls") return ok({ meta: { releaseVersion: "r1" }, recalls: [validRecall] });
+    if (path === "/api/sources") return ok({ sources: [{ name: "source" }] });
+    return ok({ evidence: [validEvidence] });
   };
-  const data = await loadPublicData({ enabled: true, baseUrl: "http://localhost:5000", timeoutMs: 1000, endpoints }, fetchMock);
-  assert.equal(data.mode, "backend");
-  assert.equal(data.meta.dataVersion, "recall-db-1");
-  assert.equal(data.recalls[0].id, "backend-recall");
-  assert.equal(data.repairEvidence[0].categoryCode, "kettle");
+  const data = await loadPublicData({ enabled: true, baseUrl: "https://example.test", timeoutMs: 1000, endpoints }, fetchMock);
   assert.equal(data.availability.recalls, true);
-  assert.equal(calls.length, 4);
-  assert.ok(calls.every(({ options }) => options.method === "GET" && !("body" in options)));
+  assert.equal(data.availability.repairEvidence, true);
+  assert.equal(data.availability.locations, false);
+  assert.equal(data.availability.sources, true);
+  assert.equal(data.apiAvailability.sources, true);
+  assert.equal(data.mode, "partial");
 });
 
-test("API03 failure removes public fixtures and marks data unavailable", async () => {
+test("API02 total endpoint failure keeps static safety/UI definitions available", async () => {
   const data = await loadPublicData({ enabled: true, baseUrl: "", timeoutMs: 1000, endpoints }, async () => ({ ok: false, status: 503 }));
-  assert.equal(data.mode, "fallback");
-  assert.match(data.error, /503/);
   assert.equal(data.families.length, 6);
-  assert.deepEqual(data.recalls, []);
-  assert.deepEqual(data.repairEvidence, []);
-  assert.deepEqual(data.locations, []);
+  assert.equal(data.safetySigns.length > 0, true);
   assert.equal(data.availability.recalls, false);
+  assert.equal(data.availability.locations, false);
+  assert.equal(data.availability.sources, true);
+  assert.equal(data.apiAvailability.sources, false);
+  assert.equal(data.sources.length > 0, true);
+  assert.equal(data.mode, "fallback");
+});
+
+test("API03 disabled API makes no request", async () => {
+  let calls = 0;
+  const data = await loadPublicData({ enabled: false }, async () => { calls += 1; });
+  assert.equal(calls, 0);
+  assert.equal(data.mode, "static");
+});
+
+
+test("API04 static snapshot makes the first screen usable before backend data arrives", () => {
+  const data = getStaticSnapshot();
+  assert.equal(data.families.length, 6);
+  assert.ok(data.safetySigns.length > 0);
+  assert.equal(data.availability.recalls, false);
+});
+
+test("API05 malformed rows fail only their dataset and cannot produce recall reassurance", async () => {
+  for (const malformed of [
+    null,
+    "not a record",
+    {},
+    { id: "r", categoryCodes: "kettle", identifiers: [] },
+    { ...validRecall, identifiers: [null] },
+    { ...validRecall, identifiers: [{ type: "model", value: "K100", normalizedValue: {} }] }
+  ]) {
+    const data = await loadPublicData(config, async (url) => {
+      const path = new URL(url).pathname;
+      return ok(path === "/api/recalls" ? { recalls: [validRecall, malformed] } : payloads[path]);
+    });
+    assert.equal(data.availability.recalls, false, JSON.stringify(malformed));
+    assert.equal(data.apiAvailability.locations, true);
+    assert.equal(data.mode, "partial");
+    assert.deepEqual(data.recalls, []);
+    assert.equal(matchRecall({ categoryCode: "kettle", model: "K100" }, data.recalls, data.availability.recalls).status, "unavailable");
+  }
+});
+
+test("API06 invalid source/location rows and impossible evidence counts remain unavailable", async () => {
+  const data = await loadPublicData(config, async (url) => {
+    const path = new URL(url).pathname;
+    if (path === "/api/sources") return ok({ sources: [null] });
+    if (path === "/api/locations") return ok({ locations: [{ ...validLocation, pathway: "unknown" }] });
+    if (path === "/api/repair-evidence") return ok({ evidence: [{ ...validEvidence, fixedCount: 500 }] });
+    return ok(payloads[path]);
+  });
+  assert.equal(data.apiAvailability.recalls, true);
+  assert.equal(data.apiAvailability.sources, false);
+  assert.equal(data.apiAvailability.locations, false);
+  assert.equal(data.apiAvailability.repairEvidence, false);
+  assert.equal(data.sources.length > 0, true);
+  assert.deepEqual(data.locations, []);
+  assert.deepEqual(data.repairEvidence, []);
+});
+
+test("API07 a stalled endpoint times out without losing successful independent datasets", async () => {
+  let requestSignal;
+  const data = await loadPublicData({ ...config, timeoutMs: 15 }, async (url, options) => {
+    requestSignal = options.signal;
+    const path = new URL(url).pathname;
+    if (path === "/api/locations") return new Promise(() => {});
+    return ok(payloads[path]);
+  });
+  assert.equal(requestSignal.aborted, true);
+  assert.equal(data.apiAvailability.locations, false);
+  assert.match(data.errors.locations, /timed out/);
+  assert.equal(data.apiAvailability.recalls, true);
+  assert.equal(data.mode, "partial");
+});
+
+test("API08 invalid JSON and stalled JSON bodies have the same independent failure boundary", async () => {
+  const data = await loadPublicData({ ...config, timeoutMs: 15 }, async (url) => {
+    const path = new URL(url).pathname;
+    if (path === "/api/recalls") return { ok: true, json: async () => { throw new SyntaxError("Invalid JSON"); } };
+    if (path === "/api/locations") return { ok: true, json: () => new Promise(() => {}) };
+    return ok(payloads[path]);
+  });
+  assert.equal(data.availability.recalls, false);
+  assert.equal(data.availability.locations, false);
+  assert.equal(data.availability.repairEvidence, true);
+  assert.match(data.errors.locations, /timed out/);
+});
+
+test("API09 empty valid datasets count as loaded and invalid metadata is not merged into the UI", async () => {
+  const empty = await loadPublicData(config, async (url) => {
+    const path = new URL(url).pathname;
+    const field = path === "/api/repair-evidence" ? "evidence" : path.split("/").at(-1);
+    return ok({ [field]: [] });
+  });
+  assert.equal(empty.mode, "backend");
+  assert.equal(Object.values(empty.apiAvailability).every(Boolean), true);
+  const badMetadata = await loadPublicData(config, async (url) => ok({ ...payloads[new URL(url).pathname], meta: "bad metadata" }));
+  assert.equal(badMetadata.mode, "fallback");
+  assert.equal(badMetadata.meta.releaseVersion, getStaticSnapshot().meta.releaseVersion);
 });

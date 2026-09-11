@@ -3,56 +3,72 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="FixForward helps Victorian households check recalls and warning signs before comparing repair and replacement costs.">
-  <title>FixForward — a clearer next step for a broken appliance</title>
+  <meta name="description" content="FixForward helps Melbourne households decide what to do with a faulty household appliance: check important safety concerns, explore repair, compare costs and find recycling options.">
+  <meta name="theme-color" content="#061f57">
+  <title>Home | FixForward</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" sizes="any">
   <link rel="stylesheet" href="styles.css">
   <script type="module" src="src/app.js"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to main content</a>
+
+  <div class="site-chrome">
   <header class="site-header">
-    <a class="brand" href="/" aria-label="FixForward home">
-      <span class="brand-mark" aria-hidden="true">F</span>
-      <span>FixForward</span>
-    </a>
-    <div class="header-actions">
-      <span class="privacy-note"><span data-icon="lock"></span> Private by design</span>
-      <button class="text-button" id="restart-button" type="button">Restart</button>
-    </div>
+    <button class="brand" id="home-button" type="button" aria-label="Go to FixForward home">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span><strong>FixForward</strong><small>Know your options</small></span>
+    </button>
+    <nav class="header-actions" aria-label="Main navigation">
+      <button class="text-button" id="about-button" type="button">About the information</button>
+      <button class="text-button restart-link" id="restart-button" type="button">Start again</button>
+      <a class="text-button lock-link" href="/logout">Lock website</a>
+    </nav>
   </header>
 
-  <div class="progress-shell" aria-label="Assessment progress">
-    <ol class="progress" id="progress">
-      <li data-phase="identify"><span>1</span> Appliance</li>
-      <li data-phase="safety"><span>2</span> Safety & recall</li>
-      <li data-phase="pathway"><span>3</span> Next pathway</li>
-      <li data-phase="cost"><span>4</span> Cost comparison</li>
+  <div class="journey-shell" id="journey-shell" hidden>
+    <ol class="journey-progress" id="journey-progress" aria-label="Your FixForward journey">
+      <li data-stage="appliance"><span>1</span><b>Your appliance</b></li>
+      <li data-stage="check"><span>2</span><b>Quick safety check</b></li>
+      <li data-stage="options"><span>3</span><b>Your options</b></li>
     </ol>
+  </div>
   </div>
 
   <main id="main" tabindex="-1">
-    <noscript><div class="notice danger">FixForward needs JavaScript to run this private, in-browser assessment.</div></noscript>
-    <div id="app" aria-live="polite"></div>
+    <noscript><div class="notice danger">FixForward needs JavaScript to show the appliance guide. Enable JavaScript in your browser, then reload this page.</div></noscript>
+    <div id="app"></div>
   </main>
 
   <footer class="site-footer">
     <div>
-      <strong>FixForward</strong>
-      <p>Screening and guidance only — no diagnosis, guarantee or financial advice.</p>
+      <strong>FixForward · household appliance guide</strong>
+      <p>Decision support only. FixForward does not diagnose electrical faults or confirm that an appliance is safe.</p>
     </div>
     <div class="footer-meta">
-      <span>Iteration 1 · v1.2.0</span>
-      <span>Public-data coverage is shown under Sources</span>
-      <button class="text-button" id="sources-button" type="button">Sources & privacy</button>
+      <span id="release-label">FixForward prototype</span>
+      <span>Melbourne-focused · no account required</span>
     </div>
   </footer>
 
-  <dialog id="sources-dialog" aria-labelledby="sources-title">
+  <dialog id="about-dialog" aria-labelledby="about-title">
     <div class="dialog-head">
-      <div><p class="eyebrow">Evidence & privacy</p><h2 id="sources-title">What this assessment uses</h2></div>
-      <button class="icon-button" id="close-sources" type="button" aria-label="Close">×</button>
+      <div><p class="eyebrow">About FixForward</p><h2 id="about-title">Where this information comes from</h2></div>
+      <button class="icon-button" id="close-about" type="button" aria-label="Close">×</button>
     </div>
-    <div id="sources-content"></div>
+    <div id="about-content"></div>
+  </dialog>
+
+  <dialog id="restart-dialog" aria-labelledby="restart-title" aria-describedby="restart-description">
+    <div class="dialog-head">
+      <div><p class="eyebrow">Start again?</p><h2 id="restart-title">Clear this journey</h2></div>
+      <button class="icon-button" data-close-restart type="button" aria-label="Close">×</button>
+    </div>
+    <p id="restart-description">Starting again clears the appliance details, answers and prices you entered in this tab.</p>
+    <div class="button-row">
+      <button class="button secondary" data-close-restart type="button">Keep my progress</button>
+      <button class="button danger" id="confirm-restart" type="button">Start again</button>
+    </div>
   </dialog>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>

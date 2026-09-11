@@ -106,20 +106,33 @@ def group_repair_evidence(statistic_rows, barrier_rows):
 
 
 def build_location(row):
-    """Expose only fields that are useful for an unverified directory result."""
+    """Expose useful service details while keeping provenance available on demand.
 
+    Latitude/longitude allow the browser to calculate nearby results without
+    sending a user's device location to FixForward. Qualification, opening and
+    appliance-acceptance claims remain conservative unless the source proves them.
+    """
+
+    latitude = row.get("latitude")
+    longitude = row.get("longitude")
     return {
         "id": str(row["id"]),
         "pathway": "repair" if row["location_type"] == "repair" else "dispose",
         "name": row["name"],
-        "type": row["facility_type"],
+        "type": row.get("facility_type") or "Service",
+        "providerType": row.get("provider_type") or "",
         "address": row.get("address") or "Address not provided",
         "suburb": row.get("suburb") or "",
         "postcode": row.get("postcode") or "",
+        "latitude": float(latitude) if latitude is not None else None,
+        "longitude": float(longitude) if longitude is not None else None,
         "phone": row.get("phone") or "",
+        "openingHours": row.get("opening_hours") or "",
         "url": safe_http_url(row.get("website")),
         "verificationStatus": row.get("verification_status") or "unverified",
         "verificationNote": row.get("verification_notes") or row.get("source_notes") or "",
+        "verificationUrl": safe_http_url(row.get("verification_url")),
+        "lastVerifiedAt": iso_value(row.get("last_verified_at")),
         "sourceUrl": safe_http_url(row.get("source_url")),
         "sourceRetrievedAt": iso_value(row.get("source_retrieved_at")),
     }
