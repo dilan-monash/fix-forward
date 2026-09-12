@@ -1,5 +1,7 @@
 # FixForward — Iteration 1 v1.6 usability-lab prototype
 
+**Local update, 12 September 2026:** Mentor feedback changes add a compact landing page, searchable optional brand/model suggestions, clearer warning actions, a safety counter at the end of the form, and an adult-and-child picture-story activity. Temporary data failures receive a bounded retry and expired website access has a recovery path. All 144 JavaScript checks pass. See the [item-by-item feedback response and remaining scanner work](docs/MENTOR_FEEDBACK_2026-09-12.md). These changes have not been deployed.
+
 **Updated 11 September 2026:** FixForward now requires a shared website password through its Flask server. The update also includes a favicon, page-specific browser titles and a reviewed AUD retail-price catalogue. “Not sure” retains repair-contact, cost-comparison and recycling exploration while safety warnings stay visible. See the [website access guide](docs/WEBSITE_ACCESS.md), [current branch verification report](docs/PASSWORD_BRANCH_VERIFICATION_2026-09-11.md), [catalogue verification report](docs/PRICE_CATALOGUE_VERIFICATION_2026-09-11.md) and [usability review](docs/USABILITY_REVIEW_2026-09-11.md).
 
 FixForward is a decision-support web application for metropolitan Melbourne households with a faulty portable appliance. Visitors enter the shared website password without creating an account. Appliance choices and answers stay in browser memory. This is a **non-final usability-lab candidate**. It is designed around the question an ordinary household user is most likely to have:

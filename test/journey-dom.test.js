@@ -8,8 +8,16 @@ import { JSDOM, VirtualConsole } from "jsdom";
 const pageHtml = await readFile(new URL("../index.html", import.meta.url), "utf8");
 let appInstance = 0;
 const settle = () => new Promise((resolve) => setImmediate(resolve));
+async function waitUntil(predicate) {
+  const deadline = Date.now() + 2000;
+  while (!predicate()) {
+    assert.ok(Date.now() < deadline, "Expected the asynchronous journey update to complete");
+    await new Promise((resolve) => setTimeout(resolve, 10));
+  }
+  await settle();
+}
 
-async function createJourney(t, { delayedData = false, delayedPrices = false, recalls = [], locations = [], prices = [], failedEndpoints = [], geolocation } = {}) {
+async function createJourney(t, { delayedData = false, delayedPrices = false, recalls = [], locations = [], prices = [], failedEndpoints = [], accessExpired = [], geolocation } = {}) {
   const scriptErrors = [];
   const virtualConsole = new VirtualConsole();
   virtualConsole.on("jsdomError", (error) => scriptErrors.push(error));
@@ -54,8 +62,8 @@ async function createJourney(t, { delayedData = false, delayedPrices = false, re
     };
     assert.ok(Object.hasOwn(datasets, pathname), `Unexpected network request: ${pathname}`);
     return {
-      ok: !failedEndpoints.includes(pathname),
-      status: failedEndpoints.includes(pathname) ? 503 : 200,
+      ok: !failedEndpoints.includes(pathname) && !accessExpired.includes(pathname),
+      status: accessExpired.includes(pathname) ? 401 : failedEndpoints.includes(pathname) ? 503 : 200,
       json: async () => ({ ...datasets[pathname], meta: pathname === "/api/replacement-prices"
         ? { source: "reviewed-price-snapshot", currency: "AUD", releaseVersion: "test-only-fixture" }
         : { releaseVersion: "test-only-fixture" } })
@@ -387,6 +395,7 @@ test("DOM: an API outage keeps the static safety journey but never invents servi
   const journey = await createJourney(t, {
     failedEndpoints: ["/api/recalls", "/api/sources", "/api/repair-evidence", "/api/locations"]
   });
+  await waitUntil(() => journey.requests.filter((path) => path === "/api/locations").length === 2);
   journey.enterCheck("repair");
   assert.match(journey.required("#app").textContent, /recall.*unavailable|cannot.*recall|could not.*recall/i);
   journey.answerCheck();
@@ -445,13 +454,14 @@ test("DOM: a manual suburb choice supersedes a pending device-location request",
 test("DOM: a recall outage during refresh replaces an earlier no-match status", async (t) => {
   const failedEndpoints = ["/api/locations"];
   const journey = await createJourney(t, { failedEndpoints });
+  await waitUntil(() => journey.requests.filter((path) => path === "/api/locations").length === 2);
   journey.enterCheck("repair", { brand: "Test Brand", model: "TEST-42" });
   journey.answerCheck();
   journey.click("#hub-find-repair");
   assert.match(journey.required(".small-status").textContent, /did not find your exact model/i);
   failedEndpoints.push("/api/recalls");
   journey.click("#retry-data");
-  await settle();
+  await waitUntil(() => journey.query(".warning-status")?.textContent.match(/did not load|unavailable|could not/i));
   journey.required(".services-screen");
   const recallStatus = journey.required(".warning-status").textContent;
   assert.match(recallStatus, /did not load|unavailable|could not/i);
@@ -651,4 +661,81 @@ test("DOM: browser titles follow the journey and confirmed Home clears the selec
   assert.equal(journey.query("#selected-price-note"), null);
   journey.restart();
   assert.equal(journey.window.document.title, "Home | FixForward");
+});
+
+test("DOM: product suggestions support keyboard selection without guessing a model", async (t) => {
+  const journey = await createJourney(t, { recalls: [{ id: "test-recall", categoryCodes: ["kettle"], brand: "Test Brand", identifiers: [{ type: "model", value: "FF-TEST-42" }] }] });
+  journey.click('[data-intent="compare"]');
+  journey.click('[data-family="heating-simple-cooking"]');
+  journey.click('[data-category="Kettle"]');
+  journey.fill('[name="brand"]', 'Test');
+  const input = journey.required('[name="brand"]');
+  const key = (element, value) => element.dispatchEvent(new journey.window.KeyboardEvent('keydown', {key:value, bubbles:true, cancelable:true}));
+  key(input, 'ArrowDown');
+  assert.equal(input.getAttribute('aria-activedescendant'), 'brand-option-0');
+  key(input, 'Enter');
+  assert.equal(input.value, 'Test Brand');
+  assert.equal(journey.required('[name="model"]').value, '');
+  assert.equal(input.getAttribute('aria-expanded'), 'false');
+  journey.click('[data-suggest="model"]');
+  assert.match(journey.required('#model-suggestions').textContent, /FF-TEST-42/);
+  journey.click('#model-option-0');
+  assert.equal(journey.required('[name="model"]').value, 'FF-TEST-42');
+  journey.click('#continue-check');
+  assert.match(journey.required('.recall-alert').textContent, /may be affected/);
+  const firstQuestion = journey.required('[data-question]');
+  assert.ok(journey.required('.recall-alert').compareDocumentPosition(firstQuestion) & journey.window.Node.DOCUMENT_POSITION_FOLLOWING);
+});
+
+test("DOM: unknown manual identity remains usable and the check footer follows the questions", async (t) => {
+  const journey = await createJourney(t);
+  journey.enterCheck('guide', {brand:'My unlisted brand',model:'MY-123'});
+  const firstQuestion = journey.required('[data-question]');
+  assert.ok(firstQuestion.compareDocumentPosition(journey.required('.recall-mini')) & journey.window.Node.DOCUMENT_POSITION_FOLLOWING);
+  assert.ok(firstQuestion.compareDocumentPosition(journey.required('.safety-footer')) & journey.window.Node.DOCUMENT_POSITION_FOLLOWING);
+  assert.equal(journey.query('.sticky-action'), null);
+  journey.answerCheck({heat:'yes'});
+  assert.match(journey.required('.attention-card').textContent, /Ask a repairer/);
+  assert.match(journey.required('.warning-explanation').textContent, /Unusual heat can have several causes/);
+  journey.required('#caution-repair');
+});
+
+test("DOM: the kids activity supports retry, all three stories, finish, replay and returning home", async (t) => {
+  const journey = await createJourney(t);
+  const initialRequests = [...journey.requests];
+  journey.click('#start-learning');
+  journey.required('.learning-screen');
+  journey.click('[data-learning-choice="secret"]');
+  assert.match(journey.required('#learning-feedback').textContent, /grown-up needs to know/);
+  assert.equal(journey.window.document.activeElement.id, 'learning-feedback');
+  journey.click('[data-learning-action="retry"]');
+  assert.equal(journey.window.document.activeElement.id, 'learning-focus');
+  for (const choice of ['adult','repair','ewaste']) {
+    journey.click(`[data-learning-choice="${choice}"]`);
+    journey.click('[data-learning-action="next"]');
+  }
+  journey.required('.learning-finish');
+  assert.equal(journey.window.document.activeElement.id, 'learning-focus');
+  journey.click('[data-learning-action="replay"]');
+  journey.required('[data-learning-choice="adult"]');
+  journey.click('[data-learning-action="exit"]');
+  journey.required('.landing');
+  assert.deepEqual(journey.requests, initialRequests, 'Learning must not request services, photos or private answers');
+  journey.enterCheck('repair');
+  journey.answerCheck();
+  journey.required('#hub-find-repair');
+});
+
+test("DOM: expired access has a recoverable route that keeps the current safety answers", async (t) => {
+  const accessExpired = ['/api/recalls','/api/sources','/api/locations','/api/repair-evidence'];
+  const journey = await createJourney(t, {accessExpired});
+  journey.enterCheck('repair');
+  journey.answer('burning', 'unsure');
+  const accessLink = journey.required('a[href="/login"]');
+  assert.equal(accessLink.target, '_blank');
+  accessExpired.splice(0);
+  journey.click('[data-refresh-access]');
+  await settle();
+  assert.equal(journey.query('a[href="/login"]'), null);
+  assert.equal(journey.required('input[name="burning"][value="unsure"]').checked, true);
 });
