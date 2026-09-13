@@ -1,7 +1,7 @@
 /** Feedback must explain the child's real choices without changing game rules. */
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { MISSIONS } from '../quest/content.js';
+import { MISSIONS, SORT_ITEMS } from '../quest/content.js';
 import { createState, transition, isAcceptedPlan } from '../quest/engine.js';
 import { progression } from '../quest/progression.js';
 import { planFeedback, celebrationCopy, rewardPreview } from '../quest/feedback.js';
@@ -133,4 +133,45 @@ test('completed stories and known ideas promise no duplicate points but keep fir
   assert.equal(rewardPreview(state, { conceptId: 'battery' }).totalPoints, 5);
   assert.equal(rewardPreview(state, { missionId: 'unknown' }).totalPoints, 0);
   assert.deepEqual(state.discoveries, box.conceptIds);
+});
+
+test('sorting previews promise exactly the new picture and idea credit the real answer will earn', () => {
+  let state = transition(createState(), { type: 'START_SORT' });
+  let knownIdeaPictures = 0;
+  for (const id of state.sorting.itemIds) {
+    const item = SORT_ITEMS.find(picture => picture.id === id);
+    const before = structuredClone(state);
+    const knownIdea = state.discoveries.includes(item.conceptId);
+    const preview = rewardPreview(state, { sortItemId: id });
+    assert.equal(preview.sortingPoints, 5);
+    assert.equal(preview.discoveryPoints, knownIdea ? 0 : 5);
+    assert.equal(preview.totalPoints, knownIdea ? 5 : 10);
+    assert.match(preview.label, new RegExp(`\\+${preview.totalPoints} Sparks`));
+    assert.match(preview.detail, /5 for this new picture/);
+    if (knownIdea) {
+      knownIdeaPictures += 1;
+      assert.doesNotMatch(preview.detail, /new idea/);
+    }
+    assert.deepEqual(state, before, 'Showing an offer never records a picture or awards points');
+    const earned = transition(state, { type: 'ANSWER_SORT', destinationId: item.answer });
+    assert.equal(progression(earned).points - progression(state).points, preview.totalPoints);
+    const replay = rewardPreview(earned, { sortItemId: id });
+    assert.equal(replay.totalPoints, 0);
+    assert.equal(replay.sortingPoints, 0);
+    assert.equal(replay.discoveryPoints, 0);
+    assert.equal(replay.replay, true);
+    assert.match(replay.label, /round count/);
+    assert.doesNotMatch(replay.label, /\+/);
+    assert.match(replay.detail, /five-picture round/);
+    state = transition(earned, { type: 'NEXT_SORT' });
+  }
+  assert.ok(knownIdeaPictures > 0, 'New pictures sharing an idea must preview five Sparks rather than zero');
+  assert.equal(rewardPreview(state, { sortItemId: 'unreviewed-picture' }).totalPoints, 0);
+});
+
+test('a repeated sorting picture celebrates round progress without claiming new Sparks', () => {
+  const copy = celebrationCopy({ kind: 'sorting', points: 0, replay: true });
+  assert.match(copy.pointsLine, /round count went up/);
+  assert.match(copy.pointsLine, /earned this picture/);
+  assert.doesNotMatch(copy.pointsLine, /\+\d/);
 });

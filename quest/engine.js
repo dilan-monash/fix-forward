@@ -40,7 +40,7 @@ export function createState() {
   return {
     version: STATE_VERSION, view: 'home', activeMission: null, completed: {}, discoveries: [],
     settings: { mode: 'guided', narration: false, sound: false, motion: 'auto' },
-    decorations: { home: null, studio: null, station: null }, postcards: {}, reflections: {}, sorting: null, sortRound: 0, practice: []
+    decorations: { home: null, studio: null, station: null }, postcards: {}, reflections: {}, sorting: null, sortRound: 0, practice: [], sortedItems: []
   };
 }
 
@@ -236,6 +236,9 @@ export function transition(state, action) {
       return {
         ...state,
         discoveries: correct ? unique([...state.discoveries, item.conceptId]) : state.discoveries,
+        // Each different picture earns its own mastery reward, even when its
+        // idea was learned in another story. Replays still count in this round.
+        sortedItems: correct ? unique([...(state.sortedItems || []), item.id]) : (state.sortedItems || []),
         practice: correct ? state.practice : markPractice(state, [item.conceptId]),
         sorting: {
           ...sorting, status: 'feedback', feedback: { correct, destinationId: action.destinationId },
@@ -377,6 +380,12 @@ export function hydrateState(raw) {
   }
   state.activeMission = hydrateMission(raw.activeMission, state.completed);
   state.sorting = hydrateSorting(raw.sorting);
+  // Keep known picture IDs across rounds. Older saves can recover credit from
+  // their last valid board; never infer a solved picture from a concept alone.
+  state.sortedItems = unique([
+    ...validIds(raw.sortedItems, SORT_ITEMS.map(item => item.id)),
+    ...Object.keys(state.sorting?.answers || {})
+  ]);
   // A usable saved board supplies a safe next seed if the counter itself is damaged.
   state.sortRound = boundedRound(raw.sortRound) ? raw.sortRound : state.sorting ? (state.sorting.round + 1) % 1000001 : 0;
   if (state.sorting) state.discoveries = unique([...state.discoveries, ...Object.keys(state.sorting.answers).map(id => itemById(id).conceptId)]);

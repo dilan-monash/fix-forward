@@ -1275,5 +1275,75 @@ export const STORY_RECORDINGS = [
     "src": "/quest/audio/4b71f45a911dd94b.mp3",
     "seconds": 17.15,
     "voice": "af_heart"
+  },
+  {
+    "id": "4b52fab7811e5691",
+    "text": "Aha! You found the clue. Great detective!",
+    "src": "/quest/audio/4b52fab7811e5691.mp3",
+    "seconds": 3.1,
+    "voice": "af_heart"
+  },
+  {
+    "id": "d54295add29517e2",
+    "text": "You spotted it! That clue can help your choice.",
+    "src": "/quest/audio/d54295add29517e2.mp3",
+    "seconds": 2.93,
+    "voice": "af_heart"
+  },
+  {
+    "id": "cbf00f91e3ce07a1",
+    "text": "Hooray! You found its place. Great thinking!",
+    "src": "/quest/audio/cbf00f91e3ce07a1.mp3",
+    "seconds": 3.1,
+    "voice": "af_heart"
+  },
+  {
+    "id": "76ac6ed7c0efecb4",
+    "text": "You did it! You used the clue. Nicely done!",
+    "src": "/quest/audio/76ac6ed7c0efecb4.mp3",
+    "seconds": 2.98,
+    "voice": "af_heart"
+  },
+  {
+    "id": "248259af0d7dce17",
+    "text": "Hooray! You did it! What a great thinker!",
+    "src": "/quest/audio/248259af0d7dce17.mp3",
+    "seconds": 2.7,
+    "voice": "af_heart"
+  },
+  {
+    "id": "7dcef78c649caef1",
+    "text": "Amazing thinking! You helped the story find its ending!",
+    "src": "/quest/audio/7dcef78c649caef1.mp3",
+    "seconds": 3.58,
+    "voice": "af_heart"
+  },
+  {
+    "id": "c72a3c2461469848",
+    "text": "You found the clue that mattered! Great thinking!",
+    "src": "/quest/audio/c72a3c2461469848.mp3",
+    "seconds": 3,
+    "voice": "af_heart"
+  },
+  {
+    "id": "f73441402402442f",
+    "text": "Hooray! Sorting mission complete. Give yourself a cheer!",
+    "src": "/quest/audio/f73441402402442f.mp3",
+    "seconds": 3.58,
+    "voice": "af_heart"
+  },
+  {
+    "id": "95458fd2894d604a",
+    "text": "That plan fits the clues! You're ready for the next step.",
+    "src": "/quest/audio/95458fd2894d604a.mp3",
+    "seconds": 3.38,
+    "voice": "af_heart"
+  },
+  {
+    "id": "1b38092b6ffae318",
+    "text": "You did it again! Your clever thinking is getting stronger!",
+    "src": "/quest/audio/1b38092b6ffae318.mp3",
+    "seconds": 3.58,
+    "voice": "af_heart"
   }
 ];

@@ -68,6 +68,8 @@ test('earned sparks fly from the chosen answer to the HUD and release its displa
   const deadlines = [...timers.values()].sort((a, b) => a.delay - b.delay);
   fire(deadlines[0]);
   assert.equal(arrivals, 1, 'the fallback deadline does not duplicate native completion');
+  assert.ok(document.querySelector('.q-reward-fx__label'), 'the praise remains readable after the Sparks reach the score');
+  assert.ok(deadlines[1].delay - deadlines[0].delay >= 500, 'there is a reading moment after the score begins filling');
   fire(deadlines[1]);
   assert.equal(document.querySelector('.q-reward-fx'), null);
   assert.equal(timers.size, 0);
@@ -112,6 +114,7 @@ test('reduced motion gives static positive feedback and updates the HUD immediat
   assert.equal(document.querySelector('.q-reward-fx').dataset.reducedMotion, 'true');
   assert.equal(document.querySelectorAll('.q-reward-fx__star').length, 0);
   assert.equal(document.querySelector('.q-reward-fx__amount').textContent, '+5');
+  assert.ok([...timers.values()][0].delay >= 2000, 'Less movement gives the child time to read the same praise');
   fire([...timers.values()][0]);
   assert.equal(document.querySelector('.q-reward-fx'), null);
 });

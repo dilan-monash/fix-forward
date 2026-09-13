@@ -11,6 +11,7 @@ import { MISSIONS, SORT_ITEMS, CONCEPTS } from '../quest/content.js';
 import { createState, transition, sortingRound, sortingSummary, suggestedMission, hydrateState } from '../quest/engine.js';
 import { STORAGE_KEY, loadProgress, saveProgress, clearProgress } from '../quest/storage.js';
 import { hitTest, bindDrag } from '../quest/drag.js';
+import { progression } from '../quest/progression.js';
 
 // Dispatch a named action through production rules, keeping scenario steps readable.
 function apply(state, type, args = {}) { return transition(state, { type, ...args }); }
@@ -237,6 +238,8 @@ test('valid saves from the earlier selector keep their card order while corrupt 
 
 test('sorting retries preserve help; correct placements, repeated clicks and reload never double-count', () => {
   let state = apply(createState(), 'START_SORT');
+  const solved = [];
+  assert.deepEqual(state.sortedItems, []);
   assert.equal(apply(state, 'START_SORT'), state);
   for (let index = 0; index < 5; index += 1) {
     const item = SORT_ITEMS.find(candidate => candidate.id === state.sorting.itemIds[index]);
@@ -246,16 +249,25 @@ test('sorting retries preserve help; correct placements, repeated clicks and rel
       assert.equal(apply(state, 'HINT'), state);
     }
     if (index === 1) {
+      const priorPoints = progression(state).points;
       state = apply(state, 'ANSWER_SORT', { destinationId: ['ewaste', 'paper', 'ask'].find(id => id !== item.answer) });
+      assert.deepEqual(state.sortedItems, solved);
+      assert.equal(progression(state).points, priorPoints, 'A wrong placement changes feedback, not rewards');
       assert.equal(sortingSummary(state.sorting).total, 1);
       assert.equal(apply(state, 'NEXT_SORT'), state);
       state = hydrateState(JSON.parse(JSON.stringify(state)));
       assert.equal(state.sorting.feedback.correct, false);
       state = apply(state, 'RETRY_SORT');
     }
+    const previous = deepFreeze(state);
     state = apply(state, 'ANSWER_SORT', { destinationId: item.answer });
+    assert.deepEqual(previous.sortedItems, solved, 'Recording the next picture cannot mutate the prior state');
+    solved.push(item.id);
+    assert.deepEqual(state.sortedItems, solved);
+    assert.equal(progression(state).breakdown.sorting, solved.length * 5);
     assert.equal(apply(state, 'ANSWER_SORT', { destinationId: item.answer }), state);
     state = hydrateState(JSON.parse(JSON.stringify(state)));
+    assert.deepEqual(state.sortedItems, solved);
     assert.equal(state.sorting.status, 'feedback');
     state = apply(state, 'NEXT_SORT');
     assert.equal(apply(state, 'NEXT_SORT'), state);
@@ -264,11 +276,37 @@ test('sorting retries preserve help; correct placements, repeated clicks and rel
   assert.deepEqual(sortingSummary(state.sorting), { independent: 3, helped: 2, total: 5 });
   const restored = hydrateState(JSON.parse(JSON.stringify(state)));
   assert.deepEqual(restored.sorting, state.sorting);
+  assert.deepEqual(restored.sortedItems, solved);
   assert.equal(apply(state, 'ANSWER_SORT', { destinationId: 'ask' }), state);
   const newRun = apply(state, 'START_SORT');
   assert.equal(newRun.sorting.round, 1);
   assert.deepEqual(sortingSummary(newRun.sorting), { independent: 0, helped: 0, total: 0 });
   assert.notDeepEqual(newRun.sorting.itemIds, state.sorting.itemIds);
+  assert.deepEqual(newRun.sortedItems, solved, 'Starting a fresh board preserves earned picture history');
+});
+
+test('sorting save recovery filters unknown picture IDs and recovers only answers from a valid board', () => {
+  const first = SORT_ITEMS[0].id;
+  const second = SORT_ITEMS[1].id;
+  const raw = { ...createState(), sortedItems: [first, first, second, 'PRIVATE CHILD TEXT', null, 4, { id: first }] };
+  assert.deepEqual(hydrateState(raw).sortedItems, [first, second]);
+  for (const sortedItems of [null, {}, 'PRIVATE CHILD TEXT']) assert.deepEqual(hydrateState({ ...raw, sortedItems }).sortedItems, []);
+  const storage = memoryStorage();
+  assert.equal(saveProgress(raw, storage), true);
+  assert.equal(storage.getItem(STORAGE_KEY).includes('PRIVATE'), false);
+  assert.deepEqual(loadProgress(storage).state.sortedItems, [first, second]);
+
+  // Version-one boards did not save a lifetime picture list. Recover only answers
+  // accepted by the board validator, excluding later cards and arbitrary text.
+  const older = apply(createState(), 'START_SORT');
+  delete older.sortedItems;
+  const [current, future] = older.sorting.itemIds;
+  older.sorting.answers = { [current]: { assisted: false }, [future]: { assisted: false }, 'PRIVATE CHILD TEXT': { assisted: false } };
+  assert.deepEqual(hydrateState(older).sortedItems, [current]);
+  older.sorting.itemIds[4] = 'unreviewed-picture';
+  const discarded = hydrateState(older);
+  assert.equal(discarded.sorting, null);
+  assert.deepEqual(discarded.sortedItems, [], 'A corrupt board cannot create recovered picture rewards');
 });
 
 test('storage rejects obsolete/malformed data and whitelists authored IDs with no arbitrary personal text', () => {
@@ -281,7 +319,7 @@ test('storage rejects obsolete/malformed data and whitelists authored IDs with n
   const raw = {
     ...completed(MISSIONS[0]), name: 'PRIVATE CHILD TEXT', email: 'private@example.test',
     settings: { mode: 'PRIVATE CHILD TEXT', narration: 'yes', motion: 'always' },
-    discoveries: ['PRIVATE CHILD TEXT'], practice: ['PRIVATE CHILD TEXT'],
+    discoveries: ['PRIVATE CHILD TEXT'], practice: ['PRIVATE CHILD TEXT'], sortedItems: ['PRIVATE CHILD TEXT'],
     decorations: { home: 'PRIVATE CHILD TEXT', studio: 'unknown', station: null },
     completed: { [MISSIONS[0].id]: { assisted: false, notes: 'PRIVATE CHILD TEXT' }, 'PRIVATE CHILD TEXT': { assisted: false } }
   };

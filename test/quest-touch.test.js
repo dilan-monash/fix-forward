@@ -17,11 +17,12 @@ import { progression } from '../quest/progression.js';
 // Return touch controls, observable callbacks and a real sorting state; teardown
 // always disposes listeners/window even when a scenario fails partway through.
 function touchFixture(t) {
-  const dom = new JSDOM(`<!doctype html><main id="surround"><article id="picture"><span id="picture-name">Collection picture</span><button id="handle" style="touch-action:manipulation">Pick up</button></article><section id="places"><button data-place="ewaste">E-waste collection</button><button data-place="paper">Paper and cardboard</button><button data-place="ask">Ask a grown-up</button></section></main>`, { pretendToBeVisual: true });
+  const dom = new JSDOM(`<!doctype html><main id="surround"><article id="picture"><button id="handle" style="touch-action:manipulation"><svg id="artwork" viewBox="0 0 100 100" tabindex="0"><title>Jug picture</title><a id="art-link" href="#artwork" tabindex="0"><path id="jug-shape" d="M20 20h50v60H20Z"/></a></svg><span id="move-label">Pick up</span></button><div id="picture-copy"><h2>Collection picture</h2><p>Read this clue before choosing a place.</p></div></article><section id="places"><button data-place="ewaste">E-waste collection</button><button data-place="paper">Paper and cardboard</button><button data-place="ask">Ask for help</button></section></main>`, { pretendToBeVisual: true });
   const { window } = dom;
   const { document } = window;
   const handle = document.getElementById('handle');
   const picture = document.getElementById('picture');
+  const artwork = document.getElementById('artwork');
   const surround = document.getElementById('surround');
   const captures = new Set();
   const released = [];
@@ -34,6 +35,7 @@ function touchFixture(t) {
   const positions = { ewaste: [40, 300, 280, 90], paper: [40, 410, 280, 90], ask: [40, 520, 280, 90] };
   picture.getBoundingClientRect = () => new window.DOMRect(40 - scroll.x, 90 - scroll.y, 280, 130);
   handle.getBoundingClientRect = () => new window.DOMRect(180 - scroll.x, 155 - scroll.y, 120, 50);
+  artwork.getBoundingClientRect = () => new window.DOMRect(185 - scroll.x, 156 - scroll.y, 90, 45);
   const targets = [...document.querySelectorAll('[data-place]')].map(element => {
     const id = element.dataset.place;
     element.getBoundingClientRect = () => {
@@ -68,7 +70,7 @@ function touchFixture(t) {
     }
   };
   const cleanup = bindDrag(handle, {
-    ghostSource: picture, targets: () => targets,
+    ghostSource: () => artwork, targets: () => targets,
     onDrop: id => { drops.push(id); state = transition(state, { type: 'ANSWER_SORT', destinationId: id }); },
     onCancel: reason => cancellations.push(reason)
   });
@@ -86,8 +88,98 @@ function touchFixture(t) {
   const lift = () => { pointer(handle, 'pointerdown'); pointer(document, 'pointermove', correctPoint()); };
   // Model the extra click browsers send after a touch; a completed drag must suppress it.
   const touchClick = () => handle.dispatchEvent(new window.PointerEvent('click', { bubbles: true, cancelable: true, pointerType: 'touch', pointerId: 11, isPrimary: true, detail: 1 }));
-  return { window, document, handle, picture, surround, targets, pointer, cleanup, captures, released, drops, cancellations, item, center, correctPoint, lift, touchClick, state: () => state, taps: () => taps, scrollTo: (x, y) => { scroll = { x, y }; } };
+  return { window, document, handle, picture, artwork, surround, targets, pointer, cleanup, captures, released, drops, cancellations, item, center, correctPoint, lift, touchClick, state: () => state, taps: () => taps, scrollTo: (x, y) => { scroll = { x, y }; } };
 }
+
+test('a finger lifts only product artwork while the clue and move label remain in their original card', t => {
+  const q = touchFixture(t);
+  const copy = q.document.getElementById('picture-copy');
+  const originalCopy = copy.outerHTML;
+  q.lift();
+  const ghost = q.document.querySelector('.q-drag-ghost');
+  assert.equal(ghost.tagName.toLowerCase(), 'svg');
+  assert.ok(ghost.querySelector('path'));
+  assert.equal(ghost.textContent, 'Jug picture');
+  assert.equal(ghost.querySelector('button, h2, p'), null);
+  assert.equal(ghost.style.width, '90px');
+  assert.equal(ghost.style.height, '45px');
+  assert.equal(copy.outerHTML, originalCopy, 'The instructions remain readable and unmoved');
+  assert.equal(q.document.querySelectorAll('#move-label').length, 1);
+  assert.equal(q.artwork.classList.contains('q-drag-source'), true);
+  assert.equal(q.picture.classList.contains('q-drag-source'), false);
+  assert.equal(q.picture.style.transform, '');
+  assert.ok(q.captures.has(11), 'The large touch button retains pointer ownership');
+  q.pointer(q.document, 'pointerup', q.correctPoint());
+  assert.equal(q.artwork.classList.contains('q-drag-source'), false);
+  assert.equal(q.state().sorting.feedback.correct, true);
+});
+
+test('an artwork ghost has no copied IDs or keyboard stops and never alters the source artwork', t => {
+  const q = touchFixture(t);
+  q.lift();
+  const ghost = q.document.querySelector('.q-drag-ghost');
+  assert.equal(ghost.id, '');
+  assert.equal(ghost.querySelector('[id]'), null);
+  assert.equal(ghost.getAttribute('aria-hidden'), 'true');
+  assert.equal(ghost.hasAttribute('inert'), true);
+  assert.equal(ghost.getAttribute('focusable'), 'false');
+  assert.equal(ghost.getAttribute('tabindex'), '-1');
+  assert.equal(ghost.querySelector('a').getAttribute('tabindex'), '-1');
+  assert.equal(q.artwork.getAttribute('tabindex'), '0');
+  assert.equal(q.document.getElementById('art-link').getAttribute('tabindex'), '0');
+  q.cleanup();
+  assert.equal(q.artwork.classList.contains('q-drag-source'), false);
+});
+
+// jsdom has no layout engine: combine the actual ghost styles to locate its
+// painted centre, then compare it with the finger and the board's drop position.
+function ghostCenter(ghost) {
+  const [, x, y] = ghost.style.transform.match(/translate\((-?[\d.]+)px, (-?[\d.]+)px\)/);
+  return { x: parseFloat(ghost.style.left) + Number(x) + parseFloat(ghost.style.width) / 2,
+    y: parseFloat(ghost.style.top) + Number(y) + parseFloat(ghost.style.height) / 2 };
+}
+
+test('dragging the separate Move handle places the artwork under the finger and over its highlighted destination', t => {
+  const q = touchFixture(t);
+  const destination = q.correctPoint();
+  // This point is inside the Move handle but outside the picture's right edge.
+  q.pointer(q.handle, 'pointerdown', { x: 295, y: 180 });
+  q.pointer(q.document, 'pointermove', destination);
+  const ghost = q.document.querySelector('.q-drag-ghost');
+  assert.deepEqual(ghostCenter(ghost), destination, 'The picture visibly reaches the same destination that receives the drop');
+  assert.equal(q.picture.style.transform, '', 'The instruction card stays in place');
+  q.pointer(q.document, 'pointerup', destination);
+  assert.deepEqual(q.drops, [q.item.answer]);
+  assert.equal(q.document.querySelector('.q-drag-ghost'), null);
+});
+
+test('a direct picture drag keeps the grabbed point instead of jumping its centre to the finger', t => {
+  const q = touchFixture(t);
+  const start = { x: 200, y: 170 };
+  const destination = q.correctPoint();
+  const bounds = q.artwork.getBoundingClientRect();
+  const grip = { x: bounds.left + bounds.width / 2 - start.x, y: bounds.top + bounds.height / 2 - start.y };
+  q.pointer(q.handle, 'pointerdown', start);
+  q.pointer(q.document, 'pointermove', destination);
+  assert.deepEqual(ghostCenter(q.document.querySelector('.q-drag-ghost')), { x: destination.x + grip.x, y: destination.y + grip.y });
+  q.pointer(q.document, 'pointerup', destination);
+  assert.deepEqual(q.drops, [q.item.answer]);
+});
+
+test('a product dropped at the wrong place returns its artwork and records feedback without Sparks', t => {
+  const q = touchFixture(t);
+  const wrong = q.targets.find(target => target.id !== q.item.answer);
+  const copy = q.document.getElementById('picture-copy').outerHTML;
+  q.lift();
+  q.pointer(q.document, 'pointerup', q.center(wrong.id));
+  assert.deepEqual(q.drops, [wrong.id]);
+  assert.equal(q.state().sorting.feedback.correct, false);
+  assert.equal(progression(q.state()).points, 0);
+  assert.equal(q.document.querySelector('.q-drag-ghost'), null);
+  assert.equal(q.artwork.isConnected, true);
+  assert.equal(q.artwork.classList.contains('q-drag-source'), false);
+  assert.equal(q.document.getElementById('picture-copy').outerHTML, copy);
+});
 
 test('only a primary finger starts a drag; a second finger cannot steal, finish or cancel it', t => {
   const q = touchFixture(t);
@@ -112,7 +204,7 @@ test('only a primary finger starts a drag; a second finger cannot steal, finish 
   q.pointer(q.document, 'pointerup', q.correctPoint());
   assert.deepEqual(q.drops, [q.item.answer]);
   assert.equal(q.state().sorting.feedback.correct, true);
-  assert.equal(progression(q.state()).points, 5);
+  assert.equal(progression(q.state()).points, 10);
   assert.deepEqual(q.released, [11]);
 });
 
@@ -139,7 +231,7 @@ test('small finger movement remains a tap and every destination retains its tap 
   assert.equal(progression(q.state()).points, 0);
   q.targets.find(target => target.id === q.item.answer).element.click();
   assert.equal(q.state().sorting.feedback.correct, true);
-  assert.equal(progression(q.state()).points, 5);
+  assert.equal(progression(q.state()).points, 10);
 });
 
 test('a completed touch drag does not also activate its synthetic click or award twice', t => {
@@ -151,7 +243,7 @@ test('a completed touch drag does not also activate its synthetic click or award
   q.pointer(q.document, 'pointerup', q.correctPoint());
   assert.deepEqual(q.drops, [q.item.answer]);
   assert.equal(Object.keys(q.state().sorting.answers).length, 1);
-  assert.equal(progression(q.state()).points, 5);
+  assert.equal(progression(q.state()).points, 10);
   q.handle.dispatchEvent(new q.window.MouseEvent('click', { bubbles: true, detail: 0 }));
   assert.equal(q.taps(), 1, 'Keyboard activation remains available after a pointer drop');
 });
@@ -169,6 +261,7 @@ test('a touch released off-target returns to the original card without recording
   assert.equal(q.document.querySelector('.q-drag-ghost'), null);
   assert.equal(q.picture.isConnected, true);
   assert.equal(q.handle.classList.contains('q-dragging'), false);
+  assert.equal(q.artwork.classList.contains('q-drag-source'), false);
   assert.equal(q.captures.size, 0);
 });
 
@@ -183,7 +276,7 @@ test('touch placement uses scrolled viewport rectangles rather than page coordin
   q.pointer(q.document, 'pointerup', point);
   assert.deepEqual(q.drops, [q.item.answer]);
   assert.equal(q.state().sorting.feedback.correct, true);
-  assert.equal(progression(q.state()).points, 5);
+  assert.equal(progression(q.state()).points, 10);
 });
 
 test('touch cancellation, lost capture and resize clean up without points and allow the next gesture', async t => {
@@ -204,7 +297,7 @@ test('touch cancellation, lost capture and resize clean up without points and al
       q.lift();
       q.pointer(q.document, 'pointerup', q.correctPoint());
       assert.equal(q.state().sorting.feedback.correct, true);
-      assert.equal(progression(q.state()).points, 5);
+      assert.equal(progression(q.state()).points, 10);
     });
   }
 });

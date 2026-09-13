@@ -3,7 +3,7 @@
  * only describe authored rules and earned progress; they never award Sparks,
  * change an attempt, or decide that a real appliance is safe to handle.
  */
-import { MISSIONS, CONCEPTS } from './content.js';
+import { MISSIONS, CONCEPTS, SORT_ITEMS } from './content.js';
 import { progression } from './progression.js';
 
 // Reject arrays and missing values before reading a plan or saved progress map.
@@ -122,7 +122,9 @@ export function celebrationCopy({ kind = 'mission', missionId = '', conceptId = 
   const message = IDEA_LINES[idea] || (kind === 'round' ? 'You used each card\'s clues to choose its next step.' : 'You used the clues to choose what happens next.');
   const pointsLine = earned
     ? `+${earned} ${earned === 1 ? 'Spark' : 'Sparks'} added!`
-    : replay ? 'Story replayed! You keep your Sparks. No extra Sparks this time.' : 'You keep your Sparks. This idea is already in your book.';
+    : kind === 'sorting' ? 'Great practice! Your round count went up. You earned this picture’s Sparks already.'
+      : kind === 'round' ? 'Five pictures sorted! Your earned Sparks are in the top bar.'
+        : replay ? 'Story replayed! You keep your Sparks. No extra Sparks this time.' : 'You keep your Sparks. This idea is already in your book.';
   return { headline, message, pointsLine };
 }
 
@@ -132,11 +134,24 @@ export function celebrationCopy({ kind = 'mission', missionId = '', conceptId = 
  * picture reflection earns 10. Existing ideas and completed replays are free
  * to enjoy again, but their previously earned points are never promised twice.
  */
-export function rewardPreview(state = {}, { missionId, conceptId } = {}) {
+export function rewardPreview(state = {}, { missionId, conceptId, sortItemId } = {}) {
   const before = progression(state);
   const mission = MISSIONS.find(item => item.id === missionId);
   const discoveries = Array.isArray(state?.discoveries) ? state.discoveries : [];
   if (!mission) {
+    // Sorting uses the authored picture's idea, not a caller-supplied shortcut.
+    // Preview exactly what ANSWER_SORT will record: picture credit plus any new idea.
+    const picture = SORT_ITEMS.find(item => item.id === sortItemId);
+    if (picture) {
+      const after = progression({ ...state, sortedItems: [...(state.sortedItems || []), picture.id], discoveries: [...discoveries, picture.conceptId] });
+      const points = after.points - before.points;
+      const sortingPoints = after.breakdown.sorting - before.breakdown.sorting;
+      const discoveryPoints = after.breakdown.discoveries - before.breakdown.discoveries;
+      return { missionPoints: 0, sortingPoints, discoveryPoints, reflectionPoints: 0, completionPoints: points, totalPoints: points, replay: points === 0,
+        label: points ? `Solve this picture: +${points} Sparks` : 'Practice picture: grow your round count',
+        detail: points ? `${sortingPoints ? '5 for this new picture. ' : ''}${discoveryPoints ? '5 more for a new idea.' : ''}`.trim()
+          : 'You earned this picture’s Sparks already. It still counts toward your five-picture round.' };
+    }
     const known = CONCEPTS.some(concept => concept.id === conceptId);
     const after = known ? progression({ ...state, discoveries: [...discoveries, conceptId] }) : before;
     const points = after.points - before.points;

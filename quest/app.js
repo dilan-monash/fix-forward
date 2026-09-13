@@ -18,6 +18,7 @@ import { createGameSounds } from './sounds.js';
 import { sceneClues, pictureHelp as renderPictureHelp, sortingPictureHelp } from './picture-help.js';
 import { planFeedback, celebrationCopy, rewardPreview } from './feedback.js';
 import { STORY_LINES } from './story-audio.js';
+import { createRewardVoice } from './reward-voice.js';
 
 // Stable elements come from quest/index.html. The main render replaces #quest-app
 // contents; modal() updates the separate dialog body.
@@ -67,6 +68,9 @@ let touchRings = new Set();
 const narration = createNarration({ synth: window.speechSynthesis, Utterance: window.SpeechSynthesisUtterance, Audio: window.Audio, onChange: updateAudio });
 const sounds = createGameSounds({ AudioContext: window.AudioContext || window.webkitAudioContext, enabled: state.settings.sound, onChange: updateSound });
 const rewardFx = createRewardFx({ document, reducedMotion: () => reduced() });
+// Short recorded cheers share the story player's Pause/Stop and mute settings.
+// If recorded media is unavailable, keep ordinary reading controls as the fallback.
+const rewardVoice = createRewardVoice({ speak: speakText, isEnabled: () => Boolean(window.Audio) && (state.settings.sound || state.settings.narration) });
 // Treat inserted text as text, not executable HTML. attr uses the same escaping for attributes.
 const escape = (text) => String(text ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');
 const attr = escape;
@@ -104,6 +108,16 @@ function toggleSound() {
   });
   hud.querySelector('[data-game-sound]')?.focus({ preventScroll: true });
 }
+// One visible control pauses decorative motion or explicitly turns it back on.
+// A fresh save still follows the device preference; choosing On is an opt-in.
+function toggleMotion(forceOn = false) {
+  // The home invitation always means On, even if the device preference changed
+  // while it was visible. Ordinary HUD clicks toggle the current effective state.
+  const enabled = forceOn === true || reduced();
+  dispatch({ type: 'SET_SETTING', key: 'motion', value: enabled ? 'full' : 'reduce' }, { focusTarget: null, speak: false });
+  announce(enabled ? 'Game animations on. Pip and Flo are ready!' : 'Animations paused. Your game and Sparks stay the same.');
+  hud.querySelector('[data-game-motion]')?.focus({ preventScroll: true });
+}
 // Cancel decoration-only work on a new screen. Engine progress has already been
 // saved, so interrupting a flying star cannot lose or duplicate its reward.
 function clearGameEffects() {
@@ -137,6 +151,7 @@ function updateHud(progress = progression(state)) {
   hud.querySelector('[data-hear]')?.addEventListener('click', readScene);
   hud.querySelector('[data-game-sound]')?.addEventListener('click', toggleSound);
   hud.querySelector('[data-game-settings]')?.addEventListener('click', settings);
+  hud.querySelector('[data-game-motion]')?.addEventListener('click', toggleMotion);
   updateSound();
   measureChrome();
 }
@@ -256,7 +271,7 @@ function restoreRoute(route, { moveFocus = true } = {}) {
   selectedAction = null; selectedDecoration = null; openClueList = false;
   reflectionHint = null; lastReward = null; celebration = false; storyBefore = false; pictureView = null; sortPicked = false; checkedPlan = null;
   state = hydrateState({ ...state, view: target.view, activeMission: target.activeMission || state.activeMission, sorting: target.sorting || state.sorting });
-  render();
+  render('q-play-enter');
   // Canonicalize this same entry after reset or validation. Otherwise reloading
   // an old entry could re-adopt its obsolete reset epoch and story snapshot.
   rememberRoute(true);
@@ -276,7 +291,7 @@ function focus(selector = '[data-focus]') {
 function dispatch(action, { focusTarget = '[data-focus]', speak = true } = {}) {
   const previousProgress = progression(state);
   // Capture geometry before render replaces the chosen picture or button.
-  const source = action.type === 'ANSWER_SORT' ? app.querySelector('.q-sort-object') : document.activeElement;
+  const source = action.type === 'ANSWER_SORT' ? app.querySelector('.q-sort-picture > svg') : document.activeElement;
   const rewardOrigin = source?.getBoundingClientRect?.();
   const next = transition(state, action);
   if (next === state) return false;
@@ -297,6 +312,7 @@ function dispatch(action, { focusTarget = '[data-focus]', speak = true } = {}) {
   // Steps create Back destinations; selections and help update the current step instead.
   rememberRoute(['ANSWER_SORT', 'RETRY_SORT', 'NEXT_SORT'].includes(action.type) || !newScene);
   if (focusTarget) focus(focusTarget);
+  let cheerSpoken = false;
   if (celebration) {
     const amount = nextProgress.points - previousProgress.points;
     const levelUp = nextProgress.level > previousProgress.level;
@@ -308,12 +324,16 @@ function dispatch(action, { focusTarget = '[data-focus]', speak = true } = {}) {
       onArrive: () => { collectSparks(previousProgress, nextProgress); if (!audioRequested) sounds.play(levelUp ? 'level' : 'tap'); } });
     if (!state.settings.narration) sounds.play('win');
     announce(`${joy.headline} ${joy.pointsLine} ${nextProgress.points} Sparks in your score bar.`);
+    // The short cheer owns this moment. Automatic full-screen narration must
+    // not immediately interrupt it; Hear it remains available for the story.
+    cheerSpoken = rewardVoice.play({ kind, replay: amount === 0 && kind !== 'round', seed: `${card?.id || next.activeMission?.id}:${next.sorting?.round || 0}` });
   } else if (action.type === 'CHECK_PLAN' || action.type === 'ANSWER_SORT') {
     const correct = action.type === 'CHECK_PLAN' ? next.activeMission?.feedback?.correct : next.sorting?.feedback?.correct;
     showGameFeedback(Boolean(correct), correct ? 'Your plan works!' : 'Not yet. Try again!');
     if (!state.settings.narration) sounds.play(correct ? 'win' : 'retry');
+    if (correct && action.type === 'CHECK_PLAN') cheerSpoken = rewardVoice.play({ kind: 'plan', seed: next.activeMission?.id });
   }
-  if (speak && state.settings.narration) readScene();
+  if (speak && state.settings.narration && !cheerSpoken) readScene();
   return true;
 }
 // Change the persistent top-level view and clear temporary panels/selections.
@@ -384,7 +404,16 @@ function listenButton(text = 'Hear it', extra = '') {
 }
 // Build the level badge and progress meter from derived rewards, not a stored score.
 function renderHud(progress = progression(state)) {
-  return `<div class="q-player-strip" aria-label="Your Quest progress"><button class="q-level-chip" data-level-info aria-label="Level ${progress.level}: ${escape(progress.title)}. ${progress.points} Sparks. See rewards."><span>${levelBadge(progress.level)}</span><span><small>LEVEL ${progress.level}</small><strong>${escape(progress.title)}</strong></span></button><div class="q-spark-meter"><div><b data-spark-target><span aria-hidden="true">✦</span> <span data-spark-value>${progress.points}</span> <span>Sparks</span></b><small>${progress.nextThreshold ? `${progress.pointsRemaining} to Level ${progress.level+1}` : 'All four level badges earned'}</small></div><div class="q-spark-track" role="progressbar" aria-label="Progress to your next level" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(progress.percent)}"><span data-spark-bar style="width:${progress.percent}%"></span></div></div><div class="q-hud-tools"><button class="q-game-sound" data-game-sound aria-pressed="${state.settings.sound}"><span aria-hidden="true">♫</span><span data-sound-label>${state.settings.sound ? 'Sound on' : 'Sound off'}</span></button><button class="q-hud-listen" data-hear aria-label="Read this screen aloud"><span aria-hidden="true">${soundIcon}</span><span>Hear it</span></button><button class="q-game-settings" data-game-settings aria-label="Game settings" title="Game settings"><span aria-hidden="true">⚙</span></button></div></div>`;
+  return `<div class="q-player-strip" aria-label="Your Quest progress"><button class="q-level-chip" data-level-info aria-label="Level ${progress.level}: ${escape(progress.title)}. ${progress.points} Sparks. See rewards."><span>${levelBadge(progress.level)}</span><span><small>LEVEL ${progress.level}</small><strong>${escape(progress.title)}</strong></span></button><div class="q-spark-meter"><div><b data-spark-target><span aria-hidden="true">✦</span> <span data-spark-value>${progress.points}</span> <span>Sparks</span></b><small>${progress.nextThreshold ? `${progress.pointsRemaining} to Level ${progress.level+1}` : 'All four level badges earned'}</small></div><div class="q-spark-track" role="progressbar" aria-label="Progress to your next level" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(progress.percent)}"><span data-spark-bar style="width:${progress.percent}%"></span></div></div><div class="q-hud-tools"><button class="q-game-sound" data-game-sound aria-pressed="${state.settings.sound}"><span aria-hidden="true">♫</span><span data-sound-label>${state.settings.sound ? 'Sound on' : 'Sound off'}</span></button><button class="q-motion-control" data-game-motion aria-pressed="${!reduced()}"><span aria-hidden="true">✦</span><span>Animations ${reduced() ? 'off' : 'on'}</span></button><button class="q-hud-listen" data-hear aria-label="Read this screen aloud"><span aria-hidden="true">${soundIcon}</span><span>Hear it</span></button><button class="q-game-settings" data-game-settings aria-label="Game settings" title="Game settings"><span aria-hidden="true">⚙</span></button></div></div>${renderActivityProgress()}`;
+}
+// Keep the current goal next to the score, even when a child scrolls to a picture.
+// Replaying always advances this round, while each different picture earns Sparks once.
+function renderActivityProgress() {
+  const stamps = `${Object.keys(state.completed).length} / ${MISSIONS.length} story stamps`;
+  if (state.view === 'sorting' && state.sorting) return `<div class="q-round-hud" role="status"><strong>${Object.keys(state.sorting.answers).length} / 5 sorted</strong><span>${state.sortedItems.length} / ${SORT_ITEMS.length} different pictures</span></div>`;
+  const item = mission();
+  if (state.view === 'mission' && item && !picker && state.activeMission.step === 'explore') return `<div class="q-round-hud" role="status"><strong>${state.activeMission.clueIds.length} / ${item.clues.length} clues found</strong><span>${stamps}</span></div>`;
+  return `<div class="q-round-hud" role="status"><strong>${stamps}</strong><span>Every story is open. Pick your next adventure!</span></div>`;
 }
 // Show only the most recent increase in Sparks; no increase means no reward banner.
 function renderCelebration() {
@@ -398,7 +427,7 @@ function renderReward() {
 // Explain the four badges and repeat-safe reward rules in a read-only panel.
 function levelInfo() {
   const progress = progression(state);
-  modal('Your Spark adventure', `<p>Collect Sparks as you learn. Every level brings a new badge.</p><div class="q-level-trail">${LEVELS.map(level => `<div class="${progress.level >= level.level ? 'earned' : ''}">${levelBadge(level.level)}<strong>Level ${level.level}</strong><span>${escape(level.title)}</span></div>`).join('')}</div><ul class="q-spark-rules"><li>Finish a new story: <strong>20 Sparks</strong></li><li>Find a new idea: <strong>5 Sparks</strong></li><li>Answer a story’s picture question: <strong>10 Sparks</strong></li></ul><p>Hints are free. Trying again is free. You keep your Sparks.</p><p class="q-small-note">Each discovery earns Sparks once. You can play every story at any level.</p>${button('Let’s play', 'data-close-clue')}`);
+  modal('Your Spark adventure', `<p>Collect Sparks as you learn. Every level brings a new badge.</p><div class="q-level-trail">${LEVELS.map(level => `<div class="${progress.level >= level.level ? 'earned' : ''}">${levelBadge(level.level)}<strong>Level ${level.level}</strong><span>${escape(level.title)}</span></div>`).join('')}</div><ul class="q-spark-rules"><li>Finish a new story: <strong>20 Sparks</strong></li><li>Sort a different picture: <strong>5 Sparks</strong></li><li>Find a new idea: <strong>5 Sparks</strong></li><li>Answer a story’s picture question: <strong>10 Sparks</strong></li></ul><p>Hints are free. Trying again is free. You keep your Sparks.</p><p class="q-small-note">Each picture and discovery earns Sparks once. Repeat pictures still fill your round. You can play every story at any level.</p>${button('Let’s play', 'data-close-clue')}`);
   dialogBody.querySelector('[data-close-clue]').onclick = closeDialog;
 }
 // Provide a small vocabulary panel with its own read-aloud and close controls.
@@ -428,7 +457,7 @@ function renderHome() {
   return `<section class="q-home q-adventure-cover">
     <div class="q-home-intro" data-read><p class="q-eyebrow"><span aria-hidden="true">✦</span> Small choices. Big adventures.</p><h1 tabindex="-1" data-focus>You choose <em>what happens next.</em></h1><p class="q-hero-invitation">Meet Pip the toaster and Flo the fan.<br>Look at pictures. Choose a plan. See your story change.</p>
       <div class="q-start-actions">${state.activeMission && state.activeMission.step !== 'outcome' ? button('Continue your adventure <span aria-hidden="true">→</span>', 'data-continue') : button(`${done ? 'Continue your adventure' : 'Start a mission'} <span aria-hidden="true">→</span>`, 'data-picker')}${state.activeMission ? button('Choose a different mission', 'data-picker', 'quiet') : ''}${state.sorting && state.sorting.status !== 'complete' ? button('Continue sorting', 'data-nav="sorting"', 'secondary') : ''}</div>
-      ${!state.settings.sound ? '<button class="q-sound-invite" data-enable-game-sound><span aria-hidden="true">♫</span> Turn on game sounds <small>Little chimes as you play</small></button>' : ''}<p class="q-boundary">Your adventure stays on screen. Real appliances need adult help.</p>
+      ${!state.settings.sound ? '<button class="q-sound-invite" data-enable-game-sound><span aria-hidden="true">♫</span> Turn on game sounds <small>Cheers and little chimes as you play</small></button>' : ''}${state.settings.motion === 'auto' && reduced() ? '<button class="q-motion-invite" data-enable-game-motion><span aria-hidden="true">✦</span> Make Pip and Flo move <small>Turn on game animations</small></button>' : ''}<p class="q-boundary">Your adventure stays on screen. Real appliances need adult help.</p>
     </div>
     <div class="q-play-doors" aria-label="Choose a game"><button data-picker><span>${artwork('flo')}</span><div><small>LOOK · CHOOSE · DISCOVER</small><strong>Story quests</strong><p>Help a friend. Earn a stamp.</p></div><b aria-hidden="true">→</b></button><button data-sort-start><span>${artwork('cardboard')}</span><div><small>TAP · MOVE · MATCH</small><strong>Sorting game</strong><p>Find a home for each picture.</p></div><b aria-hidden="true">→</b></button><button data-nav="creations"><span>${artwork('flowers')}</span><div><small>COLLECT · MAKE · KEEP</small><strong>My creations</strong><p>Make your world look like you.</p></div><b aria-hidden="true">→</b></button></div>
     <div class="q-world-wrap"><div class="q-world" aria-label="Three places on the adventure map">${neighborhood({ unlocked: state.discoveries, decorations: state.decorations })}${placeButtons()}<span class="q-world-caption">Pick a place. Find its story.</span></div><div class="q-world-greetings"><div class="q-greeting-friends">${['pip','flo'].map(id => `<button data-greet="${id}" aria-label="Say hello to ${id === 'pip' ? 'Pip' : 'Flo'}">${artwork(id)}<span>${id === 'pip' ? 'Pip' : 'Flo'}</span></button>`).join('')}</div><p class="q-world-dialogue" role="status">Pip the toaster. Flo the fan.<br>Tap a friend to say hello!</p></div></div>
@@ -564,11 +593,13 @@ function renderSorting() {
   if (run.status === 'complete') {
     const answers = Object.values(run.answers);
     const independent = answers.filter(answer => !answer.assisted).length;
-    return `<section class="q-page q-sort-finish"><p class="q-eyebrow">Sorting Station</p><h1 data-focus tabindex="-1">Five thoughtful choices.</h1>${renderCelebration()}<div class="q-finish-art">${neighborhood({ unlocked: state.discoveries, decorations: state.decorations })}</div><p>You found a next step for five pictures. Nice thinking!</p><div class="q-run-reflection"><span><b>${independent}</b> on your own</span><span><b>${answers.length - independent}</b> with a clue</span></div><p>Clues are for everyone. Which one helped you?</p><div class="q-step-actions">${button('Try another five cards →', 'data-sort-start')}${button('My Discovery Book', 'data-nav="book"', 'secondary')}${button('Finish for now', 'data-nav="home"', 'quiet')}</div></section>`;
+    // Offer an unfinished chapter after the round without locking any other story.
+    const nextStory = MISSIONS.find(story => !Object.hasOwn(state.completed, story.id));
+    return `<section class="q-page q-sort-finish"><p class="q-eyebrow">Sorting Station</p><h1 data-focus tabindex="-1">Five thoughtful choices.</h1>${renderCelebration()}<div class="q-finish-art">${neighborhood({ unlocked: state.discoveries, decorations: state.decorations })}</div><p>You found a next step for five pictures. Nice thinking!</p><div class="q-run-reflection"><span><b>${independent}</b> on your own</span><span><b>${answers.length - independent}</b> with a clue</span></div><p>Clues are for everyone. Which one helped you?</p>${nextStory ? `<p>Your next adventure: <strong>${escape(nextStory.title)}</strong></p>` : '<p>All eight story stamps are yours. What a journey!</p>'}<div class="q-step-actions">${nextStory ? button('Try a story mission →', `data-mission="${attr(nextStory.id)}"`) : ''}${button('Try another five cards →', 'data-sort-start', 'secondary')}${button('My Discovery Book', 'data-nav="book"', 'secondary')}${button('Finish for now', 'data-nav="home"', 'quiet')}</div></section>`;
   }
   if (!item) return renderHome();
   const feedback = run.status === 'feedback'; const correct = feedback && run.feedback?.correct;
-  const preview = rewardPreview(state, { conceptId: item.conceptId });
+  const preview = rewardPreview(state, { sortItemId: item.id });
   const joy = celebrationCopy({ kind: 'sorting', conceptId: item.conceptId, points: lastReward?.amount || 0, seed: item.id });
   return `<section class="q-page q-sort"><div class="q-mission-top"><button class="q-back" data-nav="home">← Adventure map</button><span>Picture ${run.index + 1} of 5</span><span class="q-sort-ticket" aria-label="Untimed picture challenge">Think it through ✦</span></div><div class="q-sort-heading"><p class="q-eyebrow">Sorting Station</p><h1 data-focus tabindex="-1">Where does this picture go?</h1><p class="q-sort-rule">These pictures are ready for collection. <strong>A warning or a missing clue? Pause and ask.</strong></p></div>
     <div class="q-sort-board"><div class="q-sort-round-track" aria-label="Picture ${run.index + 1} of 5">${Array.from({length:5}, (_,i) => `<span class="${i < run.index || (i === run.index && correct) ? 'done' : i === run.index ? 'current' : ''}">${i < run.index || (i === run.index && correct) ? '✓' : i+1}</span>`).join('')}</div><article class="q-sort-object ${correct ? 'placed' : ''} ${sortPicked ? 'q-picked-object' : ''}" data-read><button class="q-sort-art q-sort-picture" data-sort-picture aria-label="Move ${attr(item.title)} picture" aria-pressed="${sortPicked}" ${feedback ? 'disabled' : ''}>${artwork(item.artworkId)}<span class="q-card-number">${run.index + 1}/5</span></button><div class="q-sort-object-copy"><h2>${escape(item.title)}</h2><p>${escape(item.condition)}</p>${!feedback ? `<p class="q-sort-point-note">✦ ${escape(preview.label)}</p>` : ''}${!feedback ? `<button class="q-drag-handle q-lift" data-sort-drag aria-label="Pick up ${attr(item.title)}"><span aria-hidden="true">⠿</span> Move</button>` : ''}</div></article>
@@ -671,9 +702,12 @@ function clue(id) {
   const item = mission(); const entry = item?.clues.find(value => value.id === id);
   if (!entry) return;
   pictureView = { missionId: item.id, clueId: id, returnSelector: pictureView?.returnSelector || (state.settings.mode === 'challenge' ? `[data-clue="${id}"]` : '[data-show-facts]') };
-  if (!dispatch({ type: 'COLLECT_CLUE', id }, { focusTarget: null, speak: false })) { stopReading(); render(); }
+  const found = dispatch({ type: 'COLLECT_CLUE', id }, { focusTarget: null, speak: false });
+  if (!found) { stopReading(); render(); }
   focus('[data-picture-help-focus]');
   if (state.settings.narration) speakText(entry.text);
+  else if (found) rewardVoice.play({ kind: 'clue', seed: id });
+  if (found) showGameFeedback(true, 'Aha! You found the clue!');
 }
 
 // Record that help was used and show the current story/card hint. Help never deducts Sparks.
@@ -727,7 +761,7 @@ function settings() {
 }
 // Adapt the generic pointer helper to this screen and remember its cleanup callback.
 // Targets are read when needed so scrolling/resizing cannot reuse stale drop positions.
-function drag(handle, targets, onDrop, source = handle.parentElement) {
+function drag(handle, targets, onDrop, source) {
   dragCleanups.push(bindDrag(handle, {
     targets, onDrop, ghostSource: source,
     onHover: id => targets().forEach(target => target.element.classList.toggle('q-drag-over', target.id === id)),
@@ -745,6 +779,7 @@ function bind() {
   app.querySelectorAll('[data-close-picture-help]').forEach(control => { control.onclick = closePictureHelp; });
   app.querySelector('[data-show-facts]')?.addEventListener('click', showFacts);
   app.querySelector('[data-enable-game-sound]')?.addEventListener('click', toggleSound);
+  app.querySelector('[data-enable-game-motion]')?.addEventListener('click', () => toggleMotion(true));
   app.querySelector('[data-parent-demo]')?.addEventListener('click', event => {
     const control = event.currentTarget;
     const demo = control.closest('.q-parent-demo');
@@ -797,7 +832,7 @@ function bind() {
   app.querySelectorAll('[data-nav]').forEach(el => el.onclick = () => navigate(el.dataset.nav));
   app.querySelectorAll('[data-picker]').forEach(el => el.onclick = () => openPicker());
   app.querySelectorAll('[data-place]').forEach(el => el.onclick = () => openPicker(el.dataset.place));
-  app.querySelectorAll('[data-character]').forEach(el => el.onclick = () => { picker.character = el.dataset.character; render(); rememberRoute(true); focus(`[data-character="${picker.character}"]`); });
+  app.querySelectorAll('[data-character]').forEach(el => el.onclick = () => { picker.character = el.dataset.character; render('q-play-enter'); rememberRoute(true); focus(`[data-character="${picker.character}"]`); });
   app.querySelector('[data-all-missions]')?.addEventListener('click', () => { picker = { character: null, place: null }; render(); rememberRoute(true); focus(); });
   app.querySelectorAll('[data-mission]').forEach(el => el.onclick = () => { picker = null; postcardId = null; selectedAction = null; openClueList = false; dispatch({ type: 'CHOOSE_MISSION', id: el.dataset.mission }); window.scrollTo({ top: 0, behavior: 'auto' }); });
   app.querySelectorAll('[data-continue]').forEach(el => el.onclick = () => navigate('mission'));
@@ -810,7 +845,7 @@ function bind() {
   app.querySelectorAll('[data-action-select]').forEach(el => el.onclick = () => { selectedAction = el.dataset.actionSelect; const item = mission(); if (item?.slots.length === 1) dispatch({ type:'SET_PLAN', slotId:item.slots[0].id, actionId:selectedAction }, {focusTarget:`[data-action-select="${selectedAction}"]`, speak:false}); else { render(); focus(`[data-action-select="${selectedAction}"]`); } });
   app.querySelectorAll('[data-plan-slot]').forEach(el => el.onclick = () => { if (selectedAction) { dispatch({ type: 'SET_PLAN', slotId: el.dataset.planSlot, actionId: selectedAction }, { focusTarget: `[data-plan-slot="${el.dataset.planSlot}"]`, speak: false }); announce('Action added to your plan.'); } else announce('Choose an action first, then choose this space.'); });
   app.querySelectorAll('[data-remove-slot]').forEach(el => el.onclick = () => dispatch({ type: 'REMOVE_PLAN', slotId: el.dataset.removeSlot }, { focusTarget: `[data-plan-slot="${el.dataset.removeSlot}"]`, speak: false }));
-  app.querySelectorAll('[data-action-drag]').forEach(el => drag(el, () => [...app.querySelectorAll('[data-plan-slot]')].map(slot => ({ id: slot.dataset.planSlot, element: slot })), slotId => { selectedAction = null; dispatch({ type: 'SET_PLAN', slotId, actionId: el.dataset.actionDrag }, { focusTarget: `[data-plan-slot="${slotId}"]`, speak: false }); }));
+  app.querySelectorAll('[data-action-drag]').forEach(el => drag(el, () => [...app.querySelectorAll('[data-plan-slot]')].map(slot => ({ id: slot.dataset.planSlot, element: slot })), slotId => { selectedAction = null; dispatch({ type: 'SET_PLAN', slotId, actionId: el.dataset.actionDrag }, { focusTarget: `[data-plan-slot="${slotId}"]`, speak: false }); }, el.closest('.q-action-tile').querySelector('.q-action-art')));
   for (const [selector, type, target] of [['data-check-plan', 'CHECK_PLAN', '[data-feedback-focus]'], ['data-retry', 'RETRY_PLAN', '[data-plan-focus]'], ['data-complete', 'COMPLETE_MISSION', '[data-focus]'], ['data-replay', 'REPLAY_MISSION', '[data-focus]']]) app.querySelector(`[${selector}]`)?.addEventListener('click', () => { selectedAction = null; dispatch({ type }, { focusTarget: target }); });
   app.querySelector('[data-revisit-clues]')?.addEventListener('click', () => dispatch({ type: 'EXPLORE_AGAIN' }));
   app.querySelectorAll('[data-sort-start]').forEach(el => el.onclick = () => { picker = null; if (state.sorting && state.sorting.status !== 'complete') navigate('sorting'); else if (!dispatch({ type: 'START_SORT' })) { render(); focus(); } window.scrollTo({ top: 0, behavior: 'auto' }); });
@@ -821,7 +856,7 @@ function bind() {
   const pictureHandle = app.querySelector('[data-sort-picture]:not(:disabled)');
   for (const handle of [sortHandle, pictureHandle].filter(Boolean)) {
     handle.onclick = pickSortPicture;
-    drag(handle, () => [...app.querySelectorAll('[data-destination]')].map(el => ({ id: el.dataset.destination, element: el })), answerSort, app.querySelector('.q-sort-object'));
+    drag(handle, () => [...app.querySelectorAll('[data-destination]')].map(el => ({ id: el.dataset.destination, element: el })), answerSort, app.querySelector('.q-sort-picture > svg'));
   }
   app.querySelector('[data-sort-next]')?.addEventListener('click', () => dispatch({ type: 'NEXT_SORT' }));
   app.querySelector('[data-sort-retry]')?.addEventListener('click', () => dispatch({ type: 'RETRY_SORT' }));
@@ -830,7 +865,7 @@ function bind() {
   app.querySelectorAll('[data-settings]').forEach(el => el.onclick = settings);
   app.querySelectorAll('[data-decoration]').forEach(el => el.onclick = () => { selectedDecoration = el.dataset.decoration; render(); focus(`[data-decoration="${selectedDecoration}"]`); announce(`Choose a place for your ${selectedDecoration}.`); });
   app.querySelectorAll('[data-decoration-slot]').forEach(el => el.onclick = () => { if (selectedDecoration) dispatch({ type: 'PLACE_DECORATION', slotId: el.dataset.decorationSlot, decorationId: selectedDecoration }, { focusTarget: `[data-decoration-slot="${el.dataset.decorationSlot}"]`, speak: false }); else announce('Choose a decoration first.'); });
-  app.querySelectorAll('[data-decoration-drag]').forEach(el => drag(el, () => [...app.querySelectorAll('[data-decoration-slot]')].map(slot => ({ id: slot.dataset.decorationSlot, element: slot })), slotId => { selectedDecoration = null; dispatch({ type: 'PLACE_DECORATION', slotId, decorationId: el.dataset.decorationDrag }, { focusTarget: `[data-decoration-slot="${slotId}"]`, speak: false }); }));
+  app.querySelectorAll('[data-decoration-drag]').forEach(el => drag(el, () => [...app.querySelectorAll('[data-decoration-slot]')].map(slot => ({ id: slot.dataset.decorationSlot, element: slot })), slotId => { selectedDecoration = null; dispatch({ type: 'PLACE_DECORATION', slotId, decorationId: el.dataset.decorationDrag }, { focusTarget: `[data-decoration-slot="${slotId}"]`, speak: false }); }, el.closest('.q-decoration-tile').querySelector('[data-decoration] > svg')));
 }
 
 // A saved sound preference still needs a real browser gesture after reloading.
@@ -872,7 +907,7 @@ window.addEventListener('pagehide', event => { stopReading(); sounds.stop(); cle
 // listeners on return, without replaying a celebration or any completion action.
 window.addEventListener('pageshow', event => { if (event.persisted) { celebration = false; lastReward = null; render(); } });
 const media = window.matchMedia?.('(prefers-reduced-motion: reduce)');
-media?.addEventListener?.('change', () => { document.documentElement.dataset.motion = reduced() ? 'reduce' : 'full'; if (reduced()) { clearGameEffects(); updateHud(); } });
+media?.addEventListener?.('change', () => { document.documentElement.dataset.motion = reduced() ? 'reduce' : 'full'; if (reduced()) clearGameEffects(); updateHud(); });
 // The explicit parent URL changes only the initial view, without rewriting the child save.
 bindAudio();
 if (new URLSearchParams(window.location.search).get('view') === 'parents') state = { ...state, view: 'grownups' };

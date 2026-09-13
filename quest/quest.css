@@ -187,7 +187,10 @@ main:focus { outline:none; }
 .q-sort-help { display:flex; align-items:center; gap:1rem; }
 #q-drag-message { font-size:.8rem; color:var(--muted); }
 .q-drag-ghost { pointer-events:none!important; position:fixed; z-index:1000; opacity:.92; box-shadow:0 14px 26px #152d4638; border-radius:18px; background:var(--paper); max-width:290px; }
-.q-drag-source { opacity:.4; }
+/* A lifted item is an artwork clone, not its instruction card. Keep the clone's
+   measured size and transparent outline; only the original picture is dimmed. */
+.q-drag-ghost.q-drag-object-ghost { max-width:none; max-height:none; padding:0; border:0; border-radius:0; background:transparent; box-shadow:none; opacity:1; filter:drop-shadow(0 10px 7px #152d4638); }
+.q-drag-source { opacity:.25; }
 .q-sort-finish { text-align:center; max-width:850px; }
 .q-finish-art { width:min(650px,100%); margin:auto; }
 .q-run-reflection { display:flex; justify-content:center; gap:1rem; margin:1.3rem 0; }

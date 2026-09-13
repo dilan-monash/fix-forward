@@ -9,6 +9,7 @@ import { normalizeStoryText, storyAudioFor, STORY_LINES } from '../quest/story-a
 import { STORY_RECORDINGS } from '../quest/audio/story-manifest.js';
 import { MISSIONS, SORT_ITEMS } from '../quest/content.js';
 import { planFeedback } from '../quest/feedback.js';
+import { REWARD_LINES } from '../quest/reward-voice.js';
 
 // Capture the words and native callback properties assigned by the controller.
 class Utterance {
@@ -346,7 +347,7 @@ test('recorded text lookup normalizes typography without fuzzy-matching differen
 test('every packaged story recording is a valid MP3 linked to exact current authored words', async () => {
   // Build the permitted transcript bank independently from the manifest. This
   // catches stale safety facts if content changes without regenerating audio.
-  const texts = [...Object.values(STORY_LINES)];
+  const texts = [...Object.values(STORY_LINES), ...Object.values(REWARD_LINES).flat()];
   for (const mission of MISSIONS) {
     texts.push(`${mission.fictionalContext} ${mission.guideLines.intro}`, ...Object.values(mission.guideLines), ...mission.clues.map(clue => clue.text), mission.reflection.prompt, mission.reflection.explanation, mission.outcome.text, mission.helpText, ...mission.allowedActions.map(action => action.feedback));
     if (mission.slots.length === 2) for (const first of mission.allowedActions) for (const second of mission.allowedActions) {

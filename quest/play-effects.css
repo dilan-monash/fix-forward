@@ -1,9 +1,11 @@
 /* Quest-only story effects. All art is fully visible without animation.
  * Add q-play-enter for a step's greeting, q-story-reveal for its consequence,
  * q-stamp-earned for a new stamp, q-reward-enter for a local game response,
- * and q-level-up for a newly reached game level. Sequences finish in 1100 ms.
+ * and q-level-up for a newly reached game level. Story effects finish in 1100 ms;
+ * the friends' greeting lasts 2400 ms so a child has time to notice the wave.
  * Removing/replacing the owning screen cancels CSS animations automatically.
- * These effects have no callbacks, scoring side effects or infinite loops.
+ * The home/picker companions keep moving while Game animations is on; the
+ * always-visible movement button pauses them. Motion never changes game points.
  */
 /* SVG motion uses local artwork bounds; positioning remains on an outer SVG group in art.js. */
 body.quest .q-pip-arm {
@@ -49,10 +51,10 @@ body.quest .q-level-badge { overflow: visible; pointer-events: none; }
  */
 @media screen {
   html[data-motion="full"] body.quest .q-play-enter .q-guide-character .q-pip-arm {
-    animation: q-quest-pip-greeting 850ms ease-in-out 1;
+    animation: q-quest-pip-greeting 2400ms ease-in-out 1;
   }
   html[data-motion="full"] body.quest .q-play-enter .q-guide-character .q-flo-blades {
-    animation: q-quest-flo-greeting 900ms cubic-bezier(.2,.7,.3,1) 1;
+    animation: q-quest-flo-greeting 2400ms cubic-bezier(.25,.5,.35,1) 1;
   }
   html[data-motion="full"] body.quest .q-play-enter .q-guide-character .q-character-face {
     animation: q-quest-look-up 350ms ease-out 1;
@@ -138,30 +140,59 @@ body.quest .q-level-badge { overflow: visible; pointer-events: none; }
    * Motion carries no essential information and the button labels stay still.
    */
   html[data-motion="full"] body.quest .q-character-choices button:focus-visible .q-pip-arm {
-    animation: q-quest-pip-greeting 850ms ease-in-out 1;
+    animation: q-quest-pip-greeting 2400ms ease-in-out 1;
   }
   html[data-motion="full"] body.quest .q-character-choices button:focus-visible .q-flo-blades {
-    animation: q-quest-flo-greeting 900ms cubic-bezier(.2,.7,.3,1) 1;
+    animation: q-quest-flo-greeting 2400ms cubic-bezier(.25,.5,.35,1) 1;
   }
   @media (hover: hover) and (pointer: fine) {
     html[data-motion="full"] body.quest .q-character-choices button:hover .q-pip-arm {
-      animation: q-quest-pip-greeting 850ms ease-in-out 1;
+      animation: q-quest-pip-greeting 2400ms ease-in-out 1;
     }
     html[data-motion="full"] body.quest .q-character-choices button:hover .q-flo-blades {
-      animation: q-quest-flo-greeting 900ms cubic-bezier(.2,.7,.3,1) 1;
+      animation: q-quest-flo-greeting 2400ms cubic-bezier(.25,.5,.35,1) 1;
     }
   }
 }
 
+/* Keep the friendly map and chooser alive while a child decides what to play.
+ * The visible Animations button switches data-motion to reduce and immediately
+ * stops both loops. Only named guides move; a fan in a warning story stays still.
+ * Pip has a long rest between waves, and the wording/controls never move. */
+@media screen {
+  html[data-motion="full"] body.quest .q-world .q-guide-character .q-flo-blades,
+  html[data-motion="full"] body.quest .q-greeting-friends .q-guide-character .q-flo-blades,
+  html[data-motion="full"] body.quest .q-picker .q-guide-character .q-flo-blades {
+    animation: q-quest-flo-playing 3400ms linear infinite;
+  }
+  html[data-motion="full"] body.quest .q-world .q-guide-character .q-pip-arm,
+  html[data-motion="full"] body.quest .q-greeting-friends .q-guide-character .q-pip-arm,
+  html[data-motion="full"] body.quest .q-picker .q-guide-character .q-pip-arm {
+    animation: q-quest-pip-playing 7500ms ease-in-out infinite;
+  }
+}
+
 /* Keyframes describe visual movement only. No timer, callback or score update depends on them. */
+@keyframes q-quest-flo-playing {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes q-quest-pip-playing {
+  0%, 28%, 100% { transform: rotate(0deg); }
+  5%, 15%, 25% { transform: rotate(28deg); }
+  10%, 20% { transform: rotate(-10deg); }
+}
 @keyframes q-quest-pip-greeting {
+  /* Three friendly waves remain on the arm only; the story words never bob. */
   0%, 100% { transform: rotate(0deg); }
-  35% { transform: rotate(24deg); }
-  68% { transform: rotate(-7deg); }
+  15%, 45%, 75% { transform: rotate(28deg); }
+  30%, 60%, 90% { transform: rotate(-10deg); }
 }
 @keyframes q-quest-flo-greeting {
-  from { transform: rotate(-180deg); }
-  to { transform: rotate(0deg); }
+  /* Two complete turns make Flo's greeting recognisable before it settles.
+   * Only q-flo-blades has this animation; a story fan is never shown working. */
+  from { transform: rotate(0deg); }
+  to { transform: rotate(720deg); }
 }
 @keyframes q-quest-look-up {
   from { transform: translateY(2px); }
@@ -259,6 +290,7 @@ body.quest .q-fan-blades { animation: none !important; }
 /* Also stop moving containers around a warning picture: freezing only the SVG
  * child would still allow a sorting card's entry effect to carry it sideways. */
 body.quest .q-sort-object:has(.q-warning-object),
+body.quest .q-sort-art:has(.q-warning-object),
 body.quest .q-action-art:has(.q-warning-object),
 body.quest .q-placed-picture:has(.q-warning-object) { animation: none !important; }
 

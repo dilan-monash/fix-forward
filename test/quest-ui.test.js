@@ -337,10 +337,15 @@ test('all eight rendered stories and reflection retries award Sparks once and up
 });
 
 test('Collection Station tap and keyboard controls finish five cards, distinguish help and allow a fresh round', async t => {
-  const q = await createQuest(t);
+  // Static reward rendering makes the number assertions independent of the
+  // separate star-flight timing suite while exercising the same real actions.
+  const q = await createQuest(t, { reducedMotion: true });
   q.click('[data-place="station"]');
   q.click('[data-sort-start]');
   const firstIds = q.savedState().sorting.itemIds;
+  const learned = new Set();
+  assert.match(q.required('#q-game-hud .q-round-hud').textContent, /0\s*\/\s*5 sorted/);
+  assert.match(q.required('#q-game-hud .q-round-hud').textContent, /0\s*\/\s*12 different pictures/);
   for (let index = 0; index < 5; index += 1) {
     const run = q.savedState().sorting;
     const item = SORT_ITEMS.find(card => card.id === run.itemIds[index]);
@@ -354,6 +359,8 @@ test('Collection Station tap and keyboard controls finish five cards, distinguis
       assert.match(q.required('.q-sort-retry').textContent, /×/);
       assert.ok([...q.document.querySelectorAll('[data-destination]')].every(element => element.disabled));
       assert.equal(Object.keys(q.savedState().sorting.answers).length, 0);
+      assert.match(q.required('.q-round-hud').textContent, /0\s*\/\s*5 sorted/);
+      assert.equal(Number(q.required('[data-spark-value]').textContent), 0);
       q.click('[data-sort-retry]');
       assert.ok([...q.document.querySelectorAll('[data-destination]')].every(element => !element.disabled));
     }
@@ -364,6 +371,10 @@ test('Collection Station tap and keyboard controls finish five cards, distinguis
       q.click('[data-close-picture-help]');
     }
     q.keyboardActivate(`[data-destination="${item.answer}"]`);
+    learned.add(item.conceptId);
+    assert.equal(Number(q.required('[data-spark-value]').textContent), (index + 1) * 5 + learned.size * 5);
+    assert.match(q.required('.q-round-hud').textContent, new RegExp(`${index + 1}\\s*\\/\\s*5 sorted`));
+    assert.match(q.required('.q-round-hud').textContent, new RegExp(`${index + 1}\\s*\\/\\s*12 different pictures`));
     assert.ok(q.required('.q-feedback.correct').textContent.includes(item.explanation));
     assert.ok(q.required(`[data-destination="${item.answer}"]`).classList.contains('q-accepted'));
     assert.equal(q.required(`[data-destination="${item.answer}"]`).disabled, true);
@@ -375,10 +386,13 @@ test('Collection Station tap and keyboard controls finish five cards, distinguis
   assert.match(q.required('.q-run-reflection').textContent, /2 with a clue/);
   assert.equal(q.savedState().sorting.status, 'complete');
   assert.equal(Object.keys(q.savedState().sorting.answers).length, 5);
+  assert.match(q.required('.q-round-hud').textContent, /5\s*\/\s*5 sorted/);
   q.click('[data-sort-start]');
   assert.equal(q.savedState().sorting.index, 0);
   assert.deepEqual(q.savedState().sorting.answers, {});
   assert.notDeepEqual(q.savedState().sorting.itemIds, firstIds);
+  assert.match(q.required('.q-round-hud').textContent, /0\s*\/\s*5 sorted/);
+  assert.match(q.required('.q-round-hud').textContent, /5\s*\/\s*12 different pictures/);
 });
 
 test('partial sorting resumes from its companion, home and station without replacing the card or help history', async t => {
@@ -1003,7 +1017,16 @@ test('a child can drag the item picture itself with a finger, or tap it and then
     const event = new q.window.MouseEvent(type, { bubbles: true, cancelable: true, button: 0, clientX: coordinate, clientY: coordinate });
     Object.defineProperties(event, { pointerId: { value: 41 }, isPrimary: { value: true }, pointerType: { value: 'touch' } });
     target.dispatchEvent(event);
-    if (type === 'pointermove') assert.ok(q.query('.q-drag-ghost'));
+    if (type === 'pointermove') {
+      const ghost = q.required('.q-drag-ghost');
+      assert.equal(ghost.tagName.toLowerCase(), 'svg', 'Only the product artwork follows the child\'s finger');
+      assert.equal(ghost.querySelector('button, h2, p, .q-card-number'), null);
+      assert.doesNotMatch(ghost.textContent, /Move|Pick up/);
+      assert.ok(q.required('.q-sort-object-copy').textContent.includes(first.condition));
+      assert.equal(q.required('.q-sort-object-copy').style.transform, '');
+      assert.equal(q.required('.q-sort-object').classList.contains('q-drag-source'), false);
+      assert.equal(picture.querySelector('svg').classList.contains('q-drag-source'), true);
+    }
   }
   assert.equal(q.query('.q-drag-ghost'), null);
   assert.equal(q.savedState().sorting.feedback.correct, false);
@@ -1016,6 +1039,46 @@ test('a child can drag the item picture itself with a finger, or tap it and then
   q.keyboardActivate(`[data-destination="${first.answer}"]`);
   assert.equal(q.savedState().sorting.feedback.correct, true);
   assert.deepEqual(q.savedState().sorting.answers[first.id], { assisted: true });
+  assert.deepEqual(q.savedState().sortedItems, [first.id]);
+});
+
+test('replayed sorting pictures increase the visible round count while new pictures also increase saved Sparks', async t => {
+  let q = await createQuest(t, { reducedMotion: true });
+  q.click('[data-sort-start]');
+  for (let index = 0; index < 5; index += 1) {
+    const item = SORT_ITEMS.find(card => card.id === q.savedState().sorting.itemIds[index]);
+    q.click(`[data-destination="${item.answer}"]`);
+    q.click('[data-sort-next]');
+  }
+  const saved = q.actualStorage.getItem(STORAGE_KEY);
+  const previouslySolved = new Set(q.savedState().sortedItems);
+  q.dispose();
+  q = await createQuest(t, { saved, reducedMotion: true });
+  q.click('[data-sort-start]');
+  let replayed = 0;
+  for (let index = 0; index < 5; index += 1) {
+    const before = q.savedState();
+    const item = SORT_ITEMS.find(card => card.id === before.sorting.itemIds[index]);
+    const previousPoints = Number(q.required('[data-spark-value]').textContent);
+    const isReplay = previouslySolved.has(item.id);
+    const reward = isReplay ? 0 : 5 + (before.discoveries.includes(item.conceptId) ? 0 : 5);
+    if (isReplay) assert.match(q.required('.q-sort-point-note').textContent, /Practice picture: grow your round count/);
+    else assert.match(q.required('.q-sort-point-note').textContent, new RegExp(`\\+${reward} Sparks`));
+    q.click(`[data-destination="${item.answer}"]`);
+    assert.equal(Number(q.required('[data-spark-value]').textContent), previousPoints + reward);
+    assert.match(q.required('.q-round-hud').textContent, new RegExp(`${index + 1}\\s*\\/\\s*5 sorted`));
+    if (isReplay) {
+      replayed += 1;
+      assert.match(q.required('.q-earned-note').textContent, /round count went up/);
+      assert.doesNotMatch(q.required('.q-earned-note').textContent, /\+\d/);
+    }
+    previouslySolved.add(item.id);
+    assert.match(q.required('.q-round-hud').textContent, new RegExp(`${previouslySolved.size}\\s*\\/\\s*12 different pictures`));
+    assert.deepEqual(new Set(q.savedState().sortedItems), previouslySolved);
+    q.click('[data-sort-next]');
+  }
+  assert.ok(replayed > 0, 'The normal next round must actually exercise a previously solved picture');
+  assert.match(q.required('.q-round-hud').textContent, /5\s*\/\s*5 sorted/);
 });
 
 test('a mixed two-item plan explains each result, preserves the good choice and removes stale praise after an edit', async t => {
@@ -1362,6 +1425,61 @@ test('device reduced motion stays the default while an explicit Game animations 
   assert.equal(q.required('.q-reward-fx').dataset.reducedMotion, 'true');
   assert.equal(q.query('.q-reward-fx__star'), null, 'Less movement immediately restores static celebration');
   assert.equal(Number(q.required('[data-spark-value]').textContent), firstTotal + 10);
+});
+
+test('the visible animation button explicitly overrides the device, preserves progress and survives reload', async t => {
+  let q = await createQuest(t, { reducedMotion: true });
+  assert.ok(q.required('#quest-app').classList.contains('q-play-enter'), 'Arrival includes the character greeting hook');
+  assert.equal(q.document.documentElement.dataset.motion, 'reduce');
+  assert.equal(q.required('[data-game-motion]').getAttribute('aria-pressed'), 'false');
+  assert.match(q.required('[data-game-motion]').textContent, /Animations off/);
+  assert.equal(q.actualStorage.getItem(STORAGE_KEY), null, 'Merely visiting never opts into animation or rewrites a save');
+  q.keyboardActivate('[data-game-motion]');
+  assert.equal(q.media.matches, true, 'The device itself still requests reduced motion');
+  assert.equal(q.savedState().settings.motion, 'full');
+  assert.equal(q.document.documentElement.dataset.motion, 'full');
+  assert.equal(q.required('[data-game-motion]').getAttribute('aria-pressed'), 'true');
+  assert.equal(q.document.activeElement, q.required('[data-game-motion]'));
+  assert.equal(Number(q.required('[data-spark-value]').textContent), 0);
+  assert.deepEqual(q.savedState().sortedItems, []);
+  assert.deepEqual(q.savedState().completed, {});
+  const saved = q.actualStorage.getItem(STORAGE_KEY);
+  q.dispose();
+  q = await createQuest(t, { saved, reducedMotion: true });
+  assert.equal(q.document.documentElement.dataset.motion, 'full');
+  assert.equal(q.required('[data-game-motion]').getAttribute('aria-pressed'), 'true');
+  assert.ok(q.required('#quest-app').classList.contains('q-play-enter'));
+  q.keyboardActivate('[data-game-motion]');
+  assert.equal(q.savedState().settings.motion, 'reduce');
+  assert.equal(q.document.documentElement.dataset.motion, 'reduce');
+  assert.equal(q.required('[data-game-motion]').getAttribute('aria-pressed'), 'false');
+  assert.match(q.required('#q-announcement').textContent, /Animations paused/);
+  assert.equal(Number(q.required('[data-spark-value]').textContent), 0);
+  assert.deepEqual(q.savedState().sortedItems, []);
+});
+
+test('the home animation invitation still enables motion after the device preference changes while the page is open', async t => {
+  const q = await createQuest(t, { reducedMotion: true });
+  const invitation = q.required('[data-enable-game-motion]');
+  assert.match(invitation.textContent, /Make Pip and Flo move/);
+  assert.equal(q.document.documentElement.dataset.motion, 'reduce');
+  // The OS can change while the child is looking at an already-rendered button.
+  // Send the real media listener a new preference without rebuilding that screen.
+  q.media.matches = false;
+  for (const callback of q.media.callbacks) callback({ matches: false });
+  assert.equal(q.document.documentElement.dataset.motion, 'full');
+  assert.equal(q.required('[data-game-motion]').getAttribute('aria-pressed'), 'true', 'The visible HUD follows the new device setting immediately');
+  assert.equal(q.required('[data-enable-game-motion]'), invitation);
+  assert.equal(q.actualStorage.getItem(STORAGE_KEY), null, 'A device change itself does not save an explicit choice');
+  q.keyboardActivate('[data-enable-game-motion]');
+  assert.equal(q.savedState().settings.motion, 'full', 'Turn on must never act as a toggle that turns moving characters off');
+  assert.equal(q.document.documentElement.dataset.motion, 'full');
+  assert.equal(q.required('[data-game-motion]').getAttribute('aria-pressed'), 'true');
+  assert.equal(q.query('[data-enable-game-motion]'), null);
+  assert.equal(q.document.activeElement, q.required('[data-game-motion]'));
+  assert.equal(Number(q.required('[data-spark-value]').textContent), 0);
+  assert.deepEqual(q.savedState().sortedItems, []);
+  assert.deepEqual(q.savedState().completed, {});
 });
 
 // Saying hello is an explicit audio request. The visible words teach the names,

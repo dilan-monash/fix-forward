@@ -2,7 +2,7 @@
 // loads MP3s, not this script, its npm dependencies, or the neural model.
 // Install tools separately (use npm.cmd instead of npm in Windows PowerShell):
 // npm install --prefix tmp/quest-voice-build --no-save --package-lock=false kokoro-js@1.2.1 lamejs@1.2.1
-// Run from this checkout: node scripts/generate-story-audio.mjs [--sample] [--force]
+// Run from this checkout: node scripts/generate-story-audio.mjs [--sample] [--force] [--offline]
 // Kokoro weights/code: Apache-2.0, https://github.com/hexgrad/kokoro
 // MP3 encoder: lamejs 1.2.1, LGPL-3.0, used only during generation.
 import fs from 'node:fs/promises';
@@ -15,11 +15,15 @@ import { env, StyleTextToSpeech2Model, AutoTokenizer } from '../tmp/quest-voice-
 import { MISSIONS, SORT_ITEMS } from '../quest/content.js';
 import { planFeedback } from '../quest/feedback.js';
 import { STORY_LINES, normalizeStoryText } from '../quest/story-audio.js';
+import { REWARD_LINES } from '../quest/reward-voice.js';
 
 // Resolve all writes within this checkout. The ignored cache is never published.
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const output = path.join(root, 'quest', 'audio');
 env.cacheDir = path.join(root, 'tmp', 'quest-voice-build', 'model-cache');
+// Once the model is cached, --offline proves regeneration makes no model or
+// tokenizer download. Missing cached files fail clearly instead of going online.
+if (process.argv.includes('--offline')) env.allowRemoteModels = false;
 await fs.mkdir(output, { recursive: true });
 const manifestPath = path.join(output, 'story-manifest.js');
 const existing = (await import(new URL('../quest/audio/story-manifest.js', import.meta.url))).STORY_RECORDINGS;
@@ -35,6 +39,7 @@ function add(text, role = 'story') {
   if (!entries.has(id)) entries.set(id, { id, text: text.trim(), role });
 }
 Object.values(STORY_LINES).forEach(text => add(text, 'invitation'));
+Object.values(REWARD_LINES).flat().forEach(text => add(text, 'cheer'));
 for (const mission of MISSIONS) {
   add(`${mission.fictionalContext} ${mission.guideLines.intro}`, 'intro');
   Object.values(mission.guideLines).forEach(text => add(text, 'dialogue'));
@@ -81,7 +86,7 @@ const sample = process.argv.includes('--sample');
 const force = process.argv.includes('--force');
 // Generate the most visible content first so a developer can review every story
 // opening while later hints render. The final run still covers the whole bank.
-const priority = { invitation: 0, intro: 1, fact: 2, question: 3, dialogue: 4, ending: 5, hint: 6, feedback: 7 };
+const priority = { invitation: 0, cheer: 0, intro: 1, fact: 2, question: 3, dialogue: 4, ending: 5, hint: 6, feedback: 7 };
 const requested = sample ? [...entries.values()].slice(0, 1) : [...entries.values()].sort((a, b) => priority[a.role] - priority[b.role]);
 console.log(`Preparing ${requested.length} authored clips using a local Kokoro model.`);
 // A small thread count prevents a laptop from spending more time coordinating
@@ -104,7 +109,9 @@ for (const [index, entry] of requested.entries()) {
     continue;
   }
   const started = performance.now();
-  const audio = await tts.generate(entry.text, { voice: 'af_heart', speed: entry.role === 'fact' ? 0.92 : 0.96 });
+  // Cheers are short and bright, with natural word timing rather than pitch
+  // manipulation. Slower facts keep their existing, easy-to-follow reading pace.
+  const audio = await tts.generate(entry.text, { voice: 'af_heart', speed: entry.role === 'fact' ? 0.92 : entry.role === 'cheer' ? 1.04 : 0.96 });
   const generatedAt = performance.now();
   // Reject silent or invalid output so failed generation never becomes a served clip.
   const peak = audio.audio.reduce((largest, value) => Math.max(largest, Math.abs(value)), 0);

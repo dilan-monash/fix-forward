@@ -3,11 +3,15 @@
 // stars burst from the choice, fly to the HUD, then release its displayed count.
 // It never changes points, storage, game answers or the child's focus.
 
-const FLIGHT_MS = 850;
+// Leave time to follow the star trail from the answer to the visible score bar.
+// The next choice remains interactive throughout this presentation.
+const FLIGHT_MS = 1200;
 const STAR_COUNT = 12;
 const STAGGER_MS = 18;
 const ARRIVAL_MS = FLIGHT_MS + (STAR_COUNT - 1) * STAGGER_MS;
-const LIFETIME_MS = ARRIVAL_MS + 180;
+// The praise stays long enough to read after the count starts filling. Reduced
+// motion uses the same reading time with an immediate, fully updated score.
+const LIFETIME_MS = 2200;
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
 // Keep particles inside the visible tablet screen even when a source is clipped.
@@ -160,7 +164,7 @@ export function createRewardFx({
     const quiet = Boolean(typeof reducedMotion === 'function' ? reducedMotion() : reducedMotion);
     layer.dataset.reducedMotion = String(quiet);
     if (quiet || typeof popup.animate !== 'function') {
-      later(run, () => clearRun(run), 1000);
+      later(run, () => clearRun(run), LIFETIME_MS);
       arrive(run);
       return true;
     }
@@ -172,7 +176,7 @@ export function createRewardFx({
     animate(run, ring, [
       { transform: 'scale(.25)', opacity: .8 },
       { transform: 'scale(2.2)', opacity: 0 }
-    ], { duration: 500, easing: 'cubic-bezier(.16,1,.3,1)' });
+    ], { duration: 650, easing: 'cubic-bezier(.16,1,.3,1)' });
     animate(run, popup, [
       { transform: 'translate(-50%, -50%) scale(.65)', opacity: 0, offset: 0 },
       { transform: 'translate(-50%, -50%) scale(1.08)', opacity: 1, offset: .18 },
@@ -215,7 +219,7 @@ export function createRewardFx({
       animate(run, glint, [
         { transform: `translate(${start.x}px, ${start.y}px) scale(0)`, opacity: 1 },
         { transform: `translate(${start.x + Math.cos(angle) * 110}px, ${start.y + Math.sin(angle) * 90}px) scale(1)`, opacity: 0 }
-      ], { duration: 550, delay: index * 12, easing: 'ease-out' });
+      ], { duration: 700, delay: index * 12, easing: 'ease-out' });
     }
 
     // Native completion follows actual painting; a short deadline also settles
