@@ -35,7 +35,7 @@ test("UX03 recall language teaches the term instead of assuming users know it", 
 });
 
 test("UX04 recall outage does not block the safety route", () => {
-  assert.match(app, /You can still complete the safety questions below/);
+  assert.match(app, /You can still complete the safety questions/);
   assert.match(app, /Open official recall search/);
 });
 
@@ -148,7 +148,7 @@ test("UX18 browser back, restart confirmation, keyboard focus and live results r
 
 test("UX19 the appliance journey contains no account, upload or password-collection form", () => {
   assert.doesNotMatch(html + app, /type=["']file["']|type=["']password["']/i);
-  assert.match(app, /No account needed/);
+  assert.doesNotMatch(html + app, /No account needed|Lock website|id="release-label"/);
 });
 
 test("UX20 the map does not load third-party map code before a useful search result exists", () => {
@@ -190,7 +190,7 @@ test("UX25 mixed safety answers have distinct high, caution and uncertain outcom
   assert.match(app, /safety\.status === "high"/);
   assert.match(app, /safety\.status === "caution"/);
   assert.match(app, /safety\.status === "uncertain"/);
-  assert.match(app, /Needs attention/);
+  assert.match(app, /Ask a repairer to check it before using it again/);
   assert.match(app, /Some uncertainty remains/);
 });
 
@@ -214,8 +214,8 @@ test("UX27 manual suburb selection becomes a nearby search centre with distance 
 });
 
 test("UX28 brand, model, location, problem and cost inputs have explicit length limits", () => {
-  assert.match(app, /name="brand" maxlength="60"/);
-  assert.match(app, /name="model" maxlength="50"/);
+  assert.match(app, /productField\("brand", "Brand", 60/);
+  assert.match(app, /productField\("model", "Model number", 50/);
   assert.match(app, /name="area" maxlength="50"/);
   assert.match(app, /name="problem"[\s\S]*maxlength="300"/);
   assert.match(app, /name="repair"[\s\S]*maxlength="24"/);
