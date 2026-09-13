@@ -16,7 +16,7 @@ Main is the place for approved releases. Iteration 1 and Iteration 2 remain sepa
 
 This checkout's `render.yaml` describes only the Main service. The comparison services keep their own branch settings. Before announcing a release, check the service's branch, deployed commit, login, adult `/` route and child `/quest` route.
 
-**Custom domain status, 13 September 2026:** DNS for `fixforward.me` and `www.fixforward.me` is verified, but HTTPS certificate provisioning is still pending and retrying. Neither custom-domain address is verified live yet. Use the working Render URL until the certificate and served release have been checked successfully.
+**Custom HTTPS verified, 13 September 2026:** [Main](https://fixforward.me/) and [Quest](https://fixforward.me/quest) are live with the existing shared website password. Both domain certificates are issued, and [www.fixforward.me](https://www.fixforward.me/) redirects to `https://fixforward.me/`. The health endpoint confirms release `iteration-2-v2.0.0-quest`. Existing email DNS records were retained.
 
 ## Future Iteration 3 workflow
 
