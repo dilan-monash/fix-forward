@@ -8,11 +8,15 @@ Main is the place for approved releases. Iteration 1 and Iteration 2 remain sepa
 
 | Website | GitHub branch | Original Render address | Purpose |
 |---|---|---|---|
-| Main | `main` | `https://fix-forward-main.onrender.com` (intended address; verify after creation) | Latest approved release, currently the Iteration 2 application |
+| Main | `main` | [fix-forward-main.onrender.com](https://fix-forward-main.onrender.com/) | Verified Main deployment, currently the approved Iteration 2 application |
 | Iteration 1 | `iteration-1` | [fix-forward-iteration-1.onrender.com](https://fix-forward-iteration-1.onrender.com/) | Preserved original website at commit `051f759`; its Render service follows `iteration-1` with Auto Deploy off |
 | Iteration 2 | `iteration-2` | [fix-forward-iteration-2.onrender.com](https://fix-forward-iteration-2.onrender.com/) | Adult journey and Quest comparison release at commit `32e4c157` |
 
-This checkout's `render.yaml` describes only the Main service. The comparison services keep their own branch settings. A GitHub branch or a saved blueprint is not evidence of a successful deployment: check the service's branch, deployed commit, login, adult `/` route and child `/quest` route before announcing a release. **`fixforward.me` is not verified live by this document.** Confirm its DNS, certificate and served release separately before sharing it as the Main website.
+**Main deployment verified, 13 September 2026:** The Render URL serves approved commit `b6eb0496c4e369f82ade3ff297437d5711caeccb`. Its service is `srv-daj2bip594qs73ajd61g`, in **My project / Production**, on the **Free** plan in **Singapore**. Main's **Auto Deploy is Off**: review and test changes, push the approved commit, then deploy that commit manually and verify the result. A push alone does not release Main.
+
+This checkout's `render.yaml` describes only the Main service. The comparison services keep their own branch settings. Before announcing a release, check the service's branch, deployed commit, login, adult `/` route and child `/quest` route.
+
+**Custom domain status, 13 September 2026:** DNS for `fixforward.me` and `www.fixforward.me` is verified, but HTTPS certificate provisioning is still pending and retrying. Neither custom-domain address is verified live yet. Use the working Render URL until the certificate and served release have been checked successfully.
 
 ## Future Iteration 3 workflow
 
@@ -20,7 +24,7 @@ This checkout's `render.yaml` describes only the Main service. The comparison se
 2. Give Iteration 3 its own Render service, linked to `iteration-3`. On that branch, set its blueprint to a distinct service name and branch so it cannot repoint Main or either comparison service. Keep credentials in Render's private environment settings.
 3. Run the JavaScript and Flask checks listed below, then review the adult and Quest journeys on Iteration 3's actual deployment. Verify the deployed commit and data availability separately from local test results.
 4. Once Iteration 3 is approved, promote it into `main` with a history-preserving merge. Resolve any conflicts against the approved release, check the resulting application files and rerun the relevant checks. Keep Main's service name and `branch: main` in its deployment metadata.
-5. Deploy and verify Main. Retain the Iteration 3 branch and its separate URL as the new comparison snapshot; future work starts on the next iteration branch. Do not force-push an old snapshot into Main or reuse an earlier iteration's service for new work.
+5. Manually deploy the approved Main commit and verify the live result; leave Auto Deploy off. Retain the Iteration 3 branch and its separate URL as the new comparison snapshot; future work starts on the next iteration branch. Do not force-push an old snapshot into Main or reuse an earlier iteration's service for new work.
 
 ## Current application and handover
 

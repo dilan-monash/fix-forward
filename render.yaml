@@ -6,6 +6,8 @@ services:
     runtime: python
     # Main follows the main branch; the separate Iteration 1 and Iteration 2 services retain their comparison branches.
     branch: main
+    # Release Main manually after approval, matching the existing Render service setting.
+    autoDeployTrigger: "off"
     plan: free
     # The build installs runtime dependencies and rebuilds the local reviewed-price SQLite/JavaScript snapshot.
     # It does not refresh retailer data or invoke the separate hosted-data import pipeline.
