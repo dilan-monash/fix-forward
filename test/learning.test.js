@@ -1,3 +1,5 @@
+// TEST SUITE: Checks the retained legacy picture-story module; the adult entry now links to the separate Quest app.
+// Each test name describes its expected behavior; fixtures are invented test inputs.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { JSDOM } from "jsdom";

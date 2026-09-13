@@ -1,3 +1,5 @@
+// TEST SUITE: Checks pure adult decision rules, recall uncertainty, validation, costs and location filtering.
+// Each test name describes its expected behavior; fixtures are invented test inputs.
 import test from "node:test";
 import assert from "node:assert/strict";
 import {

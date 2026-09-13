@@ -1,3 +1,5 @@
+// TEST SUITE: Runs the adult UI inside jsdom using synthetic data, controlled delays and browser substitutes.
+// Each test name describes its expected behavior; fixtures are invented test inputs.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
@@ -7,7 +9,9 @@ import { JSDOM, VirtualConsole } from "jsdom";
 // device location are requested, and nothing is inserted into the database.
 const pageHtml = await readFile(new URL("../index.html", import.meta.url), "utf8");
 let appInstance = 0;
+// Let queued asynchronous handlers finish before inspecting the test page.
 const settle = () => new Promise((resolve) => setImmediate(resolve));
+// Wait for a specific asynchronous UI condition with a bounded deadline so failures cannot hang the suite.
 async function waitUntil(predicate) {
   const deadline = Date.now() + 2000;
   while (!predicate()) {
@@ -17,6 +21,8 @@ async function waitUntil(predicate) {
   await settle();
 }
 
+// Build an isolated adult page and replace networking/geolocation with controlled test doubles.
+// Restore globals and close the page after each test so one journey cannot contaminate the next.
 async function createJourney(t, { delayedData = false, delayedPrices = false, recalls = [], locations = [], prices = [], failedEndpoints = [], accessExpired = [], geolocation } = {}) {
   const scriptErrors = [];
   const virtualConsole = new VirtualConsole();
@@ -48,6 +54,8 @@ async function createJourney(t, { delayedData = false, delayedPrices = false, re
   let releasePrices;
   const pricesReady = delayedPrices ? new Promise((resolve) => { releasePrices = resolve; }) : Promise.resolve();
   const requests = [];
+  // Supply invented endpoint responses and controlled delays, including expiry/outage statuses.
+  // Tests record only requested paths here; this helper never contacts a real API.
   const fakeFetch = async (url) => {
     await ready;
     const pathname = new URL(url, window.location).pathname;
@@ -130,6 +138,8 @@ async function createJourney(t, { delayedData = false, delayedPrices = false, re
     for (const name of names) answer(name, overrides[name] || "no");
     submit("#safety-form");
   };
+  // Simulate browser Back/Forward and wait for popstate before inspecting the next screen.
+  // The timeout makes a missing history event fail clearly instead of hanging the test.
   const traverse = async (direction) => {
     let timer;
     const moved = new Promise((resolve, reject) => {
@@ -470,6 +480,7 @@ test("DOM: a recall outage during refresh replaces an earlier no-match status", 
   journey.required("#retry-data");
 });
 
+// Build a synthetic reviewed-price-shaped record; overrides make each matching scenario explicit.
 const priceFixture = (overrides = {}) => ({
   id: "test-only-kettle-price",
   categoryCode: "kettle",
@@ -700,27 +711,18 @@ test("DOM: unknown manual identity remains usable and the check footer follows t
   journey.required('#caution-repair');
 });
 
-test("DOM: the kids activity supports retry, all three stories, finish, replay and returning home", async (t) => {
+test("DOM: the adult landing opens Quest separately and keeps the real appliance journey usable", async (t) => {
   const journey = await createJourney(t);
   const initialRequests = [...journey.requests];
-  journey.click('#start-learning');
-  journey.required('.learning-screen');
-  journey.click('[data-learning-choice="secret"]');
-  assert.match(journey.required('#learning-feedback').textContent, /grown-up needs to know/);
-  assert.equal(journey.window.document.activeElement.id, 'learning-feedback');
-  journey.click('[data-learning-action="retry"]');
-  assert.equal(journey.window.document.activeElement.id, 'learning-focus');
-  for (const choice of ['adult','repair','ewaste']) {
-    journey.click(`[data-learning-choice="${choice}"]`);
-    journey.click('[data-learning-action="next"]');
-  }
-  journey.required('.learning-finish');
-  assert.equal(journey.window.document.activeElement.id, 'learning-focus');
-  journey.click('[data-learning-action="replay"]');
-  journey.required('[data-learning-choice="adult"]');
-  journey.click('[data-learning-action="exit"]');
-  journey.required('.landing');
-  assert.deepEqual(journey.requests, initialRequests, 'Learning must not request services, photos or private answers');
+  const quest = journey.required('#open-quest');
+  assert.equal(quest.tagName, 'A');
+  assert.equal(quest.getAttribute('href'), '/quest');
+  assert.equal(quest.target, '_blank');
+  assert.equal(quest.rel, 'noopener');
+  assert.equal(journey.query('#start-learning'), null);
+  assert.doesNotMatch(journey.required('.landing').textContent, /Be an appliance detective/);
+  assert.equal(journey.required('.quest-parent-link').getAttribute('href'), '/quest?view=parents');
+  assert.deepEqual(journey.requests, initialRequests);
   journey.enterCheck('repair');
   journey.answerCheck();
   journey.required('#hub-find-repair');

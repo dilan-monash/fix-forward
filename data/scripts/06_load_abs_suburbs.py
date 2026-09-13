@@ -1,3 +1,7 @@
+# Network/local-file/DATABASE-WRITING pipeline: download missing ABS archives, derive a CSV and replace Victorian lookup rows.
+# Requires suburb schema migration 007; run before postcode enrichment and validation migration 009.
+# Representative points and Postal Areas remain approximate geography, never a household address or official postcode boundary.
+
 """
 Load Victorian suburb centroids and postcodes from ABS ASGS Edition 3.
 
@@ -76,6 +80,7 @@ VIC_POSTCODE = re.compile(r"^(3\d{3}|8\d{3})$")
 VIC_BBOX = (140.5, -39.4, 150.4, -33.8)  # min_lon, min_lat, max_lon, max_lat
 
 
+# Hash a local boundary archive in chunks so provenance identifies the exact downloaded bytes.
 def sha256(path: str) -> str:
     digest = hashlib.sha256()
     with open(path, "rb") as f:
@@ -84,6 +89,7 @@ def sha256(path: str) -> str:
     return digest.hexdigest()
 
 
+# Download an explicitly configured ABS archive to the local raw-data directory.
 def download(url: str, path: str) -> None:
     import urllib.request
 
@@ -92,6 +98,7 @@ def download(url: str, path: str) -> None:
     urllib.request.urlretrieve(url, path)
 
 
+# Read geometry and record fields directly from the matching shapefile components inside one ZIP archive.
 def read_shapefile(zip_path: str):
     """Yield (record, shape) from the single shapefile inside an ABS zip."""
     import shapefile
@@ -108,6 +115,7 @@ def read_shapefile(zip_path: str):
         yield dict(zip(fields, shape_record.record)), shape_record.shape
 
 
+# Split one polygon geometry into its outer rings and holes for area and containment calculations.
 def rings(shape) -> list[list[tuple[float, float]]]:
     """Split a shapefile polygon into its rings (outer rings and holes)."""
     points = shape.points
@@ -115,6 +123,7 @@ def rings(shape) -> list[list[tuple[float, float]]]:
     return [points[starts[i]:starts[i + 1]] for i in range(len(starts) - 1)]
 
 
+# Compute signed ring area and its center so holes subtract from the combined polygon; handle a zero-area ring.
 def ring_area_centroid(ring) -> tuple[float, float, float]:
     """Signed area and centroid of one ring via the shoelace formula.
 
@@ -138,6 +147,7 @@ def ring_area_centroid(ring) -> tuple[float, float, float]:
     return area2 / 2.0, cx / (3.0 * area2), cy / (3.0 * area2)
 
 
+# Apply even-odd ray crossing over every ring so a point inside a hole is excluded.
 def point_in_shape(x: float, y: float, shape_rings) -> bool:
     """Even-odd ray casting across every ring, so holes exclude correctly."""
     inside = False
@@ -152,6 +162,7 @@ def point_in_shape(x: float, y: float, shape_rings) -> bool:
     return inside
 
 
+# Prefer an interior area-weighted center; otherwise choose the midpoint of the widest interior span.
 def representative_point(shape_rings) -> tuple[float, float]:
     """A point guaranteed to sit inside the polygon.
 
@@ -200,17 +211,20 @@ def representative_point(shape_rings) -> tuple[float, float]:
     return best_x, cy
 
 
+# Quickly reject polygons whose bounding boxes cannot intersect the area of interest.
 def bbox_overlaps(bbox, other) -> bool:
     return not (
         bbox[2] < other[0] or bbox[0] > other[2] or bbox[3] < other[1] or bbox[1] > other[3]
     )
 
 
+# Remove the ABS Victoria suffix while retaining the place name used for suburb matching.
 def clean_suburb_name(name: str) -> str:
     """Drop the ABS state qualifier, e.g. 'Hillside (Vic.)' -> 'Hillside'."""
     return re.sub(r"\s*\((?:Vic\.?|Victoria)\)\s*$", "", name).strip()
 
 
+# Prepare ABS inputs, derive approximate suburb/postcode rows and replace the Victorian lookup with source evidence.
 def main() -> int:
     load_dotenv(os.path.join(REPO_ROOT, ".env"))
     database_url = os.getenv("DATABASE_URL")
@@ -321,6 +335,7 @@ def main() -> int:
     print(f"  wrote {CLEAN_PATH}")
 
     retrieved = date.today().isoformat()
+    # This operator connection can write: normal context exit commits; an escaping exception rolls back its transaction.
     with psycopg.connect(database_url) as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT COUNT(*) FROM suburb_postcodes;")

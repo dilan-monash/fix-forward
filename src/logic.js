@@ -1,13 +1,20 @@
+// Decision and validation helpers used by the adult app.js screens.
+// These functions return values; they do not render pages, call APIs or save user answers.
+// Safety wording, question applicability and priorities come from data.js.
 import { SAFETY_RULES, SAFETY_APPLICABILITY, CATEGORY_SAFETY_PRIORITY, SAFETY_PLAN_LIMITS } from "./data.js";
 
+// Turn model/SKU text into a comparable key by normalising letter forms and punctuation.
+// The caller still requires an exact key match; this does not make a partial model exact.
 export function normalizeIdentifier(value) {
   return String(value || "").normalize("NFKC").toUpperCase().replace(/[^A-Z0-9]/g, "");
 }
 
+// Make a consistent lowercase word key for brand, problem and area comparisons.
 export function normalizeWords(value) {
   return String(value || "").normalize("NFKC").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim().replace(/\s+/g, " ");
 }
 
+// Validate optional brand text and return either a cleaned value or a field-level explanation.
 export function validateBrand(value) {
   const text = String(value ?? "").trim();
   if (!text) return { valid: true, value: "" };
@@ -17,6 +24,7 @@ export function validateBrand(value) {
   return { valid: true, value: text };
 }
 
+// Validate optional model text while allowing numeric models and common label punctuation.
 export function validateModel(value) {
   const text = String(value ?? "").trim();
   if (!text) return { valid: true, value: "" };
@@ -26,6 +34,7 @@ export function validateModel(value) {
   return { valid: true, value: text };
 }
 
+// Validate a short description of existing observations, preserving ordinary line breaks.
 export function validateProblem(value) {
   const text = String(value ?? "").trim();
   if (text.length < 5) return { valid: false, reason: "too-short", message: "Tell us a little more — at least 5 characters." };
@@ -37,6 +46,8 @@ export function validateProblem(value) {
   return { valid: true, value: text };
 }
 
+// Group description keywords into a topic for questions to ask a repairer.
+// This simple text grouping is not fault detection and must not change safety or price decisions.
 export function classifyProblem(value) {
   const text = normalizeWords(value);
   const groups = [
@@ -52,6 +63,7 @@ export function classifyProblem(value) {
   return { code: "general", label: "general performance" };
 }
 
+// Rank partial suburb/postcode matches from the supplied local index, then remove duplicates.
 export function findSuburbSuggestions(query, index, limit = 8) {
   const raw = String(query ?? "").trim();
   if (raw.length < 2) return [];
@@ -83,6 +95,8 @@ export function findSuburbSuggestions(query, index, limit = 8) {
   return output;
 }
 
+// Resolve a complete suburb or postcode to known local coordinates, or return a useful error.
+// If a postcode contains several indexed suburbs, use their average as an approximate search centre.
 export function resolveAreaInput(query, index) {
   const raw = String(query ?? "").trim();
   if (!raw) return { valid: false, reason: "missing", message: "Type a suburb or 4-digit postcode." };
@@ -111,6 +125,8 @@ export function resolveAreaInput(query, index) {
   return { valid: true, latitude, longitude, postcode, suburb, label: suburb ? `${postcode} — ${suburb}` : postcode };
 }
 
+// Count single-character edits between normalised identifiers for a nearby-spelling warning.
+// This distance never upgrades a miss into an exact recall match.
 function levenshtein(a, b) {
   const left = normalizeIdentifier(a);
   const right = normalizeIdentifier(b);
@@ -133,6 +149,8 @@ function levenshtein(a, b) {
  * identifiers are checked within the selected category. Brand supports the
  * match but cannot hide an exact model hit. Near matches are suggestions only.
  */
+// Return possible, none, insufficient or unavailable from product details and available recall records.
+// A possible result needs an exact model/SKU within the category; a brand mismatch stays visible.
 export function matchRecall(appliance, recalls, dataAvailable = true) {
   if (!dataAvailable) return { status: "unavailable", match: null, matches: [], limited: true, reason: "data-unavailable" };
 
@@ -185,6 +203,7 @@ export function matchRecall(appliance, recalls, dataAvailable = true) {
   return { status: "none", match: null, matches: [], near, limited: true, reason: "no-limited-dataset-match" };
 }
 
+// Keep only question IDs that apply to the selected appliance type.
 export function applicableSafetySigns(category, signs) {
   const safeSigns = Array.isArray(signs) ? signs : [];
   const safeCategory = String(category || "");
@@ -201,6 +220,7 @@ export function applicableSafetySigns(category, signs) {
  * questions than the guided path, while still keeping the most consequential
  * warning signs first.
  */
+// Return a short ordered question list using appliance applicability and the selected goal's limit.
 export function safetyPlanFor(category, intent, signs) {
   const safeCategory = String(category || "");
   const safeIntent = String(intent || "guide");
@@ -218,6 +238,8 @@ export function safetyPlanFor(category, intent, signs) {
   return ordered.slice(0, limit).map((id) => byId.get(id));
 }
 
+// Return the strongest reported safety status and the question IDs behind it.
+// Critical Yes takes priority, then uncertainty, then caution; clear means no rule was triggered.
 export function evaluateSafety(answers, rules = SAFETY_RULES) {
   const yes = [];
   const unsure = [];
@@ -237,6 +259,8 @@ export function evaluateSafety(answers, rules = SAFETY_RULES) {
   return { status, yes, unsure, critical, caution };
 }
 
+// Combine recall and safety status into route permissions for the adult interface.
+// A possible recall overrides ordinary options; uncertain answers still permit cautious exploration.
 export function journeyDecision(recallStatus, safetyStatus) {
   if (safetyStatus === "high") {
     return {
@@ -276,6 +300,8 @@ export function journeyDecision(recallStatus, safetyStatus) {
   return { allowCost: true, allowCommunityRepair: true, allowNextSteps: true, kind: "clear-to-options", pathway: "options" };
 }
 
+// Read a conventional AUD amount and return a value or a validation reason.
+// Zero is allowed only where the caller explicitly permits it, such as a free repair quote.
 export function parseMoney(value, { allowZero = false } = {}) {
   if (value === "" || value === null || value === undefined) return { valid: false, reason: "missing" };
   const raw = String(value).trim();
@@ -293,6 +319,8 @@ export function parseMoney(value, { allowZero = false } = {}) {
   return { valid: true, amount };
 }
 
+// Validate both user-entered amounts, then compare upfront cost in cents.
+// Return per-field errors or the amounts, difference and cheaper side; do not recommend a purchase.
 export function compareCosts(repairInput, replacementInput) {
   const repair = parseMoney(repairInput, { allowZero: true });
   const replacement = parseMoney(replacementInput);
@@ -332,12 +360,15 @@ export function compareCosts(repairInput, replacementInput) {
   };
 }
 
+// Accept a finite latitude/longitude inside its allowed range, or return null.
 function finiteCoordinate(value, maximum) {
   if (value === null || value === undefined || typeof value === "boolean" || String(value).trim() === "") return null;
   const number = Number(value);
   return Number.isFinite(number) && Math.abs(number) <= maximum ? number : null;
 }
 
+// Calculate approximate straight-line kilometres between two valid coordinate pairs.
+// Return null for missing coordinates; this is not road distance or a travel route.
 export function distanceKm(from, to) {
   const lat1 = finiteCoordinate(from?.latitude, 90);
   const lon1 = finiteCoordinate(from?.longitude, 180);
@@ -346,6 +377,7 @@ export function distanceKm(from, to) {
   if ([lat1, lon1, lat2, lon2].some((value) => value === null)) return null;
 
   const radiusKm = 6371.0088;
+  // Convert map degrees to the angle units used by the straight-line distance formula.
   const radians = (degrees) => degrees * Math.PI / 180;
   const dLat = radians(lat2 - lat1);
   const dLon = radians(lon2 - lon1);
@@ -354,6 +386,7 @@ export function distanceKm(from, to) {
   return 2 * radiusKm * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
+// Filter supplied service records by pathway and typed area; report total and limited matches.
 export function getLocations(area, pathway, locations, limit = 12) {
   const query = normalizeWords(area);
   const safeLocations = Array.isArray(locations) ? locations : [];
@@ -369,6 +402,8 @@ export function getLocations(area, pathway, locations, limit = 12) {
   return { matches: filtered.slice(0, safeLimit), total: filtered.length, mode: "area" };
 }
 
+// Rank supplied services by straight-line distance after pathway, provider and radius filters.
+// Coordinates are used locally; no search query is sent from this function.
 export function getNearbyLocations(userLocation, pathway, locations, options = {}) {
   const safeLocations = Array.isArray(locations) ? locations : [];
   const safeOptions = options && typeof options === "object" ? options : {};
@@ -394,6 +429,7 @@ export function getNearbyLocations(userLocation, pathway, locations, options = {
   };
 }
 
+// Check that a service has both usable latitude and longitude before mapping it.
 export function locationHasCoordinates(location) {
   return finiteCoordinate(location?.latitude, 90) !== null && finiteCoordinate(location?.longitude, 180) !== null;
 }

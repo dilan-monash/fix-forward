@@ -1,3 +1,6 @@
+// Read the adult app's public reference datasets from the Flask API.
+// data.js supplies the static questionnaire and empty operational fallback lists.
+// Return separate availability flags so one failed dataset cannot impersonate an empty successful result.
 import {
   META as STATIC_META,
   FAMILIES,
@@ -15,7 +18,10 @@ const DATASET_NAMES = ["recalls", "sources", "repairEvidence", "locations"];
 const RETRYABLE_STATUSES = new Set([408, 502, 503, 504]);
 const RETRY_DELAY_MS = 250;
 
+// Carry a safe request message plus status/retry information for loadPublicData.
+// Server response bodies are not copied into user-facing error messages.
 class PublicDataRequestError extends Error {
+  // Keep the safe message and the information needed to decide whether a retry can help.
   constructor(message, { status = null, retryable = false } = {}) {
     super(message);
     this.status = status;
@@ -23,6 +29,8 @@ class PublicDataRequestError extends Error {
   }
 }
 
+// Return the static screen definitions and explicit unavailable flags for operational data.
+// Empty recall, repair and location lists are placeholders, not successful no-match answers.
 export function getStaticSnapshot() {
   return {
     meta: STATIC_META,
@@ -48,20 +56,25 @@ export function getStaticSnapshot() {
   };
 }
 
+// Join the configured API base with one endpoint path without a duplicate slash.
 function apiUrl(baseUrl, endpoint) {
   return `${String(baseUrl || "").replace(/\/$/, "")}${endpoint}`;
 }
 
+// Read one JSON endpoint with a shared deadline and at most one transient-error retry.
+// Authentication/configuration failures and malformed data are not silently retried as ordinary outages.
 async function getJson(fetchImpl, url, signal) {
   let abortListener;
   // Bound both the network request and JSON body reading. The extra race also
   // handles a fetch adapter that fails to honour AbortSignal itself.
   const aborted = new Promise((_, reject) => {
+    // Reject the deadline race even if a fetch adapter ignores the abort signal.
     abortListener = () => reject(new Error("Public data request timed out"));
     if (signal.aborted) abortListener();
     else signal.addEventListener("abort", abortListener, { once: true });
   });
   try {
+    // Start the request/retry work now; the outer deadline race also bounds JSON body reading.
     const request = (async () => {
       for (let attempt = 0; attempt < 2; attempt += 1) {
         try {
@@ -106,8 +119,10 @@ async function getJson(fetchImpl, url, signal) {
   }
 }
 
+// Wait briefly before a retry, but stop immediately if the overall request has been cancelled.
 function waitForRetry(signal) {
   return new Promise((resolve, reject) => {
+    // Cancel the short retry wait and remove its listener when the shared deadline expires.
     const onAbort = () => {
       clearTimeout(timer);
       signal.removeEventListener("abort", onAbort);
@@ -122,6 +137,7 @@ function waitForRetry(signal) {
   });
 }
 
+// Start the four independent dataset reads and return them under stable dataset names.
 function endpointTasks(config, fetchImpl, signal) {
   const e = config.endpoints;
   return {
@@ -132,6 +148,7 @@ function endpointTasks(config, fetchImpl, signal) {
   };
 }
 
+// Small row-shape helpers distinguish objects, nonempty text and supported record IDs.
 function isRecord(value) {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
@@ -144,6 +161,8 @@ function validId(value) {
   return hasText(value) || (typeof value === "number" && Number.isFinite(value));
 }
 
+// Check each dataset's required fields before the UI can rely on a row.
+// Repair outcome counts must add up to their recorded sample size.
 function validDatasetRow(name, row) {
   if (!isRecord(row)) return false;
   if (name === "recalls") {
@@ -166,6 +185,8 @@ function validDatasetRow(name, row) {
   return false;
 }
 
+// Extract a complete validated dataset and metadata, or reject the whole response.
+// Dropping only a malformed recall row could hide a match, so partial row filtering is unsafe.
 function extractDataset(name, payload) {
   const field = name === "repairEvidence" ? "evidence" : name;
   const rows = payload?.[field];
@@ -183,6 +204,8 @@ function extractDataset(name, payload) {
  * A location outage must never masquerade as a recall outage, and a recall
  * outage must never prevent the static safety questionnaire from rendering.
  */
+// Load public datasets independently and return values, source metadata and per-dataset status.
+// A failed recall request leaves recall checking unavailable while static safety questions still work.
 export async function loadPublicData(config = DATA_API_CONFIG, fetchImpl = globalThis.fetch) {
   const suppliedConfig = config && typeof config === "object" ? config : DATA_API_CONFIG;
   const safeConfig = { ...DATA_API_CONFIG, ...suppliedConfig, endpoints: { ...DATA_API_CONFIG.endpoints, ...suppliedConfig.endpoints } };
@@ -196,6 +219,7 @@ export async function loadPublicData(config = DATA_API_CONFIG, fetchImpl = globa
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
   try {
     const tasks = endpointTasks(safeConfig, safeFetchImpl, controller.signal);
+    // Keep each dataset's success/failure instead of failing the whole page together.
     const results = await Promise.allSettled(DATASET_NAMES.map((name) => tasks[name]));
     const output = { ...base, mode: "backend", errors: {}, availability: { ...base.availability }, apiAvailability: { ...base.apiAvailability }, datasetMeta: { ...base.datasetMeta } };
 
@@ -203,6 +227,7 @@ export async function loadPublicData(config = DATA_API_CONFIG, fetchImpl = globa
       const result = results[index];
       if (result.status === "rejected") {
         output.errors[name] = result.reason instanceof Error ? result.reason.message : "Unavailable";
+        // A 401 needs sign-in recovery; it must not appear as a successfully empty dataset.
         if (result.reason?.status === 401) output.accessRequired = true;
         return;
       }

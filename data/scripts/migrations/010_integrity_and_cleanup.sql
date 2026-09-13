@@ -1,3 +1,6 @@
+-- DATABASE-WRITING schema/cleanup phase; can reject incomplete provenance and removes superseded coarse acceptance flags.
+-- Run before the current candidate matcher so it can fill matched_field; migration 011 enforces completeness afterward.
+
 -- FixForward migration 010 — remaining integrity and schema cleanup
 --
 -- Schema phase. matched_field is added nullable here; 011 sets NOT NULL after

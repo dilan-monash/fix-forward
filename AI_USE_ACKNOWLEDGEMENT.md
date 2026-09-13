@@ -50,6 +50,20 @@ Attach or link the original conversation export/screenshots if required by the u
 
 ## Student reflection prompts
 
+### FixForward Quest assistance — 13 September 2026
+
+OpenAI Codex assisted with implementing the user-supplied FixForward Quest brief: legacy-stack inspection, isolated child module, authored mission adaptation, original SVG illustrations, source comparison, deterministic state/drag/storage code, focused regression tests, browser walkthroughs and local handover documents. The source register records exactly which guidance was checked and its access limitations. The implementation report distinguishes automated tests and an agent walkthrough from child-participant research. No child study or human safety review is claimed.
+
+The subsequent child-focused refinement added Pip/Flo dialogue, collectible clue labels, eight illustrated stamps, a before/after scene viewer, saved postcard palettes and stickers, local SVG export code, finite accessible motion and updated comparison/demo documents. Codex assisted with code, art, test and browser review. Recorded checks distinguish visible desktop review and phone DOM measurements from unverified browser file saving and child research.
+
+The later tablet-first refinement responded to the user's request for simpler English, more playful interaction and a clear parent explanation. Codex assisted with shortening authored child text while preserving scored rules, adding picture reflections and learning-goal fields, local Sparks/level logic, larger tap choices, word help, contextual narration, finite art sequences, the parent guide and the revised adult invitation. Assistance also covered implementation checks and the [tablet build handover](docs/QUEST_TABLET_PLAY.md). That document records the refinement's completed checks and remaining verification limits; earlier totals must not be presented as current results. Sentence-length checks and expert/agent review do not establish children's comprehension, engagement or learning outcomes. The W3C references are design guidance, not an accessibility certification.
+
+The subsequent handover pass added plain-English source comments and a [developer walkthrough and review Q&A](docs/DEVELOPER_HANDOVER.md). Codex inspected the current code, documented function/module connections and distinguished runtime reads from database-writing maintenance scripts. No maintenance scripts or live database changes were executed. [Handover verification](docs/HANDOVER_VERIFICATION.md) records the source comparison and automated checks. The explanations require student/developer review and do not substitute for demonstrating personal understanding or approving a release.
+
+The work began on `feature/child-quest-prototype`, starting from `c203c3827acfb3b8ef1124a7f643943dad9ff6b6`, and is now prepared on `iteration-2`. The existing `main` branch and Render website remain the Iteration 1 comparison baseline; Iteration 2 uses a separate service when deployed. This acknowledgement does not verify a live deployment. See [Quest implementation evidence](docs/QUEST_IMPLEMENTATION.md) and [authored-content/source register](docs/QUEST_CONTENT_SOURCES.md). Preserve the supplied build brief and this conversation as prompt/output evidence if the course requires it, after removing unrelated private information. Students must record their own review, accepted/rejected changes and individual contributions; these remain uncompleted student responsibilities. This note does not substitute for their declaration below.
+
+### Prompts for the student's own reflection
+
 Write these answers yourself:
 
 1. Which AI suggestion did I verify most carefully, and why?

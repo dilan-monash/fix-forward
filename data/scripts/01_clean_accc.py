@@ -1,3 +1,6 @@
+# Local-file transformation: turn the latest dated raw ACCC XML into data/clean/recalls.csv.
+# This preserves a limited feed snapshot for 03_load_accc_neon.py; keyword relevance is not a confirmed product match.
+
 """
 Step 6b: Clean ACCC recall RSS into a CSV for loading.
 
@@ -49,6 +52,7 @@ OUT_COLUMNS = [
 ]
 
 
+# Remove feed markup, collapse whitespace and bound the summary length for the cleaned CSV.
 def strip_html(text: str) -> str:
     text = unescape(text or "")
     text = re.sub(r"<[^>]+>", " ", text)
@@ -56,6 +60,7 @@ def strip_html(text: str) -> str:
     return text[:2000]
 
 
+# Use an available parsed date or parse the RSS date string, leaving an unknown date blank.
 def parse_published(entry) -> str:
     if getattr(entry, "published_parsed", None):
         return datetime(*entry.published_parsed[:6]).date().isoformat()
@@ -67,6 +72,7 @@ def parse_published(entry) -> str:
     return ""
 
 
+# Build bounded lowercase keyword metadata; this legacy text is not the reviewed product-identifier matcher.
 def build_keywords(title: str, category: str, summary: str) -> str:
     parts = [title, category, summary]
     combined = " ".join(p for p in parts if p).lower()
@@ -75,6 +81,7 @@ def build_keywords(title: str, category: str, summary: str) -> str:
     return " ".join(tokens[:80])
 
 
+# Pick the last filename in the sorted dated XML set, or stop when no source snapshot exists.
 def latest_raw_file() -> str:
     files = sorted(glob.glob(os.path.join(RAW_DIR, "*.xml")))
     if not files:
@@ -82,6 +89,7 @@ def latest_raw_file() -> str:
     return files[-1]
 
 
+# Parse and deduplicate feed entries by notice URL, then write the cleaned recall input for the Neon loader.
 def main() -> int:
     raw_path = latest_raw_file()
     print(f"Parsing: {raw_path}")

@@ -1,4 +1,8 @@
+// Read and rank dated public replacement-price examples for the adult cost screen.
+// This catalogue is separate from Neon safety/service data and from the user's repair quote.
+// A validated saved copy can cover a price-service outage, with its fallback status shown in app.js.
 // Retail prices are dated observations, never a diagnosis or a buying recommendation.
+// Build a comparison key for a recorded brand/model without changing the displayed text.
 const normalize = (value) => String(value || "").normalize("NFKC").toLowerCase().replace(/[^a-z0-9]/g, "");
 const retailerHosts = {
   "The Good Guys": "thegoodguys.com.au", "JB Hi-Fi": "jbhifi.com.au",
@@ -7,6 +11,8 @@ const retailerHosts = {
   "Myer": "myer.com.au", "Amazon AU": "amazon.com.au"
 };
 
+// Check a dated AUD observation, its fields and an approved retailer's source URL.
+// Return false for impossible amounts/dates or a source address that does not match the named retailer.
 export function validPriceRow(row, today = new Date()) {
   if (!row || typeof row !== "object" || typeof row.id !== "string" || !row.id.trim()) return false;
   if (!["categoryCode", "brand", "model", "productName"].every((key) => typeof row[key] === "string" && row[key].trim())) return false;
@@ -23,6 +29,7 @@ export function validPriceRow(row, today = new Date()) {
   } catch { return false; }
 }
 
+// Accept a complete reviewed-price payload with unique valid rows, or throw an error.
 export function validatePricePayload(payload, today = new Date()) {
   if (payload?.meta?.source !== "reviewed-price-snapshot" || payload?.meta?.currency !== "AUD" || !Array.isArray(payload.prices)) throw new Error("Invalid price catalogue");
   const ids = new Set();
@@ -33,6 +40,8 @@ export function validatePricePayload(payload, today = new Date()) {
   return payload;
 }
 
+// Find same-category records, keep the newest observation per product/retailer, and rank matches.
+// Only complete brand and model equality counts as exact; older-than-90-day rows are marked stale.
 export function matchPriceExamples(prices, appliance, { today = new Date(), limit = 6 } = {}) {
   const brand = normalize(appliance.brand);
   const model = normalize(appliance.model);
@@ -52,11 +61,14 @@ export function matchPriceExamples(prices, appliance, { today = new Date(), limi
     .slice(0, Math.max(0, limit));
 }
 
+// Request the price API with a bounded wait, then use only a validated saved copy if it fails.
+// Return an empty unavailable catalogue if neither source is valid; never invent an amount.
 export async function loadPriceCatalogue(snapshot, { fetchImpl = globalThis.fetch, timeoutMs = 5000, today = new Date() } = {}) {
   let timer;
   const controller = new AbortController();
   try {
     const timeout = new Promise((_, reject) => { timer = setTimeout(() => { controller.abort(); reject(new Error("Price request timed out")); }, timeoutMs); });
+    // Fetch and validate together so a late or malformed response cannot bypass the deadline/fallback.
     const request = (async () => {
       const response = await fetchImpl("/api/replacement-prices", { signal: controller.signal, headers: { Accept: "application/json" } });
       if (!response.ok) throw new Error("Price service unavailable");
@@ -69,6 +81,7 @@ export async function loadPriceCatalogue(snapshot, { fetchImpl = globalThis.fetc
   } finally { clearTimeout(timer); }
 }
 
+// Return authored questions for a repairer based on a description topic, not a diagnosed fault.
 export function problemQuestions(code) {
   return ({
     battery: "Tell the repairer whether it would not charge or lost charge quickly, and whether you noticed damage or swelling. Ask whether they handle this battery type.",

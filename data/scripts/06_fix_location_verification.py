@@ -1,3 +1,7 @@
+# DATABASE-WRITING bulk correction: separate dataset provenance from facility-level verification.
+# Requires location/provenance/import-run schema and loaded sources; this resets verification fields to unverified.
+# It can clear later manual verification too, so historical rerun claims below are not a promise to preserve new review work.
+
 """
 Move dataset URLs out of verification_url and into the source provenance fields.
 
@@ -49,6 +53,7 @@ WEBSITE_SUFFIX = (
 )
 
 
+# Backfill source provenance, clear facility-verification claims and rewrite the limits attached to each location.
 def main() -> int:
     load_dotenv(os.path.join(REPO_ROOT, ".env"))
     database_url = os.getenv("DATABASE_URL")
@@ -62,6 +67,7 @@ def main() -> int:
         print("ERROR: pip install -r requirements-data.txt")
         return 1
 
+    # This operator connection can write: normal context exit commits; an escaping exception rolls back its transaction.
     with psycopg.connect(database_url) as conn:
         with conn.cursor() as cur:
             cur.execute(

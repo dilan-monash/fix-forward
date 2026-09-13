@@ -1,3 +1,7 @@
+# Network and DATABASE-WRITING seed: check configured citation URLs, then replace safety-rule source links.
+# Requires safety-rule seed 04 and migration 008. --strict-urls stops before database writes if a URL check fails.
+# Without strict mode, URL failures are reported but do not block the citation writes; availability is not content verification.
+
 """
 Attach specific, checkable sources to every safety rule.
 
@@ -151,6 +155,7 @@ ATTEMPTS = [
 ]
 
 
+# Check a cited URL with the implemented HTTP fallback and return its status or a short error label.
 def url_status(url: str, timeout: int = 20) -> int | str:
     """Confirm a citation resolves. 403 means a filter refused us, not 404."""
     last: int | str = "unknown"
@@ -170,6 +175,7 @@ def url_status(url: str, timeout: int = 20) -> int | str:
     return last
 
 
+# Check the citation registry, map it to existing rules and commit source links plus each rule primary-source fields.
 def main(argv: list[str]) -> int:
     strict = "--strict-urls" in argv
 
@@ -203,6 +209,7 @@ def main(argv: list[str]) -> int:
         return 1
 
     today = date.today().isoformat()
+    # This operator connection can write: normal context exit commits; an escaping exception rolls back its transaction.
     with psycopg.connect(database_url) as conn:
         with conn.cursor() as cur:
             source_ids: dict[str, int] = {}
@@ -234,6 +241,8 @@ def main(argv: list[str]) -> int:
             rule_ids = dict(cur.fetchall())
 
             missing = sorted(set(RULE_SOURCES) - set(rule_ids))
+            # Source upserts above have already executed. Returning normally here can commit them through the connection context,
+            # even though missing rules stop citation linking; the nonzero exit does not promise no database changes.
             if missing:
                 print()
                 print("ERROR: these hazard codes are not in safety_rules:")

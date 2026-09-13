@@ -1,3 +1,6 @@
+# Configuration adapter used by the application factory and in-process diagnostic.
+# Read environment settings and an optional local .env; never return secret values through the public API.
+
 """Environment-only configuration.
 
 No database password is stored in source control. The hosting platform injects
@@ -10,6 +13,7 @@ from pathlib import Path
 
 
 @dataclass(frozen=True)
+# Hold an immutable snapshot of backend configuration for one application instance.
 class Settings:
     database_url: str
     release_version: str
@@ -19,6 +23,7 @@ class Settings:
     session_cookie_secure: bool
 
     @classmethod
+    # Prefer existing environment values, bound the connection timeout and retain the exact shared password.
     def from_environment(cls):
         # The local setup instructions promise .env support. Read it here so
         # python app.py, Gunicorn and the diagnostic use the same settings.
@@ -34,7 +39,7 @@ class Settings:
         return cls(
             database_url=os.getenv("DATABASE_URL", "").strip(),
             release_version=os.getenv(
-                "RELEASE_VERSION", "iteration-1-v1.6.0-usability-lab"
+                "RELEASE_VERSION", "iteration-2-v2.0.0-quest"
             ).strip(),
             db_connect_timeout=timeout,
             # These never enter frontend code or the public API. Keep the shared

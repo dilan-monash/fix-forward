@@ -1,9 +1,12 @@
+// TEST SUITE: Checks reviewed-price validation and matching without querying live retailers or a database.
+// Each test name describes its expected behavior; fixtures are invented test inputs.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { matchPriceExamples, validPriceRow, validatePricePayload, loadPriceCatalogue } from "../src/price-catalogue.js";
 import { PRICE_SNAPSHOT } from "../src/price-snapshot.js";
 
 const today = new Date("2026-09-11T10:00:00Z");
+// Create an invented price row and its API-shaped wrapper; these are never retail evidence.
 const row = (overrides = {}) => ({ id: "fixture-a", categoryCode: "kettle", brand: "Example", model: "ABC-123", productName: "Synthetic test kettle", retailer: "The Good Guys", priceAud: 49.95, currency: "AUD", sourceUrl: "https://www.thegoodguys.com.au/test-only", observedAt: "2026-09-11", priceKind: "advertised", availability: "not-verified", notes: "Synthetic test only", ...overrides });
 const payload = (prices = [row()]) => ({ meta: { source: "reviewed-price-snapshot", currency: "AUD" }, prices });
 

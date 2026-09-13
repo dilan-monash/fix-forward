@@ -1,3 +1,6 @@
+-- DATABASE-WRITING schema phase for auditable category-pattern candidates, not the product-identifier API tables.
+-- 06_build_recall_patterns.py seeds definitions; 06_match_recalls.py records candidate evidence and preserves review decisions.
+
 -- FixForward migration 005 — pattern-based recall matching
 --
 -- The previous approach compared category aliases to recall text with

@@ -1,3 +1,6 @@
+# DATABASE-WRITING classification: update household-electrical relevance using exact facility-type labels.
+# Run after location imports and the relevant schema migrations. Relevance selects candidate results; it is not acceptance verification.
+
 """
 Flag recycling locations that may appear on the responsible-disposal pathway.
 
@@ -27,6 +30,7 @@ WHITELIST = (
 )
 
 
+# Apply the source-type relevance rules to stored locations and report the resulting candidate counts.
 def main() -> int:
     load_dotenv(os.path.join(REPO_ROOT, ".env"))
     database_url = os.getenv("DATABASE_URL")
@@ -41,6 +45,7 @@ def main() -> int:
         return 1
 
     print("Flagging recycling eligibility on locations...")
+    # This operator connection can write: normal context exit commits; an escaping exception rolls back its transaction.
     with psycopg.connect(database_url) as conn:
         with conn.cursor() as cur:
             # Repair locations are not disposal destinations

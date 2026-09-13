@@ -1,3 +1,6 @@
+# Read-only database wrapper suite using a fake psycopg module and connection/cursor objects.
+# It checks transaction options, timeout ordering and sanitized failures without a real database connection.
+
 """Pooler compatibility and failure handling without a live database."""
 
 import sys
@@ -10,7 +13,9 @@ from flask import Flask
 from backend.db import DatabaseUnavailable, fetch_all
 
 
+# Group pooler-compatible query ordering and failure-path checks.
 class DatabaseAccessTests(unittest.TestCase):
+    # Prepare mock context managers and an isolated Flask configuration for one query-wrapper case.
     def setUp(self):
         self.app = Flask(__name__)
         self.app.config.update(
@@ -27,6 +32,7 @@ class DatabaseAccessTests(unittest.TestCase):
 
         # Model PgBouncer's rejection at the driver boundary. No credentials or
         # running PostgreSQL instance are needed for this regression check.
+        # Stand in for psycopg.connect and record supplied options without opening a socket.
         def connect(_url, **kwargs):
             if "options" in kwargs:
                 raise RuntimeError("unsupported startup parameter in options")

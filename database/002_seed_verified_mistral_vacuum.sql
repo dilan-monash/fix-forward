@@ -1,3 +1,7 @@
+-- DATABASE-WRITING narrow product seed; requires database/001 and the matching imported ACCC notice row.
+-- This SQL does not fetch or inspect the notice. Its manually_reviewed flag relies on the recorded review of these exact identifiers.
+-- If the source notice row is absent, INSERT ... SELECT adds no product; successful execution alone is not coverage evidence.
+
 -- One verified record from the team's ACCC RSS snapshot.
 -- Source notice: Mistral Barrel Cyclonic Vacuum Cleaner - BVC 160 / BVC 165.
 -- This seed is deliberately narrow; it is not a claim of complete recall coverage.
@@ -27,6 +31,7 @@ JOIN recalls AS r ON r.id = rp.recall_id
 WHERE r.official_url = 'https://www.productsafety.gov.au/search-consumer-product-recalls/mistral-barrel-cyclonic-vacuum-cleaner-%E2%80%93-sold-at-bunnings'
 ON CONFLICT DO NOTHING;
 
+-- Two known model variants share this notice. These are exact reviewed identifiers, not guessed aliases.
 INSERT INTO recall_identifiers
     (recall_product_id, identifier_type, identifier_value, normalized_value)
 SELECT rp.id, values_to_add.identifier_type,

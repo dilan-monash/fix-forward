@@ -1,3 +1,7 @@
+# DATABASE-WRITING enrichment: fill derived postcode/provider fields and available OSM opening-hour tags.
+# Run after location imports and the current suburb lookup; stale unmatched postcode values can be cleared.
+# It does not write facility verification or acceptance. 06_fix_location_verification.py owns the provenance/verification reset.
+
 """
 Honest location enrichment (no invented acceptance/public access).
 
@@ -30,6 +34,7 @@ REPO_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, "..", ".."))
 OSM_RAW = os.path.join(SCRIPT_DIR, "..", "raw", "osm", "victoria_repair_pois.json")
 
 
+# Map broad source labels to supported provider types; this classification does not prove service suitability.
 def provider_type_from_facility(facility_type: str | None, location_type: str) -> str:
     """Always return a constrained provider_type. locations.provider_type is NOT NULL."""
     if not facility_type:
@@ -50,6 +55,7 @@ def provider_type_from_facility(facility_type: str | None, location_type: str) -
     return "recycling_facility"
 
 
+# Read only existing raw OSM hours and index them by normalized name, or return an empty map.
 def osm_opening_hours_by_name() -> dict[str, str]:
     if not os.path.exists(OSM_RAW):
         return {}
@@ -65,6 +71,7 @@ def osm_opening_hours_by_name() -> dict[str, str]:
     return mapping
 
 
+# Recompute postcode/provider fields, copy available source hours and commit the location updates.
 def main() -> int:
     load_dotenv(os.path.join(REPO_ROOT, ".env"))
     database_url = os.getenv("DATABASE_URL")
@@ -81,6 +88,7 @@ def main() -> int:
     osm_hours = osm_opening_hours_by_name()
     print(f"OSM opening_hours tags found: {len(osm_hours)}")
 
+    # This operator connection can write: normal context exit commits; an escaping exception rolls back its transaction.
     with psycopg.connect(database_url) as conn:
         with conn.cursor() as cur:
             # Postcode is derived from the suburb name. Always recompute

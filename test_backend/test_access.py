@@ -1,3 +1,6 @@
+# Access-gate integration suite using isolated cookies, test configuration and fake repository responses.
+# These tests check the real gate logic without a hosted database; scenario test names describe each expected boundary.
+
 """Access gate integration tests with isolated cookies and repository fakes."""
 
 import importlib.util
@@ -10,7 +13,9 @@ WEB_DEPENDENCIES = all(importlib.util.find_spec(name) for name in ("flask", "dot
 
 
 @unittest.skipUnless(WEB_DEPENDENCIES, "Flask test dependencies are not installed")
+# Group shared-password, CSRF, expiry, cache and route-access regression cases.
 class AccessTests(unittest.TestCase):
+    # Create a fresh test application and browser client so cookies cannot leak between cases.
     def setUp(self):
         from backend import create_app
 
@@ -24,6 +29,7 @@ class AccessTests(unittest.TestCase):
         })
         self.client = self.app.test_client()
 
+    # Read the CSRF token rendered by the test client instead of bypassing the actual form flow.
     def token(self, path="/login"):
         response = self.client.get(path)
         self.assertEqual(response.status_code, 200)
@@ -32,6 +38,7 @@ class AccessTests(unittest.TestCase):
         response.close()
         return token.group(1)
 
+    # Submit the test password through the real login route using that client session token.
     def login(self, password="fixforward"):
         return self.client.post("/login", data={"csrf_token": self.token(), "password": password})
 

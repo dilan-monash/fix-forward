@@ -1,3 +1,7 @@
+# DATABASE-WRITING import: replace only repair-type locations from the cleaned OSM CSV.
+# Requires location-enrichment/provenance columns and import-run migration 006. Recycling rows are retained.
+# Source tags create unverified leads; the loader does not establish public access, qualification or appliance acceptance.
+
 """
 Step 8c: Load OSM repair locations into Neon.
 
@@ -39,6 +43,7 @@ OSM_SOURCE = {
 }
 
 
+# Load repair candidates with source provenance, commit the replacement and report both location-type counts.
 def main() -> int:
     load_dotenv(os.path.join(REPO_ROOT, ".env"))
     database_url = os.getenv("DATABASE_URL")
@@ -65,6 +70,7 @@ def main() -> int:
         locations = list(csv.DictReader(f))
 
     print("Loading OSM repair locations into Neon...")
+    # This operator connection can write: normal context exit commits; an escaping exception rolls back its transaction.
     with psycopg.connect(database_url) as conn:
         with conn.cursor() as cur:
             cur.execute("DELETE FROM locations WHERE location_type = 'repair';")

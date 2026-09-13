@@ -1,3 +1,6 @@
+# Read-only database report: inspect stored category candidates after 06_match_recalls.py.
+# This script does not run a second matcher or confirm any result; zero candidates is not a recall clearance.
+
 """
 Report recall candidate coverage per appliance category.
 
@@ -25,6 +28,7 @@ REPO_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, "..", ".."))
 OFFICIAL_SEARCH = "https://www.productsafety.gov.au/recalls"
 
 
+# Print snapshot coverage, category counts and stored match evidence using SELECT queries only.
 def main() -> int:
     load_dotenv(os.path.join(REPO_ROOT, ".env"))
     database_url = os.getenv("DATABASE_URL")

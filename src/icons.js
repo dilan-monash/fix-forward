@@ -1,3 +1,5 @@
+// Small decorative SVG snippets used by the adult app.js button and message helpers.
+// Keys are icon names; values are trusted local SVG strings. Visible labels supply their meaning.
 export const icons = {
   arrow: '<svg aria-hidden="true" viewBox="0 0 20 20"><path d="M4 10h11M11 6l4 4-4 4"/></svg>',
   shield: '<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-2.8 8.2-7 10-4.2-1.8-7-5.5-7-10V6l7-3z"/><path d="M9 12l2 2 4-5"/></svg>',

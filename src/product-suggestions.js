@@ -1,15 +1,23 @@
+// Build optional brand/model suggestions for app.js from limited price and recall records.
+// Inputs are the selected appliance and already loaded public records; the result is brand/model lists.
+// No keystrokes are sent to a search service, and choosing a suggestion is not a recall decision.
 // These are optional identity suggestions from the project's limited records.
 // A suggestion is not a recall result, a diagnosis, or a complete product list.
 const LIMIT = 8;
+// Normalise lookup text and sort labels consistently; keep the original text for display.
+// Brand and model keys use different punctuation rules because product labels differ.
 const text = (value) => typeof value === "string" ? value.trim() : "";
 const brandKey = (value) => text(value).normalize("NFKC").toLocaleLowerCase("en").replace(/\s+/g, " ");
 const modelKey = (value) => text(value).normalize("NFKC").toLocaleLowerCase("en").replace(/[^\p{L}\p{N}]/gu, "");
 const compare = (left, right) => left.localeCompare(right, "en", { sensitivity: "base", numeric: true });
 
+// Return category-specific suggestions while preserving whether a model came from a recall notice.
+// Models are suggested only after a complete known brand; typed values are never replaced automatically.
 export function productSuggestions(appliance = {}, prices = [], recalls = []) {
   const categoryCode = text(appliance?.categoryCode);
   if (!categoryCode) return { brands: [], models: [] };
   const products = new Map();
+  // Add one complete identity, deduplicating it while preserving recall-note provenance.
   const addProduct = (brandValue, modelValue, source) => {
     const brand = text(brandValue);
     const model = text(modelValue);

@@ -1,3 +1,8 @@
+/* Adult FixForward presentation, loaded by index.html and the simple error pages. */
+/* src/app.js supplies screen markup and state classes; this file changes appearance only. */
+/* Later refinement sections override earlier rules. Keep their order when editing. */
+/* Quest uses its separate styles under quest/. */
+/* Shared colours, fonts, spacing and shadows follow. */
 :root {
   --ink: #071c49;
   --muted: #5c6d85;
@@ -34,6 +39,7 @@
   background: var(--cream);
 }
 
+/* Baseline sizing, text wrapping and accessible keyboard focus/skip-link treatment. */
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; scroll-padding-block: 10rem; }
 body { margin: 0; min-width: 0; background: radial-gradient(circle at 92% 0%, rgba(18,182,244,.13), transparent 32rem), linear-gradient(135deg, #f8fcff 0%, var(--cream) 58%, #e9f7ff 100%); color: var(--ink); }
@@ -50,6 +56,7 @@ h1, h2, h3, p { text-wrap: pretty; }
 .skip-link:focus { transform: none; }
 :focus-visible { outline: 3px solid var(--green-800); outline-offset: 3px; box-shadow: 0 0 0 3px white; }
 
+/* Persistent header: branding, navigation and the three-step journey indicator. */
 .site-chrome { position: sticky; top: 0; z-index: 500; }
 .site-header { position: relative; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .5rem 1rem; padding: .82rem clamp(1rem, 4vw, 3.6rem); border-bottom: 1px solid rgba(216,226,222,.86); background: rgba(251,250,245,.94); backdrop-filter: blur(18px); }
 .brand { display: inline-flex; align-items: center; gap: .72rem; border: 0; background: transparent; color: var(--ink); cursor: pointer; text-align: left; }
@@ -77,6 +84,7 @@ h1, h2, h3, p { text-wrap: pretty; }
 .journey-progress li.done span { border-color: var(--green-500); background: var(--mint); color: var(--green-900); }
 .journey-progress li.done::after { background: var(--green-500); }
 
+/* Main content height, standalone server error cards and temporary loading state. */
 main { min-height: 70vh; }
 .error-page { display: grid; place-items: center; min-height: 100vh; padding: 1.25rem; }
 .error-page main { width: min(640px, 100%); min-height: 0; padding: clamp(1.25rem, 5vw, 3rem); border: 1px solid var(--line); border-radius: 24px; background: white; box-shadow: var(--shadow-sm); }
@@ -89,6 +97,7 @@ main { min-height: 70vh; }
 .loader { width: 50px; height: 50px; margin-bottom: 1rem; border: 5px solid var(--mint); border-top-color: var(--green-700); border-radius: 50%; animation: spin .8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* Landing-page explanation and goal choices before a household enters product details. */
 .kicker, .eyebrow, .mini-label { color: var(--green-700); font-size: .76rem; font-weight: 900; letter-spacing: .105em; text-transform: uppercase; }
 .goal-first { overflow: hidden; }
 .hero-simple { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(280px, .8fr); align-items: center; gap: clamp(1.5rem, 4vw, 4rem); padding: clamp(1.5rem, 4vw, 3.5rem) clamp(1rem, 5vw, 5rem); }
@@ -135,6 +144,7 @@ main { min-height: 70vh; }
 .trust-note h2 { margin: .35rem 0 0; font-size: clamp(2rem, 4vw, 3.7rem); letter-spacing: -.055em; }
 .trust-note > p { margin: .4rem 0 0; color: var(--muted); font-size: 1.02rem; line-height: 1.7; }
 
+/* Shared screen widths and headings; identification cards and form controls follow. */
 .screen { width: min(1180px, calc(100% - 2rem)); margin: 0 auto; padding: 3rem 0 6rem; }
 .narrow { width: min(850px, calc(100% - 2rem)); }
 .wide-screen { width: min(1160px, calc(100% - 2rem)); }
@@ -187,6 +197,7 @@ input:focus, select:focus { border-color: var(--green-700); outline: 3px solid v
 .button.compact { min-height: 44px; padding: .55rem .85rem; font-size: .875rem; }
 .button[disabled] { opacity: .62; cursor: wait; transform: none; }
 
+/* Recall notices distinguish possible matches from incomplete or unavailable checks. */
 .recall-mini { display: grid; grid-template-columns: auto 1fr; gap: 1rem; margin: 1rem 0 1.2rem; padding: 1.25rem; border: 1px solid var(--line); border-radius: 20px; background: white; box-shadow: var(--shadow-card); }
 .recall-alert { border-color: #efaaa6; background: var(--red-soft); }
 .recall-neutral { background: var(--blue-soft); border-color: #c8dce7; }
@@ -196,6 +207,7 @@ input:focus, select:focus { border-color: var(--green-700); outline: 3px solid v
 .recall-mini p { color: #52645e; line-height: 1.55; }
 .inline-warning { padding: .65rem .75rem; border-radius: 10px; background: var(--orange-soft); color: #674816 !important; }
 
+/* Safety questions, answer selection, field errors and the continuation area. */
 .question-list { display: grid; gap: .75rem; }
 .question-card { margin: 0; padding: 1.05rem; border: 1px solid var(--line); border-radius: 18px; background: white; box-shadow: var(--shadow-card); }
 .question-card legend { display: flex; align-items: center; gap: .65rem; width: 100%; padding: 0; font-size: 1rem; font-weight: 850; }
@@ -212,6 +224,7 @@ input:focus, select:focus { border-color: var(--green-700); outline: 3px solid v
 .sticky-action strong, .sticky-action span { display: block; }
 .sticky-action span { margin-top: .17rem; color: var(--muted); font-size: .76rem; }
 
+/* Result priorities: serious warnings, uncertainty, official recall guidance and next-step cards. */
 .result-screen { padding-top: 2.4rem; }
 .urgent-card, .caution-card, .recall-result-card { margin-top: 1.5rem; padding: clamp(1.4rem, 4vw, 2.2rem); border-radius: 26px; box-shadow: var(--shadow-sm); }
 .urgent-card, .recall-result-card { border: 1px solid #efaaa6; background: var(--red-soft); }
@@ -282,6 +295,7 @@ input:focus, select:focus { border-color: var(--green-700); outline: 3px solid v
 .evidence-details dt { color: var(--muted); font-weight: 800; }
 .evidence-details dd { margin: 0; }
 
+/* Services: location search, filters, paired map/list results and honest empty states. */
 .services-screen { width: min(1320px, calc(100% - 2rem)); }
 .services-hero { display: flex; justify-content: space-between; gap: 2rem; align-items: end; margin: 1.5rem 0 1rem; }
 .services-hero > div:first-child { max-width: 760px; }
@@ -328,6 +342,7 @@ input:focus, select:focus { border-color: var(--green-700); outline: 3px solid v
 .wider-help h2 { margin: 0 0 .4rem; }
 .wider-help p { color: var(--muted); }
 
+/* Cost screens: entered amounts and comparison are distinct from supporting examples. */
 .cost-screen { width: min(920px, calc(100% - 2rem)); }
 .smart-cost-card { padding: 1.25rem; border: 1px solid var(--line); border-radius: 24px; background: linear-gradient(145deg, white, var(--mint-3)); box-shadow: var(--shadow-sm); }
 .smart-cost-head h2 { margin: .4rem 0 .15rem; font-size: 1.9rem; letter-spacing: -.04em; }
@@ -361,6 +376,7 @@ input:focus, select:focus { border-color: var(--green-700); outline: 3px solid v
 .mini-check-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: .45rem; }
 .mini-check-grid span { padding: .65rem .7rem; border: 1px solid rgba(255,255,255,.12); border-radius: 10px; color: #c8dcd5; font-size: .8rem; }
 
+/* Reusable notices, footer, source/restart dialogs and short status messages. */
 .notice { padding: .9rem 1rem; border-radius: 14px; line-height: 1.5; }
 .notice.warning { border: 1px solid #edcf9d; background: var(--orange-soft); color: #694917; }
 .notice.success { background: var(--mint); color: var(--green-900); }
@@ -399,6 +415,7 @@ dialog::backdrop { background: rgba(6,39,34,.7); backdrop-filter: blur(3px); }
 .leaflet-touch .leaflet-bar a { width: 44px; height: 44px; line-height: 44px; }
 .leaflet-popup-content-wrapper { border-radius: 12px; box-shadow: var(--shadow-sm); }
 
+/* Responsive rules reshape controls for smaller windows; they do not change decisions. */
 @media (max-width: 1080px) {
   .goal-grid { grid-template-columns: repeat(2, 1fr); }
   .goal-card { min-height: 280px; }
@@ -473,10 +490,12 @@ dialog::backdrop { background: rgba(6,39,34,.7); backdrop-filter: blur(3px); }
   html { scroll-padding-block: 1.5rem; }
 }
 
+/* Device preference removes animated scrolling and loading motion for this base layout. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; }
 }
 
+/* Completion banners describe the quick check; supporting repair history remains below services. */
 .quick-check-pass {
   display: flex;
   align-items: flex-start;
@@ -784,6 +803,7 @@ dialog::backdrop { background: rgba(6,39,34,.7); backdrop-filter: blur(3px); }
   .choice-card:active, .category-button:active { transform: none; }
 }
 .learning-screen { padding-top: 1rem; }
+/* Retained three-story learning-screen styles for src/learning.js, separate from Quest's adventure. */
 .learning-heading { margin: 1rem 0; }
 .learning-heading h1 { margin: .3rem 0 .5rem; font-size: clamp(1.9rem, 5vw, 3rem); line-height: 1.12; letter-spacing: -.035em; }
 .learning-heading > p:last-child { margin: 0; color: var(--muted); line-height: 1.55; }
@@ -873,3 +893,7 @@ dialog::backdrop { background: rgba(6,39,34,.7); backdrop-filter: blur(3px); }
   .safety-footer > div { flex-basis: auto; }
   .site-chrome { position: static; }
 }
+
+.quest-parent-link { display:block; margin-top:.85rem; padding:.4rem 0; min-height:44px; font-size:.875rem; font-weight:700; text-underline-offset:4px; }
+/* Adult landing links to the separate Quest game and parent guide use comfortable touch targets. */
+.quest-family-invite .button { min-height:48px; }

@@ -1,3 +1,7 @@
+# DATABASE-WRITING candidate refresh: match loaded recalls using active definitions from the pattern table.
+# Requires recall import, category/pattern seeds and schema 010 for matched-field provenance; run before validation 011.
+# Existing human review status is preserved for retained candidates; candidates no longer produced by the patterns are deleted.
+
 """
 Match ACCC recalls to appliance categories using the reviewed pattern table.
 
@@ -30,6 +34,7 @@ from recall_matching import Pattern, best_matches  # noqa: E402
 OFFICIAL_SEARCH = "https://www.productsafety.gov.au/recalls"
 
 
+# Read patterns and recall fields, upsert the strongest candidate per category, remove stale candidates and commit.
 def main() -> int:
     load_dotenv(os.path.join(REPO_ROOT, ".env"))
     database_url = os.getenv("DATABASE_URL")
@@ -43,6 +48,7 @@ def main() -> int:
         print("ERROR: pip install -r requirements-data.txt")
         return 1
 
+    # This operator connection can write: normal context exit commits; an escaping exception rolls back its transaction.
     with psycopg.connect(database_url) as conn:
         with conn.cursor() as cur:
             cur.execute(

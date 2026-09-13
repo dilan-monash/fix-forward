@@ -1,3 +1,6 @@
+# Read-only diagnostic entry point for the local backend configuration, not a deployed-site or data-accuracy check.
+# It calls real API handlers in process and may contact the configured PostgreSQL database; it does not start a public server.
+
 """Read-only checks of the database-backed endpoints, without printing secrets.
 
 Run from the project root: python -m backend.check_database
@@ -18,6 +21,7 @@ DATASET_CHECKS = (
 )
 
 
+# Check readiness first, then collect only dataset status/count results; stop early after failed connectivity.
 def run_checks(app):
     """Return only safe status/count fields; never connection or row details."""
     results = []
@@ -46,6 +50,7 @@ def run_checks(app):
     return results
 
 
+# Load diagnostic configuration, run safe reads and distinguish missing setup, failed endpoints and empty imports.
 def main():
     try:
         # This in-process diagnostic is not a public HTTP server. Bypass only

@@ -1,3 +1,6 @@
+// Retained three-story Appliance Detective activity used by the adult app's learning screen.
+// This is separate from the newer /quest module and its Sparks, storage and eight missions.
+// Authored story records contain picture type, choices, feedback and a discovery; they are not real product data.
 // A separate, fictional learning journey: it never evaluates a real appliance.
 const STORIES = [
   {
@@ -38,12 +41,15 @@ const STORIES = [
   }
 ];
 
+// Keep authored text safe when inserting it into the activity's HTML.
 const escapeHtml = (value) => String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
 
+// Return an untouched first story with no answer and no completed ending.
 export function createLearningState() {
   return { step: 0, choice: null, finished: false };
 }
 
+// Keep only a valid story index and answer; reject impossible completion combinations.
 function validState(state) {
   if (!Number.isInteger(state?.step) || state.step < 0 || state.step >= STORIES.length) return createLearningState();
   const selected = STORIES[state.step].choices.find((choice) => choice.id === state.choice);
@@ -52,6 +58,8 @@ function validState(state) {
 
 // No progression until feedback has been read and a safer choice selected.
 // Incorrect answers have unlimited retries, with no score or penalty.
+// Apply one choose/retry/next/replay action and return the resulting story state.
+// Unknown actions leave it unchanged; only a correct choice can advance.
 export function transitionLearning(current, action) {
   const state = validState(current);
   const story = STORIES[state.step];
@@ -68,11 +76,13 @@ export function transitionLearning(current, action) {
   return state;
 }
 
+// Return the heading or feedback selector that should receive focus for this state.
 export function learningFocusTarget(current) {
   const state = validState(current);
   return state.choice && !state.finished ? "#learning-feedback" : "#learning-focus";
 }
 
+// Return a local SVG picture for a fictional toaster, fan or recycling story.
 function illustration(kind) {
   const toaster = `<rect x="70" y="70" width="180" height="120" rx="32" fill="#b6e9f4"/><path d="M96 72V60h128v12" fill="none"/><path d="M93 190v10m135-10v10M232 113h20v27h-20"/><circle cx="129" cy="123" r="6" fill="#061f57"/><circle cx="183" cy="123" r="6" fill="#061f57"/><path d="M143 145q13 12 26 0" fill="none"/>`;
   const scene = kind === "fan"
@@ -83,12 +93,14 @@ function illustration(kind) {
   return `<svg class="learning-illustration" aria-hidden="true" viewBox="0 0 320 240" fill="none" stroke="#061f57" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="160" cy="222" rx="105" ry="10" fill="#dcecf4" stroke="none"/>${scene}</svg>`;
 }
 
+// Count correct story steps and return the labelled discovery indicator.
 function progress(state) {
   const answered = STORIES[state.step].choices.find((choice) => choice.id === state.choice)?.correct === true;
   const count = state.finished ? STORIES.length : state.step + Number(answered);
   return `<div class="learning-progress"><p>${count} of ${STORIES.length} discoveries</p><ol aria-label="Your picture stories">${STORIES.map((story, index) => `<li class="${index < count ? "is-done" : ""}"${index === state.step && !state.finished ? ' aria-current="step"' : ""}><span aria-hidden="true">${index < count ? "✓" : index + 1}</span>${escapeHtml(story.name)}${index < count ? '<span class="sr-only"> completed</span>' : ""}</li>`).join("")}</ol></div>`;
 }
 
+// Return the complete activity HTML from validated state; app.js attaches its button handlers.
 export function renderLearning(current) {
   const state = validState(current);
   const story = STORIES[state.step];

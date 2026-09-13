@@ -1,3 +1,7 @@
+# Local build writer used by Render: validate reviewed JSON, build SQLite and regenerate src/price-snapshot.js.
+# An optional argument also writes public JSON. This path uses standard-library helpers and never contacts Neon.
+# The API reads the built SQLite file; the explicit static preview consumes the generated JavaScript snapshot.
+
 """Build the reviewed public replacement-price database using only stdlib.
 
 Run from the project root: python data/scripts/build_price_catalogue.py
@@ -24,6 +28,7 @@ from backend.price_catalogue import (  # noqa: E402
 )
 
 
+# Build and reread the local price database, then export the matching browser module and optional JSON payload.
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source-dir", type=Path, default=DEFAULT_SOURCE_DIR)

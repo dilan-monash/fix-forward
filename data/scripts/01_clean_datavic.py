@@ -1,3 +1,6 @@
+# Local-file transformation: read the configured DataVic raw JSON and write locations_recycling.csv.
+# 03_load_datavic_neon.py loads these candidates later; missing contact or acceptance information is not invented here.
+
 """
 Step 7b: Clean DataVic waste infrastructure for recycling/disposal locations.
 
@@ -42,12 +45,14 @@ OUT_COLUMNS = [
 ]
 
 
+# Convert a present source field to trimmed text and represent a missing value as an empty field.
 def clean_text(value) -> str:
     if value is None:
         return ""
     return str(value).strip()
 
 
+# Convert a numeric coordinate to CSV text and leave missing or invalid values blank.
 def parse_coord(value) -> str:
     text = clean_text(value)
     if not text:
@@ -58,6 +63,7 @@ def parse_coord(value) -> str:
         return ""
 
 
+# Deduplicate named facilities, combine their source type labels and write the recycling-location input.
 def main() -> int:
     if not os.path.exists(RAW_PATH):
         print(f"ERROR: Run 00_download_datavic.py first. Missing: {RAW_PATH}")

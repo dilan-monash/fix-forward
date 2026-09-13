@@ -1,3 +1,7 @@
+// Adult application entry loaded by index.html. It draws screens and connects their controls.
+// logic.js makes decisions; data-service.js reads public APIs; price-catalogue.js handles dated prices.
+// User appliance answers, costs and exact device coordinates remain in this tab's memory.
+// Quest is a separate entry point and save system; this module does not import its game state.
 import { loadPublicData, getStaticSnapshot } from "./data-service.js";
 import {
   matchRecall,
@@ -42,6 +46,8 @@ const toast = document.querySelector("#toast");
 
 let publicData = getStaticSnapshot();
 let publicDataLoading = true;
+// Request counters identify which reply still belongs to the current screen/journey.
+// They prevent slow network or location replies from overwriting a newer user choice.
 let loadGeneration = 0;
 let mapInstance = null;
 let mapMarkers = new Map();
@@ -53,6 +59,8 @@ let priceCatalogue = { ...PRICE_SNAPSHOT, mode: "saved-copy" };
 let priceRequest = null;
 let renderedScreen = null;
 
+// Make a fresh adult journey in this tab, including empty safety answers and prices.
+// This state is separate from Quest saves; restarting creates another copy.
 const emptyState = () => ({
   screen: "landing",
   learning: createLearningState(),
@@ -83,16 +91,25 @@ const emptyState = () => ({
 });
 let state = emptyState();
 
+// Small display helpers: choose a local icon, escape text/attributes, and format AUD or counts.
+// Escaping keeps user-entered or downloaded text from becoming executable page markup.
 function icon(name) { return icons[name] || ""; }
 function escapeHtml(value) { return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;"); }
 function escapeAttr(value) { return escapeHtml(value); }
 function money(value) { return new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD", maximumFractionDigits: 2 }).format(value); }
 function formatCount(value) { return new Intl.NumberFormat("en-AU").format(Number(value) || 0); }
+// Show a short status message without changing the journey or submitting data.
 function showToast(message) { toast.textContent = message; toast.classList.add("show"); setTimeout(() => toast.classList.remove("show"), 2600); }
+// Choose instant or smooth scrolling from the device's reduced-motion preference.
 function scrollBehavior() { return window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"; }
+// Move keyboard focus to the main content after navigation, then return to its top.
 function focusMain() { main?.focus({ preventScroll: true }); window.scrollTo({ top: 0, behavior: scrollBehavior() }); }
+// Focus a specific control in the current screen without unexpectedly scrolling it.
 function focusElement(selector) { app.querySelector(selector)?.focus({ preventScroll: true }); }
+// Record that this journey has been used, so Home/Restart can offer confirmation.
 function markTouched() { state.touched = true; }
+// Read the availability flags and dataset lists supplied by data-service.js.
+// An empty list alone is not proof that recall or service information loaded successfully.
 function availability(name) { return publicData?.availability?.[name] === true; }
 function families() { return publicData?.families || []; }
 function recalls() { return publicData?.recalls || []; }
@@ -101,6 +118,8 @@ function sources() { return publicData?.sources || []; }
 function repairEvidence() { return publicData?.repairEvidence || []; }
 function locations() { return publicData?.locations || []; }
 
+// Accept only a usable web address, optionally restricted to known hosts.
+// Return null for a rejected address so callers can omit the link.
 function safeExternalUrl(value, allowedHosts = null) {
   try {
     const url = new URL(String(value || ""));
@@ -110,22 +129,28 @@ function safeExternalUrl(value, allowedHosts = null) {
   } catch { return null; }
 }
 
+// Build an escaped external link from a checked address and visible label.
+// The new tab cannot control this tab through window.opener.
 function externalLink(url, label, className = "") {
   const safe = safeExternalUrl(url);
   return safe ? `<a class="${escapeAttr(className)}" href="${escapeAttr(safe)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}<span class="sr-only"> (opens in a new tab)</span> ↗</a>` : "";
 }
 
+// Turn a recorded phone number into a call link using only dialling characters.
 function telephoneLink(phone) {
   const cleaned = String(phone || "").replace(/[^0-9+]/g, "");
   return cleaned ? `<a class="button secondary compact" href="tel:${escapeAttr(cleaned)}">Call</a>` : "";
 }
 
+// Build a directions link for a listed place with valid coordinates.
+// The link names the destination; it does not attach the user's exact device location.
 function directionsLink(item) {
   if (!locationHasCoordinates(item)) return "";
   const url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(item.latitude)},${encodeURIComponent(item.longitude)}`;
   return externalLink(url, "Directions", "button secondary compact");
 }
 
+// Update the three-step header for the current journey stage, or hide it on Home.
 function setStage(stage = null) {
   journeyShell.hidden = !stage;
   const order = ["appliance", "check", "options"];
@@ -137,6 +162,8 @@ function setStage(stage = null) {
   });
 }
 
+// Move to a named screen, record it in browser history, and redraw the page.
+// Leaving services invalidates an outstanding location request before it can update another screen.
 function navigate(screen, { replace = false } = {}) {
   const fromScreen = state.screen;
   if (fromScreen === "services" && screen !== "services") { ++geoGeneration; if (state.geoStatus === "loading") state.geoStatus = "idle"; }
@@ -149,15 +176,18 @@ function navigate(screen, { replace = false } = {}) {
   focusMain();
 }
 
+// Use this tab's previous journey entry, or return Home if none belongs to FixForward.
 function back() {
   if (history.state?.fixForward) history.back();
   else navigate("landing", { replace: true });
 }
 
+// Return a labelled Back button; bindBack connects it after the screen is inserted.
 function renderBack(label = "Back") {
   return `<button class="back-button" type="button" data-back>${icon("arrow")} ${escapeHtml(label)}</button>`;
 }
 
+// Replace the content with a loading message while leaving the shared page shell intact.
 function renderLoading(message = "Getting FixForward ready…") {
   setStage(null);
   app.innerHTML = `<section class="loading-screen" role="status" aria-live="polite">
@@ -168,6 +198,8 @@ function renderLoading(message = "Getting FixForward ready…") {
   </section>`;
 }
 
+// Refresh independent public datasets and keep the user's current answers.
+// Only the latest request may replace data; a newly available recall result can change the route.
 async function reloadPublicData({ announce = false, showLoading = false } = {}) {
   const generation = ++loadGeneration;
   publicDataLoading = true;
@@ -183,6 +215,7 @@ async function reloadPublicData({ announce = false, showLoading = false } = {}) 
     if (state.appliance.category) {
       const previousRecall = state.recall;
       state.recall = matchRecall(state.appliance, data.recalls || [], Boolean(data.availability?.recalls));
+      // Losing the data connection must not erase a possible recall already found for this product.
       if (!data.availability?.recalls && previousRecall?.status === "possible") state.recall = { ...previousRecall, refreshUnavailable: true };
       state.decision = null;
     }
@@ -203,6 +236,8 @@ async function reloadPublicData({ announce = false, showLoading = false } = {}) 
   }
 }
 
+// Draw the adult goal choices and separate Quest/parent links.
+// Choosing a goal starts identification; it does not skip the safety check.
 function renderLanding() {
   document.title = "Home | FixForward";
   setStage(null);
@@ -218,13 +253,14 @@ function renderLanding() {
         </div>
         <p class="hero-reassurance">A few short questions. You choose what happens next.</p>
       </div>
-      <aside class="family-learning-card" aria-labelledby="family-learning-title">
+      <aside class="family-learning-card quest-family-invite" aria-labelledby="family-learning-title">
         <span class="learning-invite-icon" aria-hidden="true">✦</span>
-        <p class="eyebrow">For kids + a grown-up</p>
-        <h2 id="family-learning-title">Be an appliance detective</h2>
-        <p>Try three picture stories together. Spot a safer choice and discover why repair and recycling matter.</p>
-        <button class="button primary" id="start-learning" type="button">Play together ${icon("arrow")}</button>
-        <small>All on screen. No appliance needed.</small>
+        <p class="eyebrow">An adventure for ages 7–12</p>
+        <h2 id="family-learning-title">Small clues. Big discoveries.</h2>
+        <p>Meet Pip and Flo in <strong>FixForward Quest</strong>. Children explore picture stories, collect Sparks and practise choosing what happens next.</p>
+        <a class="button primary" id="open-quest" href="/quest" target="_blank" rel="noopener">Play FixForward Quest ${icon("arrow")}<span class="sr-only"> (opens in a new tab)</span></a>
+        <a class="quest-parent-link" href="/quest?view=parents" target="_blank" rel="noopener">Why Quest? A guide for parents ↗</a>
+        <small>Made for taps and drags. Stories stay on screen.</small>
       </aside>
     </div>
 
@@ -250,9 +286,10 @@ function renderLanding() {
     state.serviceSafetyMode = "clear";
     navigate("identify");
   }));
-  app.querySelector("#start-learning")?.addEventListener("click", () => navigate("learning"));
 }
 
+// Draw and bind the retained three-story learning activity from learning.js.
+// Its fictional answers stay inside state.learning and never become appliance safety answers.
 function renderLearningScreen() {
   setStage(null);
   app.innerHTML = renderLearning(state.learning);
@@ -267,10 +304,13 @@ function renderLearningScreen() {
   }));
 }
 
+// Return one brand/model input with its suggestion list, help text and error space.
 function productField(name, label, limit, hint) {
   return `<div class="product-autocomplete"><label for="product-${name}">${label}</label><div class="product-input-row"><input id="product-${name}" name="${name}" maxlength="${limit}" value="${escapeAttr(state.appliance[name])}" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="${name}-suggestions" aria-describedby="${name}-hint ${name}-error" placeholder="Type or choose a ${name}"><button class="text-button" type="button" data-suggest="${name}" aria-label="Show ${name} suggestions">⌄</button></div><div id="${name}-suggestions" class="product-suggestions" role="listbox" aria-label="${label} suggestions" hidden></div><small class="field-hint" id="${name}-hint">${hint}</small><small class="field-error" id="${name}-error"></small></div>`;
 }
 
+// Connect optional brand/model suggestions to typing, clicks and keyboard choices.
+// The limited local records assist entry; they do not identify or certify the user's product.
 function bindProductSuggestions() {
   for (const name of ["brand", "model"]) {
     const input = app.querySelector(`[name="${name}"]`);
@@ -278,7 +318,9 @@ function bindProductSuggestions() {
     if (!input || !list) continue;
     let options = [];
     let active = -1;
+    // Hide this suggestion list and its keyboard highlight without deleting typed text.
     const close = () => { list.hidden = true; input.setAttribute("aria-expanded", "false"); input.removeAttribute("aria-activedescendant"); active = -1; };
+    // Apply the chosen suggestion by index, then let normal input handlers update state.
     const select = (index) => {
       if (!options[index]) return;
       input.value = name === "brand" ? options[index] : options[index].model;
@@ -286,6 +328,7 @@ function bindProductSuggestions() {
       close();
       input.focus({ preventScroll: true });
     };
+    // Rebuild this field's suggestions from current category/brand text and public records.
     const show = () => {
       const matches = productSuggestions(state.appliance, priceCatalogue.prices || [], recalls());
       options = matches[name === "brand" ? "brands" : "models"];
@@ -317,6 +360,7 @@ function bindProductSuggestions() {
   }
 }
 
+// Choose the identification heading and explanation for the user's selected goal.
 function intentHeading() {
   if (state.intent === "repair") return { eyebrow: "Repair", title: "What appliance needs help?", copy: "Tell us what it is. Brand and model are useful if you know them, but they are not required." };
   if (state.intent === "compare") return { eyebrow: "Compare costs", title: "What appliance are you comparing?", copy: "Tell us what it is, then we will take you straight to the cost tool after a short check." };
@@ -324,10 +368,12 @@ function intentHeading() {
   return { eyebrow: "Help me decide", title: "What appliance is causing trouble?", copy: "Choose the closest match. We will ask a few relevant questions and guide you from there." };
 }
 
+// Ask logic.js for the short safety-question list matching this appliance and goal.
 function currentSafetyPlan() {
   return safetyPlanFor(state.appliance.category, state.intent, safetySigns());
 }
 
+// Name the intended destination for screen copy; safety rules still decide the actual route.
 function destinationAfterCheck() {
   if (state.intent === "repair") return "repair options";
   if (state.intent === "compare") return "cost comparison";
@@ -335,6 +381,8 @@ function destinationAfterCheck() {
   return "your options";
 }
 
+// Draw appliance choices and bind brand/model entry and validation.
+// Changing the appliance clears dependent answers, prices and location choices before continuing.
 function renderIdentify() {
   setStage("appliance");
   const selectedFamily = families().find((family) => family.id === state.appliance.family);
@@ -379,6 +427,7 @@ function renderIdentify() {
   }));
   bindProductSuggestions();
   app.querySelectorAll("[data-family]").forEach((button) => button.addEventListener("click", () => {
+    // A different appliance cannot inherit a previous appliance's warnings, quote or search centre.
     state.appliance = { family: button.dataset.family, category: "", categoryCode: "", brand: "", model: "" };
     state.safety = {};
     state.recall = null;
@@ -402,6 +451,7 @@ function renderIdentify() {
     app.querySelector(".category-panel")?.scrollIntoView({ block: "center", behavior: scrollBehavior() });
   }));
   app.querySelectorAll("[data-category]").forEach((button) => button.addEventListener("click", () => {
+    // Clear dependent results even within one family: questions and product evidence may differ.
     state.appliance.category = button.dataset.category;
     state.appliance.categoryCode = CATEGORY_CODE_BY_NAME[button.dataset.category] || "";
     state.safety = {};
@@ -455,6 +505,8 @@ function renderIdentify() {
   });
 }
 
+// Render the current recall status with its source or recovery link.
+// Missing data, missing details and no exact match each have different wording; none clears a recall.
 function recallMiniCard() {
   const result = state.recall || matchRecall(state.appliance, recalls(), availability("recalls"));
   state.recall = result;
@@ -481,8 +533,10 @@ function recallMiniCard() {
   return `<aside class="recall-mini recall-neutral"><div class="recall-icon">i</div><div><p class="mini-label">What is a product recall?</p><h2>We do not have enough model detail for a product-specific check.</h2><p>That is okay. A <strong>product recall</strong> is a safety notice asking people to stop using, repair or return a product. You can keep going and use the official search if you want to check your exact appliance.</p>${externalLink(acccUrl, "Open official recall search")}</div></aside>`;
 }
 
+// Provide the current question list to the existing safety-screen helpers.
 function relevantSigns() { return currentSafetyPlan(); }
 
+// Explain why this goal needs safety questions before showing its next tool.
 function safetyReasonCopy() {
   if (state.intent === "repair") return "Some warning signs mean a community repair event is not the right first stop. We only ask the checks that matter most for this appliance.";
   if (state.intent === "compare") return "A cost comparison should not encourage you to keep using an appliance that may need checking first. You can still explore costs if you are not sure about an answer.";
@@ -490,6 +544,7 @@ function safetyReasonCopy() {
   return "These questions help us avoid suggesting the wrong next step. We keep them specific to the appliance you selected.";
 }
 
+// Return the local pictogram and wording for one safety question, using its rule ID.
 function safetyVisual(id) {
   const help = SAFETY_HELP[id] || {};
   return `<div class="safety-visual" role="img" aria-label="Simple visual for ${escapeAttr(help.question || id)}">
@@ -498,6 +553,8 @@ function safetyVisual(id) {
   </div>`;
 }
 
+// Build one named safety question with Yes/No/Not sure choices and expandable help.
+// The help uses existing observations, rather than asking the person to test an appliance.
 function questionCard(id, index) {
   const help = SAFETY_HELP[id] || {};
   const answer = state.safety[id] || "";
@@ -520,16 +577,20 @@ function questionCard(id, index) {
   </fieldset>`;
 }
 
+// Return the displayed questions answered Yes or Not sure for supporting explanations.
 function flaggedSafetyAnswers(signs = relevantSigns()) {
   return signs.filter(([id]) => ["yes", "unsure"].includes(state.safety[id]));
 }
 
+// Evaluate the current answers and include a deliberate decision not to inspect further.
+// Opting out stays uncertain unless an already reported critical warning makes it high risk.
 function currentSafetyResult() {
   const result = evaluateSafety(state.safety);
   if (!state.safetyOptOut) return result;
   return { ...result, status: result.status === "high" ? "high" : "uncertain", unsure: [...result.unsure, "unable-to-check"] };
 }
 
+// Carry the current safety mode into a repair-contact, cost or disposal planning screen.
 function openPathway(action) {
   state.fromRepairHub = false;
   state.serviceSafetyMode = state.safetyResult?.status === "high" ? "high"
@@ -539,6 +600,8 @@ function openPathway(action) {
   navigate(action === "compare" ? "cost" : "services");
 }
 
+// Return cautious information-gathering choices when uncertainty remains.
+// These options help the user ask questions; they are not permission to use the appliance.
 function explorationOptions() {
   return `<section class="exploration-options" aria-labelledby="explore-title"><h2 id="explore-title">You can still explore your options.</h2><p>We cannot recommend repair or replacement while safety is unclear. These paths help you gather information. Get advice before using the appliance again.</p><div class="result-grid">
     ${resultActionCard("repair", "🔧", "Ask about repair", "Find repair businesses to contact. Ask whether they can assess your appliance and what an inspection costs.", "Explore repair options")}
@@ -547,10 +610,13 @@ function explorationOptions() {
   </div></section>`;
 }
 
+// Connect the cautious planning cards to openPathway after rendering them.
 function bindExplorationOptions() {
   app.querySelectorAll(".exploration-options [data-action]").forEach((button) => button.addEventListener("click", () => openPathway(button.dataset.action)));
 }
 
+// Refresh the answered count and next-step wording without replacing question controls.
+// Not sure remains an answer, so choosing it does not prevent finishing the form.
 function updateSafetyFooter() {
   const signs = relevantSigns();
   const answered = signs.filter(([id]) => state.safety[id]).length;
@@ -571,6 +637,8 @@ function updateSafetyFooter() {
   if (button) button.textContent = answered === signs.length ? "See my next step" : "Continue";
 }
 
+// Check required answers, derive the safety/recall decision and choose the next screen.
+// Only a route with no reported blocking condition goes directly to the requested tool.
 function finishSafetyCheck({ allowIncomplete = false } = {}) {
   const signs = relevantSigns();
   const missing = signs.filter(([id]) => !state.safety[id]);
@@ -595,6 +663,8 @@ function finishSafetyCheck({ allowIncomplete = false } = {}) {
   navigate("results");
 }
 
+// Draw the appliance-specific questions and bind answers, help, opt-out and submission.
+// Answer changes invalidate earlier decisions before the next result is calculated.
 function renderCheck() {
   setStage("check");
   const signs = relevantSigns();
@@ -692,12 +762,16 @@ function renderCheck() {
   updateSafetyFooter();
 }
 
+// Find the downloaded repair-history row for this appliance's mapped evidence category.
+// Return null when the UI category has no supported history mapping.
 function repairEvidenceForAppliance() {
   const mappedCode = EVIDENCE_CATEGORY_CODE_BY_UI_CATEGORY[state.appliance.categoryCode];
   if (!mappedCode) return null;
   return repairEvidence().find((item) => item.categoryCode === mappedCode) || null;
 }
 
+// Turn recorded repair counts into a labelled chart and source explanation.
+// The chart describes past category-level events, not this appliance's chance of repair.
 function repairEvidenceSummary() {
   if (!availability("repairEvidence")) return `<div class="evidence-empty"><span aria-hidden="true">↻</span><p><strong>Repair history is unavailable right now.</strong><br>${availability("locations") ? "You can still use the repair map and service listings." : "Contact a repair business or your manufacturer to ask about your appliance."}</p></div>`;
   const evidence = repairEvidenceForAppliance();
@@ -707,6 +781,7 @@ function repairEvidenceSummary() {
   const fixed = Math.max(0, Number(evidence.fixedCount) || 0);
   const repairable = Math.max(0, Number(evidence.repairableCount) || 0);
   const other = Math.max(0, sample - fixed - repairable);
+  // Round labels for readability; use the original proportions for chart widths below.
   const pct = (value) => sample ? Math.round((value / sample) * 100) : 0;
   const fixedPct = pct(fixed);
   const repairablePct = pct(repairable);
@@ -733,6 +808,7 @@ function repairEvidenceSummary() {
   </div>`;
 }
 
+// Keep limited, missing or unavailable recall information visible beside ordinary tools.
 function subtleRecallStatus() {
   if (state.recall?.status === "none") return `<div class="small-status"><span>✓</span><p><strong>We did not find your exact model in FixForward’s current safety-notice list.</strong> That does not prove there is no recall. ${externalLink("https://www.productsafety.gov.au/recalls", "Check the official search")}</p></div>`;
   if (state.recall?.status === "insufficient") return `<div class="small-status"><span>i</span><p><strong>We could not check your exact model because we do not have enough model detail.</strong> That is okay — you can still use the official Australian recall search whenever you want.</p></div>`;
@@ -740,10 +816,12 @@ function subtleRecallStatus() {
   return "";
 }
 
+// Return one reusable next-step card from its title, explanation and action ID.
 function resultActionCard(id, iconText, title, description, cta, featured = false) {
   return `<article class="result-action ${featured ? "featured" : ""}"><span class="result-action-icon" aria-hidden="true">${iconText}</span><h2>${escapeHtml(title)}</h2><p>${escapeHtml(description)}</p><button class="button ${featured ? "primary" : "secondary"}" type="button" data-action="${escapeAttr(id)}">${escapeHtml(cta)} ${icon("arrow")}</button></article>`;
 }
 
+// Draw the two practical repair choices, with repair history as background context.
 function renderRepairHub() {
   setStage("options");
   state.pathway = "repair";
@@ -763,6 +841,8 @@ function renderRepairHub() {
   app.querySelector("#hub-cost")?.addEventListener("click", () => { state.pathway = "cost"; state.fromRepairHub = true; navigate("cost"); });
 }
 
+// Choose the result screen from current safety answers and the recall result.
+// Serious warnings and possible recalls take priority; uncertainty retains cautious planning options.
 function renderResults() {
   setStage("options");
   const safety = currentSafetyResult();
@@ -846,6 +926,7 @@ function renderResults() {
   }));
 }
 
+// Return repair-filter labels, removing the community-cafe option on cautious routes.
 function providerOptions() {
   const options = [
     ["all", "All repair options"],
@@ -857,6 +938,7 @@ function providerOptions() {
   return state.serviceSafetyMode === "clear" ? options : options.filter(([id]) => id !== "repair_cafe");
 }
 
+// Translate a service record's type into a readable repair or recycling label.
 function friendlyProviderType(item, isRepair) {
   if (!isRepair) return item.type || "Electrical-appliance recycling location";
   const labels = {
@@ -869,6 +951,8 @@ function friendlyProviderType(item, isRepair) {
   return labels[item.providerType] || item.type || "Repair option";
 }
 
+// Build a service card from a supplied record, preserving missing-details and source limits.
+// A displayed listing still asks the user to confirm help or acceptance before travelling.
 function renderServiceCard(item, isRepair, index) {
   const locationText = [item.address, item.suburb, item.postcode].filter(Boolean).join(", ");
   const distance = Number.isFinite(item.distanceKm) ? `${item.distanceKm < 10 ? item.distanceKm.toFixed(1) : Math.round(item.distanceKm)} km away` : "";
@@ -886,6 +970,8 @@ function renderServiceCard(item, isRepair, index) {
   </article>`;
 }
 
+// Select eligible downloaded services, then search near a device/area point or typed area.
+// Cautious repair routes exclude community cafes before distance and provider filtering.
 function currentServiceResult() {
   if (!availability("locations")) return { matches: [], total: 0, mode: "unavailable" };
   const availableLocations = state.pathway === "repair" && state.serviceSafetyMode !== "clear"
@@ -898,15 +984,18 @@ function currentServiceResult() {
   return { matches: [], total: 0, mode: "empty" };
 }
 
+// Remove the existing Leaflet map and its marker lookup before replacing the screen.
 function destroyMap() {
   if (mapInstance) { mapInstance.remove(); mapInstance = null; }
   mapMarkers = new Map();
 }
 
+// Find the visible service card whose record ID matches a map marker.
 function serviceCardForId(id) {
   return Array.from(app.querySelectorAll("[data-location-id]")).find((card) => card.dataset.locationId === String(id)) || null;
 }
 
+// Open a service marker and highlight its matching card, or report that the map is not ready.
 function focusMapLocation(id) {
   const marker = mapMarkers.get(String(id));
   if (!marker || !mapInstance) {
@@ -922,12 +1011,15 @@ function focusMapLocation(id) {
   app.querySelector("#services-map")?.scrollIntoView({ behavior: scrollBehavior(), block: "center" });
 }
 
+// Load the pinned map library once and share that request between callers.
+// After eight seconds or a load error, return false so the ordinary service list remains usable.
 function ensureLeaflet() {
   if (globalThis.L) return Promise.resolve(true);
   if (leafletPromise) return leafletPromise;
 
   leafletPromise = new Promise((resolve) => {
     let settled = false;
+    // Resolve the shared map request once; failure removes the script so a later try is possible.
     const finish = (value) => {
       if (settled) return;
       settled = true;
@@ -970,6 +1062,8 @@ function ensureLeaflet() {
   return leafletPromise;
 }
 
+// Draw available service coordinates from the same results used by the list.
+// After loading Leaflet, verify the target still belongs to the page before creating a map.
 async function renderMap(result) {
   destroyMap();
   const mapEl = app.querySelector("#services-map");
@@ -994,6 +1088,7 @@ async function renderMap(result) {
     return;
   }
   mapEl.innerHTML = `<div class="map-fallback">Loading map…</div>`;
+  // Waiting can outlive a search or screen change; next reject a map element no longer on the page.
   const loaded = await ensureLeaflet();
   if (!loaded || !globalThis.L || !document.contains(mapEl)) {
     if (document.contains(mapEl)) mapEl.innerHTML = `<div class="map-fallback">The map could not load. The service list still works.</div>`;
@@ -1039,6 +1134,7 @@ async function renderMap(result) {
   if (bounds.length > 1) mapInstance.fitBounds(bounds, { padding: [28, 28], maxZoom: 14 });
 }
 
+// Return an area prompt, an honest no-match message, or the supplied service cards.
 function renderServiceResults(result, isRepair) {
   if (result.mode === "empty") return `<div class="service-empty"><span>⌖</span><h2>Use your location or type a suburb to see options.</h2><p>If you choose current location, it is used in this browser to sort nearby places and is not saved to FixForward's database.</p></div>`;
   if (!result.matches.length) {
@@ -1057,10 +1153,12 @@ function renderServiceResults(result, isRepair) {
   return `<div class="results-head"><strong>${formatCount(result.total)} option${result.total === 1 ? "" : "s"} found</strong><span>${context}</span></div><div class="service-list">${result.matches.map((item, index) => renderServiceCard(item, isRepair, index)).join("")}</div>`;
 }
 
+// Describe completion of the quick check without claiming the appliance is safe.
 function quickCheckPassedBanner() {
   return `<div class="quick-check-pass"><span aria-hidden="true">✓</span><div><strong>Quick check completed</strong><p>You did not report one of the serious warning signs in this check. This is not a guarantee that the appliance is safe.</p></div></div>`;
 }
 
+// Keep the current repair-contact or disposal-handling restriction above service results.
 function serviceSafetyBanner() {
   if (state.pathway === "repair" && state.serviceSafetyMode !== "clear") {
     return `<div class="service-caution-banner"><span aria-hidden="true">!</span><div><strong>Contact a repair business for advice first.</strong><p>Safety is still unclear. These listings are places to ask about an assessment, not a recommendation to repair or use the appliance. Ask whether they are qualified to assess it. Community Repair Cafés are not included on this path.</p></div></div>`;
@@ -1074,6 +1172,7 @@ function serviceSafetyBanner() {
   return quickCheckPassedBanner();
 }
 
+// Choose a useful Back label using navigation history and the current safety route.
 function optionBackLabel() {
   const previous = history.state?.fromScreen;
   if (previous === "cost") return "Back to cost comparison";
@@ -1084,11 +1183,14 @@ function optionBackLabel() {
   return state.intent === "guide" ? "Back to my options" : "Back to quick check";
 }
 
+// Return the current local suburb suggestions with their keyboard-selection state.
 function areaSuggestionsHtml() {
   if (!state.areaSuggestions.length) return "";
   return `<div id="area-suggestions" class="area-suggestions" role="listbox" aria-label="Matching Melbourne suburbs and postcodes">${state.areaSuggestions.map((item, index) => `<button type="button" class="area-option ${index === state.areaActiveIndex ? "active" : ""}" role="option" id="area-option-${index}" aria-selected="${index === state.areaActiveIndex}" data-area-index="${index}"><strong>${escapeHtml(item.postcode)}</strong><span>${escapeHtml(item.suburb)}</span></button>`).join("")}</div>`;
 }
 
+// Update suggestions from the local suburb index as text changes.
+// Manual area entry invalidates an older device-location request so it cannot override this choice.
 function refreshAreaSuggestions(value) {
   ++geoGeneration;
   if (state.geoStatus === "loading") state.geoStatus = "idle";
@@ -1106,10 +1208,12 @@ function refreshAreaSuggestions(value) {
   bindAreaSuggestionClicks();
 }
 
+// Connect each visible suburb suggestion to its numbered result.
 function bindAreaSuggestionClicks() {
   app.querySelectorAll("[data-area-index]").forEach((button) => button.addEventListener("click", () => chooseAreaSuggestion(Number(button.dataset.areaIndex))));
 }
 
+// Use a chosen suburb's coordinates as the search centre and clear device location.
 function chooseAreaSuggestion(index) {
   const item = state.areaSuggestions[index];
   if (!item) return;
@@ -1124,6 +1228,8 @@ function chooseAreaSuggestion(index) {
   focusElement("#area");
 }
 
+// Validate a typed suburb/postcode against the local index, then redraw nearby services.
+// An unresolved name stays a field error instead of becoming invented coordinates.
 function submitAreaSearch() {
   const input = app.querySelector("#area");
   const value = input?.value.trim() || "";
@@ -1149,6 +1255,8 @@ function submitAreaSearch() {
   focusElement("#area");
 }
 
+// Draw service search, filters, warnings, list and map from the current journey state.
+// Bind new controls after rendering; the list works even when the external map cannot load.
 function renderServices() {
   destroyMap();
   setStage("options");
@@ -1234,9 +1342,12 @@ function renderServices() {
   renderMap(result);
 }
 
+// Ask the browser for location only after the user chooses that action.
+// Ignore callbacks from an older request, journey or screen; coordinates stay in this tab's state.
 function requestUserLocation() {
   const generation = ++geoGeneration;
   const activeJourney = journeyId;
+  // Accept a location reply only while its request, journey and screen still match.
   const isCurrent = () => generation === geoGeneration && activeJourney === journeyId && state.screen === "services";
   if (!navigator.geolocation) {
     state.geoStatus = "denied";
@@ -1270,12 +1381,15 @@ function requestUserLocation() {
   );
 }
 
+// Describe whether category, brand and model details are present for cost-context wording.
+// This checks supplied detail, not whether a real product has been verified.
 function productMatchLevel() {
   if (state.appliance.brand && state.appliance.model) return { label: "Exact product requested", copy: `${state.appliance.brand} ${state.appliance.model}` };
   if (state.appliance.brand) return { label: "Brand-level request", copy: `${state.appliance.brand} ${state.appliance.category}` };
   return { label: "Appliance-type request", copy: state.appliance.category };
 }
 
+// Keep unresolved safety or recall limits visible while the person explores cost information.
 function costSafetyBanner() {
   if (state.safetyResult?.status === "uncertain") {
     return `<div class="service-caution-banner"><span aria-hidden="true">?</span><div><strong>Explore costs while you arrange safety advice.</strong><p>We cannot recommend repair or replacement while safety is unclear. A lower price does not mean the appliance is safe to use.</p></div></div>`;
@@ -1286,6 +1400,8 @@ function costSafetyBanner() {
   return quickCheckPassedBanner();
 }
 
+// Render dated inspection-fee examples and optional questions for a repairer.
+// The user's description is grouped as context, not diagnosed or converted into a quote.
 function costContextResultHtml() {
   const identity = [state.appliance.brand, state.appliance.model].filter(Boolean).join(" ");
   const identityNote = state.appliance.brand && state.appliance.model
@@ -1300,6 +1416,8 @@ function costContextResultHtml() {
   </section>`;
 }
 
+// Render reviewed price examples ranked by exact product, brand or appliance type.
+// Old or out-of-stock records remain explained but cannot fill the comparison input.
 function recordedPricesHtml() {
   const rows = matchPriceExamples(priceCatalogue.prices, state.appliance);
   const exact = rows.some((row) => row.match === "exact");
@@ -1316,6 +1434,8 @@ function recordedPricesHtml() {
     ${rows.length ? `<div class="retail-price-grid">${rows.map((row) => `<article class="retail-price-card"><span class="price-match-label">${row.match === "exact" ? "Same brand and model" : row.match === "brand" ? "Same brand · different model" : "Same appliance type"}</span><h3>${escapeHtml(row.productName)}</h3><p class="retail-model">${escapeHtml(row.brand)} · Model ${escapeHtml(row.model)}</p><p class="price-context-amount">${money(row.priceAud)} <small>AUD</small></p><p>${escapeHtml(row.retailer)}<br><small>Source reviewed ${escapeHtml(row.observedAt)}${row.stale ? " · older than 90 days" : ""}</small></p>${row.notes ? `<details class="plain-details price-record-details"><summary>Price details and limitations</summary><p class="small-copy">${escapeHtml(row.notes)}</p></details>` : ""}${row.availability === "out-of-stock" ? `<p class="field-error">Recorded as out of stock.</p>` : ""}<div class="retail-card-actions">${externalLink(row.sourceUrl, "Check retailer price", "text-link")}${!row.stale && row.availability !== "out-of-stock" ? `<button class="button secondary" type="button" data-use-price="${escapeAttr(row.id)}">Use ${money(row.priceAud)} in comparison<span class="sr-only"> for ${escapeHtml(row.productName)}</span></button>` : `<p class="small-copy">Check a current price before comparing.</p>`}</div></article>`).join("")}</div>` : `<div class="notice"><strong>No recorded examples for this appliance type yet.</strong><p>Enter a price from a retailer for a similar size and type. We will not substitute an unrelated appliance.</p></div>`}`;
 }
 
+// Start one price-catalogue request and refresh only the visible price section on completion.
+// The price loader labels a saved-copy fallback separately from a successful server response.
 function refreshRecordedPrices() {
   if (priceRequest) return;
   priceRequest = loadPriceCatalogue(PRICE_SNAPSHOT).then((catalogue) => {
@@ -1325,6 +1445,8 @@ function refreshRecordedPrices() {
   });
 }
 
+// Draw and bind manual cost comparison, optional price examples and problem context.
+// Entered prices remain the user's inputs; editing a selected example clears its source attribution.
 function renderCost() {
   setStage("options");
   const c = state.comparison;
@@ -1384,6 +1506,7 @@ function renderCost() {
   bindBack();
   app.querySelectorAll('#cost-form input').forEach((input) => input.addEventListener("input", (event) => {
     state.costs[event.target.name] = event.target.value;
+    // After an edit, this is the person's amount rather than the retailer's recorded observation.
     if (event.target.name === "replacement") { state.selectedPrice = null; app.querySelector("#selected-price-note")?.remove(); }
     state.comparison = null;
     app.querySelector(".comparison-result")?.remove();
@@ -1439,8 +1562,12 @@ function renderCost() {
   app.querySelector("#cost-find-recycle")?.addEventListener("click", () => openPathway("dispose"));
 }
 
+// Attach the shared Back behaviour to the current screen's Back buttons.
 function bindBack() { app.querySelectorAll("[data-back]").forEach((button) => button.addEventListener("click", back)); }
 
+// Recheck journey requirements before drawing any requested screen, including browser Back/Forward.
+// A missing appliance, unanswered check, new recall or serious warning can redirect the request.
+// This prevents a saved history entry or delayed data refresh from bypassing current safety rules.
 function renderScreen() {
   destroyMap();
   if (["check", "results", "repair-hub", "services", "cost"].includes(state.screen) && !state.appliance.category) state.screen = "landing";
@@ -1457,6 +1584,8 @@ function renderScreen() {
       const status = currentSafetyResult().status;
       state.safetyResult = currentSafetyResult();
       state.decision = journeyDecision(state.recall?.status || "insufficient", status);
+      // High-risk disposal remains a contact/planning route with handling warnings.
+      // A possible recall still takes priority over that exception.
       const allowedDisposal = state.screen === "services" && state.pathway === "dispose" && state.recall?.status !== "possible";
       if (state.recall?.status === "possible" || (status === "high" && !allowedDisposal) || (state.screen === "repair-hub" && status !== "clear")) state.screen = "results";
       state.serviceSafetyMode = status === "high" ? "high" : ["uncertain", "caution"].includes(status) ? "caution" : "clear";
@@ -1489,6 +1618,7 @@ function renderScreen() {
   }
 }
 
+// Group a source by its recorded description for the About panel's headings.
 function groupName(source) {
   const text = `${source.name || ""} ${source.use || ""} ${source.limitations || ""}`.toLowerCase();
   if (text.includes("recall") || text.includes("accc")) return "Product safety notices";
@@ -1500,6 +1630,8 @@ function groupName(source) {
   return "Other information";
 }
 
+// Draw dataset availability, source dates and privacy/coverage limits for this local state.
+// Keep retail examples and inspection fees separate from safety and service data.
 function renderAbout() {
   if (!publicData) return;
   const groups = {};
@@ -1520,6 +1652,8 @@ function renderAbout() {
     <div class="privacy-box"><h3>Important limits</h3><p>FixForward currently has only a small product-specific recall list, so the official Australian recall search is still the complete place to check. Repair history describes similar appliance types, not your exact appliance. Service listings may be incomplete or out of date, so call/check before travelling. Recorded retail prices include a model, source and review date. An exact match needs both the brand and model; other examples may differ in size and features. These are dated observations, not live offers or a repair quote. Service-fee examples stay separate from your own repair quote.</p></div>`;
 }
 
+// Discard this tab's adult answers and map, then return Home.
+// A new journey ID makes old browser-history entries and pending location callbacks inapplicable.
 function doRestart() {
   ++journeyId;
   ++geoGeneration;
@@ -1538,6 +1672,8 @@ document.querySelectorAll("[data-close-restart]").forEach((button) => button.add
 document.querySelector("#about-button")?.addEventListener("click", () => { renderAbout(); aboutDialog.showModal(); });
 document.querySelector("#close-about")?.addEventListener("click", () => aboutDialog.close());
 
+// History stores screen names, not appliance answers. Ignore entries from before a restart.
+// renderScreen reapplies current safety rules even when the browser asks for an older screen.
 window.addEventListener("popstate", (event) => {
   ++geoGeneration;
   if (state.geoStatus === "loading") state.geoStatus = "idle";

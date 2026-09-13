@@ -1,15 +1,25 @@
+# Render deployment blueprint for the Flask adult/Quest site; it does not provision or migrate Neon.
+# Secrets are supplied by hosting configuration, and app.py exposes the WSGI application imported below.
 services:
   - type: web
-    name: fixforward-iteration-1
+    name: fix-forward-iteration-2
     runtime: python
+    # This separate free service follows Iteration 2; the existing main/Iteration 1 service is retained.
+    branch: iteration-2
+    plan: free
+    # The build installs runtime dependencies and rebuilds the local reviewed-price SQLite/JavaScript snapshot.
+    # It does not refresh retailer data or invoke the separate hosted-data import pipeline.
     buildCommand: pip install -r requirements.txt && python data/scripts/build_price_catalogue.py
+    # Gunicorn serves app:app on the port provided by Render; Flask uses the existing shared access gate.
     startCommand: gunicorn --workers 2 --threads 2 --timeout 60 --bind 0.0.0.0:$PORT "app:app"
+    # Liveness remains available without login or Neon. Authenticated /api/ready checks the database separately.
     healthCheckPath: /api/health
+    # sync:false values are configured outside this file; keep credentials out of source and frontend assets.
     envVars:
       - key: DATABASE_URL
         sync: false
       - key: RELEASE_VERSION
-        value: iteration-1-v1.6.0-usability-lab
+        value: iteration-2-v2.0.0-quest
       - key: SITE_PASSWORD
         sync: false
       - key: SECRET_KEY

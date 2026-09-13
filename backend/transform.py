@@ -1,3 +1,6 @@
+# Pure data-shaping functions used by the API and unit tests; no network, database or file writes occur here.
+# Convert database naming/types to the browser contract while keeping uncertainty, provenance and missing data visible.
+
 """Pure transformations from database rows to the public API contract."""
 
 from datetime import date, datetime
@@ -7,6 +10,7 @@ from urllib.parse import urlparse
 PRODUCT_SAFETY_HOSTS = {"productsafety.gov.au", "www.productsafety.gov.au"}
 
 
+# Normalize dates to ISO strings and retain None for an unknown date.
 def iso_value(value):
     """Return stable ISO dates so the frontend does not depend on server locale."""
 
@@ -15,6 +19,7 @@ def iso_value(value):
     return str(value) if value is not None else None
 
 
+# Reject missing or non-HTTP links and optionally require an exact allowlisted host.
 def safe_http_url(value, allowed_hosts=None):
     """Accept only absolute HTTP(S) URLs and optionally restrict their host."""
 
@@ -32,6 +37,7 @@ def safe_http_url(value, allowed_hosts=None):
     return str(value).strip()
 
 
+# Select supported public fields from a reviewed product; discard incomplete identifiers and non-official notice links.
 def build_recall_record(row):
     """Shape one manually reviewed recall product for browser-side matching."""
 
@@ -64,6 +70,7 @@ def build_recall_record(row):
     }
 
 
+# Group barriers beside each benchmark and retain records outside the three named repair outcomes.
 def group_repair_evidence(statistic_rows, barrier_rows):
     """Attach zero or more repair barriers to each category benchmark."""
 
@@ -81,6 +88,7 @@ def group_repair_evidence(statistic_rows, barrier_rows):
     for row in statistic_rows:
         category = row["appliance_category"]
         sample_size = int(row["sample_size"])
+        # The source sample may include other outcomes. Keep that remainder visible instead of forcing the three counts to total 100%.
         classified = (
             int(row["fixed_count"])
             + int(row["repairable_count"])
@@ -105,6 +113,7 @@ def group_repair_evidence(statistic_rows, barrier_rows):
     return evidence
 
 
+# Format candidate service details without turning provenance, coordinates or missing fields into verification.
 def build_location(row):
     """Expose useful service details while keeping provenance available on demand.
 

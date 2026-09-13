@@ -1,3 +1,6 @@
+# Read-only local exploration helper for the manually supplied ORA CSV.
+# It prints source columns and Australian category counts; it neither cleans the file nor writes a database.
+
 """
 Step 4 helper: Print ORA column names and Australian category counts.
 
@@ -16,6 +19,7 @@ RAW_PATH = os.path.join(
 )
 
 
+# Read the configured raw snapshot and print the field names and Australian category frequency summary.
 def main() -> None:
     if not os.path.exists(RAW_PATH):
         print(f"ERROR: Raw file not found: {RAW_PATH}")

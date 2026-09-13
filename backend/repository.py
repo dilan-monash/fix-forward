@@ -1,12 +1,17 @@
+# Queries consumed by backend/api.py; all execution goes through the read-only helpers in db.py.
+# Category-level recall candidates are a separate pipeline from the manually reviewed product identifiers exposed here.
+
 """SQL queries for FixForward's read-only public datasets."""
 
 from .db import fetch_all, fetch_one
 
 
+# Read a constant to check connectivity without scanning an application table.
 def health_check():
     return fetch_one("SELECT 1 AS ok")
 
 
+# Choose the newest successful import for the ACCC source and retain its limited coverage window.
 def recall_metadata():
     return fetch_one(
         """
@@ -33,6 +38,7 @@ def recall_metadata():
     )
 
 
+# Publish only manually reviewed product records, aggregating their category links and identifiers.
 def reviewed_recall_products():
     return fetch_all(
         """
@@ -71,6 +77,7 @@ def reviewed_recall_products():
     )
 
 
+# Read the provenance register in stable ID order for the adult source information panel.
 def sources():
     return fetch_all(
         """
@@ -81,6 +88,7 @@ def sources():
     )
 
 
+# Join the published category statistics to stable UI category codes and display order.
 def repair_statistics():
     return fetch_all(
         """
@@ -103,6 +111,7 @@ def repair_statistics():
     )
 
 
+# Read the recorded category barriers in descending frequency, without inventing missing explanations.
 def repair_barriers():
     return fetch_all(
         """
@@ -113,6 +122,7 @@ def repair_barriers():
     )
 
 
+# Read household-electrical location candidates; relevance alone does not establish acceptance or verification.
 def relevant_locations():
     return fetch_all(
         """

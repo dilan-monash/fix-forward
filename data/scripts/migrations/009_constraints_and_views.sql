@@ -1,3 +1,6 @@
+-- DATABASE-WRITING validation phase, after imports/enrichment/backfills; invalid existing rows abort the validation block.
+-- Derived verified/unverified views support data review. The current locations API still exposes relevant candidates conservatively.
+
 -- FixForward migration 009 — remaining constraints and the derived eligibility views
 --
 -- Run AFTER the import and fix scripts. Each constraint audits existing data

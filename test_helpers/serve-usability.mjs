@@ -2,7 +2,7 @@
  * TEST ONLY: localhost browser usability fixture server.
  *
  * Start: node test_helpers/serve-usability.mjs
- * Open:  http://127.0.0.1:5501/
+ * Open:  http://127.0.0.1:5502/quest and http://127.0.0.1:5502/
  *
  * Serves the current frontend with conspicuous synthetic-data labels. Public
  * API responses are invented fixtures held in memory. It does not load .env,
@@ -15,9 +15,10 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+// Resolve files from this checkout, not whichever folder the terminal happens to use.
 const workspace = fileURLToPath(new URL("../", import.meta.url));
 const hostname = "127.0.0.1";
-const port = 5501;
+const port = Number(process.env.PORT || 5502);
 const marker = "SYNTHETIC USABILITY TEST DATA";
 const meta = Object.freeze({
   releaseVersion: marker,
@@ -28,6 +29,7 @@ const meta = Object.freeze({
 });
 const fixtureInfo = `http://${hostname}:${port}/test-fixture-info`;
 
+// Synthetic datasets match the API response shapes so the adult interface can be reviewed offline from Neon.
 const recalls = [{
   id: "SYNTHETIC-RECALL-ONLY",
   categoryCodes: ["kettle"],
@@ -95,6 +97,7 @@ const datasets = new Map([
   ["/api/health", { status: "ok", mode: "synthetic-test-only", database: "not-used", ...meta }]
 ]);
 
+// Return one labelled, non-cached fixture response. HEAD returns headers without a body.
 function send(request, response, status, body, type = "text/plain; charset=utf-8") {
   response.writeHead(status, {
     "Content-Type": type,
@@ -105,6 +108,8 @@ function send(request, response, status, body, type = "text/plain; charset=utf-8
   response.end(request.method === "HEAD" ? undefined : body);
 }
 
+// Handle read-only preview requests: invented APIs first, then a strict public-asset list.
+// This deliberately separate helper has no production login and must stay on loopback.
 const server = http.createServer(async (request, response) => {
   if (!["GET", "HEAD"].includes(request.method)) {
     send(request, response, 405, "Test server is read-only.");
@@ -128,10 +133,10 @@ const server = http.createServer(async (request, response) => {
 
   // An explicit frontend allowlist prevents accidentally exposing credentials,
   // backend files, local reports, fixtures or any file outside this workspace.
-  const permitted = route === "/" || ["/index.html", "/styles.css", "/404.html", "/500.html", "/favicon.svg"].includes(route)
-    || /^\/src\/[a-zA-Z0-9_-]+\.js$/.test(route);
+  const permitted = route === "/" || ["/index.html", "/styles.css", "/404.html", "/500.html", "/favicon.svg", "/quest", "/quest/", "/quest/index.html", "/quest/quest.css", "/quest/play-effects.css", "/quest/tablet-play.css"].includes(route)
+    || /^\/(src|quest)\/[a-zA-Z0-9_-]+\.js$/.test(route);
   if (!permitted) { send(request, response, 404, "Not found."); return; }
-  const relative = route === "/" ? "index.html" : route.slice(1);
+  const relative = route === "/" ? "index.html" : ["/quest", "/quest/"].includes(route) ? "quest/index.html" : route.slice(1);
   try {
     let content = await readFile(path.join(workspace, relative), "utf8");
     const extension = path.extname(relative);
@@ -141,17 +146,23 @@ const server = http.createServer(async (request, response) => {
       content = content.replace("<title>", "<title>[SYNTHETIC TEST] ");
       content = content.replace("<body>", `<body><aside aria-label="Synthetic test environment" style="padding:12px 20px;background:#fff1d9;color:#071c49;border-bottom:2px solid #071c49;font:700 14px/1.5 sans-serif;">${marker} · Invented records · No database connected · Do not contact or visit test locations.</aside>`);
     }
+    if (relative === "quest/index.html") {
+      content = content.replace('</head>', '<meta name="quest-review-fixture" content="synthetic-adult-data"></head>');
+    }
     send(request, response, 200, content, type);
   } catch {
     send(request, response, 404, "Not found.");
   }
 });
 
+// Bind only to the local machine and print the two comparison URLs.
 server.listen(port, hostname, () => {
   console.log(`${marker}: http://${hostname}:${port}/`);
+  console.log(`FixForward Quest: http://${hostname}:${port}/quest (authored stories; no API needed)`);
   console.log("Recall fixture: Kettle / Test Brand / FF-TEST-42. Search: Richmond or 3121.");
-  console.log("No database connection. No user data is saved. Stop this process after usability testing.");
+  console.log("No database connection. Quest progress saves only in this browser. Stop with Ctrl+C.");
 });
 server.on("error", (error) => { console.error(`Test server could not start: ${error.code}`); process.exitCode = 1; });
+// Closing the preview process stops serving files; it does not clear browser storage.
 process.on("SIGINT", () => server.close());
 process.on("SIGTERM", () => server.close());

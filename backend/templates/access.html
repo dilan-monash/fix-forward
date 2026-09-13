@@ -1,4 +1,6 @@
 <!doctype html>
+<!-- Shared server-rendered access view from backend/access.py: login, logout confirmation or unavailable mode.
+     It loads only its own stylesheet/favicon and never embeds the password or appliance application scripts. -->
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -15,6 +17,7 @@
       <img src="/favicon.svg" alt="" width="52" height="52">
       <span><strong>FixForward</strong><small>Know your options</small></span>
     </div>
+    <!-- An unavailable gate has no login form: configuration failure must not open the protected site. -->
     {% if mode == 'unavailable' %}
       <p class="eyebrow">Website access</p>
       <h1 id="access-title">We cannot open the website right now</h1>
@@ -24,6 +27,7 @@
       <h1 id="access-title">Lock FixForward?</h1>
       <p>You will need the shared website password to open it again in this browser.</p>
       {% if error %}<p class="error" role="alert" id="access-error">{{ error }}</p>{% endif %}
+      <!-- GET only asks for confirmation; the token-protected POST actually clears access. -->
       <form method="post" action="{{ url_for('access.logout') }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
         <button type="submit">Lock website</button>
@@ -34,6 +38,7 @@
       <h1 id="access-title">Enter the website password</h1>
       <p id="password-help">Use the shared password from the FixForward team. You do not need an account.</p>
       {% if error %}<p class="error" role="alert" id="access-error">{{ error }}</p>{% endif %}
+      <!-- The token binds this POST to the visitor session; the password field is intentionally never prefilled. -->
       <form method="post" action="{{ url_for('access.login') }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
         <label for="website-password">Website password</label>

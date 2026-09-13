@@ -1,0 +1,253 @@
+/* Quest-only story effects. All art is fully visible without animation.
+ * Add q-play-enter for a step's greeting, q-story-reveal for its consequence,
+ * q-stamp-earned for a new stamp, q-reward-enter for a local game response,
+ * and q-level-up for a newly reached game level. Sequences finish in 1100 ms.
+ * Removing/replacing the owning screen cancels CSS animations automatically.
+ * These effects have no callbacks, scoring side effects or infinite loops.
+ */
+/* SVG motion uses local artwork bounds; positioning remains on an outer SVG group in art.js. */
+body.quest .q-pip-arm {
+  transform-box: fill-box;
+  transform-origin: 100% 88%;
+}
+body.quest .q-flo-blades,
+body.quest .q-character-face,
+body.quest .q-outcome-evidence,
+body.quest .q-outcome-adult,
+body.quest .q-outcome-home,
+body.quest .q-outcome-packaging,
+body.quest .q-help-message,
+body.quest .q-decision-sparkles,
+body.quest .q-passport-ink,
+body.quest .q-home-neighbour,
+body.quest .q-neighbour-wave,
+body.quest .q-outcome-paper,
+body.quest .q-outcome-box,
+body.quest .q-envelope-flap,
+body.quest .q-phone-handset,
+body.quest .q-reward-token,
+body.quest .q-reward-accents,
+body.quest .q-level-medallion,
+body.quest .q-level-ribbons,
+body.quest .q-level-accents {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+body.quest .q-outcome-adult { transform-origin: 50% 100%; }
+body.quest .q-help-message { transform-origin: 40% 100%; }
+body.quest .q-neighbour-wave { transform-origin: 0 95%; }
+body.quest .q-outcome-paper { transform-origin: 50% 95%; }
+body.quest .q-envelope-flap { transform-origin: 50% 0; }
+body.quest .q-level-ribbons { transform-origin: 50% 0; }
+body.quest .q-passport-stamp { overflow: visible; }
+body.quest .q-reward-art,
+body.quest .q-level-badge { overflow: visible; pointer-events: none; }
+
+/* Motion is opt-in from the existing app setting, then further restricted by
+ * the operating-system preference. The static illustration retains the story.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  html[data-motion="full"] body.quest .q-play-enter .q-guide-character .q-pip-arm {
+    animation: q-quest-pip-greeting 850ms ease-in-out 1;
+  }
+  html[data-motion="full"] body.quest .q-play-enter .q-guide-character .q-flo-blades {
+    animation: q-quest-flo-greeting 900ms cubic-bezier(.2,.7,.3,1) 1;
+  }
+  html[data-motion="full"] body.quest .q-play-enter .q-guide-character .q-character-face {
+    animation: q-quest-look-up 350ms ease-out 1;
+  }
+
+  html[data-motion="full"] body.quest .q-story-reveal .q-outcome-evidence {
+    animation: q-quest-evidence-arrives 650ms cubic-bezier(.2,.7,.3,1) 80ms 1 backwards;
+  }
+  html[data-motion="full"] body.quest .q-story-reveal .q-outcome-adult {
+    animation: q-quest-grownup-arrives 500ms ease-out 1;
+  }
+  html[data-motion="full"] body.quest .q-story-reveal .q-outcome-home {
+    animation: q-quest-home-revealed 650ms ease-out 1;
+  }
+  html[data-motion="full"] body.quest .q-story-reveal .q-home-neighbour {
+    animation: q-quest-grownup-arrives 650ms ease-out 150ms 1 backwards;
+  }
+  html[data-motion="full"] body.quest .q-story-reveal .q-neighbour-wave {
+    animation: q-quest-neighbour-welcome 650ms ease-in-out 400ms 1 backwards;
+  }
+  html[data-motion="full"] body.quest .q-story-reveal .q-outcome-packaging {
+    animation: q-quest-packaging-separates 600ms ease-out 250ms 1 backwards;
+  }
+  html[data-motion="full"] body.quest .q-story-reveal .q-outcome-paper {
+    animation: q-quest-paper-unfolds 650ms ease-out 350ms 1 backwards;
+  }
+  html[data-motion="full"] body.quest .q-story-reveal .q-outcome-box {
+    animation: q-quest-box-settles 500ms ease-out 200ms 1 backwards;
+  }
+  html[data-motion="full"] body.quest .q-story-reveal .q-envelope-flap {
+    animation: q-quest-envelope-opens 650ms ease-out 220ms 1 backwards;
+  }
+  html[data-motion="full"] body.quest .q-story-reveal .q-phone-handset {
+    animation: q-quest-call-planned 650ms ease-out 200ms 1 backwards;
+  }
+  html[data-motion="full"] body.quest .q-story-reveal .q-help-message {
+    animation: q-quest-question-shared 500ms ease-out 250ms 1 backwards;
+  }
+  html[data-motion="full"] body.quest .q-story-reveal .q-decision-sparkles {
+    animation: q-quest-decision-mark 580ms ease-out 300ms 1 backwards;
+  }
+  html[data-motion="full"] body.quest .q-story-reveal .q-story-route {
+    animation: q-quest-route-prepared 850ms ease-out 1;
+  }
+  html[data-motion="full"] body.quest .q-story-reveal .q-story-second-route {
+    animation: q-quest-route-prepared 650ms ease-out 180ms 1 backwards;
+  }
+  html[data-motion="full"] body.quest .q-story-reveal .q-story-written-line {
+    animation: q-quest-plan-written 620ms ease-out 300ms 1 backwards;
+  }
+  html[data-motion="full"] body.quest .q-stamp-earned .q-passport-ink,
+  html[data-motion="full"] body.quest .q-passport-stamp.q-stamp-earned .q-passport-ink {
+    animation: q-quest-stamp-pressed 600ms cubic-bezier(.2,.7,.3,1) 1;
+  }
+  html[data-motion="full"] body.quest .q-reward-enter .q-reward-token {
+    animation: q-quest-reward-kept 780ms cubic-bezier(.2,.7,.3,1) 1;
+  }
+  html[data-motion="full"] body.quest .q-reward-enter .q-reward-path {
+    animation: q-quest-route-prepared 800ms ease-out 1;
+  }
+  html[data-motion="full"] body.quest .q-reward-enter .q-reward-accents {
+    animation: q-quest-reward-marks 650ms ease-out 150ms 1 backwards;
+  }
+  html[data-motion="full"] body.quest .q-level-up .q-level-medallion {
+    animation: q-quest-medallion-settles 850ms cubic-bezier(.2,.7,.3,1) 1;
+  }
+  html[data-motion="full"] body.quest .q-level-up .q-level-ribbons {
+    animation: q-quest-ribbon-unfolds 550ms ease-out 100ms 1 backwards;
+  }
+  html[data-motion="full"] body.quest .q-level-up .q-level-ring {
+    animation: q-quest-route-prepared 950ms ease-out 100ms 1 backwards;
+  }
+  html[data-motion="full"] body.quest .q-level-up .q-level-accents {
+    animation: q-quest-reward-marks 550ms ease-out 500ms 1 backwards;
+  }
+
+  /* A character answers a deliberate keyboard focus as well as a pointer.
+   * Motion carries no essential information and the button labels stay still.
+   */
+  html[data-motion="full"] body.quest .q-character-choices button:focus-visible .q-pip-arm {
+    animation: q-quest-pip-greeting 850ms ease-in-out 1;
+  }
+  html[data-motion="full"] body.quest .q-character-choices button:focus-visible .q-flo-blades {
+    animation: q-quest-flo-greeting 900ms cubic-bezier(.2,.7,.3,1) 1;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    html[data-motion="full"] body.quest .q-character-choices button:hover .q-pip-arm {
+      animation: q-quest-pip-greeting 850ms ease-in-out 1;
+    }
+    html[data-motion="full"] body.quest .q-character-choices button:hover .q-flo-blades {
+      animation: q-quest-flo-greeting 900ms cubic-bezier(.2,.7,.3,1) 1;
+    }
+  }
+}
+
+/* Keyframes describe visual movement only. No timer, callback or score update depends on them. */
+@keyframes q-quest-pip-greeting {
+  0%, 100% { transform: rotate(0deg); }
+  35% { transform: rotate(24deg); }
+  68% { transform: rotate(-7deg); }
+}
+@keyframes q-quest-flo-greeting {
+  from { transform: rotate(-180deg); }
+  to { transform: rotate(0deg); }
+}
+@keyframes q-quest-look-up {
+  from { transform: translateY(2px); }
+  to { transform: translateY(0); }
+}
+@keyframes q-quest-evidence-arrives {
+  from { transform: translateY(20px) rotate(-8deg); }
+  to { transform: translateY(0) rotate(0deg); }
+}
+@keyframes q-quest-grownup-arrives {
+  from { transform: translateX(18px); }
+  to { transform: translateX(0); }
+}
+@keyframes q-quest-home-revealed {
+  from { transform: translateY(18px) scale(.93); }
+  to { transform: translateY(0) scale(1); }
+}
+@keyframes q-quest-packaging-separates {
+  from { transform: translateX(-24px) rotate(-6deg); }
+  to { transform: translateX(0) rotate(0deg); }
+}
+@keyframes q-quest-question-shared {
+  from { transform: scale(.65); }
+  to { transform: scale(1); }
+}
+@keyframes q-quest-decision-mark {
+  from { transform: scale(.9); }
+  to { transform: scale(1); }
+}
+@keyframes q-quest-route-prepared {
+  from { stroke-dasharray: 1; stroke-dashoffset: 1; }
+  to { stroke-dasharray: 1; stroke-dashoffset: 0; }
+}
+@keyframes q-quest-plan-written {
+  from { stroke-dasharray: 1; stroke-dashoffset: 1; }
+  to { stroke-dasharray: 1; stroke-dashoffset: 0; }
+}
+@keyframes q-quest-stamp-pressed {
+  from { transform: scale(1.07) rotate(-4deg); }
+  to { transform: scale(1) rotate(0deg); }
+}
+@keyframes q-quest-neighbour-welcome {
+  0%, 100% { transform: rotate(0); }
+  35% { transform: rotate(-22deg); }
+  68% { transform: rotate(7deg); }
+}
+@keyframes q-quest-paper-unfolds {
+  from { transform: scaleY(.6) rotate(-12deg); }
+  to { transform: scaleY(1) rotate(0); }
+}
+@keyframes q-quest-box-settles {
+  from { transform: scale(.92); }
+  to { transform: scale(1); }
+}
+@keyframes q-quest-envelope-opens {
+  from { transform: scaleY(.15); }
+  to { transform: scaleY(1); }
+}
+@keyframes q-quest-call-planned {
+  0% { transform: rotate(-18deg) translateY(-4px); }
+  65% { transform: rotate(5deg); }
+  100% { transform: rotate(0); }
+}
+@keyframes q-quest-reward-kept {
+  0% { transform: translateY(18px) scale(.76) rotate(-7deg); }
+  68% { transform: translateY(-2px) scale(1.035) rotate(2deg); }
+  100% { transform: translateY(0) scale(1) rotate(0); }
+}
+@keyframes q-quest-reward-marks {
+  from { transform: scale(.75); }
+  to { transform: scale(1); }
+}
+@keyframes q-quest-medallion-settles {
+  0% { transform: translateY(9px) scale(.84) rotate(-8deg); }
+  72% { transform: translateY(0) scale(1.025) rotate(2deg); }
+  100% { transform: translateY(0) scale(1) rotate(0); }
+}
+@keyframes q-quest-ribbon-unfolds {
+  from { transform: scaleY(.45); }
+  to { transform: scaleY(1); }
+}
+
+/* Explicitly freeze warning objects even if a future caller adds a trigger to
+ * a broader container. A celebration is about asking for help, never the fault.
+ */
+body.quest .q-warning-object,
+body.quest .q-warning-object *,
+body.quest .q-fan-blades { animation: none !important; }
+
+html[data-motion="reduce"] body.quest .quest-art *,
+html[data-motion="reduce"] body.quest .q-passport-stamp { animation: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  body.quest .quest-art *,
+  body.quest .q-passport-stamp { animation: none !important; }
+}

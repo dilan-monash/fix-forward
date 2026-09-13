@@ -1,3 +1,6 @@
+-- DATABASE-WRITING schema phase; separate where a source row came from from evidence about an individual facility.
+-- 06_fix_location_verification.py performs the corresponding data correction; schema changes alone do not verify facilities.
+
 -- FixForward migration 003 — separate source provenance from facility verification
 --
 -- Every locations.verification_url currently holds a *dataset* URL: the DataVic

@@ -1,3 +1,6 @@
+# DATABASE-WRITING seed: populate the stable appliance catalogue from the repository mapping CSV.
+# Requires migration 001; recall-pattern and per-category acceptance work depend on these category codes.
+
 """
 Seed appliance_categories from the team-approved mapping CSV.
 
@@ -19,12 +22,14 @@ REPO_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, "..", ".."))
 MAPPING_PATH = os.path.join(SCRIPT_DIR, "..", "mapping", "appliance_families.csv")
 
 
+# Turn a mapping label into the stable lowercase underscore code used by this data pipeline.
 def slugify(text: str) -> str:
     text = text.lower().strip()
     text = re.sub(r"[^a-z0-9]+", "_", text)
     return text.strip("_")
 
 
+# Read mapped categories, upsert their ordering and aliases, and report category coverage before committing.
 def main() -> int:
     load_dotenv(os.path.join(REPO_ROOT, ".env"))
     database_url = os.getenv("DATABASE_URL")
@@ -42,6 +47,7 @@ def main() -> int:
         rows = list(csv.DictReader(f))
 
     print(f"Seeding appliance_categories from {len(rows)} mapping rows...")
+    # This operator connection can write: normal context exit commits; an escaping exception rolls back its transaction.
     with psycopg.connect(database_url) as conn:
         with conn.cursor() as cur:
             # Upsert only. Deleting would cascade into recall patterns and

@@ -1,3 +1,7 @@
+# Mixed diagnostic suite: pure matcher cases always run, and configured database cases add temporary test writes.
+# The database section intentionally inserts control rows inside a rollback scope; it is not a SELECT-only command.
+# It requires the data-layer schema/constraints and uses the real configured database when a URL exists.
+
 """
 Regression tests for the FixForward data layer.
 
@@ -42,6 +46,7 @@ DATASET_URLS = (
 results: list[tuple[bool, str, str]] = []
 
 
+# Collect and print one named assertion without stopping the remaining diagnostic cases.
 def check(passed: bool, name: str, detail: str = "") -> None:
     results.append((passed, name, detail))
     print(f"  [{'PASS' if passed else 'FAIL'}] {name}")
@@ -49,10 +54,12 @@ def check(passed: bool, name: str, detail: str = "") -> None:
         print(f"         {detail}")
 
 
+# Apply the shared production pattern definitions to a small supplied title/summary fixture.
 def categories_for(title: str, summary: str = "") -> dict:
     return best_matches(title, summary, PATTERNS)
 
 
+# Exercise known false positives and valid appliance terms without network or database access.
 def offline_pattern_tests() -> None:
     print("Pattern matching (no database required)")
 
@@ -153,6 +160,7 @@ def offline_pattern_tests() -> None:
         check(category in hit, f"genuine recall still matches {category}: {text[:40]}")
 
 
+# Check schema/data constraints and view behavior, rolling back inserted positive/negative control rows.
 def database_tests(conn) -> None:
     import psycopg
 
@@ -347,6 +355,7 @@ def database_tests(conn) -> None:
                 cur.execute("SELECT id FROM data_sources ORDER BY id LIMIT 1;")
                 source_id = cur.fetchone()[0]
 
+                # Insert one temporary regression location inside the surrounding rollback transaction.
                 def make_location(name: str) -> int:
                     cur.execute(
                         """
@@ -367,6 +376,7 @@ def database_tests(conn) -> None:
                     )
                     return cur.fetchone()[0]
 
+                # Count whether one temporary location qualifies for the derived recommendation view.
                 def in_view(location_id: int) -> int:
                     cur.execute(
                         "SELECT COUNT(*) FROM verified_location_recommendations WHERE id = %s;",
@@ -479,6 +489,7 @@ def database_tests(conn) -> None:
                     fk_rejected = True
                 check(fk_rejected, "database rejects an acceptance row with an unknown category_code")
 
+                # Explicit rollback is the boundary that removes temporary control rows, including successful inserts.
                 raise psycopg.Rollback
     except psycopg.Rollback:
         pass
@@ -488,6 +499,7 @@ def database_tests(conn) -> None:
         check(cur.fetchone()[0] == 0, "test rows were rolled back and left nothing behind")
 
 
+# Run local matcher checks, conditionally run configured database checks and summarize failures with a nonzero exit.
 def main() -> int:
     print("FixForward data regression tests")
     print("=" * 72)

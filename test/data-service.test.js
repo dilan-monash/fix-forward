@@ -1,3 +1,5 @@
+// TEST SUITE: Checks independent public-data loading, payload validation and failure/retry behavior with fake fetch responses.
+// Each test name describes its expected behavior; fixtures are invented test inputs.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { loadPublicData, getStaticSnapshot } from "../src/data-service.js";
@@ -5,6 +7,7 @@ import { matchRecall } from "../src/logic.js";
 
 const endpoints = { recalls: "/api/recalls", sources: "/api/sources", repairEvidence: "/api/repair-evidence", locations: "/api/locations" };
 
+// Build the minimal successful fetch-response shape needed by the data loader.
 function ok(payload) { return { ok: true, status: 200, json: async () => payload }; }
 
 const validRecall = { id: "r", categoryCodes: ["kettle"], identifiers: [{ type: "model", value: "K100" }] };

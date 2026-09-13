@@ -1,12 +1,18 @@
+// Static adult screen content and rule tables consumed by app.js, logic.js and data-service.js.
+// Question IDs connect visible prompts, severity rules, help text and appliance applicability.
+// Public operational records are deliberately absent here; the API supplies recalls, history and services.
+// Source links and dated service-fee examples are supporting context, not personalised decisions.
 // Static UI definitions. Public recall, repair and location records come from
 // the backend. Fallback data arrays stay empty so an outage can never create a
 // false safety/recall or service result from stale demo data.
+// Default version labels for the static snapshot; successful API metadata can replace the data status.
 export const META = Object.freeze({
-  releaseVersion: "iteration-1-v1.6.0-usability-lab",
+  releaseVersion: "iteration-2-v2.0.0-quest",
   dataVersion: "public-data-unavailable",
   retrievalDate: "See About the information"
 });
 
+// Visible family cards: each has an ID, label, hint, icon and allowed appliance-category names.
 export const FAMILIES = Object.freeze([
   {
     id: "heating-simple-cooking",
@@ -52,6 +58,7 @@ export const FAMILIES = Object.freeze([
   }
 ]);
 
+// Translate visible appliance names into stable codes used by API records and price matching.
 export const CATEGORY_CODE_BY_NAME = Object.freeze({
   "Kettle": "kettle",
   "Toaster": "toaster",
@@ -76,6 +83,7 @@ export const CATEGORY_CODE_BY_NAME = Object.freeze({
 
 // The Open Repair Alliance evidence uses broader categories than the UI. These
 // mappings are disclosed to users in the expandable "How we got this" panel.
+// Map each UI appliance code to its supported repair-history group; null means no supported group.
 export const EVIDENCE_CATEGORY_CODE_BY_UI_CATEGORY = Object.freeze({
   "kettle": "kettle",
   "toaster": "toaster",
@@ -98,11 +106,13 @@ export const EVIDENCE_CATEGORY_CODE_BY_UI_CATEGORY = Object.freeze({
   "portable-air-conditioner": "dehumidifier_and_portable_air_conditioner"
 });
 
+// Empty by design: a backend outage must stay unavailable, never become a demo recall answer.
 export const RECALLS = Object.freeze([]);
 
 // The visible questions are intentionally written for ordinary household users.
 // Several older technical questions are combined where the same user action is
 // appropriate, reducing the safety check while keeping conservative routing.
+// Question ID/text pairs used to construct the goal-specific safety form.
 export const SAFETY_SIGNS = Object.freeze([
   ["burning", "Have you seen smoke, fire or smelled burning?"],
   ["electrical", "Have you felt a shock, seen sparks, or found exposed/damaged wires?"],
@@ -113,6 +123,7 @@ export const SAFETY_SIGNS = Object.freeze([
   ["battery", "Is the battery swollen, leaking or damaged?"]
 ]);
 
+// Severity and explanation by question ID; evaluateSafety uses these to rank reported warnings.
 export const SAFETY_RULES = Object.freeze({
   burning: Object.freeze({
     severity: "critical",
@@ -144,6 +155,7 @@ export const SAFETY_RULES = Object.freeze({
   })
 });
 
+// Limit specialised questions to relevant appliance names, such as batteries in shavers.
 export const SAFETY_APPLICABILITY = Object.freeze({
   battery: Object.freeze(["Shaver"]),
   water: Object.freeze(["Kettle", "Rice cooker", "Coffee machine", "Steam cleaner", "Dehumidifier", "Portable air conditioner", "Shaver"]),
@@ -153,6 +165,7 @@ export const SAFETY_APPLICABILITY = Object.freeze({
 // Human-first question copy. The main question stays short; the explanation and
 // examples are hidden behind an info button so users who already understand it
 // are not forced to read a paragraph before every answer.
+// Plain-language question help, examples and pictograms displayed by questionCard in app.js.
 export const SAFETY_HELP = Object.freeze({
   burning: Object.freeze({
     question: "Any smoke, fire or burning smell?",
@@ -208,6 +221,7 @@ export const SAFETY_HELP = Object.freeze({
 // Questions are deliberately prioritised by appliance instead of showing every
 // generic warning to every user. Direct Repair/Compare/Recycle paths stay short;
 // 'I'm not sure' can ask a slightly fuller set.
+// Order important applicable warning IDs for each appliance before applying the goal's question limit.
 export const CATEGORY_SAFETY_PRIORITY = Object.freeze({
   "Kettle": Object.freeze(["water", "plug", "heat", "power"]),
   "Rice cooker": Object.freeze(["water", "plug", "heat", "power"]),
@@ -230,8 +244,10 @@ export const CATEGORY_SAFETY_PRIORITY = Object.freeze({
   "Portable air conditioner": Object.freeze(["water", "plug", "power"])
 });
 
+// Maximum questions for each goal; logic.js chooses applicable questions before applying these limits.
 export const SAFETY_PLAN_LIMITS = Object.freeze({ repair: 4, compare: 3, recycle: 2, guide: 5 });
 
+// Fallback source names, URLs and uses for About; they do not imply the live datasets loaded.
 export const SOURCES = Object.freeze([
   { name: "ACCC Product Safety recalls", url: "https://www.productsafety.gov.au/recalls", use: "Official Australian product safety and recall notices" },
   { name: "Energy Safe Victoria", url: "https://www.energysafe.vic.gov.au/", use: "Electrical safety guidance" },
@@ -245,6 +261,7 @@ export const SOURCES = Object.freeze([
 // Published service-pricing examples used only as transparent cost context.
 // They are deliberately kept separate because the providers use different
 // service models; FixForward must not merge them into a fake repair quote.
+// Dated provider-fee records used only in the cost and About panels; keep their service terms attached.
 export const COST_CONTEXT_SOURCES = Object.freeze([
   Object.freeze({
     id: "national-small-workshop",
@@ -276,9 +293,12 @@ export const COST_CONTEXT_SOURCES = Object.freeze([
   })
 ]);
 
+// Empty operational fallback: real sample/outcome counts must come from the validated API.
 export const REPAIR_EVIDENCE = Object.freeze([]);
+// Empty operational fallback: never show invented service places during an API outage.
 export const LOCATIONS = Object.freeze([]);
 
+// Authored landing choices; IDs connect the buttons to goal-specific navigation and safety plans.
 export const GOALS = Object.freeze([
   {
     id: "repair",
@@ -312,4 +332,5 @@ export const GOALS = Object.freeze([
 
 // Kept in the public data contract for backward compatibility with v1.3.
 // The goal-first UI no longer displays technical risk-group headings.
+// Retained empty compatibility field; the current form uses individual goal-specific questions.
 export const SAFETY_GROUPS = Object.freeze([]);

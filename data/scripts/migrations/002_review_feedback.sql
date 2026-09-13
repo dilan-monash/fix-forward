@@ -1,3 +1,6 @@
+-- DATABASE-WRITING schema phase following migration 001; adapts review fields and allowed statuses.
+-- Later migrations replace the temporary whole-location eligibility flag and per-row recall-window fields.
+
 -- FixForward migration 002 — review feedback completion (NON-DESTRUCTIVE)
 
 -- Location recommendation flag (TRUE only when acceptance + public access confirmed)

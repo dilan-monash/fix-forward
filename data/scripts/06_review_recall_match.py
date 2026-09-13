@@ -1,3 +1,7 @@
+# Mode-dependent database review tool: --list or non-interactive input only lists candidates.
+# Interactive confirm/reject choices with a reviewer name write review decisions and commit them.
+# Requires candidates from 06_match_recalls.py; category confirmation is not a product/model safety clearance.
+
 """
 Review unreviewed recall_category_matches against the official ACCC notice.
 
@@ -28,6 +32,7 @@ SCRIPT_DIR = os.path.dirname(__file__)
 REPO_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, "..", ".."))
 
 
+# Read unreviewed category candidates with their source notice and stored match evidence.
 def list_candidates(cur) -> list[tuple]:
     cur.execute(
         """
@@ -43,6 +48,7 @@ def list_candidates(cur) -> list[tuple]:
     return cur.fetchall()
 
 
+# Display one candidate and its official link so a human can review the supporting notice.
 def print_candidate(row: tuple) -> None:
     (
         recall_id,
@@ -78,6 +84,7 @@ def print_candidate(row: tuple) -> None:
     print("  skip    = leave unreviewed")
 
 
+# Read trimmed terminal input, treating end-of-input as an empty response rather than inventing a decision.
 def prompt(label: str) -> str:
     try:
         return input(label).strip()
@@ -85,6 +92,7 @@ def prompt(label: str) -> str:
         return ""
 
 
+# Choose listing or interactive review, require a reviewer for changes and persist only explicitly entered decisions.
 def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -106,8 +114,10 @@ def main(argv: list[str]) -> int:
         print("ERROR: pip install -r requirements-data.txt")
         return 1
 
+    # Piped/non-interactive execution never guesses review answers. Only a terminal session without --list can write decisions.
     interactive = sys.stdin.isatty() and not args.list
 
+    # This operator connection can write: normal context exit commits; an escaping exception rolls back its transaction.
     with psycopg.connect(database_url) as conn:
         with conn.cursor() as cur:
             rows = list_candidates(cur)

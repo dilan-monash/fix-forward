@@ -1,3 +1,7 @@
+# DATABASE-WRITING RESET tool: schema.sql drops five base tables with CASCADE before recreating them.
+# This is not an incremental deployment migration; dependent data/schema can be removed by the reset.
+# The numbered migration and import stages are separate follow-up operations, never automatic Flask startup work.
+
 """
 Step 3: Create the five Iteration 1 public tables in Neon.
 
@@ -25,6 +29,7 @@ EXPECTED_TABLES = (
 )
 
 
+# Read and execute the destructive base-schema SQL, then report the recreated public tables.
 def main() -> int:
     database_url = os.getenv("DATABASE_URL")
     if not database_url or "USER:PASSWORD" in database_url:
@@ -41,6 +46,7 @@ def main() -> int:
         schema_sql = f.read()
 
     print("Applying schema to Neon...")
+    # This operator connection can write: normal context exit commits; an escaping exception rolls back its transaction.
     with psycopg.connect(database_url) as conn:
         with conn.cursor() as cur:
             cur.execute(schema_sql)

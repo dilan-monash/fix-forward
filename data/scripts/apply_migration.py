@@ -1,3 +1,8 @@
+# DATABASE-WRITING schema tool: read selected SQL files from migrations/ and execute them against DATABASE_URL.
+# Each file is committed separately; failure can leave earlier files applied. Explicit arguments retain the requested order.
+# Bootstrap schema changes precede data backfills; constraint migrations 009 and 011 follow those backfills.
+# No arguments means all files in numeric order, which does not perform the required intervening data imports.
+
 """
 Apply one or more numbered migrations from data/scripts/migrations.
 
@@ -33,6 +38,7 @@ REPO_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, "..", ".."))
 MIGRATIONS_DIR = os.path.join(SCRIPT_DIR, "migrations")
 
 
+# Resolve unambiguous migration prefixes to files, preserving explicit order or returning the sorted full set.
 def resolve(prefixes: list[str]) -> list[str]:
     """Map '003' or a filename to a migration path, preserving argument order."""
     available = sorted(glob.glob(os.path.join(MIGRATIONS_DIR, "*.sql")))
@@ -53,6 +59,7 @@ def resolve(prefixes: list[str]) -> list[str]:
     return paths
 
 
+# Load the chosen SQL files and execute/commit each one, stopping at the first reported failure.
 def main(argv: list[str]) -> int:
     load_dotenv(os.path.join(REPO_ROOT, ".env"))
     database_url = os.getenv("DATABASE_URL")
@@ -70,6 +77,7 @@ def main(argv: list[str]) -> int:
     if not paths:
         return 1
 
+    # A connection is opened per file, not for the whole batch: completed files remain committed if a later file fails.
     for path in paths:
         name = os.path.basename(path)
         with open(path, encoding="utf-8") as f:

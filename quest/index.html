@@ -1,0 +1,53 @@
+<!-- Use modern HTML standards mode, matching the adult entry page. -->
+<!doctype html>
+<!-- CHILD ENTRY: Flask serves this at /quest after website access; the local fixture helper also serves it for review. -->
+<!-- English page language helps screen readers choose the correct pronunciation. -->
+<html lang="en">
+<head>
+  <!-- UTF-8 preserves the story punctuation, arrows and reward symbols. -->
+  <meta charset="utf-8">
+  <!-- Use the actual device width so tablet/phone breakpoints in the CSS can take effect. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Metadata describes the child experience; the visible game text comes from app.js/content.js. -->
+  <meta name="description" content="Help Pip and Flo find a next chapter in FixForward Quest, an illustrated adventure about clues, care and second chances.">
+  <!-- Supporting browsers may use this colour for their own surrounding interface. -->
+  <meta name="theme-color" content="#fff8ec">
+  <!-- This initial title is replaced with the current mission/page title after the app renders. -->
+  <title>FixForward Quest</title>
+  <!-- Reuse the local FixForward tab icon so the two experiences share the same brand. -->
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<!-- CSS order matters: base layout, art motion, then tablet refinements. -->
+  <link rel="stylesheet" href="/quest/quest.css">
+  <link rel="stylesheet" href="/quest/play-effects.css">
+  <link rel="stylesheet" href="/quest/tablet-play.css">
+<!-- Native ES modules load app.js and its imports; there is no bundler or hot reload in this checkout. -->
+  <script type="module" src="/quest/app.js"></script>
+</head>
+<!-- The quest class scopes child animation rules to this page. -->
+<body class="quest">
+  <!-- Keyboard users can skip repeated navigation and focus the current adventure. -->
+  <a class="q-skip" href="#quest-main">Skip to adventure</a>
+<!-- Persistent navigation uses data-nav values read once by app.js. -->
+  <header class="q-header">
+    <!-- data-nav is read by app.js; this button requests the home view without opening a new page. -->
+    <!-- Decorative arrow artwork is hidden from assistive tools; aria-label names the whole button. -->
+    <button class="q-brand" data-nav="home" aria-label="FixForward Quest home"><span class="q-brand-symbol" aria-hidden="true">↗</span><span>FixForward <b>Quest</b></span></button>
+    <!-- grownups is the saved internal name for the optional parent guide; book opens the discoveries. -->
+    <!-- app.js replaces book-count with the current number of discovered concepts. -->
+    <nav aria-label="Adventure navigation"><button data-nav="grownups">Why Quest?</button><button data-nav="book">Discovery Book <span id="book-count">0</span></button></nav>
+  </header>
+<!-- app.js renders the selected game into quest-app and moves focus to its next task. -->
+  <!-- tabindex=-1 lets the controller focus this area programmatically after navigation. -->
+  <!-- quest-app starts empty; render() supplies the game. noscript explains what to do if scripts are disabled. -->
+  <main id="quest-main" tabindex="-1"><div id="quest-app"></div><noscript><p>Turn on JavaScript in your browser to play FixForward Quest.</p></noscript></main>
+  <!-- Persistent controls call readScene(), settings() or navigate() in the screen controller. -->
+  <!-- aria-pressed is updated by app.js to reflect the saved narration preference. -->
+  <footer class="q-footer"><span>Your ideas. Their next chapter.</span><button id="read-aloud" aria-pressed="false">Read aloud</button><button id="quest-settings">Settings</button><button data-nav="grownups">About this adventure</button></footer>
+<!-- A polite live region announces short updates without taking keyboard focus. -->
+  <!-- q-sr hides the region visually; aria-atomic asks assistive tools to read the complete update. -->
+  <div id="q-announcement" class="q-sr" role="status" aria-live="polite" aria-atomic="true"></div>
+<!-- One reusable native dialog hosts clues, help and settings; app.js restores focus on close. -->
+  <!-- modal() inserts q-dialog-title inside the body before opening it; the close button restores focus. -->
+  <dialog id="q-dialog" aria-labelledby="q-dialog-title"><div id="q-dialog-body"></div><button class="q-dialog-close" id="q-dialog-close" aria-label="Close panel">×</button></dialog>
+</body>
+</html>
