@@ -27,8 +27,6 @@ import { SUBURB_POSTCODES } from "./suburb-index.js";
 import { icons } from "./icons.js";
 import { PRICE_SNAPSHOT } from "./price-snapshot.js";
 import { loadPriceCatalogue, matchPriceExamples, problemQuestions } from "./price-catalogue.js";
-import { productSuggestions } from "./product-suggestions.js";
-import { createLearningState, transitionLearning, renderLearning } from "./learning.js";
 
 const app = document.querySelector("#app");
 const main = document.querySelector("#main");
@@ -39,6 +37,7 @@ const restartDialog = document.querySelector("#restart-dialog");
 const aboutDialog = document.querySelector("#about-dialog");
 const aboutContent = document.querySelector("#about-content");
 const toast = document.querySelector("#toast");
+const releaseLabel = document.querySelector("#release-label");
 
 let publicData = getStaticSnapshot();
 let publicDataLoading = true;
@@ -55,7 +54,6 @@ let renderedScreen = null;
 
 const emptyState = () => ({
   screen: "landing",
-  learning: createLearningState(),
   intent: "guide",
   appliance: { family: "", category: "", categoryCode: "", brand: "", model: "" },
   recall: null,
@@ -186,11 +184,12 @@ async function reloadPublicData({ announce = false, showLoading = false } = {}) 
       if (!data.availability?.recalls && previousRecall?.status === "possible") state.recall = { ...previousRecall, refreshUnavailable: true };
       state.decision = null;
     }
+    releaseLabel.textContent = data.meta?.releaseVersion || "FixForward prototype";
     renderAbout();
     if (announce) showToast(["recalls", "repairEvidence", "locations"].every((key) => data.availability?.[key]) ? "Information refreshed." : "Some information is still unavailable. Available parts have been refreshed.");
-    // Editable fields on these screens are mirrored in state as the user types,
-    // so cold data can refresh suggestions and notices without losing answers.
-    if (["landing", "identify", "services", "results", "repair-hub", "cost", "check"].includes(state.screen) || showLoading) {
+    // Landing has no form values. The service screen stores its search input in
+    // state as the user types, so it can also refresh safely when cold data lands.
+    if (["landing", "services", "results", "repair-hub", "cost", "check"].includes(state.screen) || showLoading) {
       const active = document.activeElement;
       const focusSelector = active?.id ? `#${active.id}` : active?.name ? `[name="${active.name}"]` : null;
       renderScreen();
@@ -203,30 +202,48 @@ async function reloadPublicData({ announce = false, showLoading = false } = {}) 
   }
 }
 
+function goalCard(goal) {
+  return `<article class="goal-card goal-${escapeAttr(goal.id)}">
+    <span class="goal-icon" aria-hidden="true">${goal.icon}</span>
+    <h2>${escapeHtml(goal.title)}</h2>
+    <p>${escapeHtml(goal.description)}</p>
+    <button class="goal-button" type="button" data-intent="${escapeAttr(goal.id)}">${escapeHtml(goal.cta)} ${icon("arrow")}</button>
+  </article>`;
+}
+
 function renderLanding() {
   document.title = "Home | FixForward";
   setStage(null);
   app.innerHTML = `<section class="landing goal-first">
     <div class="hero-simple">
       <div class="hero-copy-simple">
-        <p class="kicker">Appliance help for Melbourne families</p>
-        <h1>Repair, replace or recycle?</h1>
-        <p class="lede">FixForward helps you check warning signs, compare costs and find local services for a faulty appliance.</p>
+        <p class="kicker">For Melbourne households with a faulty appliance</p>
+        <h1>Something wrong with an appliance?</h1>
+        <p class="lede">Choose what you need. FixForward asks only a few questions that matter for your appliance, then takes you straight to repair, cost comparison or recycling.</p>
         <div class="hero-quick-wrap" aria-label="Choose what you want to do">
           <p>What do you want to do?</p>
           <div class="hero-quick-actions">${GOALS.map((goal) => `<button type="button" data-intent="${escapeAttr(goal.id)}"><span aria-hidden="true">${goal.icon}</span><strong>${escapeHtml(goal.id === "guide" ? "Help me decide" : goal.id === "compare" ? "Compare costs" : goal.id === "recycle" ? "Recycle it" : "Repair it")}</strong></button>`).join("")}</div>
         </div>
-        <p class="hero-reassurance">A few short questions. You choose what happens next.</p>
+        <div class="hero-reassurance"><span>${icon("shield")} Only relevant safety questions</span><span>${icon("lock")} No account needed</span><span>⏱ A few short questions</span></div>
       </div>
-      <aside class="family-learning-card" aria-labelledby="family-learning-title">
-        <span class="learning-invite-icon" aria-hidden="true">✦</span>
-        <p class="eyebrow">For kids + a grown-up</p>
-        <h2 id="family-learning-title">Be an appliance detective</h2>
-        <p>Try three picture stories together. Spot a safer choice and discover why repair and recycling matter.</p>
-        <button class="button primary" id="start-learning" type="button">Play together ${icon("arrow")}</button>
-        <small>All on screen. No appliance needed.</small>
-      </aside>
+      <div class="hero-appliance-visual" aria-hidden="true">
+        <div class="visual-ring ring-one"></div><div class="visual-ring ring-two"></div>
+        <div class="visual-device">↻<small>fix forward</small></div>
+        <span class="floating-chip chip-repair">🔧 Repair</span>
+        <span class="floating-chip chip-cost">⚖ Compare</span>
+        <span class="floating-chip chip-recycle">♻ Recycle</span>
+      </div>
     </div>
+
+    <section class="goal-section" aria-labelledby="goal-title">
+      <div class="section-heading compact-heading">
+        <p class="eyebrow">Choose your path</p>
+        <h2 id="goal-title">Choose your next step.</h2>
+        <p>You do not need technical knowledge. We explain each question, and “Not sure” is always an option.</p>
+      </div>
+      <div class="goal-grid">${GOALS.map(goalCard).join("")}</div>
+      <p class="safety-promise">${icon("shield")} <strong>Repair, Compare and Recycle use a short 2–4 question check for most appliances.</strong> “I’m not sure” can ask a little more because it is designed to guide the decision.</p>
+    </section>
 
     <section class="impact-simple" aria-label="Why this matters">
       <span aria-hidden="true">♻</span><div><p class="eyebrow">Why this matters</p><h2>Use it longer when that makes sense. Recycle it properly when it does not.</h2><p>FixForward helps you check repair before unnecessary replacement and find a responsible next step for an appliance that is finished.</p></div>
@@ -250,71 +267,6 @@ function renderLanding() {
     state.serviceSafetyMode = "clear";
     navigate("identify");
   }));
-  app.querySelector("#start-learning")?.addEventListener("click", () => navigate("learning"));
-}
-
-function renderLearningScreen() {
-  setStage(null);
-  app.innerHTML = renderLearning(state.learning);
-  app.querySelectorAll("[data-learning-action]").forEach((button) => button.addEventListener("click", () => {
-    const type = button.dataset.learningAction;
-    if (type === "exit") { navigate("landing"); return; }
-    state.learning = transitionLearning(state.learning, { type, choice: button.dataset.learningChoice });
-    renderLearningScreen();
-    const target = app.querySelector(type === "choose" ? "#learning-feedback" : "#learning-focus");
-    target?.focus({ preventScroll: true });
-    target?.scrollIntoView({ block: "center", behavior: scrollBehavior() });
-  }));
-}
-
-function productField(name, label, limit, hint) {
-  return `<div class="product-autocomplete"><label for="product-${name}">${label}</label><div class="product-input-row"><input id="product-${name}" name="${name}" maxlength="${limit}" value="${escapeAttr(state.appliance[name])}" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="${name}-suggestions" aria-describedby="${name}-hint ${name}-error" placeholder="Type or choose a ${name}"><button class="text-button" type="button" data-suggest="${name}" aria-label="Show ${name} suggestions">⌄</button></div><div id="${name}-suggestions" class="product-suggestions" role="listbox" aria-label="${label} suggestions" hidden></div><small class="field-hint" id="${name}-hint">${hint}</small><small class="field-error" id="${name}-error"></small></div>`;
-}
-
-function bindProductSuggestions() {
-  for (const name of ["brand", "model"]) {
-    const input = app.querySelector(`[name="${name}"]`);
-    const list = app.querySelector(`#${name}-suggestions`);
-    if (!input || !list) continue;
-    let options = [];
-    let active = -1;
-    const close = () => { list.hidden = true; input.setAttribute("aria-expanded", "false"); input.removeAttribute("aria-activedescendant"); active = -1; };
-    const select = (index) => {
-      if (!options[index]) return;
-      input.value = name === "brand" ? options[index] : options[index].model;
-      input.dispatchEvent(new window.Event("input", { bubbles: true }));
-      close();
-      input.focus({ preventScroll: true });
-    };
-    const show = () => {
-      const matches = productSuggestions(state.appliance, priceCatalogue.prices || [], recalls());
-      options = matches[name === "brand" ? "brands" : "models"];
-      active = -1;
-      input.removeAttribute("aria-activedescendant");
-      list.innerHTML = options.length ? options.map((item, index) => `<div id="${name}-option-${index}" role="option" aria-selected="false" data-product-option="${index}">${escapeHtml(name === "brand" ? item : item.model)}${name === "model" ? `<small>${escapeHtml(item.source)} · confirm against your label</small>` : ""}</div>`).join("") : `<p class="suggestion-empty">${name === "model" && !state.appliance.brand.trim() ? "Enter a brand to see known models." : "No suggestions in our small list. You can type your own or leave this blank."}</p>`;
-      list.hidden = false;
-      input.setAttribute("aria-expanded", "true");
-      list.querySelectorAll("[data-product-option]").forEach((option) => {
-        option.addEventListener("mousedown", (event) => event.preventDefault());
-        option.addEventListener("click", () => select(Number(option.dataset.productOption)));
-      });
-    };
-    input.addEventListener("focus", show);
-    input.addEventListener("input", show);
-    input.addEventListener("blur", close);
-    app.querySelector(`[data-suggest="${name}"]`)?.addEventListener("click", () => { input.focus({ preventScroll: true }); show(); });
-    input.addEventListener("keydown", (event) => {
-      if (event.key === "Escape") { close(); return; }
-      if (["ArrowDown", "ArrowUp"].includes(event.key)) {
-        event.preventDefault();
-        if (list.hidden) show();
-        if (!options.length) return;
-        active = event.key === "ArrowDown" ? (active + 1) % options.length : (active <= 0 ? options.length - 1 : active - 1);
-        list.querySelectorAll('[role="option"]').forEach((option, index) => option.setAttribute("aria-selected", String(index === active)));
-        input.setAttribute("aria-activedescendant", `${name}-option-${active}`);
-      } else if (event.key === "Enter" && !list.hidden && active >= 0) { event.preventDefault(); select(active); }
-    });
-  }
 }
 
 function intentHeading() {
@@ -359,8 +311,8 @@ function renderIdentify() {
     ${state.appliance.category ? `<section class="product-details-card">
       <div><p class="eyebrow">Optional</p><h2>Do you know the brand or model?</h2><p>This can help us check safety notices and find recorded prices for the same model. It is okay if you do not know.</p></div>
       <div class="form-grid">
-        ${productField("brand", "Brand", 60, "Search known brands, enter your own, or leave blank.")}
-        ${productField("model", "Model number", 50, "Choose only a model that matches your label. A brand can have many models. You can leave this blank.")}
+        <label>Brand<input name="brand" maxlength="60" value="${escapeAttr(state.appliance.brand)}" autocomplete="off" placeholder="e.g. Dyson, Breville, Mistral" aria-describedby="brand-error"><small class="field-hint">Optional · up to 60 characters</small><small class="field-error" id="brand-error"></small></label>
+        <label>Model number<input name="model" maxlength="50" value="${escapeAttr(state.appliance.model)}" autocomplete="off" placeholder="e.g. BVC 160" aria-describedby="model-error"><small>Copy the model from the label if it is easy to reach. You can leave this blank.</small><small class="field-error" id="model-error"></small></label>
       </div>
       <details class="plain-details model-help"><summary>Where can I find the model number?</summary><div class="model-help-body"><div class="model-label-demo" role="img" aria-label="Example appliance rating label showing brand and model number"><span>APPLIANCE LABEL</span><strong>Brand: Example</strong><b>Model: ABC-123</b><small>230–240 V · 50 Hz</small></div><p>If it is safe and easy to see, look for a label on the outside, back or base, or check the manual or receipt. Do not move a hot or damaged appliance to find it. The model may be labelled <strong>Model</strong>, <strong>Model No.</strong> or <strong>M/N</strong>. <strong>Do not open the appliance or remove screws to find it.</strong></p></div></details>
       <div class="continue-row"><button class="button primary large" id="continue-check" type="button">Continue — ${checkCount} quick question${checkCount === 1 ? "" : "s"} ${icon("arrow")}</button><span>Then we take you to ${escapeHtml(destinationAfterCheck())}.</span></div>
@@ -377,7 +329,6 @@ function renderIdentify() {
     state.comparison = null;
     state.problemContext = null;
   }));
-  bindProductSuggestions();
   app.querySelectorAll("[data-family]").forEach((button) => button.addEventListener("click", () => {
     state.appliance = { family: button.dataset.family, category: "", categoryCode: "", brand: "", model: "" };
     state.safety = {};
@@ -469,8 +420,7 @@ function recallMiniCard() {
   }
 
   if (result.status === "unavailable") {
-    if (publicData?.accessRequired) return `<aside class="recall-mini recall-neutral"><div class="recall-icon">i</div><div><h2>Website access has expired.</h2><p>Open the access page in a new tab and enter the website password. Then return here and refresh the information to keep your answers.</p><div class="button-row"><a class="button secondary" href="/login" target="_blank" rel="noopener">Open access page <span class="sr-only">(opens in a new tab)</span></a><button class="button secondary" type="button" data-refresh-access>Refresh information</button></div></div></aside>`;
-    return `<aside class="recall-mini recall-neutral"><div class="recall-icon">i</div><div><p class="mini-label">Safety notice check</p><h2>We cannot check our recall information right now.</h2><p>You can still complete the safety questions. For a complete check, use the official Australian recall search.</p>${externalLink(acccUrl, "Open official recall search")}</div></aside>`;
+    return `<aside class="recall-mini recall-neutral"><div class="recall-icon">i</div><div><p class="mini-label">Safety notice check</p><h2>We cannot check our recall information right now.</h2><p>You can still complete the safety questions below. For a complete check, use the official Australian recall search.</p>${externalLink(acccUrl, "Open official recall search")}</div></aside>`;
   }
 
   if (result.status === "none") {
@@ -599,23 +549,19 @@ function renderCheck() {
   setStage("check");
   const signs = relevantSigns();
   const noun = signs.length === 1 ? "question" : "questions";
-  const recallCard = recallMiniCard();
-  const urgentRecall = state.recall?.status === "possible";
   app.innerHTML = `<section class="screen narrow check-screen">
     ${renderBack("Back to appliance")}
-    <div class="step-heading friendly-heading check-heading"><p class="eyebrow">${escapeHtml(state.appliance.category)}</p><h1>${signs.length} quick ${noun}</h1></div>
+    <div class="step-heading friendly-heading check-heading"><p class="eyebrow">Quick check · ${escapeHtml(state.appliance.category)}</p><h1>${signs.length} quick ${noun} before ${escapeHtml(destinationAfterCheck())}.</h1><p>${escapeHtml(safetyReasonCopy())}</p></div>
 
     <div class="check-rules"><span>✓ Answer from what you already noticed</span><span>✕ Do not switch it on or open it just to check</span></div>
     <button class="cant-check-button" id="cannot-check" type="button">I’m not able to check this safely</button>
 
-    ${urgentRecall ? recallCard : ""}
+    ${recallMiniCard()}
 
     <form id="safety-form" novalidate>
       <div class="question-list simple-questions">${signs.map(([id], index) => questionCard(id, index)).join("")}</div>
-      <details class="plain-details"><summary>Why do we ask these questions?</summary><p>${escapeHtml(safetyReasonCopy())}</p></details>
-      ${urgentRecall ? "" : recallCard}
       <div class="form-error" id="safety-error" role="alert"></div>
-      <div class="safety-footer simple-sticky"><div role="status" aria-live="polite"><strong>0 of ${signs.length} answered</strong><span>Answer only from what you already know. Use the info button if a question is unclear.</span></div><button class="button primary" type="submit">Continue</button></div>
+      <div class="sticky-action simple-sticky"><div><strong>0 of ${signs.length} answered</strong><span>Answer only from what you already know. Use the info button if a question is unclear.</span></div><button class="button primary" type="submit">Continue</button></div>
     </form>
   </section>`;
 
@@ -786,10 +732,10 @@ function renderResults() {
   }
 
   if (safety.status === "caution") {
-    const cautionItems = safety.caution.map((id) => `<li><strong>${escapeHtml(id === "heat" ? "Unusual heat" : "Power trips or a new sound")}</strong><p>${escapeHtml(SAFETY_RULES[id]?.explanation || "A repairer can assess this warning.")}</p></li>`).join("");
+    const cautionItems = safety.caution.map((id) => `<span>${escapeHtml(SAFETY_HELP[id]?.question || SAFETY_RULES[id]?.explanation || id)}</span>`).join("");
     app.innerHTML = `<section class="screen narrow result-screen">
       ${renderBack("Back to safety questions")}
-      <div class="attention-card"><span class="urgent-icon">i</span><p class="eyebrow">Your next step</p><h1>Ask a repairer to check it before using it again.</h1><p>Contact the manufacturer or a qualified appliance repairer. Explain what happened and ask whether they can assess this model and what an inspection costs.</p><div class="warning-explanation"><h2>Why we suggest a check</h2><ul>${cautionItems}</ul><p>Your answers help us suggest a next step. They do not identify the fault.</p></div></div>
+      <div class="attention-card"><span class="urgent-icon">i</span><p class="eyebrow">Needs attention</p><h1>Arrange advice about the warning you noticed.</h1><p>You reported a warning such as unusual heat, repeated power trips or a new noise. That is different from smoke, shock or exposed wiring, but it still deserves assessment.</p><div class="reported-simple">${cautionItems}</div></div>
       ${possibleRecall ? `<div class="priority-card"><strong>A product recall may also apply.</strong><p>Check the official recall instructions first. The recall notice takes priority over ordinary cost or repair planning.</p>${externalLink(state.recall?.match?.noticeUrl || "https://www.productsafety.gov.au/recalls", "See official recall instructions", "button danger")}</div>` : `<div class="caution-actions"><h2>What can you do next?</h2><p>Do not use a community Repair Café as a substitute for checking a possible fault. You can still look at the money side or plan responsible recycling while arranging advice.</p><div class="button-row"><button class="button primary" id="caution-repair" type="button">Explore repair options</button><button class="button secondary" id="caution-cost" type="button">Compare repair and replacement costs</button><button class="button secondary" id="caution-recycle-plan" type="button">Plan recycling</button>${externalLink("https://www.energysafe.vic.gov.au/", "Electrical safety guidance", "button ghost")}</div></div>`}
     </section>`;
     bindBack();
@@ -1467,19 +1413,11 @@ function renderScreen() {
     url.hash = state.screen === "landing" ? "" : state.screen;
     history.replaceState({ ...history.state, fixForward: true, screen: state.screen, journeyId }, "", url);
   }
-  const titles = { landing: "Home", learning: "Appliance detective", identify: "Your appliance", check: "Quick safety check", results: "Your options", "repair-hub": "Repair options", services: state.pathway === "dispose" ? "Find recycling services" : "Find repair services", cost: "Compare repair and replacement costs" };
+  const titles = { landing: "Home", identify: "Your appliance", check: "Quick safety check", results: "Your options", "repair-hub": "Repair options", services: state.pathway === "dispose" ? "Find recycling services" : "Find repair services", cost: "Compare repair and replacement costs" };
   document.title = `${titles[state.screen] || "Your options"} | FixForward`;
   if (!publicData) { renderLoading(); return; }
-  const renderers = { landing: renderLanding, learning: renderLearningScreen, identify: renderIdentify, check: renderCheck, results: renderResults, "repair-hub": renderRepairHub, services: renderServices, cost: renderCost };
+  const renderers = { landing: renderLanding, identify: renderIdentify, check: renderCheck, results: renderResults, "repair-hub": renderRepairHub, services: renderServices, cost: renderCost };
   (renderers[state.screen] || renderLanding)();
-  app.querySelectorAll("[data-refresh-access]").forEach((button) => button.addEventListener("click", () => reloadPublicData({ announce: true })));
-  if (publicData.accessRequired && !app.querySelector("[data-refresh-access]") && !["landing", "learning"].includes(state.screen)) {
-    const notice = document.createElement("aside");
-    notice.className = "access-recovery notice";
-    notice.innerHTML = `<strong>Website access has expired.</strong><p><a href="/login" target="_blank" rel="noopener">Open the access page in a new tab</a>, enter the website password, then return here. Your answers stay in this tab.</p><button class="button secondary" type="button">Refresh information</button>`;
-    notice.querySelector("button").addEventListener("click", () => reloadPublicData({ announce: true }));
-    app.firstElementChild?.append(notice);
-  }
   // Animate navigation once, never a background refresh or an answer edit.
   // Safety warnings stay still and immediately readable.
   const changedScreen = renderedScreen !== state.screen;
@@ -1514,7 +1452,7 @@ function renderAbout() {
     retrievalDate: row.retrieved, url: row.url
   }));
   aboutContent.innerHTML = `<div class="about-intro"><h3>How FixForward helps</h3><p>FixForward brings together safety notices, repair information and local service listings to help you decide what to do next.</p></div>
-    <div class="privacy-box"><h3>Your privacy</h3><p>A temporary access cookie keeps this browser unlocked for up to four hours. It contains no appliance answers.</p><p>FixForward does not intentionally store your appliance choices, safety answers, cost values or exact device coordinates. If you choose “Use my current location”, nearby sorting is calculated in the browser from service coordinates already loaded. Your browser/operating system handles the location permission, and OpenStreetMap receives ordinary requests for the map area displayed. The hosting provider may still process normal technical access logs such as IP address, time and requested page.</p></div>
+    <div class="privacy-box"><h3>Your privacy</h3><p>A temporary access cookie keeps this browser unlocked for up to four hours. It contains no appliance answers. Use Lock website to end access.</p><p>FixForward does not intentionally store your appliance choices, safety answers, cost values or exact device coordinates. If you choose “Use my current location”, nearby sorting is calculated in the browser from service coordinates already loaded. Your browser/operating system handles the location permission, and OpenStreetMap receives ordinary requests for the map area displayed. The hosting provider may still process normal technical access logs such as IP address, time and requested page.</p></div>
     <div class="source-availability"><h3>What is working right now</h3>${[["Product safety information","recalls"],["Repair history","repairEvidence"],["Melbourne service locations","locations"]].map(([label,key]) => `<p><span class="status-dot ${availability(key) ? "ok" : "warn"}"></span><strong>${label}</strong> — ${availability(key) ? "loaded" : "currently unavailable/limited"}</p>`).join("")}</div>
     ${Object.entries(groups).map(([group, items]) => `<details class="source-group"><summary>${escapeHtml(group)} <span>${items.length}</span></summary><ul class="source-list">${items.map((source) => `<li><strong>${escapeHtml(source.name)}</strong><p>${escapeHtml(source.use || source.limitations || "Public information source")}</p><small>${source.retrievalDate ? `Retrieved ${escapeHtml(source.retrievalDate)}` : ""}${source.version ? ` · Version ${escapeHtml(source.version)}` : ""}</small>${source.url ? externalLink(source.url, "Open original source") : ""}</li>`).join("")}</ul></details>`).join("")}
     <div class="privacy-box"><h3>Important limits</h3><p>FixForward currently has only a small product-specific recall list, so the official Australian recall search is still the complete place to check. Repair history describes similar appliance types, not your exact appliance. Service listings may be incomplete or out of date, so call/check before travelling. Recorded retail prices include a model, source and review date. An exact match needs both the brand and model; other examples may differ in size and features. These are dated observations, not live offers or a repair quote. Service-fee examples stay separate from your own repair quote.</p></div>`;
@@ -1548,6 +1486,7 @@ window.addEventListener("popstate", (event) => {
 
 // Render the useful static landing experience immediately. Public datasets load
 // in the background, so a Render/Neon cold start never blocks the first screen.
+releaseLabel.textContent = publicData.meta?.releaseVersion || "FixForward prototype";
 if (!historyReady) {
   history.replaceState({ fixForward: true, screen: "landing", journeyId }, "", location.pathname + location.search);
   historyReady = true;

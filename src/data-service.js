@@ -12,16 +12,6 @@ import {
 import { DATA_API_CONFIG } from "./config.js";
 
 const DATASET_NAMES = ["recalls", "sources", "repairEvidence", "locations"];
-const RETRYABLE_STATUSES = new Set([408, 502, 503, 504]);
-const RETRY_DELAY_MS = 250;
-
-class PublicDataRequestError extends Error {
-  constructor(message, { status = null, retryable = false } = {}) {
-    super(message);
-    this.status = status;
-    this.retryable = retryable;
-  }
-}
 
 export function getStaticSnapshot() {
   return {
@@ -36,7 +26,6 @@ export function getStaticSnapshot() {
     locations: LOCATIONS,
     availability: { recalls: false, sources: true, repairEvidence: false, locations: false },
     apiAvailability: { recalls: false, sources: false, repairEvidence: false, locations: false },
-    accessRequired: false,
     errors: {},
     datasetMeta: {
       recalls: STATIC_META,
@@ -63,63 +52,20 @@ async function getJson(fetchImpl, url, signal) {
   });
   try {
     const request = (async () => {
-      for (let attempt = 0; attempt < 2; attempt += 1) {
-        try {
-          let response;
-          try {
-            response = await fetchImpl(url, {
-              method: "GET",
-              headers: { Accept: "application/json" },
-              credentials: "same-origin",
-              cache: "no-cache",
-              signal
-            });
-          } catch (error) {
-            throw new PublicDataRequestError("Public data could not be reached", {
-              retryable: !signal.aborted && error?.name !== "AbortError"
-            });
-          }
-          if (!response.ok) {
-            // Access configuration failures require server attention, while an
-            // expired session needs a fresh visit to /login. Retrying either
-            // cannot restore access. Do not expose server error details.
-            let accessUnavailable = false;
-            if (response.status === 503 && typeof response.json === "function") {
-              try { accessUnavailable = (await response.json())?.error?.code === "access_unavailable"; } catch { /* An upstream error may have no JSON body. */ }
-            }
-            throw new PublicDataRequestError(`Public data request failed (${response.status})`, {
-              status: response.status,
-              retryable: RETRYABLE_STATUSES.has(response.status) && !accessUnavailable
-            });
-          }
-          // Malformed JSON/data is not a transient transport failure.
-          return await response.json();
-        } catch (error) {
-          if (attempt > 0 || !error?.retryable || signal.aborted) throw error;
-          await waitForRetry(signal);
-        }
-      }
+      const response = await fetchImpl(url, {
+        method: "GET",
+        headers: { Accept: "application/json" },
+        credentials: "same-origin",
+        cache: "no-cache",
+        signal
+      });
+      if (!response.ok) throw new Error(`Public data request failed (${response.status})`);
+      return response.json();
     })();
     return await Promise.race([request, aborted]);
   } finally {
     signal.removeEventListener("abort", abortListener);
   }
-}
-
-function waitForRetry(signal) {
-  return new Promise((resolve, reject) => {
-    const onAbort = () => {
-      clearTimeout(timer);
-      signal.removeEventListener("abort", onAbort);
-      reject(new Error("Public data request timed out"));
-    };
-    const timer = setTimeout(() => {
-      signal.removeEventListener("abort", onAbort);
-      resolve();
-    }, RETRY_DELAY_MS);
-    if (signal.aborted) onAbort();
-    else signal.addEventListener("abort", onAbort, { once: true });
-  });
 }
 
 function endpointTasks(config, fetchImpl, signal) {
@@ -203,7 +149,6 @@ export async function loadPublicData(config = DATA_API_CONFIG, fetchImpl = globa
       const result = results[index];
       if (result.status === "rejected") {
         output.errors[name] = result.reason instanceof Error ? result.reason.message : "Unavailable";
-        if (result.reason?.status === 401) output.accessRequired = true;
         return;
       }
       try {
