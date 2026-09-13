@@ -59,3 +59,17 @@ export function playTrail({ step = 'look' } = {}) {
   const current = stages.some(stage => stage.id === step) ? step : 'look';
   return `<ol class="q-play-trail" aria-label="Your picture adventure">${stages.map(stage => `<li class="q-play-trail-step${stage.id === current ? ' is-current' : ''}"${stage.id === current ? ' aria-current="step"' : ''}><span class="q-play-trail-art" aria-hidden="true">${stage.picture}</span><strong>${stage.label}</strong></li>`).join('')}</ol>`;
 }
+
+/** Four illustrated stepping stones follow the real story state. A wrong plan
+ * stays at Plan; only the ending reaches Discover. These are progress pictures,
+ * not shortcuts, so they cannot bypass reading clues or checking a choice. */
+export function storyTrail(active = {}) {
+  const current = active.step === 'outcome' ? 3 : ['plan', 'feedback'].includes(active.step) ? 2 : active.step === 'explore' ? 1 : 0;
+  const stages = [
+    { label: 'Meet', picture: artwork('pip') },
+    { label: 'Look', picture: symbols.look },
+    { label: 'Plan', picture: symbols.choose },
+    { label: 'Discover', picture: rewardBurst({ kind: 'win' }) }
+  ];
+  return `<ol class="q-step-track q-story-trail" aria-label="Mission steps">${stages.map((stage, index) => `<li class="${index < current ? 'is-finished' : ''}"${index === current ? ' aria-current="step"' : ''}><span class="q-stage-picture" aria-hidden="true">${stage.picture}<em>${index < current ? '✓' : index + 1}</em></span><b>${stage.label}</b></li>`).join('')}</ol>`;
+}

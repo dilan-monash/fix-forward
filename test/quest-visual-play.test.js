@@ -5,11 +5,24 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import { SORT_ITEMS } from '../quest/content.js';
-import { sortingVisualClues, playTrail } from '../quest/visual-play.js';
+import { sortingVisualClues, playTrail, storyTrail } from '../quest/visual-play.js';
 
 // Parse a returned component without loading scripts, network resources or saves.
 const fragment = markup => JSDOM.fragment(markup);
 const labels = id => [...fragment(sortingVisualClues(SORT_ITEMS.find(item => item.id === id))).querySelectorAll('strong')].map(element => element.textContent);
+
+// A retry belongs to the plan stage, not the ending. The decorative trail must
+// never promise a discovery or offer a clickable way around the clue checks.
+test('illustrated story steps follow real progress and keep retries at Plan', () => {
+  for (const [step, label] of [['intro','Meet'], ['explore','Look'], ['plan','Plan'], ['feedback','Plan'], ['outcome','Discover']]) {
+    const content = fragment(storyTrail({ step, feedback: { correct: false } }));
+    assert.equal(content.querySelector('[aria-current="step"] b').textContent, label);
+    assert.equal(content.querySelectorAll('li').length, 4);
+    assert.equal(content.querySelectorAll('li svg').length, 4);
+    assert.equal(content.querySelector('button,a,[tabindex]'), null);
+    if (step === 'feedback') assert.equal(content.querySelectorAll('.is-finished').length, 2);
+  }
+});
 
 test('every reviewed sorting picture has two or three short illustrated facts without answer buttons', () => {
   for (const item of SORT_ITEMS) {

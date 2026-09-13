@@ -18,6 +18,8 @@ WEB_DEPENDENCIES = all(importlib.util.find_spec(name) for name in ("flask", "dot
 QUEST_ENTRIES = ("/quest", "/quest/", "/quest/index.html")
 QUEST_ASSETS = (
     "/quest/quest.css", "/quest/app.js", "/quest/art.js", "/quest/content.js",
+    "/quest/touch-fx.js", "/quest/touch-fx.css", "/quest/scene-play.css",
+    "/quest/adventure-world.js", "/quest/adventure-world.css",
     "/quest/engine.js", "/quest/storage.js", "/quest/drag.js",
     "/quest/play-effects.css", "/quest/postcard.js", "/quest/postcard-options.js",
     "/quest/progression.js", "/quest/tablet-play.css",

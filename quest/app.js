@@ -14,13 +14,15 @@ import { renderParentGuide } from './parent-guide.js';
 import { createNavigation, NAVIGATION_KEY } from './navigation.js';
 import { createNarration } from './narration.js';
 import { createRewardFx } from './reward-fx.js';
+import { createTouchFx } from './touch-fx.js';
+import { renderAdventureTrail } from './adventure-world.js';
 import { createGameSounds } from './sounds.js';
 import { createHaptics } from './haptics.js';
 import { addWordHelp } from './word-help.js';
 import { sceneClues, pictureHelp as renderPictureHelp, sortingPictureHelp } from './picture-help.js';
 import { planFeedback, celebrationCopy, rewardPreview } from './feedback.js';
 import { STORY_LINES } from './story-audio.js';
-import { sortingVisualClues, playTrail } from './visual-play.js';
+import { sortingVisualClues, playTrail, storyTrail } from './visual-play.js';
 
 // Stable elements come from quest/index.html. The main render replaces #quest-app
 // contents; modal() updates the separate dialog body.
@@ -68,12 +70,13 @@ let hudFrame = null;
 let feedbackTimer = null;
 let hudAnimations = [];
 let pendingHudProgress = null;
-let touchRings = new Set();
 const narration = createNarration({ synth: window.speechSynthesis, Utterance: window.SpeechSynthesisUtterance, Audio: window.Audio, onChange: updateAudio });
 const sounds = createGameSounds({ AudioContext: window.AudioContext || window.webkitAudioContext, enabled: state.settings.sound, onChange: updateSound });
 // Quest always plays its character and reward animations. The effects controller
 // still settles the score if a browser cannot animate; effects never own progress.
 const rewardFx = createRewardFx({ document });
+// Touch decorations acknowledge a gesture; only the engine records learning or rewards.
+const touchFx = createTouchFx({ document });
 const haptics = createHaptics({ navigator: window.navigator, isEnabled: () => state.settings.haptics });
 // Treat inserted text as text, not executable HTML. attr uses the same escaping for attributes.
 const escape = (text) => String(text ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');
@@ -104,7 +107,7 @@ function toggleSound() {
   dispatch({ type: 'SET_SETTING', key: 'sound', value: enabled }, { focusTarget: null, speak: false });
   sounds.enable(enabled, { gesture: enabled }).then(() => {
     updateSound();
-    if (enabled && state.settings.sound && !audioRequested) sounds.play('tap');
+    if (enabled && state.settings.sound && narration.getState().status !== 'speaking') sounds.play('tap');
     announce(sounds.getState().message || (enabled ? 'Game sounds on.' : 'Game sounds off.'));
   });
   hud.querySelector('[data-game-sound]')?.focus({ preventScroll: true });
@@ -113,12 +116,12 @@ function toggleSound() {
 // saved, so interrupting a flying star cannot lose or duplicate its reward.
 function clearGameEffects() {
   rewardFx.cancel();
+  touchFx.cancel();
   if (hudFrame !== null) window.cancelAnimationFrame?.(hudFrame);
   if (feedbackTimer !== null) window.clearTimeout(feedbackTimer);
   hudFrame = null; feedbackTimer = null; pendingHudProgress = null;
   hudAnimations.forEach(animation => { try { animation.cancel(); } catch { /* An old WebView may already have removed the effect. */ } }); hudAnimations = [];
   document.querySelector('[data-game-feedback]')?.remove();
-  touchRings.forEach(ring => ring.remove()); touchRings.clear();
 }
 // Give an immediate, brief response in the visible play area. Detailed learning
 // feedback remains on the page; this toast adds no score and takes no focus.
@@ -307,6 +310,13 @@ function dispatch(action, { focusTarget = '[data-focus]', speak = true } = {}) {
   // Steps create Back destinations; selections and help update the current step instead.
   rememberRoute(['ANSWER_SORT', 'RETRY_SORT', 'NEXT_SORT'].includes(action.type) || !newScene);
   if (focusTarget) focus(focusTarget);
+  // A checked sorting choice makes only its little picture arrive or spring
+  // back. Use the new screen's geometry because rendering/focus may scroll it.
+  if (action.type === 'ANSWER_SORT') touchFx.drop({
+    origin: app.querySelector('.q-sort-picture > svg'),
+    target: app.querySelector(`[data-destination="${action.destinationId}"]`),
+    correct: Boolean(next.sorting?.feedback?.correct), artwork: source
+  });
   // Winning uses a short musical sound. Keep automatic story reading out of
   // this moment; the child can still request Hear it or Hear this clue.
   let winFeedback = celebration;
@@ -318,7 +328,7 @@ function dispatch(action, { focusTarget = '[data-focus]', speak = true } = {}) {
     const joy = celebrationCopy({ kind, missionId: next.activeMission?.id, conceptId: kind === 'sorting' ? card?.conceptId : '', points: amount, levelUp, replay: amount === 0, seed: card?.id || action.type });
     rewardFx.play({ points: amount, origin: rewardOrigin, target: hud.querySelector('[data-spark-target]'), levelUp,
       label: joy.headline,
-      onArrive: () => { collectSparks(previousProgress, nextProgress); if (!audioRequested) sounds.play(levelUp ? 'level' : 'spark'); } });
+      onArrive: () => { collectSparks(previousProgress, nextProgress); if (narration.getState().status !== 'speaking') sounds.play(levelUp ? 'level' : 'spark'); } });
     sounds.play('win');
     haptics.play('correct', { pointerType: lastPointerType });
     announce(`${joy.headline} ${joy.pointsLine} ${nextProgress.points} Sparks in your score bar.`);
@@ -444,13 +454,9 @@ function wordHelp() {
 function placeButtons() {
   return LOCATIONS.map(item => `<button class="q-map-place place-${attr(item.id)}" data-place="${attr(item.id)}"><span>${escape(item.title)}</span><b aria-hidden="true">↗</b></button>`).join('');
 }
-const stampTitles = ['A new home', 'A quiet mystery', 'A warning clue', 'A second chance', 'The next stop', 'Two different paths', 'Pause the plan', 'A missing answer'];
 // Show each authored story as an available mission or an earned postcard entry.
 function renderPassport() {
-  return `<section class="q-passport" aria-label="Your story passport"><div class="q-passport-heading"><div><p class="q-eyebrow">Your story passport</p><h2>Eight stories. Your next chapters.</h2></div><p>Find a story. Keep its stamp. Make it yours.</p></div><div class="q-passport-stamps">${MISSIONS.map((item, index) => {
-    const earned = Object.hasOwn(state.completed, item.id);
-    return `<button class="q-passport-story ${earned ? 'earned' : ''}" ${earned ? `data-postcard="${attr(item.id)}"` : `data-mission="${attr(item.id)}"`} aria-label="${earned ? 'Design a postcard for' : 'Explore'} ${attr(item.title)}"><span class="q-passport-art">${passportStamp(item.id)}</span><strong>${escape(stampTitles[index] || item.title)}</strong><small>${earned ? 'Stamp collected · Create ↗' : 'Find this story →'}</small></button>`;
-  }).join('')}</div></section>`;
+  return renderAdventureTrail({ missions: MISSIONS, completed: state.completed, suggestedId: suggestedMission(state) });
 }
 // Build the child start/resume screen, neighbourhood and three game choices.
 // Saved state controls resume buttons; all stories remain available at every level.
@@ -479,8 +485,7 @@ function renderPicker() {
 }
 // Translate the internal mission step into the four visible progress labels.
 function missionProgress(active) {
-  const stage = ['intro', 'explore', 'plan', 'feedback', 'outcome'].indexOf(active.step);
-  return `<ol class="q-step-track" aria-label="Mission steps">${['Meet', 'Look at facts', 'Make a plan', 'See what happens'].map((label, i) => `<li ${i === Math.min(stage, 3) ? 'aria-current="step"' : ''}><span>${i < stage ? '✓' : i + 1}</span>${label}</li>`).join('')}</ol>`;
+  return storyTrail(active);
 }
 // Create either positioned scene hotspots or a plain clue list from the same clue IDs.
 // Guided mode reveals labels; both versions dispatch the same discovery action.
@@ -743,6 +748,9 @@ function clue(id) {
   const found = dispatch({ type: 'COLLECT_CLUE', id }, { focusTarget: null, speak: false });
   if (!found) { stopReading(); render(); }
   focus('[data-picture-help-focus]');
+  // The lens surrounds the exact authored clue picture after it comes into view.
+  // Reopening a clue can replay its decoration without granting another discovery.
+  touchFx.clue({ element: app.querySelector('.q-picture-help-art') });
   sounds.play('choose');
   if (state.settings.narration) speakText(entry.text, { keepSounds: true });
   if (found) showGameFeedback(true, 'Aha! You found the clue!');
@@ -866,7 +874,7 @@ function bind() {
     const item = mission();
     if (!item || !state.completed[item.id]) return;
     if (isReflectionCorrect(item, el.dataset.reflection)) { reflectionHint = null; dispatch({type:'CHECK_REFLECTION', missionId:item.id, answerId:el.dataset.reflection}, {focusTarget:'[data-reflection-focus]'}); }
-    else { reflectionHint = item.id; lastReward = null; render(); showGameFeedback(false, 'Try the other picture!'); if (!audioRequested) sounds.play('retry'); focus('[data-reflection-focus]'); announce('Here’s a clue. You can try again.'); }
+    else { reflectionHint = item.id; lastReward = null; render(); showGameFeedback(false, 'Try the other picture!'); if (narration.getState().status !== 'speaking') sounds.play('retry'); focus('[data-reflection-focus]'); announce('Here’s a clue. You can try again.'); }
   });
   app.querySelectorAll('[data-greet]').forEach(el => el.onclick = () => greet(el.dataset.greet));
   app.querySelectorAll('[data-postcard]').forEach(el => el.onclick = () => openPostcard(el.dataset.postcard));
@@ -926,19 +934,20 @@ function unlockGameAudio(event) {
 // A tiny ring makes a finger press visible on glass. It is decorative, has no
 // haptic permission requirement and carries no score or game logic.
 function showTouch(event) {
-  if (!event.isTrusted || event.pointerType === 'mouse' || !event.target.closest?.('button')) return;
-  const ring = document.createElement('span'); ring.className = 'q-tap-ring';
-  ring.setAttribute('aria-hidden', 'true'); ring.style.left = `${event.clientX}px`; ring.style.top = `${event.clientY}px`;
-  ring.addEventListener('animationend', () => { ring.remove(); touchRings.delete(ring); }, { once: true });
-  touchRings.add(ring); document.body.append(ring);
+  const control = event.target.closest?.('button');
+  if (!event.isTrusted || !control || control.disabled || state.view === 'grownups') return;
+  touchFx.press({ element: control, x: event.clientX, y: event.clientY, pointerType: event.pointerType });
 }
 document.addEventListener('pointerdown', event => { lastPointerType = event.pointerType || 'mouse'; unlockGameAudio(event); showTouch(event); }, { passive: true });
 document.addEventListener('keydown', event => { lastPointerType = 'keyboard'; if (event.key === 'Enter' || event.key === ' ') unlockGameAudio(event); });
-// Play the press in capture phase, so a success/retry chime can replace it after
-// the game checks the answer. Narration and its controls always take priority.
+// Ordinary buttons get one small press sound. Actions with their own pickup,
+// choice, page or result cue are excluded, including a drag's suppressed click.
+// Only a currently speaking voice mutes this cue: a finished or paused reading
+// must not leave the game silent because its earlier request is still remembered.
 document.addEventListener('click', event => {
   const control = event.target.closest?.('button');
-  if (!event.isTrusted || !control || control.disabled || audioRequested || control.matches('[data-game-sound],[data-enable-game-sound],[data-hear],#read-aloud') || control.closest('[data-audio-dock]')) return;
+  if (!event.isTrusted || !control || control.disabled || narration.getState().status === 'speaking' || control.closest('[data-audio-dock]')) return;
+  if (control.matches('[data-game-sound],[data-enable-game-sound],[data-hear],[data-hear-picture],[data-hear-sort-clue],#read-aloud,[data-greet],[data-sort-drag],[data-sort-picture],[data-action-drag],[data-action-select],[data-decoration-drag],[data-destination],[data-check-plan],[data-reflection],[data-complete],[data-sort-next],[data-sort-retry],[data-retry],[data-replay],[data-start-mission],[data-mission],[data-sort-start],[data-clue],[data-picture-clue],[data-open-plan],[data-plan-slot],[data-nav],[data-picker],[data-place]')) return;
   sounds.play('tap');
 }, true);
 const chromeObserver = typeof window.ResizeObserver === 'function' ? new window.ResizeObserver(measureChrome) : null;
@@ -961,7 +970,7 @@ dialog.addEventListener('cancel', () => { stopReading(); });
 document.querySelector('#quest-settings').onclick = settings;
 document.querySelector('#read-aloud').onclick = readScene;
 // Release temporary browser resources when leaving the page; saved progress remains.
-window.addEventListener('pagehide', event => { stopReading(); sounds.stop(); haptics.stop(); clearGameEffects(); cleanDrag(); cleanDownload(); cleanDemo(); if (!event.persisted) { navigation?.dispose(); narration.dispose(); sounds.dispose(); haptics.dispose(); rewardFx.destroy(); chromeObserver?.disconnect(); } });
+window.addEventListener('pagehide', event => { stopReading(); sounds.stop(); haptics.stop(); clearGameEffects(); cleanDrag(); cleanDownload(); cleanDemo(); if (!event.persisted) { navigation?.dispose(); narration.dispose(); sounds.dispose(); haptics.dispose(); rewardFx.destroy(); touchFx.dispose(); chromeObserver?.disconnect(); } });
 // A browser may cache the whole page when leaving Quest. Reattach cleaned drag
 // listeners on return, without replaying a celebration or any completion action.
 window.addEventListener('pageshow', event => { if (event.persisted) { celebration = false; lastReward = null; render(); } });

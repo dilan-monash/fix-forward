@@ -70,6 +70,8 @@ def create_app(test_config=None):
         ) or (
             asset_path in {"quest/index.html", "quest/quest.css", "quest/app.js",
                            "quest/art.js", "quest/content.js", "quest/engine.js",
+                           "quest/touch-fx.js", "quest/touch-fx.css", "quest/scene-play.css",
+                           "quest/adventure-world.js", "quest/adventure-world.css",
                            "quest/storage.js", "quest/drag.js", "quest/play-effects.css",
                            "quest/postcard.js", "quest/postcard-options.js",
                            "quest/progression.js", "quest/tablet-play.css",

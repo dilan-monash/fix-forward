@@ -1,0 +1,87 @@
+/* ADVENTURE TRAIL: a local illustrated world below the existing home map. All
+ * styling is scoped to this component; the approved hero and parent guide keep
+ * their layout. SVGs are shared with the stories, without extra image requests. */
+.q-adventure-trail { grid-column:1/-1; min-width:0; margin:1.5rem 0 .5rem; padding:1.5rem clamp(.75rem,2vw,1.5rem); border:1px solid #c7dcd4; border-radius:30px; background:linear-gradient(160deg,#e5f1ed,#f6f3df 67%,#e5edf5); }
+.q-adventure-heading { display:flex; align-items:center; justify-content:space-between; gap:1rem; position:relative; z-index:1; }
+.q-adventure-heading h2 { max-width:680px; margin:.3rem 0 .5rem; font-size:clamp(1.5rem,2.5vw,2.2rem); line-height:1.15; }
+.q-adventure-heading p { margin:0; }
+.q-adventure-kicker { color:#22796b; font-weight:800; }
+.q-adventure-progress { display:grid; grid-template-columns:36px auto; align-items:center; flex:0 0 auto; gap:.2rem .45rem; padding:.75rem 1rem; border:2px solid #e8bc57; border-radius:18px; background:#fff8e9; box-shadow:0 4px 0 #e8bc5730; }
+.q-adventure-progress-star { grid-row:1/3; color:#a25b0d; font-size:2.6rem; line-height:1; }
+.q-adventure-progress p { white-space:nowrap; }
+.q-adventure-progress strong { color:#112858; }
+.q-adventure-progress meter { display:block; width:100%; min-width:90px; height:12px; border:0; border-radius:12px; background:#e0e6db; }
+.q-adventure-progress meter::-webkit-meter-bar { border:0; background:#e0e6db; border-radius:12px; }
+.q-adventure-progress meter::-webkit-meter-optimum-value { background:#22796b; border-radius:12px; }
+.q-adventure-progress meter::-moz-meter-bar { background:#22796b; border-radius:12px; }
+
+/* The route is painted behind stable, native buttons. No labels or touch
+ * targets bob around: children can tap a picture without chasing animation. */
+.q-adventure-map { position:relative; isolation:isolate; margin-top:1.25rem; min-width:0; }
+.q-adventure-islands { position:relative; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:1.4rem .5rem; margin:0; padding:.5rem 0; list-style:none; }
+.q-adventure-stop { min-width:0; position:relative; }
+.q-adventure-island { position:relative; display:flex; flex-direction:column; align-items:center; width:100%; height:100%; min-height:248px; min-width:44px; padding:.45rem .35rem .7rem; border:2px solid transparent; border-radius:22px; background:transparent; color:#112858; text-align:center; line-height:1.3; transition:background-color 150ms,border-color 150ms,box-shadow 150ms; }
+.q-adventure-island:hover { background:#fffdf798; border-color:#a4c5b3; }
+.q-adventure-island:focus-visible { outline:3px solid #125e96; outline-offset:3px; background:#fffdf7; }
+.q-adventure-island:active { background:#f7e5b7; }
+.q-adventure-title { display:block; max-width:100%; font-size:var(--q-reading-size,1.125rem); line-height:1.3; margin:.2rem 0 .4rem; }
+.q-adventure-action { display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:.3rem; margin-top:auto; color:#225d53; font-size:var(--q-label-size,1rem); font-weight:700; line-height:1.3; }
+.q-adventure-chapter { position:absolute; z-index:2; top:.4rem; left:.55rem; display:grid; place-items:center; width:34px; height:34px; border:2px solid #799d8c; border-radius:50%; background:#fffdf7; font-size:1.125rem; font-weight:800; box-shadow:0 3px 0 #a0bba24a; }
+.is-earned .q-adventure-chapter { color:white; border-color:#22796b; background:#22796b; }
+.is-earned .q-adventure-action { color:#225d53; }
+.is-suggested .q-adventure-island { border-color:#b78625; background:#fff8e982; box-shadow:0 4px 0 #deb86c38; }
+.q-adventure-next { position:absolute; top:.45rem; right:.45rem; z-index:2; padding:.25rem .45rem; border:1px solid #d4a947; border-radius:9px; background:#f9d980; font-size:1rem; font-weight:800; }
+.q-island-stage { position:relative; display:block; width:100%; max-width:220px; height:168px; flex:0 0 168px; margin-top:1.3rem; }
+.q-island-stage>.q-island-ground { position:absolute; inset:auto 0 0; width:100%; height:auto; overflow:visible; }
+.q-island-story-art { position:absolute; z-index:1; width:138px; max-width:70%; bottom:28px; left:50%; translate:-50% 0; }
+.q-island-story-art>.quest-art { display:block; width:100%; height:auto; }
+.q-island-earned-star { position:absolute; z-index:2; right:8%; bottom:33px; color:#9b570b; font-size:2.5rem; line-height:1; text-shadow:0 2px #fff8e9; }
+.q-adventure-map>.q-adventure-route { position:absolute; z-index:-1; inset:0; width:100%; height:100%; overflow:visible; pointer-events:none; }
+.q-adventure-route path { fill:none; stroke:#99b9a0; stroke-width:5; stroke-dasharray:2 13; stroke-linecap:round; vector-effect:non-scaling-stroke; }
+.q-adventure-map>.q-adventure-route--narrow { display:none; }
+
+/* Two clouds, a flag on each island and earned stars carry the motion. Only
+ * transforms/opacity animate; product pictures (including warnings) stay still.
+ * Brief star twinkles finish by themselves, avoiding perpetual flashing. */
+.q-adventure-cloud { position:absolute; z-index:-1; width:62px; height:17px; border-radius:24px; background:#fffdf7; opacity:.75; pointer-events:none; animation:q-trail-cloud 14s ease-in-out infinite alternate; }
+.q-adventure-cloud::before,.q-adventure-cloud::after { content:""; position:absolute; bottom:3px; width:27px; height:27px; border-radius:50%; background:inherit; }
+.q-adventure-cloud::before { left:8px; }
+.q-adventure-cloud::after { left:28px; width:22px; height:22px; }
+.q-adventure-cloud--one { left:28%; top:7px; }
+.q-adventure-cloud--two { right:17%; top:52%; animation-delay:-7s; }
+.q-island-pennant { transform-box:fill-box; transform-origin:left center; animation:q-trail-flag 5s ease-in-out infinite; }
+.q-adventure-stop:nth-child(even) .q-island-pennant { animation-delay:-2.5s; }
+.q-island-earned-star { animation:q-trail-stamp 650ms ease-out 2; }
+@keyframes q-trail-cloud { from { transform:translateX(-8px); } to { transform:translateX(8px); } }
+@keyframes q-trail-flag { 0%,100% { transform:skewY(-3deg) scaleX(.97); } 50% { transform:skewY(3deg) scaleX(1); } }
+@keyframes q-trail-stamp { 0%,100% { scale:1; } 50% { scale:1.14; } }
+
+/* Two roomy columns on phones keep titles readable and each entire island
+ * touchable. The route changes shape, while DOM/keyboard order stays 1 to 8. */
+@media(max-width:700px) {
+  .q-adventure-trail { padding:1rem .5rem; border-radius:22px; }
+  .q-adventure-heading { flex-wrap:wrap; padding:0 .25rem; }
+  .q-adventure-heading h2 { font-size:1.6rem; }
+  .q-adventure-progress { grid-template-columns:28px auto 90px; gap:.45rem; padding:.5rem .7rem; }
+  .q-adventure-progress-star { grid-row:auto; font-size:2rem; }
+  .q-adventure-islands { grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem .3rem; }
+  .q-adventure-island { min-height:228px; padding:.4rem .2rem .65rem; border-radius:17px; }
+  .q-island-stage { height:146px; flex-basis:146px; margin-top:1.45rem; }
+  .q-island-story-art { width:125px; max-width:77%; bottom:20px; }
+  .q-adventure-chapter { left:.3rem; top:.3rem; width:30px; height:30px; font-size:1rem; }
+  .q-adventure-next { top:.3rem; right:.2rem; padding:.2rem .3rem; }
+  .q-adventure-map>.q-adventure-route--wide { display:none; }
+  .q-adventure-map>.q-adventure-route--narrow { display:block; }
+  .q-adventure-cloud--one { left:35%; top:3px; }
+  .q-adventure-cloud--two { right:10%; top:49%; }
+}
+
+/* Narrow phones need the artwork's proportions to shrink, not the reading
+ * size. This also leaves the chapter number and suggestion label separate. */
+@media(max-width:375px) {
+  .q-adventure-island { min-height:216px; }
+  .q-island-stage { height:126px; flex-basis:126px; margin-top:1.55rem; }
+  .q-island-story-art { max-width:82%; bottom:17px; }
+  .q-adventure-progress { grid-template-columns:25px auto; }
+  .q-adventure-progress meter { grid-column:2; }
+}

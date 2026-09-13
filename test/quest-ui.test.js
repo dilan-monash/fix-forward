@@ -1441,6 +1441,77 @@ test('earned stars travel before the HUD fills, while points are saved once and 
   assert.deepEqual(new Set(q.savedState().discoveries), new Set(item.conceptIds));
 });
 
+test('sorting touch stamps target the visible destination after retry and success without duplicate Sparks or win speech', async t => {
+  const q = await createQuest(t, { controlledAnimations: true });
+  // Use the shipping hide rule: accepted destinations replace their old drawing
+  // with the placed product. That hidden drawing cannot supply drop coordinates.
+  const css = await readFile(new URL('../quest/quest.css', import.meta.url), 'utf8');
+  const hideRule = css.match(/\.q-destination\.q-accepted \.q-destination-drawing\s*\{[^}]*\}/)?.[0];
+  assert.ok(hideRule, 'this regression follows the actual accepted-drawing CSS rule');
+  const style = q.document.createElement('style');
+  style.textContent = hideRule;
+  q.document.head.append(style);
+  const baseRect = q.window.Element.prototype.getBoundingClientRect;
+  const destinationLeft = { paper: 280, ewaste: 470, ask: 660 };
+  const geometryReads = [];
+  q.window.Element.prototype.getBoundingClientRect = function () {
+    if (this.matches('[data-destination]')) {
+      geometryReads.push({ destination: this.dataset.destination, hidden: false });
+      return { left: destinationLeft[this.dataset.destination], top: 430, width: 170, height: 150 };
+    }
+    const drawing = this.closest('.q-destination-drawing');
+    if (drawing) {
+      const hidden = q.window.getComputedStyle(drawing).display === 'none';
+      geometryReads.push({ destination: drawing.closest('[data-destination]').dataset.destination, hidden });
+      return hidden ? { left: 0, top: 0, width: 0, height: 0 } : { left: 200, top: 200, width: 60, height: 60 };
+    }
+    if (this.matches('.q-sort-picture > svg')) return { left: 80, top: 180, width: 120, height: 110 };
+    return baseRect.call(this);
+  };
+  q.click('[data-place="station"]');
+  q.click('[data-sort-start]');
+  const run = q.savedState().sorting;
+  const item = SORT_ITEMS.find(card => card.id === run.itemIds[0]);
+  const wrong = ['paper', 'ewaste', 'ask'].find(id => id !== item.answer);
+  q.click(`[data-destination="${wrong}"]`);
+  const retry = q.required('.q-touch-fx[data-effect="drop-retry"] .q-touch-fx__retry');
+  assert.equal(Number.parseFloat(retry.style.left) + 31, destinationLeft[wrong] + 85);
+  assert.equal(Number.parseFloat(retry.style.top) + 31, 505);
+  assert.equal(q.savedState().sorting.feedback.correct, false);
+  assert.deepEqual(q.savedState().sorting.answers, {});
+  assert.equal(Number(q.required('[data-spark-value]').textContent), 0);
+  const retryAnimations = q.animations.filter(animation => animation.element.closest('.q-touch-fx'));
+  q.click('[data-sort-retry]');
+  assert.ok(retryAnimations.every(animation => animation.cancelled), 'retry replaces its old visual feedback cleanly');
+  const speechBeforeWin = q.narration.utterances.length;
+  q.click(`[data-destination="${item.answer}"]`);
+  const accepted = q.required(`[data-destination="${item.answer}"]`);
+  assert.equal(q.window.getComputedStyle(accepted.querySelector('.q-destination-drawing')).display, 'none');
+  const stamp = q.required('.q-touch-fx[data-effect="drop-correct"] .q-touch-fx__correct');
+  assert.equal(Number.parseFloat(stamp.style.left) + 31, destinationLeft[item.answer] + 85, 'success stamp centres on the visible destination button');
+  assert.equal(Number.parseFloat(stamp.style.top) + 31, 505);
+  assert.ok(geometryReads.some(read => read.destination === item.answer && !read.hidden));
+  assert.ok(geometryReads.every(read => !read.hidden), 'no successful drop measures the drawing hidden by the accepted state');
+  assert.equal(q.narration.utterances.length, speechBeforeWin, 'winning remains musical even while automatic story narration is enabled');
+  assert.deepEqual(q.savedState().sortedItems, [item.id]);
+  assert.equal(Object.keys(q.savedState().sorting.answers).length, 1);
+  const wonSave = q.actualStorage.getItem(STORAGE_KEY);
+  const finalStar = q.animations.findLast(animation => animation.element.matches('.q-reward-fx__star') && typeof animation.onfinish === 'function');
+  assert.ok(finalStar);
+  finalStar.finish();
+  assert.equal(Number(q.required('[data-spark-value]').textContent), 10, 'a first picture and its first idea earn five Sparks each');
+  finalStar.finish();
+  accepted.click();
+  assert.equal(q.actualStorage.getItem(STORAGE_KEY), wonSave, 'repeated animation completion or a disabled answer cannot award twice');
+  const touchAnimations = q.animations.filter(animation => animation.element.closest('.q-touch-fx'));
+  assert.ok(touchAnimations.length);
+  q.click('.q-header [data-nav="home"]');
+  assert.equal(q.query('.q-touch-fx, .q-reward-fx'), null);
+  assert.ok(touchAnimations.every(animation => animation.cancelled), 'navigation cancels the remaining destination decorations');
+  assert.equal(Number(q.required('[data-spark-value]').textContent), 10);
+  assert.deepEqual(q.savedState().sortedItems, [item.id]);
+});
+
 test('leaving a star flight settles the next screen from saved progress and ignores late animation callbacks', async t => {
   const q = await createQuest(t, { controlledAnimations: true });
   const item = MISSIONS[0];
