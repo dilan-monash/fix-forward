@@ -9,6 +9,7 @@ Credentials are isolated test values, and no database or hosted service is used.
 import importlib.util
 import re
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
 
@@ -19,6 +20,10 @@ QUEST_ASSETS = (
     "/quest/engine.js", "/quest/storage.js", "/quest/drag.js",
     "/quest/play-effects.css", "/quest/postcard.js", "/quest/postcard-options.js",
     "/quest/progression.js", "/quest/tablet-play.css",
+    "/quest/navigation.js", "/quest/narration.js", "/quest/parent-guide.js",
+    "/quest/reward-fx.js", "/quest/sounds.js", "/quest/game-feel.css",
+    "/quest/picture-help.js", "/quest/feedback.js", "/quest/clue-play.css",
+    "/quest/family-guide.css", "/quest/story-audio.js", "/quest/audio/story-manifest.js",
 )
 
 
@@ -105,10 +110,34 @@ class QuestRouteTests(unittest.TestCase):
                         self.assertIn('href="/quest"', text)
                         self.assertNotIn('id="quest-app"', text)
 
+    def test_story_recording_is_protected_and_supports_tablet_audio_ranges(self):
+        # Test real packaged bytes without any speech service or database. A range
+        # response must match the original MP3, so UTF-8 corruption cannot pass.
+        audio_folder = Path(__file__).resolve().parents[1] / "quest" / "audio"
+        clips = sorted(audio_folder.glob("*.mp3"))
+        self.assertTrue(clips, "At least one packaged story recording is required")
+        clip = clips[0]
+        original = clip.read_bytes()
+        route = f"/quest/audio/{clip.name}"
+        with self.client.get(route) as response:
+            self.assertEqual(response.status_code, 303)
+            self.assertEqual(response.headers["Location"], "/login")
+        self.login()
+        with self.client.get(route, headers={"Range": "bytes=0-63"}) as response:
+            self.assertEqual(response.status_code, 206)
+            self.assertEqual(response.mimetype, "audio/mpeg")
+            self.assertEqual(response.data, original[:64])
+            self.assertEqual(response.headers["Content-Range"], f"bytes 0-63/{len(original)}")
+            self.assertEqual(response.headers["Cache-Control"], "private, no-store")
+        with self.client.head(route) as response:
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(int(response.headers["Content-Length"]), len(original))
+            self.assertEqual(response.data, b"")
+
     def test_quest_cannot_expand_the_public_asset_allowlist(self):
         self.login()
         blocked = (
-            "/quest/.env", "/quest/content.js.map", "/quest/unknown.js",
+            "/quest/.env", "/quest/audio/.env", "/quest/audio/build.py", "/quest/audio/invalid.mp3", "/quest/content.js.map", "/quest/unknown.js",
             "/quest/../backend/config.py", "/quest/%2e%2e/backend/config.py",
             "/quest/../../.env", "/quest/docs/QUEST_CONTENT_SOURCES.md",
             "/docs/QUEST_CONTENT_SOURCES.md", "/test_backend/test_quest_routes.py",

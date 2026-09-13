@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "dev:quest": "node test_helpers/serve-usability.mjs",
-    "check:quest": "node --check quest/app.js && node --check quest/art.js && node --check quest/content.js && node --check quest/engine.js && node --check quest/drag.js && node --check quest/storage.js && node --test test/quest-*.test.js",
+    "check:quest": "node --check quest/app.js && node --check quest/reward-fx.js && node --check quest/sounds.js && node --check quest/picture-help.js && node --check quest/feedback.js && node --check quest/story-audio.js && node --check quest/navigation.js && node --check quest/narration.js && node --check quest/parent-guide.js && node --check quest/art.js && node --check quest/content.js && node --check quest/engine.js && node --check quest/drag.js && node --check quest/storage.js && node --test test/quest-*.test.js",
     "test": "node --test test/*.test.js",
-    "check": "node --check src/app.js && node --check src/data-service.js && node --check src/data.js && node --check src/logic.js && node --check src/price-catalogue.js && node --check src/price-snapshot.js && node --check src/product-suggestions.js && node --check src/learning.js && node --check quest/app.js && node --check quest/art.js && node --test test/*.test.js"
+    "check": "node --check src/app.js && node --check src/data-service.js && node --check src/data.js && node --check src/logic.js && node --check src/price-catalogue.js && node --check src/price-snapshot.js && node --check src/product-suggestions.js && node --check src/learning.js && node --check quest/app.js && node --check quest/reward-fx.js && node --check quest/sounds.js && node --check quest/picture-help.js && node --check quest/feedback.js && node --check quest/story-audio.js && node --check quest/navigation.js && node --check quest/narration.js && node --check quest/parent-guide.js && node --check quest/art.js && node --test test/*.test.js"
   },
   "engines": {
     "node": ">=20"

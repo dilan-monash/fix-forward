@@ -27,6 +27,7 @@ body.quest .q-envelope-flap,
 body.quest .q-phone-handset,
 body.quest .q-reward-token,
 body.quest .q-reward-accents,
+body.quest .q-win-rays,
 body.quest .q-level-medallion,
 body.quest .q-level-ribbons,
 body.quest .q-level-accents {
@@ -43,10 +44,10 @@ body.quest .q-passport-stamp { overflow: visible; }
 body.quest .q-reward-art,
 body.quest .q-level-badge { overflow: visible; pointer-events: none; }
 
-/* Motion is opt-in from the existing app setting, then further restricted by
- * the operating-system preference. The static illustration retains the story.
+/* Motion follows the device unless the player explicitly chooses Game animations.
+ * app.js resolves that choice into data-motion; Less movement remains available. The static illustration retains the story.
  */
-@media (prefers-reduced-motion: no-preference) {
+@media screen {
   html[data-motion="full"] body.quest .q-play-enter .q-guide-character .q-pip-arm {
     animation: q-quest-pip-greeting 850ms ease-in-out 1;
   }
@@ -114,6 +115,11 @@ body.quest .q-level-badge { overflow: visible; pointer-events: none; }
   }
   html[data-motion="full"] body.quest .q-reward-enter .q-reward-accents {
     animation: q-quest-reward-marks 650ms ease-out 150ms 1 backwards;
+  }
+  /* The starburst belongs to a completed decision. It expands once, then stays
+   * visible; no overlay, timer or animation completion blocks the next action. */
+  html[data-motion="full"] body.quest .q-reward-enter .q-win-rays {
+    animation: q-quest-win-burst 850ms cubic-bezier(.2,.7,.3,1) 100ms 1 backwards;
   }
   html[data-motion="full"] body.quest .q-level-up .q-level-medallion {
     animation: q-quest-medallion-settles 850ms cubic-bezier(.2,.7,.3,1) 1;
@@ -228,6 +234,12 @@ body.quest .q-level-badge { overflow: visible; pointer-events: none; }
   from { transform: scale(.75); }
   to { transform: scale(1); }
 }
+/* One radial expansion gives the win a distinct shape without falling confetti. */
+@keyframes q-quest-win-burst {
+  0% { transform: scale(.62) rotate(-8deg); opacity:.45; }
+  62% { transform: scale(1.07) rotate(2deg); opacity:1; }
+  100% { transform: scale(1) rotate(0deg); opacity:1; }
+}
 @keyframes q-quest-medallion-settles {
   0% { transform: translateY(9px) scale(.84) rotate(-8deg); }
   72% { transform: translateY(0) scale(1.025) rotate(2deg); }
@@ -244,10 +256,15 @@ body.quest .q-level-badge { overflow: visible; pointer-events: none; }
 body.quest .q-warning-object,
 body.quest .q-warning-object *,
 body.quest .q-fan-blades { animation: none !important; }
+/* Also stop moving containers around a warning picture: freezing only the SVG
+ * child would still allow a sorting card's entry effect to carry it sideways. */
+body.quest .q-sort-object:has(.q-warning-object),
+body.quest .q-action-art:has(.q-warning-object),
+body.quest .q-placed-picture:has(.q-warning-object) { animation: none !important; }
 
 html[data-motion="reduce"] body.quest .quest-art *,
 html[data-motion="reduce"] body.quest .q-passport-stamp { animation: none !important; }
 @media (prefers-reduced-motion: reduce) {
-  body.quest .quest-art *,
-  body.quest .q-passport-stamp { animation: none !important; }
+  html:not([data-motion=full]) body.quest .quest-art *,
+  html:not([data-motion=full]) body.quest .q-passport-stamp { animation: none !important; }
 }

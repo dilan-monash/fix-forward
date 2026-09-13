@@ -132,10 +132,52 @@ body.quest { --play-yellow:#f8d777; --play-mint:#d8ebdd; --play-blue:#dbe7f3; }
 .q-level-trail strong { font-size:.8rem; }
 .q-level-trail span { font-size:.75rem; line-height:1.4; }
 .q-spark-rules { line-height:1.9; padding-left:1.4rem; }
-/* Parent guide layout is scoped to the child page and does not restyle the adult app. */
-.q-parent-guide { max-width:1200px; }
-.q-parent-hero { display:grid; grid-template-columns:1.1fr 1fr; gap:2rem; align-items:center; padding:1rem 0 2rem; }
-.q-parent-hero h1 { font-size:clamp(2rem,4vw,3.7rem); }
+/* Parent guide: a compact introduction, four readable steps and optional detail.
+ * The same local sans-serif face connects it to the game without making adults
+ * scan a large illustrated cover before they understand the activity. */
+body.quest .q-parent-guide { max-width:1080px; }
+body.quest .q-parent-hero { display:block; padding:1.7rem 2rem; margin-bottom:2rem; border:1px solid #b4cbd4; border-radius:28px 28px 28px 8px; background:linear-gradient(120deg,#e3eef6,#f3f7ef); }
+body.quest .q-parent-hero h1 { max-width:780px; font-size:clamp(1.9rem,3.7vw,2.8rem); line-height:1.12; margin:.5rem 0 1rem; letter-spacing:-.025em; }
+body.quest .q-parent-hero>p { max-width:760px; }
+body.quest .q-parent-hero .q-parent-lead { font-size:1.12rem; line-height:1.6; color:#263f55; }
+body.quest .q-parent-guide p { line-height:1.65; }
+body.quest .q-parent-guide h2 { font-size:clamp(1.4rem,2.5vw,1.8rem); line-height:1.25; letter-spacing:-.015em; }
+body.quest .q-parent-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.9rem; margin:1.3rem 0 2rem; }
+body.quest .q-parent-card { min-width:0; padding:1.2rem; border:1px solid #b7ccd8; border-radius:18px; background:#e7eff6; }
+body.quest .q-parent-card[data-tone=mint] { background:#e5efdf; border-color:#b9cdb0; }
+body.quest .q-parent-card[data-tone=sun] { background:#faf0cf; border-color:#d9c58a; }
+body.quest .q-parent-card[data-tone=peach] { background:#f7e6dc; border-color:#d9bba9; }
+body.quest .q-parent-card>.q-eyebrow { display:inline-block; margin:0 0 .55rem; font-size:.72rem; letter-spacing:.06em; color:#37516a; }
+body.quest .q-parent-card h3 { margin:0 0 .65rem; font-size:1.13rem; line-height:1.25; }
+body.quest .q-parent-card p { margin:0; font-size:.95rem; color:#384d5e; }
+body.quest .q-parent-current { padding:1.6rem 1.8rem; margin:1.4rem 0; border-left:5px solid #9ab4b5; border-radius:0 20px 20px 0; background:#f0f3e9; }
+body.quest .q-parent-current>p { max-width:850px; }
+body.quest .q-parent-current h2 { margin:.4rem 0 .9rem; }
+body.quest .q-parent-current>div { padding:1rem 1.2rem; border:1px solid #c5cdbb; border-radius:14px; background:#fffdf4; }
+body.quest .q-parent-current h3 { margin:0; font-size:1.12rem; }
+body.quest .q-parent-current .q-small-note { font-size:.86rem; color:#526477; }
+body.quest .q-parent-details { border-bottom:1px solid #c9d1c7; }
+body.quest .q-parent-details>summary { cursor:pointer; padding:1.1rem .3rem; min-height:52px; color:#203f53; font-size:1.02rem; font-weight:800; line-height:1.4; }
+body.quest .q-parent-details[open]>summary { color:#226a60; }
+body.quest .q-parent-details>p,body.quest .q-parent-details>ul { max-width:850px; margin:.3rem .3rem 1rem; font-size:.95rem; }
+body.quest .q-parent-details a { overflow-wrap:anywhere; }
+body.quest .q-parent-actions { display:flex; flex-wrap:wrap; gap:.75rem; margin:1.3rem 0 .2rem; }
+/* The parent preview reuses real game scenes. Its explicit stage attribute
+ * selects one still frame; a button-driven reveal can animate the after frame. */
+body.quest .q-parent-intro { min-width:0; }
+body.quest .q-parent-demo { min-width:0; padding:1rem; margin-top:1.5rem; border:1px solid #b5c7bd; border-radius:22px 22px 7px 22px; background:#fffaf0; box-shadow:0 5px 0 #cddbcf; }
+body.quest .q-parent-demo>.q-eyebrow { margin:0 0 .35rem; font-size:.68rem; }
+body.quest .q-parent-demo>h2 { margin:0 0 .85rem; font-size:1.35rem; }
+body.quest .q-parent-demo-pictures { overflow:hidden; border:1px solid #d1ccb6; border-radius:13px; background:#f2ecd7; }
+body.quest .q-parent-demo-frame { display:none; }
+body.quest .q-parent-demo[data-parent-demo-stage=before] [data-parent-demo-frame=before],
+body.quest .q-parent-demo[data-parent-demo-stage=after] [data-parent-demo-frame=after] { display:block; }
+body.quest .q-parent-demo-frame>.quest-art { display:block; width:100%; height:auto; aspect-ratio:900/460; }
+body.quest .q-parent-demo-frame>p { display:flex; flex-wrap:wrap; align-items:center; gap:.35rem .55rem; min-height:46px; margin:0; padding:.5rem .7rem; background:#e5ebdd; color:#2d4b40; font-size:.83rem; line-height:1.4; }
+body.quest .q-parent-demo-frame b { padding:.15rem .4rem; border-radius:5px; background:#fffdf4; font-size:.75rem; }
+body.quest .q-parent-demo>.q-parent-demo-caption { margin:.85rem 0; font-size:.9rem; line-height:1.55; color:#425751; }
+body.quest .q-parent-demo>.q-button { width:100%; text-align:center; background:#e0ecda; border-color:#7b9f82; }
+/* Retain older optional artwork hooks for callers that supply a cover picture. */
 .q-parent-picture { border-radius:28px; overflow:hidden; background:#eee6ce; }
 .q-parent-why { max-width:870px; margin:1.5rem auto 2.5rem; text-align:center; }
 .q-parent-why h2 { font-size:clamp(1.5rem,2.5vw,2rem); }
@@ -280,7 +322,7 @@ body.quest { --play-yellow:#f8d777; --play-mint:#d8ebdd; --play-blue:#dbe7f3; }
   .q-reflection-options button { flex-direction:row; text-align:left; }
 }
 /* One-shot entry/selection effects also require data-motion=full from the app setting. */
-@media(prefers-reduced-motion:no-preference) {
+@media screen {
   html[data-motion=full] .q-play-enter .q-play-doors>button { animation:q-door-arrive 450ms ease-out both; }
   html[data-motion=full] .q-play-enter .q-play-doors>button:nth-child(2) { animation-delay:80ms; }
   html[data-motion=full] .q-play-enter .q-play-doors>button:nth-child(3) { animation-delay:160ms; }
@@ -294,3 +336,161 @@ body.quest { --play-yellow:#f8d777; --play-mint:#d8ebdd; --play-blue:#dbe7f3; }
 @keyframes q-sort-deal { from { opacity:.5; transform:translateX(-18px) rotate(-2deg); } to { opacity:1; transform:none; } }
 @keyframes q-sort-arrive { from { opacity:.5; transform:translateY(-14px) scale(.85); } to { opacity:1; transform:none; } }
 @keyframes q-answer-reveal { from { background:#f4e4a8; } to { background:#e5efdd; } }
+
+/* Discovered picture facts stay beside the scene. Each short note has its own
+ * illustration and heading; learning does not depend on opening a pop-up. */
+body.quest .q-picture-facts { display:grid; gap:.75rem; margin:1rem 0; }
+body.quest .q-picture-facts>h2 { margin:0; font-size:1.18rem; line-height:1.3; }
+body.quest .q-picture-facts>p { margin:0; color:#4b605f; font-size:.88rem; line-height:1.45; }
+body.quest .q-picture-fact-grid { display:grid; gap:.75rem; }
+body.quest .q-picture-fact { display:grid; grid-template-columns:72px minmax(0,1fr); gap:.85rem; align-items:center; padding:.85rem; border:1px solid #b7cbb7; border-radius:17px 17px 17px 5px; background:#f6faed; box-shadow:0 3px 0 #d6e0cc; }
+body.quest .q-picture-fact>span:first-child,body.quest .q-picture-fact-art { display:block; width:72px; }
+body.quest .q-picture-fact-art>svg { height:72px; }
+body.quest .q-picture-fact h3 { margin:0 0 .3rem; font-size:1rem; line-height:1.35; }
+body.quest .q-picture-fact p { margin:.2rem 0; color:#354f52; font-size:.94rem; line-height:1.55; }
+body.quest .q-picture-fact .q-eyebrow { font-size:.64rem; margin:0 0 .3rem; color:#365e57; }
+body.quest .q-picture-fact .q-listen { min-height:44px; margin-top:.45rem; }
+body.quest .q-picture-fact:focus { outline:3px solid #125e96; outline-offset:3px; }
+
+/* Speech controls remain reachable during a long page. The body-level toolbar
+ * sits at the viewport bottom with reserved page space; the dialog copy stays
+ * inline inside its native focus boundary. The app owns every button state. */
+body.quest .q-audio-dock { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:.7rem 1rem; padding:.7rem .9rem; margin:.9rem 0; border:1px solid #aac2d1; border-radius:16px; background:#e8f0f6; color:#244357; }
+body.quest>.q-audio-dock { position:fixed; z-index:30; bottom:max(1rem,env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%); width:min(640px,calc(100% - 2rem)); margin:0; box-shadow:0 5px 24px #1f3d4f25; }
+body.quest:has(>.q-audio-dock:not([hidden])) { padding-bottom:100px; }
+body.quest .q-audio-dock>p { flex:1 1 180px; margin:0; font-size:.84rem; line-height:1.5; }
+body.quest .q-audio-dock>[data-audio-status] { flex:1 1 135px; font-size:.9rem; font-weight:800; line-height:1.4; }
+body.quest .q-audio-dock strong { color:#183e56; }
+body.quest .q-audio-actions { display:flex; flex-wrap:wrap; align-items:center; gap:.45rem; }
+body.quest .q-audio-actions button { display:inline-flex; align-items:center; justify-content:center; gap:.4rem; min-height:46px; padding:.55rem .8rem; border:1px solid #819eb2; border-radius:10px; background:#fffdf7; color:#203f53; font-size:.85rem; font-weight:800; }
+body.quest .q-audio-actions button:hover:not(:disabled) { background:#f9e9b8; border-color:#55798c; }
+body.quest .q-audio-actions button[aria-pressed=true] { background:#244d63; border-color:#244d63; color:white; }
+body.quest .q-audio-actions button:disabled { color:#637583; border-color:#b9c8d0; background:#edf1f2; cursor:default; }
+body.quest .q-audio-actions svg { width:19px; height:19px; flex:0 0 19px; }
+
+/* A wrong destination has a visible cross as well as coral colour. It stays
+ * steady while the child reads the clue and chooses again; there is no shake. */
+body.quest .q-destination.q-sort-retry { background:#fae9e1; border-color:#a95844; box-shadow:0 3px 0 #ddb39d; }
+body.quest .q-destination.q-sort-retry:hover:not(:disabled) { background:#f9dfd0; }
+body.quest .q-destination-cross { position:absolute; top:.5rem; right:.5rem; display:grid; place-items:center; width:31px; height:31px; border-radius:50%; border:2px solid #fff8ef; background:#a44d39; color:white; font-size:1.5rem; font-weight:900; line-height:1; }
+body.quest .q-feedback.retry { background:#fae9df; border-color:#c9957e; }
+body.quest .q-feedback.retry .q-feedback-mark { background:#a44d39; color:white; font-size:1.7rem; }
+body.quest .q-feedback.retry h2 { color:#783e32; }
+body.quest .q-feedback.retry .q-button.primary { background:#245e55; color:white; }
+
+/* The win picture is in normal document flow. Its static star remains when
+ * animations are reduced, and the next button is available immediately. */
+body.quest .q-win-celebration { display:flex; align-items:center; justify-content:center; gap:.6rem; width:100%; max-width:740px; padding:.4rem .8rem; margin:.6rem auto; border:1px solid #d5bd78; border-radius:22px; background:linear-gradient(120deg,#fcf1cc,#fff9e8); }
+body.quest .q-win-celebration>.quest-art,body.quest .q-win-celebration>span:first-child { display:block; width:230px; flex:0 0 230px; max-width:60%; }
+body.quest .q-win-celebration .quest-art { max-height:120px; }
+body.quest .q-win-celebration h2,body.quest .q-win-celebration strong { font-size:1.2rem; line-height:1.25; }
+body.quest .q-win-celebration p { margin:.25rem 0; font-size:.94rem; line-height:1.5; }
+/* SVG-only celebrations need no empty banner; callers can place this compact
+ * picture beside the success copy or above its next-step action. */
+body.quest .q-win-celebration:has(>.quest-art:only-child) { width:230px; max-width:100%; padding:0; border:0; background:none; }
+body.quest .q-win-celebration>.quest-art:only-child { max-width:100%; }
+
+/* Creations is a workbench, visually separate from the green story map. The
+ * lavender paper, project shelves and postcard tools belong to creative play. */
+body.quest .q-creations-studio { max-width:1180px; padding:1.5rem 1.7rem 2rem; margin-top:1rem; border:1px solid #c7bfd4; border-radius:30px 30px 8px 30px; background:linear-gradient(150deg,#eeebf7,#fff8e9 62%); }
+body.quest .q-creations-studio>h1 { font-size:clamp(2rem,4vw,2.8rem); max-width:750px; }
+body.quest .q-creations-studio>.q-eyebrow { color:#5b527c; }
+body.quest .q-creations-studio>p { max-width:720px; color:#4c5369; }
+body.quest .q-creations-studio .q-creative-invite { border-color:#beb3d1; background:#faf6ff; box-shadow:0 5px 0 #d9d1e7; }
+body.quest .q-creations-studio .q-decorating { margin-top:1.8rem; border-top-color:#b2a6c3; }
+body.quest .q-creations-studio .q-decoration-picks { padding:1rem; border:1px solid #c8bdd6; border-radius:18px; background:#e7e0f0; }
+body.quest .q-creations-studio .q-decoration-tile { background:#fffdf6; border-color:#b9acc8; }
+body.quest .q-creations-studio .q-decoration-tile>button:first-child { min-height:105px; }
+body.quest .q-creations-studio .q-decoration-slots button { border-color:#ada0bb; background:#f5f0fa; }
+body.quest .q-creations-studio .q-decor-world { border:8px solid #fffaf1; border-radius:20px; overflow:hidden; box-shadow:0 5px 0 #cbbfda; }
+body.quest .q-creations-studio .q-postcard-preview { background:#dcd3e9; box-shadow:0 7px 0 #c6bad6,0 12px 22px #3c2e5814; }
+/* Finished stories form a postcard shelf; the thumbnail previews the child's
+ * real saved design instead of repeating the adventure-map illustration. */
+body.quest .q-created-postcards { margin-top:1.8rem; }
+body.quest .q-creation-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1.2rem; margin:1.4rem 0; }
+body.quest .q-creation-card { display:flex; flex-direction:column; gap:.7rem; min-width:0; padding:.7rem .7rem .9rem; border:1px solid #b9afc9; border-radius:16px 16px 16px 5px; background:#fffdf7; text-align:left; box-shadow:0 5px 0 #d1c5df; }
+body.quest .q-creation-card>span { display:block; width:100%; overflow:hidden; border:1px solid #ded4e5; border-radius:10px; }
+body.quest .q-creation-card svg { width:100%; height:auto; }
+body.quest .q-creation-card strong { margin:0 .25rem; font-size:1.04rem; line-height:1.35; }
+body.quest .q-creation-card small { margin:0 .25rem; font-size:.83rem; font-weight:800; color:#52675b; }
+body.quest .q-creation-card:hover { background:#f6f0fc; border-color:#796d8b; }
+body.quest .q-creation-card:active { background:#eee5f7; }
+body.quest .q-creation-empty { display:flex; flex-wrap:wrap; align-items:center; gap:.8rem 1.2rem; padding:1.2rem; margin:1.2rem 0; border:1px dashed #b4a5c8; border-radius:18px; background:#faf6ff; }
+body.quest .q-creation-empty>.quest-art { width:110px; height:100px; flex:0 0 110px; }
+body.quest .q-creation-empty>p { flex:1 1 170px; font-size:1rem; line-height:1.55; }
+body.quest .q-creation-empty>h2 { width:100%; margin:0; font-size:1.35rem; }
+
+/* Tablet and phone rules keep paragraphs readable, controls reachable and the
+ * parent cards in a simple reading order without shrinking the type. */
+@media(max-width:1000px) {
+  body.quest .q-parent-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  body.quest .q-creation-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+/* With a wide plan desk, show the facts side by side so answers remain close
+ * to the evidence. Explore mode keeps its facts in the separate scene column. */
+@media(min-width:900px) {
+  body.quest .q-plan-desk .q-picture-fact-grid { grid-template-columns:repeat(3,minmax(0,1fr)); align-items:stretch; }
+  body.quest .q-plan-desk .q-picture-fact { grid-template-columns:56px minmax(0,1fr); align-items:start; gap:.6rem; }
+  body.quest .q-plan-desk .q-picture-fact-art { width:56px; }
+  body.quest .q-plan-desk .q-picture-fact-art>svg { height:56px; }
+}
+/* Keep the visual example beside the introduction only when each has room for
+ * comfortable reading; smaller tablets and phones follow one reading order. */
+@media(min-width:960px) {
+  body.quest .q-parent-hero:has(.q-parent-demo) { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:1.5rem; align-items:center; padding:1.6rem; }
+  body.quest .q-parent-hero .q-parent-demo { margin-top:0; }
+}
+@media(max-width:600px) {
+  body.quest .q-parent-hero { padding:1.2rem; border-radius:22px 22px 22px 7px; margin-bottom:1.5rem; }
+  body.quest .q-parent-hero .q-parent-lead { font-size:1.02rem; }
+  body.quest .q-parent-demo { padding:.8rem; }
+  body.quest .q-parent-grid { grid-template-columns:1fr; gap:.75rem; }
+  body.quest .q-parent-card { padding:1.1rem; }
+  body.quest .q-parent-card h3 { font-size:1.12rem; }
+  body.quest .q-parent-current { padding:1.1rem; }
+  body.quest .q-parent-actions { flex-direction:column; align-items:stretch; }
+  body.quest .q-parent-actions>.q-button { width:100%; text-align:center; }
+  body.quest .q-picture-fact { grid-template-columns:60px minmax(0,1fr); gap:.65rem; padding:.7rem; }
+  body.quest .q-picture-fact>span:first-child,body.quest .q-picture-fact-art { width:60px; }
+  body.quest .q-picture-fact-art>svg { height:60px; }
+  body.quest .q-picture-fact h3 { font-size:.98rem; }
+  body.quest .q-picture-fact p { font-size:.91rem; }
+  body.quest .q-audio-dock { padding:.65rem; gap:.5rem; }
+  body.quest:has(>.q-audio-dock:not([hidden])) { padding-bottom:140px; }
+  body.quest .q-audio-actions { width:100%; }
+  body.quest .q-audio-actions button { flex:1 1 auto; font-size:.82rem; }
+  body.quest .q-win-celebration { padding:.4rem; gap:.2rem; }
+  body.quest .q-win-celebration>.quest-art,body.quest .q-win-celebration>span:first-child { flex-basis:145px; width:145px; max-width:52%; }
+  body.quest .q-win-celebration .quest-art { max-height:86px; }
+  body.quest .q-win-celebration:has(>.quest-art:only-child) { width:172px; }
+  body.quest .q-win-celebration>.quest-art:only-child { width:172px; flex-basis:172px; }
+  body.quest .q-win-celebration h2,body.quest .q-win-celebration strong { font-size:1.05rem; }
+  body.quest .q-win-celebration p { font-size:.85rem; }
+  body.quest .q-destination-cross { width:27px; height:27px; font-size:1.3rem; top:.3rem; right:.3rem; }
+  body.quest .q-creations-studio { padding:1.1rem .85rem 1.6rem; border-radius:22px 22px 6px 22px; }
+  body.quest .q-creations-studio .q-decoration-picks { padding:.6rem; gap:.6rem; }
+  body.quest .q-creations-studio .q-decoration-slots { gap:.5rem; }
+  body.quest .q-creation-grid { grid-template-columns:1fr; gap:1rem; }
+  body.quest .q-creation-empty { padding:.9rem; }
+  body.quest .q-creation-empty>.quest-art { width:86px; height:86px; flex-basis:86px; }
+}
+
+/* Keep the activity menu before the large map for tablet and keyboard order.
+   At desktop size the map still shares the introduction's row. */
+@media (min-width:901px) {
+  .q-adventure-cover .q-home-intro { grid-column:1; grid-row:1; }
+  .q-adventure-cover .q-world-wrap { grid-column:2; grid-row:1; }
+  .q-adventure-cover .q-play-doors { grid-row:2; }
+}
+/* Native modal focus stays inside its own audio dock; hide the background copy. */
+body.quest:has(dialog[open])>.q-audio-dock { display:none; }
+
+/* Illustration sizes must not stretch the small speaker icon inside Hear. */
+body.quest .q-picture-fact .q-listen svg { width:23px; height:23px; }
+/* Portrait tablets give facts their own readable row, instead of squeezing
+   a long sentence beside a large scene. Challenge hotspots keep their layout. */
+@media (min-width:601px) and (max-width:900px) {
+  .q-stage-explore:has(.q-picture-facts) { display:block; }
+  .q-stage-explore:has(.q-picture-facts)>.q-mission-scene { aspect-ratio:900/300; min-height:0; max-height:260px; }
+  .q-stage-explore .q-picture-fact-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}

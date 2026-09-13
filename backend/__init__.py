@@ -4,6 +4,7 @@
 """Flask application factory for the FixForward public-data API."""
 
 from pathlib import Path
+import re
 
 from .config import Settings
 
@@ -71,7 +72,15 @@ def create_app(test_config=None):
                            "quest/art.js", "quest/content.js", "quest/engine.js",
                            "quest/storage.js", "quest/drag.js", "quest/play-effects.css",
                            "quest/postcard.js", "quest/postcard-options.js",
-                           "quest/progression.js", "quest/tablet-play.css"}
+                           "quest/progression.js", "quest/tablet-play.css",
+                           "quest/navigation.js", "quest/narration.js", "quest/parent-guide.js",
+                           "quest/reward-fx.js", "quest/sounds.js", "quest/game-feel.css",
+                           "quest/picture-help.js", "quest/feedback.js", "quest/clue-play.css",
+                           "quest/family-guide.css", "quest/story-audio.js", "quest/audio/story-manifest.js",
+                           "quest/audio/KOKORO-LICENSE.txt"}
+        ) or (
+            # Only generated, content-addressed story audio is public, not arbitrary files.
+            re.fullmatch(r"quest/audio/[a-f0-9]{16}\.mp3", asset_path) is not None
         )
         if not allowed:
             return _not_found_response(request.path)

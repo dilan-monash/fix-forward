@@ -1,0 +1,86 @@
+@charset "UTF-8";
+/* FAMILY INTRODUCTION: load after game-feel.css. These rules only style the
+   parent guide; the child game, its score bar and touch controls are unchanged. */
+.q-family-welcome { display:grid; grid-template-columns:minmax(0,1.2fr) minmax(300px,1fr); gap:1.5rem; align-items:center; padding:1.3rem 0 2rem; }
+.q-family-copy { min-width:0; }
+.q-family-copy h1 { max-width:640px; margin:.65rem 0 1.05rem; font-size:clamp(2rem,3.7vw,3rem); letter-spacing:-.035em; line-height:1.12; text-wrap:balance; }
+.q-family-copy .q-family-lead { margin:.5rem 0 1rem; font-size:1.24rem; font-weight:800; color:#28685e; line-height:1.4; }
+.q-family-copy>p:not(.q-eyebrow):not(.q-family-lead):not(.q-family-screen-note) { max-width:650px; margin:.7rem 0 1rem; color:#3e5667; font-size:1rem; }
+.q-family-copy>.q-button { margin:.45rem 0; }
+.q-family-copy>.q-family-screen-note { max-width:480px; margin:.55rem 0; color:#516477; font-size:.84rem; }
+
+/* Original code-native depth: a raised paper platform, soft shadows and layered
+   rings frame the familiar SVG guides. No downloaded art or rendering library
+   is needed. Visible captions repeat the character identities for every reader. */
+.q-family-art { min-width:0; margin:0; }
+.q-family-world { position:relative; isolation:isolate; width:100%; aspect-ratio:1.13; max-height:410px; border-radius:48% 48% 40% 42%; background:radial-gradient(ellipse at 48% 42%,#fffdf1 0 28%,#ebf2d5 50%,#d4e8d8 74%); overflow:hidden; }
+.q-family-world::after { content:''; position:absolute; left:13%; right:13%; bottom:11%; height:12%; background:#40665b; opacity:.12; filter:blur(13px); border-radius:50%; z-index:-1; }
+.q-family-platform { position:absolute; left:10%; right:10%; bottom:18%; height:24%; border-radius:50%; background:linear-gradient(#fffff3,#e6e5c8); border:2px solid #fffdf4; box-shadow:0 13px 0 #b5c8b8,0 20px 0 #92b2a0,0 27px 0 #d9dcc8; transform:rotate(-5deg); }
+.q-family-orbit { position:absolute; inset:12% 5% 22%; border:1px solid #b6d5bd; border-radius:50%; transform:rotate(-26deg); }
+.q-family-orbit--two { inset:3% 20% 13%; border-color:#fffef4; transform:rotate(35deg); }
+.q-family-character { position:absolute; bottom:22%; width:54%; filter:drop-shadow(0 6px 0 #49685917); }
+.q-family-character--pip { left:3%; transform:rotate(-5deg); z-index:2; }
+.q-family-character--flo { right:0; bottom:24%; transform:rotate(5deg); z-index:1; }
+.q-family-character>svg { width:100%; height:auto; }
+.q-family-shine { position:absolute; color:#f0b745; font-size:2.3rem; text-shadow:0 2px 0 white; }
+.q-family-shine--one { left:15%; top:13%; transform:rotate(-10deg); }
+.q-family-shine--two { right:9%; top:23%; font-size:3.4rem; color:#3d8979; }
+.q-family-shine--three { left:44%; top:7%; font-size:1.1rem; }
+.q-family-greeting { position:absolute; left:50%; bottom:5%; width:max-content; max-width:90%; padding:.5rem 1rem; background:#fffaf0; color:#245c51; box-shadow:0 3px 0 #d2d4b8; border-radius:14px 14px 14px 4px; transform:translateX(-50%) rotate(-3deg); font-size:.86rem; font-weight:800; }
+.q-family-art figcaption { display:grid; grid-template-columns:1fr 1fr; gap:.3rem 1rem; text-align:center; color:#3a5764; font-size:.9rem; margin-top:.8rem; }
+.q-family-art figcaption b { color:#173d58; font-size:1.18rem; }
+.q-family-art figcaption small { grid-column:1/-1; margin-top:.3rem; font-size:.79rem; color:#5c6d76; }
+
+/* Three visible steps form one worked example. The numbered list reads in the
+   same order on a tablet, a narrow phone, and with assistive technology. */
+.q-family-learning { margin:1rem 0 3rem; padding:1.7rem; border:1px solid #dce2d4; border-radius:28px; background:#fffdf6; }
+.q-family-learning-heading { text-align:center; }
+.q-family-learning-heading>h2 { margin:.4rem 0 .7rem; }
+.q-family-learning-heading>p:last-child { margin:0 auto 1.2rem; max-width:650px; color:#526674; font-size:.95rem; }
+.q-family-steps { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; list-style:none; margin:1.2rem 0 0; padding:0; }
+.q-family-steps>li { position:relative; min-width:0; padding:1rem; border-radius:20px; background:#e8f0f5; box-shadow:0 4px 0 #cfdae1; }
+.q-family-steps>li[data-tone=mint] { background:#e9f2e5; box-shadow:0 4px 0 #cddfc6; }
+.q-family-steps>li[data-tone=sun] { background:#fbf0d7; box-shadow:0 4px 0 #e6d7ad; }
+.q-family-step-top { display:flex; align-items:center; justify-content:center; position:relative; height:106px; }
+.q-family-step-top>svg { width:130px; height:106px; object-fit:contain; }
+.q-family-steps>li:last-child .q-family-step-top>svg { width:100%; height:auto; max-height:100px; border:3px solid #fffdf4; border-radius:8px; transform:rotate(-3deg); box-shadow:0 3px 0 #c6b17f; }
+.q-family-step-number { position:absolute; left:0; top:0; display:grid; place-items:center; width:29px; height:29px; border:2px solid white; border-radius:50%; background:#41636e; color:white; font-weight:800; font-size:.8rem; }
+.q-family-steps h3 { margin:.7rem 0 .4rem; font-size:1.25rem; }
+.q-family-steps p { margin:.3rem 0 .6rem; font-size:.93rem; color:#3e5361; }
+.q-family-steps .q-family-practice { margin:.8rem 0 0; padding-top:.7rem; border-top:1px solid #5c7b762e; font-size:.84rem; font-weight:800; color:#264f50; }
+.q-family-help-note { margin:1.3rem 0 0; font-size:.92rem; color:#495f65; }
+
+/* The preferred purpose quote remains a substantial section heading even after
+   the restored welcome becomes the page's single h1. */
+body.quest .q-parent-restored-intro>h2 { max-width:1040px; margin:1.25rem auto 1.6rem; font-size:clamp(1.8rem,3.2vw,2.7rem); line-height:1.28; letter-spacing:-.025em; }
+
+/* A short, optional entrance adds life without continually moving beside text.
+   Device/reduced-motion preferences are already resolved by the app's data flag. */
+@keyframes q-family-arrive { from { opacity:0; translate:0 10px; } to { opacity:1; translate:0 0; } }
+html[data-motion=full] .q-family-art { animation:q-family-arrive 420ms ease-out both; }
+
+/* At portrait tablet sizes keep the welcome readable beside smaller art. Narrow
+   screens stack the illustration and the learning steps instead of shrinking text. */
+@media (max-width:850px) {
+  .q-family-welcome { grid-template-columns:minmax(0,1.3fr) minmax(230px,1fr); gap:1rem; }
+  .q-family-copy h1 { font-size:2rem; }
+  .q-family-copy .q-family-lead { font-size:1.08rem; }
+  .q-family-greeting { font-size:.72rem; padding:.4rem .65rem; }
+  .q-family-learning { padding:1.2rem; }
+  .q-family-steps { gap:.65rem; }
+  .q-family-steps>li { padding:.8rem; }
+}
+@media (max-width:620px) {
+  .q-family-welcome { grid-template-columns:1fr; padding-top:.5rem; }
+  .q-family-copy h1 { max-width:450px; font-size:2.15rem; }
+  .q-family-art { width:min(100%,360px); margin:.3rem auto .5rem; }
+  .q-family-greeting { font-size:.84rem; }
+  .q-family-steps { grid-template-columns:1fr; gap:1rem; }
+  .q-family-steps>li { display:grid; grid-template-columns:90px minmax(0,1fr); gap:0 .8rem; padding:.9rem; }
+  .q-family-step-top { grid-column:1; grid-row:1/4; height:110px; align-self:center; }
+  .q-family-step-top>svg { width:90px; height:100px; }
+  .q-family-step-number { left:-.3rem; top:-.4rem; }
+  .q-family-steps h3,.q-family-steps p { grid-column:2; }
+  .q-family-steps h3 { margin:.1rem 0 .35rem; }
+  .q-family-steps .q-family-practice { margin:.35rem 0 0; }
+}

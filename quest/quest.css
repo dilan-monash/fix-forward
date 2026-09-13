@@ -240,14 +240,15 @@ dialog p { font-size:.95rem; }
 .q-check { display:flex; align-items:center; gap:.7rem; min-height:48px; }
 .q-check input { width:22px; height:22px; accent-color:var(--teal); }
 .q-settings p { margin:.2rem 0; }
-/* Enable baseline motion only when the device permits it; reduced-motion rules below provide a still presentation. */
-@media(prefers-reduced-motion:no-preference) {
+/* app.js resolves Follow my device, Game animations or Less movement into data-motion.
+   Without an explicit game preference, the device reduction rule still applies. */
+@media screen {
   html[data-motion=full] .q-feedback.correct { animation:q-settle 160ms ease-out; }
   html[data-motion=full] .q-hotspot.found { animation:q-settle 140ms ease-out; }
   @keyframes q-settle { from { opacity:.65; translate:0 3px; } to { opacity:1; translate:0 0; } }
 }
 html[data-motion=reduce] *,html[data-motion=reduce] *::before,html[data-motion=reduce] *::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; }
-@media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; } }
+@media(prefers-reduced-motion:reduce) { html:not([data-motion=full]) *,html:not([data-motion=full]) *::before,html:not([data-motion=full]) *::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; } }
 /* Responsive defaults for smaller screens; later tablet-play.css adds the current tablet/phone arrangement. */
 @media(max-width:900px) {
   .q-home { grid-template-columns:1fr; padding-top:1.4rem; }
@@ -425,7 +426,7 @@ html[data-motion=reduce] *,html[data-motion=reduce] *::before,html[data-motion=r
 .theme-mint span { background:linear-gradient(125deg,#39897d 50%,#c4ddae 50%); }
 .q-sticker-choices b { font-size:1.9rem; height:30px; line-height:1; color:var(--teal); }
 .q-postcard-tools>.q-button { width:100%; }
-@media (prefers-reduced-motion:no-preference) {
+@media screen {
   html[data-motion=full] .q-play-enter .q-world-dialogue,html[data-motion=full] .q-play-enter .q-guide-dialogue { animation:q-dialogue-arrive 260ms ease-out both; }
   html[data-motion=full] .q-play-enter .q-postcard-preview { animation:q-paper-arrive 420ms ease-out both; }
   html[data-motion=full] dialog[open] .q-clue-art { animation:q-paper-arrive 280ms ease-out both; }

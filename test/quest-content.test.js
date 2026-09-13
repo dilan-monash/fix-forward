@@ -6,7 +6,9 @@
  */
 import test from "node:test";
 import assert from "node:assert/strict";
+import { JSDOM } from "jsdom";
 import { MISSIONS, SORT_ITEMS, CONCEPTS, LOCATIONS, SOURCES, validateQuestContent } from "../quest/content.js";
+import { artwork } from "../quest/art.js";
 
 test("all eight authored missions and twelve sorting cards have reviewable complete paths", () => {
   assert.equal(MISSIONS.length, 8);
@@ -121,7 +123,7 @@ test("two-picture reflections revisit the evidence that changed each story's pla
     "bulging-gadget": /battery was bulging/i,
     "mystery-glass-jug": /list named bottles and jars/i,
   };
-  const pictureIds = new Set(["paper", "fan", "person", "toaster-damaged", "kettle", "boxed-toaster", "cardboard", "shaver", "battery-shaver", "glass-jug"]);
+  const pictureIds = new Set(["paper", "empty-report", "missing-answer", "glass-list", "fan", "person", "toaster-damaged", "kettle", "boxed-toaster", "cardboard", "shaver", "battery-shaver", "glass-jug"]);
   for (const mission of MISSIONS) {
     const { reflection } = mission;
     assert.equal(reflection.options.length, 2, mission.id);
@@ -140,6 +142,37 @@ test("two-picture reflections revisit the evidence that changed each story's pla
   assert.match(glass.reflection.explanation, /needs to ask about this exact kind/i);
 });
 
+test("missing reports and limited lists have distinct valid pictures instead of a completed-check drawing", () => {
+  const quiet = MISSIONS.find(mission => mission.id === "quiet-fan");
+  const flo = MISSIONS.find(mission => mission.id === "flo-next-home");
+  const kettle = MISSIONS.find(mission => mission.id === "kettle-last-chapter");
+  const glass = MISSIONS.find(mission => mission.id === "mystery-glass-jug");
+  assert.equal(quiet.clues.find(clue => clue.id === "no-report").artworkId, "empty-report");
+  for (const mission of [quiet, flo]) assert.equal(mission.reflection.options.find(option => option.id === "empty-report").artworkId, "empty-report");
+  assert.equal(kettle.reflection.options.find(option => option.id === "missing-answer").artworkId, "missing-answer");
+  assert.equal(glass.clues.find(clue => clue.id === "missing-rule").artworkId, "glass-list");
+  assert.equal(glass.reflection.options.find(option => option.id === "limited-list").artworkId, "glass-list");
+  // XML parsing catches malformed exportable SVG, while distinct artwork proves
+  // these new evidence IDs do not silently fall through to the generic paper.
+  for (const id of ["empty-report", "missing-answer", "glass-list"]) {
+    const markup = artwork(id);
+    const image = new JSDOM(markup, { contentType: "image/svg+xml" });
+    assert.equal(image.window.document.documentElement.localName, "svg");
+    assert.notEqual(markup, artwork("paper"));
+    assert.ok(image.window.document.querySelector(`.q-${id}`), id);
+    if (id === "empty-report") {
+      assert.equal(image.window.document.querySelector(".q-empty-report-space").childElementCount, 0);
+      assert.match(image.window.document.documentElement.textContent, /\?[^]*EMPTY/);
+    }
+    if (id === "glass-list") {
+      assert.ok(image.window.document.querySelector(".q-listed-bottle"));
+      assert.ok(image.window.document.querySelector(".q-listed-jar"));
+      assert.equal(image.window.document.querySelector(".q-glass-list .q-list-unknown"), null, "The unresolved jug is outside the limited list");
+    }
+    image.window.close();
+  }
+});
+
 test("child-facing explanations use short sentences without technical decision jargon", () => {
   const fields = [];
   for (const mission of MISSIONS) {
@@ -156,4 +189,17 @@ test("child-facing explanations use short sentences without technical decision j
       assert.ok(sentence.trim().split(/\s+/).length <= 12, `Sentence needs shortening: ${sentence}`);
     }
   }
+});
+
+test("first character stories explain the appliance names and keep complete sharing checks", () => {
+  const flo = MISSIONS.find((mission) => mission.id === "flo-next-home");
+  const pip = MISSIONS.find((mission) => mission.id === "pip-damaged-cable");
+  assert.match(flo.fictionalContext, /Flo is a fan/);
+  assert.match(pip.fictionalContext, /Pip is a toaster/);
+  // Simpler words must still retain the checked-working item and willing recipient.
+  const floClues = flo.clues.map((clue) => clue.text).join(" ");
+  assert.match(floClues, /Flo works.*adult owner.*finished the checks.*qualified repairer.*checked.*Bea wants Flo/s);
+  const moving = MISSIONS.find((mission) => mission.id === "moving-day-box");
+  assert.match(moving.clues.find((clue) => clue.id === "toaster-plan").text, /toaster works.*adult owner.*finished the checks.*qualified repairer checked.*Bea wants it/s);
+  assert.match(MISSIONS.find((mission) => mission.id === "bulging-gadget").clues.find((clue) => clue.id === "bulging").text, /Bulging means swollen.*Leave the device alone/s);
 });

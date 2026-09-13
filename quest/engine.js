@@ -20,7 +20,7 @@ export const DECORATION_SLOTS = ['home', 'studio', 'station'];
 // Match sorting-card answers and the three destination controls in app.js.
 export const DESTINATION_IDS = ['ewaste', 'paper', 'ask'];
 // A view is a whole screen; a step is the current stage inside one mission.
-const VIEWS = ['home', 'mission', 'sorting', 'book', 'grownups'];
+const VIEWS = ['home', 'mission', 'sorting', 'book', 'creations', 'grownups'];
 const STEPS = ['intro', 'explore', 'plan', 'feedback', 'outcome'];
 // Resolve only authored missions; an unknown action or saved ID returns undefined.
 const missionById = id => MISSIONS.find(mission => mission.id === id);
@@ -39,7 +39,7 @@ const boundedRound = value => Number.isSafeInteger(value) && value >= 0 && value
 export function createState() {
   return {
     version: STATE_VERSION, view: 'home', activeMission: null, completed: {}, discoveries: [],
-    settings: { mode: 'guided', narration: false, motion: 'auto' },
+    settings: { mode: 'guided', narration: false, sound: false, motion: 'auto' },
     decorations: { home: null, studio: null, station: null }, postcards: {}, reflections: {}, sorting: null, sortRound: 0, practice: []
   };
 }
@@ -193,8 +193,10 @@ export function transition(state, action) {
       return { ...state, practice: markPractice(state, [item.conceptId]), sorting: { ...sorting, assistedIds: [...sorting.assistedIds, item.id] } };
     }
     case 'SET_SETTING': {
-      // Accept only fixed setting choices; narration remains an explicit opt-in.
-      const allowed = { mode: ['guided', 'challenge'], narration: [true, false], motion: ['auto', 'reduce'] };
+      // Sound effects and read-aloud are separate choices; both start quietly off.
+      // Auto follows the device preference. Full is a deliberate in-game choice,
+      // while Reduce always keeps travel and celebration animations quiet.
+      const allowed = { mode: ['guided', 'challenge'], narration: [true, false], sound: [true, false], motion: ['auto', 'reduce', 'full'] };
       if (!Object.hasOwn(allowed, action.key) || !allowed[action.key].includes(action.value) || state.settings[action.key] === action.value) return state;
       return { ...state, settings: { ...state.settings, [action.key]: action.value } };
     }
@@ -367,7 +369,11 @@ export function hydrateState(raw) {
   if (isRecord(raw.settings)) {
     state.settings.mode = raw.settings.mode === 'challenge' ? 'challenge' : 'guided';
     state.settings.narration = raw.settings.narration === true;
-    state.settings.motion = raw.settings.motion === 'reduce' ? 'reduce' : 'auto';
+    // Old saves have no sound field. Only an explicit true opts into game sounds.
+    state.settings.sound = raw.settings.sound === true;
+    // Preserve only reviewed motion choices; old and unknown values follow the
+    // device setting rather than silently opting a child into extra animation.
+    state.settings.motion = ['reduce', 'full'].includes(raw.settings.motion) ? raw.settings.motion : 'auto';
   }
   state.activeMission = hydrateMission(raw.activeMission, state.completed);
   state.sorting = hydrateSorting(raw.sorting);

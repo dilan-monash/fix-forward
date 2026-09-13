@@ -147,6 +147,37 @@ test('navigation preserves active work, settings and optional decoration choice'
   assert.equal(apply(state, 'COMPLETE_MISSION'), state, 'Hidden stale callbacks cannot finish a mission');
 });
 
+// A child can explicitly choose game animations without changing a tablet's own
+// accessibility settings. Unrecognised save data must never make that choice.
+test('motion starts with the device preference and explicit full or reduce survives a real save', () => {
+  const original = deepFreeze(createState());
+  assert.equal(original.settings.motion, 'auto');
+  let state = original;
+  const storage = memoryStorage();
+  for (const motion of ['full', 'reduce', 'auto']) {
+    state = apply(state, 'SET_SETTING', { key: 'motion', value: motion });
+    assert.equal(state.settings.motion, motion);
+    assert.equal(saveProgress(state, storage), true);
+    state = loadProgress(storage).state;
+    assert.equal(state.settings.motion, motion, 'Reload keeps the actual user choice');
+    assert.equal(state.settings.narration, false);
+    assert.equal(state.settings.sound, false);
+    assert.equal(apply(state, 'SET_SETTING', { key: 'motion', value: motion }), state, 'Repeating the same choice is a no-op');
+  }
+  assert.equal(original.settings.motion, 'auto', 'Setting changes do not mutate the earlier save');
+});
+
+test('old or malformed motion preferences follow the device and cannot force full animation', () => {
+  const full = apply(createState(), 'SET_SETTING', { key: 'motion', value: 'full' });
+  for (const value of [undefined, null, true, false, 1, 'always', 'FULL', {}, []]) {
+    assert.equal(apply(full, 'SET_SETTING', { key: 'motion', value }), full, 'Unknown live choices are ignored');
+    const raw = { ...full, settings: { ...full.settings, motion: value } };
+    assert.equal(hydrateState(raw).settings.motion, 'auto', 'Unknown saved choices fall back to the device');
+  }
+  const oldSave = { ...full, settings: { mode: 'guided', narration: false } };
+  assert.equal(hydrateState(oldSave).settings.motion, 'auto');
+});
+
 test('suggestions use reviewed concepts, remain optional and cover unfinished missions', () => {
   const state = createState();
   assert.equal(suggestedMission(state), MISSIONS[0].id);
