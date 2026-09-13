@@ -1,16 +1,36 @@
-# FixForward — Iteration 2 with Quest
+# FixForward — Main with the approved Iteration 2 Quest
 
-**Current code location:** This checkout is on `iteration-2` and contains the adult website plus the animated Quest experience. Both `index.html` files and every authored JavaScript module contain comments directly beside the code. The outer workspace is a separate copy. See the [verified technology stack and source links](docs/TECH_STACK.md).
+**Current code location:** This checkout is on `main` and contains the approved Iteration 2 adult website plus the animated Quest experience. The application was promoted from `iteration-2` commit `32e4c157` while preserving Git history. Its package version remains `2.0.0` and its release identifier remains `iteration-2-v2.0.0-quest`; Main has its own deployment metadata. Both `index.html` files and every authored JavaScript module contain comments directly beside the code. The outer workspace is a separate copy. See the [verified technology stack and source links](docs/TECH_STACK.md).
 
-**Two websites for mentor comparison:** Preserve the existing `main` branch and its current Render website as Iteration 1. Deploy `iteration-2` as a separate service with its own URL. Do not merge this work into `main` or change the existing service's linked branch as part of that comparison setup. A published branch alone does not establish that its website is live; verify the separate Iteration 2 deployment and URL before sharing it.
+## Branches and websites
+
+Main is the place for approved releases. Iteration 1 and Iteration 2 remain separate comparison snapshots; they no longer depend on keeping Main at an older version.
+
+| Website | GitHub branch | Original Render address | Purpose |
+|---|---|---|---|
+| Main | `main` | `https://fix-forward-main.onrender.com` (intended address; verify after creation) | Latest approved release, currently the Iteration 2 application |
+| Iteration 1 | `iteration-1` | [fix-forward-iteration-1.onrender.com](https://fix-forward-iteration-1.onrender.com/) | Preserved original website at commit `051f759`; its Render service follows `iteration-1` with Auto Deploy off |
+| Iteration 2 | `iteration-2` | [fix-forward-iteration-2.onrender.com](https://fix-forward-iteration-2.onrender.com/) | Adult journey and Quest comparison release at commit `32e4c157` |
+
+This checkout's `render.yaml` describes only the Main service. The comparison services keep their own branch settings. A GitHub branch or a saved blueprint is not evidence of a successful deployment: check the service's branch, deployed commit, login, adult `/` route and child `/quest` route before announcing a release. **`fixforward.me` is not verified live by this document.** Confirm its DNS, certificate and served release separately before sharing it as the Main website.
+
+## Future Iteration 3 workflow
+
+1. Start from the latest approved `main` and create an `iteration-3` branch. Develop there; keep `iteration-1` and `iteration-2` unchanged for comparison.
+2. Give Iteration 3 its own Render service, linked to `iteration-3`. On that branch, set its blueprint to a distinct service name and branch so it cannot repoint Main or either comparison service. Keep credentials in Render's private environment settings.
+3. Run the JavaScript and Flask checks listed below, then review the adult and Quest journeys on Iteration 3's actual deployment. Verify the deployed commit and data availability separately from local test results.
+4. Once Iteration 3 is approved, promote it into `main` with a history-preserving merge. Resolve any conflicts against the approved release, check the resulting application files and rerun the relevant checks. Keep Main's service name and `branch: main` in its deployment metadata.
+5. Deploy and verify Main. Retain the Iteration 3 branch and its separate URL as the new comparison snapshot; future work starts on the next iteration branch. Do not force-push an old snapshot into Main or reuse an earlier iteration's service for new work.
+
+## Current application and handover
 
 **New developer or pre-deployment walkthrough:** Start with the [plain-English developer handover](docs/DEVELOPER_HANDOVER.md). It maps both experiences, traces clicks through functions and storage/API connections, explains the data pipeline and answers common review questions. Source comments explain responsibilities, functions and important decisions. See [comment-pass verification](docs/HANDOVER_VERIFICATION.md) for the exact scope and checks.
 
-**FixForward Quest tablet refinement, 13 September 2026:** This isolated branch adds a child adventure for ages 7–12 at `/quest`, alongside the adult `/` journey. The latest refinement adds large picture choices, simpler story sentences, four local levels, Sparks, two-picture clue reflections, word help and finite art sequences. Parents have a direct guide at `/quest?view=parents`. Hints and retries earn the same rewards; Sparks are game progress, not a learning score. See [the current tablet build, exact rules and verification limits](docs/QUEST_TABLET_PLAY.md), which supersedes earlier feature descriptions for this refinement.
+**FixForward Quest tablet refinement, 13 September 2026:** This release includes a child adventure for ages 7–12 at `/quest`, alongside the adult `/` journey. The latest refinement adds large picture choices, simpler story sentences, four local levels, Sparks, two-picture clue reflections, word help and finite art sequences. Parents have a direct guide at `/quest?view=parents`. Hints and retries earn the same rewards; Sparks are game progress, not a learning score. See [the current tablet build, exact rules and verification limits](docs/QUEST_TABLET_PLAY.md), which supersedes earlier feature descriptions for this refinement.
 
 Run `npm.cmd run dev:quest` from this checkout and open **http://127.0.0.1:5502/quest**, **http://127.0.0.1:5502/quest?view=parents** and **http://127.0.0.1:5502/**. The local adult preview uses explicitly labelled synthetic test records; Quest uses authored stories. This preview is a local review helper, not the production server. See [exact Windows commands and earlier verification](docs/QUEST_IMPLEMENTATION.md), [earlier creative refresh](docs/QUEST_CREATIVE_REFRESH.md), [mentor demo](docs/QUEST_DEMO.md), [comparison worksheet](docs/QUEST_COMPARISON_WORKSHEET.md) and [source register](docs/QUEST_CONTENT_SOURCES.md). The dated baseline notes below describe earlier snapshots, not validation of the current tablet refinement or its deployment status.
 
-**Local update, 12 September 2026:** Mentor feedback changes add a compact landing page, searchable optional brand/model suggestions, clearer warning actions, a safety counter at the end of the form, and an adult-and-child picture-story activity. Temporary data failures receive a bounded retry and expired website access has a recovery path. All 144 JavaScript checks pass. See the [item-by-item feedback response and remaining scanner work](docs/MENTOR_FEEDBACK_2026-09-12.md). These changes have not been deployed.
+**Local update, 12 September 2026:** Mentor feedback changes add a compact landing page, searchable optional brand/model suggestions, clearer warning actions, a safety counter at the end of the form, and an adult-and-child picture-story activity. Temporary data failures receive a bounded retry and expired website access has a recovery path. All 144 JavaScript checks pass. See the [item-by-item feedback response and remaining scanner work](docs/MENTOR_FEEDBACK_2026-09-12.md). Those checks describe the dated local review; use the release arrangement above and the actual Render deployment for current hosting status.
 
 **Updated 11 September 2026:** FixForward now requires a shared website password through its Flask server. The update also includes a favicon, page-specific browser titles and a reviewed AUD retail-price catalogue. “Not sure” retains repair-contact, cost-comparison and recycling exploration while safety warnings stay visible. See the [website access guide](docs/WEBSITE_ACCESS.md), [current branch verification report](docs/PASSWORD_BRANCH_VERIFICATION_2026-09-11.md), [catalogue verification report](docs/PRICE_CATALOGUE_VERIFICATION_2026-09-11.md) and [usability review](docs/USABILITY_REVIEW_2026-09-11.md).
 
@@ -220,7 +240,7 @@ python data/scripts/build_price_catalogue.py
 This workspace has a private, Git-ignored `.env` with `DATABASE_URL=` left blank and local website-access settings configured. Put the real database URL immediately after `DATABASE_URL=`, save, and restart Flask. In a fresh checkout, copy `.env.example` to `.env`, set `SITE_PASSWORD` privately, and generate a random `SECRET_KEY` of at least 32 characters. Set `SESSION_COOKIE_SECURE=false` only for local HTTP testing at `127.0.0.1:5000`; keep it true on HTTPS hosting. Existing shell/hosting environment variables take precedence. Never put real credentials in frontend code, Git, documentation, screenshots or chat. See [website access setup](docs/WEBSITE_ACCESS.md).
 
 ```powershell
-$env:RELEASE_VERSION = "iteration-1-v1.6.0-usability-lab"
+$env:RELEASE_VERSION = "iteration-2-v2.0.0-quest"
 python -m flask --app app run --debug
 ```
 
