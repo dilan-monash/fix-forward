@@ -1,8 +1,37 @@
-# FixForward — Iteration 2 with Quest
+# FixForward — Iteration 2 development and review
 
-**Current code location:** This checkout is on `iteration-2` and contains the adult website plus the animated Quest experience. Both `index.html` files and every authored JavaScript module contain comments directly beside the code. The outer workspace is a separate copy. See the [verified technology stack and source links](docs/TECH_STACK.md).
+**Current code location:** Work on the adult website and animated Quest experience in this `iteration-2` checkout. In the existing workspace, that is `tmp/child-quest-prototype`; the outer folder is a separate older copy, and `tmp/github-update` is the Main checkout. In another clone, select the `iteration-2` branch and check the working tree before editing. Both `index.html` files and every authored JavaScript module contain comments directly beside the code. See the [agent working agreement](AGENTS.md) and [verified technology stack and source links](docs/TECH_STACK.md).
 
-**Two websites for mentor comparison:** Preserve the existing `main` branch and its current Render website as Iteration 1. Deploy `iteration-2` as a separate service with its own URL. Do not merge this work into `main` or change the existing service's linked branch as part of that comparison setup. A published branch alone does not establish that its website is live; verify the separate Iteration 2 deployment and URL before sharing it.
+## Branches and websites
+
+| Website | GitHub branch | Website address | Role |
+|---|---|---|---|
+| Main | `main` | [fixforward.me](https://fixforward.me/) · [original Render address](https://fix-forward-main.onrender.com/) | Stable approved website. It changes only after the user explicitly approves the reviewed release for Main. |
+| Iteration 2 | `iteration-2` | [fix-forward-iteration-2.onrender.com](https://fix-forward-iteration-2.onrender.com/) | Ongoing development and review website for new changes to the adult guide and Quest. |
+| Iteration 1 | `iteration-1` | [fix-forward-iteration-1.onrender.com](https://fix-forward-iteration-1.onrender.com/) | Preserved original comparison website. Keep its branch and service unchanged. |
+
+This checkout's `render.yaml` belongs to the Iteration 2 service. Do not point it at Main or repoint an existing service to publish a preview. Main uses its own blueprint and manual release process. The [public GitHub branch](https://github.com/dilan-monash/fix-forward/tree/iteration-2) shows source code; it is not the deployed web application.
+
+## Development and review workflow
+
+1. Open the `iteration-2` checkout. Check `git branch --show-current`, `git status --short` and `git worktree list`; preserve any existing work. Make and review the requested code changes here, keeping nearby plain-English comments accurate.
+2. Run the relevant checks and inspect the affected journeys. Before publishing application changes, run `npm.cmd run check` and `python -m unittest discover -s test_backend -v` in the configured development environment. Test adult `/`, child `/quest`, access and data behavior as appropriate. The local `dev:quest` helper uses synthetic adult records and is not a production server.
+3. Ordinary requested improvements are published to I2 for review under the user's current workflow; respect any later request to keep work local. Inspect the diff and commit only the intended files on `iteration-2`. Exclude credentials, local environments and temporary output. Record the commit ID that was reviewed and tested.
+4. Confirm the configured GitHub remote and current branch, then push only `iteration-2`, for example `git push origin iteration-2`. Saving a file changes the local working copy; committing records a local version; pushing publishes that version to GitHub. None of these steps alone updates the running website.
+5. In Render, open **fix-forward-iteration-2**, confirm its linked branch is `iteration-2`, and use **Manual Deploy** for the reviewed commit. Keep Auto Deploy off. If deploying the latest branch commit, first confirm it is still the reviewed commit. Wait for the deployment to succeed, then check the deployed commit, login, adult and Quest routes, and public-data availability on the I2 website.
+6. Share the I2 URL and the exact changes for review. Keep `fixforward.me` unchanged. Treat local checks, a GitHub push and a verified live deployment as separate results.
+
+## Promotion to Main
+
+Promote a change only when the user explicitly approves the reviewed I2 commit for Main. I2 preview approval and successful tests do not grant that approval, and an earlier Main approval does not carry forward to later releases. Until then, do not edit, merge into, push or deploy Main or change its hosting configuration.
+
+After explicit approval, use a history-preserving promotion of the approved commit, resolve conflicts against that reviewed version, and retain Main's own service name, `branch: main` and deployment policy. Compare the resulting application with the approved I2 version, allowing only the intended Main metadata differences, and run the relevant checks. Keep Main's Auto Deploy off and manually deploy only the approved release. Never force-push or reset Main to replace its history. Verify Main after deployment; ordinary development then continues on I2. A future iteration branch is a separate decision, not the default next step.
+
+## Shared database boundary
+
+The websites currently share Neon reference data. Separate Git branches and Render services do not isolate database changes: an import or migration could affect Main even when started from I2. Ordinary application access remains read-only. Do not run imports, migrations, schema changes or reference-data writes against the shared database for I2 development. Use an explicitly separate database or Neon branch for database development; changes to shared production data need separate, specific authorization. Do not expose or copy credentials into source, logs or chat.
+
+## Current application and handover
 
 **New developer or pre-deployment walkthrough:** Start with the [plain-English developer handover](docs/DEVELOPER_HANDOVER.md). It maps both experiences, traces clicks through functions and storage/API connections, explains the data pipeline and answers common review questions. Source comments explain responsibilities, functions and important decisions. See [comment-pass verification](docs/HANDOVER_VERIFICATION.md) for the exact scope and checks.
 
@@ -10,7 +39,7 @@
 
 Run `npm.cmd run dev:quest` from this checkout and open **http://127.0.0.1:5502/quest**, **http://127.0.0.1:5502/quest?view=parents** and **http://127.0.0.1:5502/**. The local adult preview uses explicitly labelled synthetic test records; Quest uses authored stories. This preview is a local review helper, not the production server. See [exact Windows commands and earlier verification](docs/QUEST_IMPLEMENTATION.md), [earlier creative refresh](docs/QUEST_CREATIVE_REFRESH.md), [mentor demo](docs/QUEST_DEMO.md), [comparison worksheet](docs/QUEST_COMPARISON_WORKSHEET.md) and [source register](docs/QUEST_CONTENT_SOURCES.md). The dated baseline notes below describe earlier snapshots, not validation of the current tablet refinement or its deployment status.
 
-**Local update, 12 September 2026:** Mentor feedback changes add a compact landing page, searchable optional brand/model suggestions, clearer warning actions, a safety counter at the end of the form, and an adult-and-child picture-story activity. Temporary data failures receive a bounded retry and expired website access has a recovery path. All 144 JavaScript checks pass. See the [item-by-item feedback response and remaining scanner work](docs/MENTOR_FEEDBACK_2026-09-12.md). These changes have not been deployed.
+**Local update, 12 September 2026:** Mentor feedback changes add a compact landing page, searchable optional brand/model suggestions, clearer warning actions, a safety counter at the end of the form, and an adult-and-child picture-story activity. Temporary data failures receive a bounded retry and expired website access has a recovery path. All 144 JavaScript checks pass. See the [item-by-item feedback response and remaining scanner work](docs/MENTOR_FEEDBACK_2026-09-12.md). These are dated local results; use the workflow above and the actual Render deployment for current release status.
 
 **Updated 11 September 2026:** FixForward now requires a shared website password through its Flask server. The update also includes a favicon, page-specific browser titles and a reviewed AUD retail-price catalogue. “Not sure” retains repair-contact, cost-comparison and recycling exploration while safety warnings stay visible. See the [website access guide](docs/WEBSITE_ACCESS.md), [current branch verification report](docs/PASSWORD_BRANCH_VERIFICATION_2026-09-11.md), [catalogue verification report](docs/PRICE_CATALOGUE_VERIFICATION_2026-09-11.md) and [usability review](docs/USABILITY_REVIEW_2026-09-11.md).
 

@@ -2,7 +2,7 @@
 
 Prepared on 13 September 2026 for this adult/Quest checkout, now on `iteration-2`. This guide explains the code that exists here. It supports a developer handover and a pre-deployment walkthrough; it does not certify a production release or claim to reproduce a course rubric.
 
-The mentor comparison has two websites: the existing `main` branch and its Render service are Iteration 1; a separate service linked to `iteration-2` provides Iteration 2 when deployed. Preserve the existing service and branch. Confirm the new deployment and its URL separately from local tests or a Git push.
+Iteration 2 is the ongoing development and review website. Main at `fixforward.me` stays at the approved release until the user explicitly approves a reviewed I2 commit for promotion; Iteration 1 remains preserved separately. Follow the canonical [branch roles](../README.md#branches-and-websites), [manual I2 review workflow](../README.md#development-and-review-workflow) and [shared database boundary](../README.md#shared-database-boundary). A local check or Git push does not prove deployment.
 
 ## Start here, even if you do not write code
 

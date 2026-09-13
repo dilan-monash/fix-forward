@@ -4,8 +4,10 @@ services:
   - type: web
     name: fix-forward-iteration-2
     runtime: python
-    # This separate free service follows Iteration 2; the existing main/Iteration 1 service is retained.
+    # Iteration 2 is the review website. The separate main service owns fixforward.me and stays approved/stable.
     branch: iteration-2
+    # Deploy tested preview commits explicitly; publishing this branch must not deploy Main.
+    autoDeployTrigger: "off"
     plan: free
     # The build installs runtime dependencies and rebuilds the local reviewed-price SQLite/JavaScript snapshot.
     # It does not refresh retailer data or invoke the separate hosted-data import pipeline.

@@ -4,7 +4,7 @@
 
 This document supersedes the feature descriptions in [QUEST_CREATIVE_REFRESH.md](QUEST_CREATIVE_REFRESH.md) for this refinement, including its earlier 580 ms motion limit. Earlier dated test totals and browser observations remain historical evidence in [QUEST_IMPLEMENTATION.md](QUEST_IMPLEMENTATION.md). The automated results and specific browser checks from this refinement are recorded below, with the remaining review limits. Those local checks did not change production hosting or databases and are not evidence of a live release.
 
-The current release branch is `iteration-2`. Keep the existing `main` branch and its current Render website as Iteration 1, and use a separate Iteration 2 service and URL for the mentor comparison. Confirm that separate deployment before reporting it live.
+The development and review branch is `iteration-2`; its website can show proposed changes while Main at `fixforward.me` stays at the user's approved release. Iteration 1 remains preserved separately. Use the canonical [site roles](../README.md#branches-and-websites), [manual I2 deployment workflow](../README.md#development-and-review-workflow) and [shared database boundary](../README.md#shared-database-boundary). Main promotion requires explicit user approval for the reviewed release.
 
 ## Open the local build
 
