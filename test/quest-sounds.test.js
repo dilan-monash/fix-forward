@@ -143,6 +143,46 @@ test('wins begin with the original melody, rotate through two gentle variations 
   f.sounds.dispose();
 });
 
+test('pickup, target, drop, choose, page and Spark actions each have a short quiet acknowledgement', async () => {
+  const f = audioFixture();
+  const kinds = ['pickup', 'target', 'drop', 'choose', 'page', 'spark'];
+  for (const kind of kinds) assert.equal(f.sounds.play(kind), false, 'acknowledgements respect Sound off');
+  await f.sounds.enable(true, { gesture: true });
+  const context = f.contexts[0];
+  const shapes = [];
+  for (const kind of kinds) {
+    const first = context.oscillators.length;
+    assert.equal(f.sounds.play(kind), true);
+    const notes = context.oscillators.slice(first);
+    shapes.push(JSON.stringify(notes.map(note => note.frequency.values[0][1])));
+    assert.ok(notes.length <= 2);
+    assert.ok(notes.every(note => note.stops[0] - context.currentTime < 0.16), 'a physical acknowledgement is briefer than a win');
+    assert.ok(notes.every(note => note.connections[0].gain.values.every(([, volume]) => volume <= 0.045)));
+    assert.ok(f.timers.size <= 2, 'rapid targets replace rather than accumulate');
+  }
+  assert.equal(new Set(shapes).size, kinds.length, 'each requested interaction has its own small cue');
+  f.sounds.dispose();
+});
+
+test('incidental sounds cannot cut off a win or level melody and are never queued afterwards', async () => {
+  const f = audioFixture();
+  await f.sounds.enable(true, { gesture: true });
+  const context = f.contexts[0];
+  for (const celebration of ['win', 'level']) {
+    assert.equal(f.sounds.play(celebration), true);
+    const notes = context.oscillators.length;
+    for (const kind of ['tap', 'pickup', 'target', 'drop', 'choose', 'page', 'spark']) assert.equal(f.sounds.play(kind), false);
+    assert.equal(context.oscillators.length, notes, 'a celebration remains the only sound');
+    for (const callback of [...f.timers.values()]) callback();
+    assert.equal(context.oscillators.length, notes, 'missed acknowledgements are not replayed later');
+    assert.equal(f.sounds.play('spark'), true, 'the next action can sound after natural cleanup');
+  }
+  f.sounds.play('win');
+  f.sounds.stop();
+  assert.equal(f.sounds.play('choose'), true, 'navigation Stop clears celebration priority');
+  f.sounds.dispose();
+});
+
 test('muted, locked and partly failed wins do not advance the next celebration chime', async () => {
   const f = audioFixture();
   assert.equal(f.sounds.play('win'), false, 'muted requests stay quiet');
@@ -271,19 +311,19 @@ test('native note failures and a removed UI callback cannot break the next game 
   await Promise.resolve();
 });
 
-test('sound preferences save separately from narration and older or malformed saves stay quiet', () => {
+test('sound preferences save separately from narration and preserve an explicit muted save', () => {
   const original = createState();
-  assert.equal(original.settings.sound, false);
-  const selected = transition(original, { type: 'SET_SETTING', key: 'sound', value: true });
-  assert.equal(selected.settings.sound, true);
-  assert.equal(selected.settings.narration, false);
-  assert.equal(original.settings.sound, false, 'A saved-state input is never mutated');
-  assert.equal(hydrateState(selected).settings.sound, true);
+  assert.equal(original.settings.sound, true);
+  const selected = transition(original, { type: 'SET_SETTING', key: 'sound', value: false });
+  assert.equal(selected.settings.sound, false);
+  assert.equal(selected.settings.narration, true);
+  assert.equal(original.settings.sound, true, 'A saved-state input is never mutated');
+  assert.equal(hydrateState(selected).settings.sound, false);
   for (const value of ['true', 1, null, undefined]) {
-    assert.equal(hydrateState({ ...selected, settings: { ...selected.settings, sound: value } }).settings.sound, false);
+    assert.equal(hydrateState({ ...selected, settings: { ...selected.settings, sound: value } }).settings.sound, true);
     assert.equal(transition(original, { type: 'SET_SETTING', key: 'sound', value }), original);
   }
   const oldSave = { ...selected, settings: { mode: 'guided', narration: true, motion: 'auto' } };
-  assert.equal(hydrateState(oldSave).settings.sound, false);
+  assert.equal(hydrateState(oldSave).settings.sound, true);
   assert.equal(hydrateState(oldSave).settings.narration, true);
 });

@@ -10,6 +10,12 @@
 // original little melodies use soft sine waves, not a startling wrong-answer buzzer.
 const MELODIES = Object.freeze({
   tap: [[740, 0, 0.08]],
+  pickup: [[587.33, 0, 0.065], [783.99, 0.035, 0.075]],
+  target: [[880, 0, 0.045]],
+  drop: [[659.25, 0, 0.065], [523.25, 0.045, 0.085]],
+  choose: [[698.46, 0, 0.08]],
+  page: [[392, 0, 0.065], [523.25, 0.045, 0.075]],
+  spark: [[1046.50, 0, 0.055], [1318.51, 0.045, 0.08]],
   retry: [[330, 0, 0.14], [294, 0.12, 0.20]],
   win: [[523.25, 0, 0.16], [659.25, 0.10, 0.18], [783.99, 0.20, 0.20], [1046.50, 0.32, 0.25]],
   level: [[523.25, 0, 0.16], [659.25, 0.10, 0.18], [783.99, 0.20, 0.20], [1046.50, 0.32, 0.24], [1318.51, 0.46, 0.28]]
@@ -44,6 +50,7 @@ export function createGameSounds({
   // This small session-only counter varies successful chimes, never game points.
   // Muted, blocked and failed play requests must not skip a melody.
   let nextWin = 0;
+  let activeKind = null;
   let status = selected ? (typeof AudioContext === 'function' ? 'locked' : 'unavailable') : 'off';
   const voices = new Set();
 
@@ -70,6 +77,7 @@ export function createGameSounds({
   // the browser's ended event arrive together. A timer is a suspended-tab fallback.
   function release(voice) {
     if (!voices.delete(voice)) return;
+    if (!voices.size) activeKind = null;
     cancelTimer(voice.timer);
     voice.oscillator.onended = null;
     try { voice.oscillator.disconnect(); } catch { /* It may already be disconnected. */ }
@@ -83,6 +91,7 @@ export function createGameSounds({
       try { voice.oscillator.stop(); } catch { /* An ended note is already silent. */ }
       release(voice);
     }
+    activeKind = null;
   }
 
   // Tablets can suspend audio when a tab loses focus. Reflect that state honestly
@@ -142,6 +151,10 @@ export function createGameSounds({
   function play(kind) {
     if (disposed || !selected || !Object.hasOwn(MELODIES, kind)) return false;
     if (context?.state !== 'running') { publish(typeof AudioContext === 'function' ? 'locked' : 'unavailable'); return false; }
+    // A passing destination, page tap or arriving Spark must not cut a win in
+    // half. Drop incidental cues while a celebration plays; never queue them for
+    // later. A new win/level can replace it, and explicit Stop always works.
+    if (voices.size && ['win', 'level'].includes(activeKind) && !['win', 'level'].includes(kind)) return false;
     stop();
     try {
       const now = context.currentTime;
@@ -166,6 +179,7 @@ export function createGameSounds({
           release(voice);
         }, (delay + duration + 0.12) * 1000);
       }
+      activeKind = kind;
       // Advance only after every note was scheduled successfully. A later win
       // replaces these notes through stop(), so variations cannot overlap.
       if (kind === 'win') nextWin = (nextWin + 1) % WIN_MELODIES.length;

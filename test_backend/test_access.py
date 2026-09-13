@@ -4,9 +4,11 @@
 """Access gate integration tests with isolated cookies and repository fakes."""
 
 import importlib.util
+from html import unescape
 import re
 import unittest
 from unittest.mock import patch
+from urllib.parse import parse_qs, urlsplit
 
 
 WEB_DEPENDENCIES = all(importlib.util.find_spec(name) for name in ("flask", "dotenv"))
@@ -48,7 +50,9 @@ class AccessTests(unittest.TestCase):
             with self.subTest(path=path):
                 response = self.client.get(path)
                 self.assertEqual(response.status_code, 303)
-                self.assertEqual(response.headers["Location"], "/login")
+                location = urlsplit(response.headers["Location"])
+                self.assertEqual(location.path, "/login")
+                self.assertEqual(parse_qs(location.query), {"next": [path]} if path == "/index.html" else {})
                 self.assertNotIn(b"type=\"module\"", response.data)
 
     @patch("backend.api.repository.health_check")
@@ -261,6 +265,75 @@ class AccessTests(unittest.TestCase):
         response = self.client.post("/login?next=//example.com", data={"csrf_token": token, "password": "fixforward"})
         self.assertEqual(response.status_code, 303)
         self.assertEqual(response.headers["Location"], "/")
+
+    # Follow the real gate, rendered hidden fields and form action. A direct Quest
+    # or parent-view link must land at that page after the shared password works.
+    def test_login_returns_to_requested_quest_entries_and_parent_view(self):
+        for destination in ("/index.html", "/quest", "/quest/", "/quest/index.html",
+                            "/quest?view=parents", "/quest/?view=parents", "/quest/index.html?view=parents"):
+            with self.subTest(destination=destination):
+                self.client = self.app.test_client()
+                with self.client.get(destination) as locked:
+                    self.assertEqual(locked.status_code, 303)
+                    login_url = locked.headers["Location"]
+                    self.assertEqual(parse_qs(urlsplit(login_url).query), {"next": [destination]})
+                with self.client.get(login_url) as page:
+                    self.assertEqual(page.status_code, 200)
+                    html = page.get_data(as_text=True)
+                    fields = {name: unescape(value) for name, value in re.findall(r'<input type="hidden" name="([^"]+)" value="([^"]*)"', html)}
+                    self.assertEqual(fields["next"], destination)
+                    self.assertIn('method="post" action="/login"', html)
+                fields["password"] = "fixforward"
+                with self.client.post("/login", data=fields) as success:
+                    self.assertEqual(success.status_code, 303)
+                    self.assertEqual(success.headers["Location"], destination)
+                with self.client.get(destination) as target:
+                    self.assertEqual(target.status_code, 200)
+                    self.assertEqual(target.headers["Cache-Control"], "private, no-store")
+                    if destination.startswith("/quest"):
+                        self.assertIn(b'id="quest-app"', target.data)
+
+    def test_destination_survives_csrf_password_errors_and_other_tab_requests(self):
+        token = self.token("/login?next=/quest")
+        for csrf_token, password, expected_status in (("bad-token", "fixforward", 400), (token, "incorrect", 401)):
+            with self.client.post("/login", data={"csrf_token": csrf_token, "password": password, "next": "/quest"}) as response:
+                self.assertEqual(response.status_code, expected_status)
+                self.assertIn(b'name="next" value="/quest"', response.data)
+            self.assertEqual(self.client.get("/api/ready").status_code, 401)
+        # A second tab's parent page and an expired asset request cannot replace
+        # the first form's destination; no global session redirect field is used.
+        self.token("/login?next=/quest?view=parents")
+        self.assertEqual(self.client.get("/src/app.js").status_code, 303)
+        with self.client.post("/login", data={"csrf_token": token, "password": "fixforward", "next": "/quest"}) as response:
+            self.assertEqual(response.status_code, 303)
+            self.assertEqual(response.headers["Location"], "/quest")
+
+    def test_edited_return_fields_cannot_redirect_outside_known_page_entries(self):
+        rejected = ("https://example.com", "//example.com", "///example.com", "/\\example.com", "\\\\example.com",
+                    "javascript:alert(1)", "/%2f%2fexample.com", "/quest/../../logout", "/quest/parents",
+                    "/quest?view=parents&next=https://example.com", "/quest#//example.com", "/quest\r\nLocation: https://example.com",
+                    " /quest", "/quest ", "/login", "/logout", "/api/sources", "/src/app.js", "/.env")
+        for destination in rejected:
+            with self.subTest(destination=destination):
+                self.client = self.app.test_client()
+                token = self.token("/login?next=/quest")
+                with self.client.post("/login", data={"csrf_token": token, "password": "fixforward", "next": destination}) as response:
+                    self.assertEqual(response.status_code, 303)
+                    self.assertEqual(response.headers["Location"], "/")
+                # An already-authorized visit to login uses the same validation.
+                with self.client.get("/login", query_string={"next": destination}) as response:
+                    self.assertEqual(response.headers["Location"], "/")
+
+    def test_expired_quest_access_can_log_in_again_at_the_same_parent_view(self):
+        self.login()
+        with self.client.session_transaction() as stored:
+            stored["access_issued_at"] -= 4 * 60 * 60
+        with self.client.get("/quest?view=parents") as locked:
+            self.assertEqual(locked.status_code, 303)
+            login_url = locked.headers["Location"]
+        token = self.token(login_url)
+        with self.client.post("/login", data={"csrf_token": token, "password": "fixforward", "next": "/quest?view=parents"}) as response:
+            self.assertEqual(response.headers["Location"], "/quest?view=parents")
 
     def test_oversized_login_request_is_rejected(self):
         token = self.token()

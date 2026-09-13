@@ -35,13 +35,24 @@ const validIds = (values, ids) => Array.isArray(values) ? unique(values.filter(i
 // Keep the deterministic round seed finite and within the range used by START_SORT.
 const boundedRound = value => Number.isSafeInteger(value) && value >= 0 && value <= 1000000;
 
-/** Return a fresh, independent save with guided play, sound off and animated graphics. */
+/** Return a fresh adventure with sensory feedback ready for the first game tap.
+ * Browser audio still waits for a gesture; these defaults never start a speaker. */
 export function createState() {
   return {
     version: STATE_VERSION, view: 'home', activeMission: null, completed: {}, discoveries: [],
-    settings: { mode: 'guided', narration: false, sound: false, motion: 'full' },
+    settings: { mode: 'guided', narration: true, sound: true, haptics: true, motion: 'full' },
     decorations: { home: null, studio: null, station: null }, postcards: {}, reflections: {}, sorting: null, sortRound: 0, practice: [], sortedItems: []
   };
+}
+
+/** Both play styles need every authored fact before planning. Guided reveals
+ * them in order; Challenge lets children find them. Counting exact IDs prevents
+ * duplicates or unrelated clues from unlocking a story's next step. */
+export function canOpenPlan(state) {
+  const active = state?.activeMission;
+  const mission = missionById(active?.id);
+  return Boolean(state?.view === 'mission' && active?.step === 'explore' && mission
+    && Array.isArray(active.clueIds) && mission.clues.every(clue => active.clueIds.includes(clue.id)));
 }
 
 // Start or replay a known story without clearing previously earned discoveries.
@@ -138,8 +149,8 @@ export function transition(state, action) {
       if (!mission || !['explore', 'plan'].includes(active.step) || !mission.clues.some(clue => clue.id === action.id) || active.clueIds.includes(action.id)) return state;
       return updateMission(state, { clueIds: [...active.clueIds, action.id] });
     case 'OPEN_PLAN':
-      // One inspected clue is enough to plan; children can return for more evidence.
-      return active?.step === 'explore' && active.clueIds.length > 0 ? updateMission(state, { step: 'plan' }) : state;
+      // The visible next-step control and the rule engine share this same gate.
+      return canOpenPlan(state) ? updateMission(state, { step: 'plan' }) : state;
     case 'EXPLORE_AGAIN':
       // A wrong answer can return to clues without losing the plan or help history.
       return active?.step === 'plan' || (active?.step === 'feedback' && !active.feedback?.correct)
@@ -193,10 +204,11 @@ export function transition(state, action) {
       return { ...state, practice: markPractice(state, [item.conceptId]), sorting: { ...sorting, assistedIds: [...sorting.assistedIds, item.id] } };
     }
     case 'SET_SETTING': {
-      // Sound effects and read-aloud are separate choices; both start quietly off.
+      // Sound, story voice and touch feedback are independent choices. Muting
+      // the speaker does not remove gentle touch feedback in a quiet room.
       // The current requested design always animates its graphics. Motion is no
       // longer a switchable setting; stale controls cannot change that policy.
-      const allowed = { mode: ['guided', 'challenge'], narration: [true, false], sound: [true, false] };
+      const allowed = { mode: ['guided', 'challenge'], narration: [true, false], sound: [true, false], haptics: [true, false] };
       if (!Object.hasOwn(allowed, action.key) || !allowed[action.key].includes(action.value) || state.settings[action.key] === action.value) return state;
       return { ...state, settings: { ...state.settings, [action.key]: action.value } };
     }
@@ -371,9 +383,11 @@ export function hydrateState(raw) {
   state.practice = validIds(raw.practice, conceptIds);
   if (isRecord(raw.settings)) {
     state.settings.mode = raw.settings.mode === 'challenge' ? 'challenge' : 'guided';
-    state.settings.narration = raw.settings.narration === true;
-    // Old saves have no sound field. Only an explicit true opts into game sounds.
-    state.settings.sound = raw.settings.sound === true;
+    // Keep a child's explicit off choices. Missing or malformed older fields
+    // inherit the new first-run defaults, still subject to browser gesture rules.
+    for (const key of ['narration', 'sound', 'haptics']) {
+      if (typeof raw.settings[key] === 'boolean') state.settings[key] = raw.settings[key];
+    }
     // Keep createState's fixed full motion for this requested design. Older
     // auto/reduce saves retain every valid story, point and picture below;
     // changing presentation never resets the child's adventure.

@@ -22,6 +22,8 @@ function renderFamilyWelcome() {
       <p class="q-eyebrow">Welcome to FixForward Quest</p>
       <h1 id="q-family-title" data-focus tabindex="-1">For parents and curious families</h1>
       <p class="q-family-lead">Small choices can give things a new story.</p>
+      <!-- A practical starting point, not an age gate or a timed learning claim. -->
+      <p class="q-family-quick-facts"><strong>Designed for ages 7–12.</strong> Plan for about 5–10 minutes to explore one story, or try a five-picture sorting round. This is a planning guide: children can take their time and stop whenever they like.</p>
       <p>Quest is a picture-story game about caring for the things around us. Your child follows clues, chooses what happens next and discovers why a choice fits. A fan might find a new home. A warning might mean stopping to ask for help.</p>
       <p><strong>Your child is the decision-maker.</strong> They can try again, ask for a hint or hear the words. There is no timer to race.</p>
       <button class="q-button primary" data-picker>Explore the stories <span aria-hidden="true">→</span></button>
@@ -145,7 +147,7 @@ export function renderParentGuide({
       <p>Quest saves progress, designs and settings in this browser. It asks for no player name, birthday, photo or contact details. Quest sends no child scores or play analytics.</p>
       <p>${storageAvailable ? 'Clearing browser data can remove saved progress. Reset my adventure clears the Quest save.' : 'Saving is blocked in this browser. Your child can still play during this visit.'} The household appliance journey is separate.</p>
       <!-- Sound effects and browser speech have separate controls and saved choices. -->
-      <p>Game sounds start off. In the game, the Sound button turns the short chimes on or mutes them. These sounds are separate from Hear it. Pause and Resume control reading aloud; Stop ends the reading.</p>
+      <p>On a new adventure, game sounds and story reading are ready after the first tap. Saved choices are remembered. Sound mutes the short chimes; Settings can switch automatic reading or supported touch feedback off. Read to me reads the current screen. Winning uses musical chimes, without spoken congratulations. Pause and Resume control reading aloud; Stop ends the reading.</p>
       <!-- Be clear about the story voice's origin and the device-voice fallback.
            Audio playback never asks for a microphone or records the child. -->
       <p>The story voice is made with AI and included with the game. Its words stay visible, too. Other words may use your device's voice, which also helps if a story recording cannot play. Some voices may use an online service.</p>

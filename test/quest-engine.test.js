@@ -8,7 +8,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import { MISSIONS, SORT_ITEMS, CONCEPTS } from '../quest/content.js';
-import { createState, transition, sortingRound, sortingSummary, suggestedMission, hydrateState } from '../quest/engine.js';
+import { createState, transition, sortingRound, sortingSummary, suggestedMission, hydrateState, canOpenPlan } from '../quest/engine.js';
 import { STORAGE_KEY, loadProgress, saveProgress, clearProgress } from '../quest/storage.js';
 import { hitTest, bindDrag } from '../quest/drag.js';
 import { progression } from '../quest/progression.js';
@@ -71,9 +71,11 @@ test('clues, retries and help survive a save; a wrong answer can never finish th
   const mission = MISSIONS[0];
   let state = apply(createState(), 'CHOOSE_MISSION', { id: mission.id });
   state = apply(state, 'START_MISSION');
-  assert.equal(apply(state, 'OPEN_PLAN'), state, 'At least one story clue is needed');
+  assert.equal(apply(state, 'OPEN_PLAN'), state, 'Every authored story clue is needed');
   state = apply(state, 'COLLECT_CLUE', { id: mission.clues[0].id });
   assert.equal(apply(state, 'COLLECT_CLUE', { id: mission.clues[0].id }), state);
+  assert.equal(apply(state, 'OPEN_PLAN'), state, 'One clue cannot skip the remaining facts');
+  for (const clue of mission.clues.slice(1)) state = apply(state, 'COLLECT_CLUE', { id: clue.id });
   state = apply(state, 'OPEN_PLAN');
   const slotId = mission.slots[0].id;
   const wrong = mission.allowedActions.find(action => !mission.acceptedPlans.some(plan => plan[slotId] === action.id));
@@ -111,6 +113,26 @@ test('two-part plans accept placements in either order and require both decision
   assert.equal(apply(state, 'CHECK_PLAN'), state);
 });
 
+test('Guided and Challenge both require every exact authored clue before planning', () => {
+  assert.equal(canOpenPlan(createState()), false);
+  for (const mode of ['guided', 'challenge']) for (const mission of MISSIONS) {
+    let state = apply(createState(), 'SET_SETTING', { key: 'mode', value: mode });
+    state = apply(state, 'CHOOSE_MISSION', { id: mission.id });
+    assert.equal(canOpenPlan(state), false, 'introduction is not the facts stage');
+    state = apply(state, 'START_MISSION');
+    for (const clue of mission.clues) {
+      assert.equal(canOpenPlan(state), false);
+      assert.equal(apply(state, 'OPEN_PLAN'), state);
+      state = apply(state, 'COLLECT_CLUE', { id: clue.id });
+    }
+    assert.equal(canOpenPlan(state), true);
+    const repeated = { ...state, activeMission: { ...state.activeMission, clueIds: mission.clues.map(() => mission.clues[0].id) } };
+    assert.equal(canOpenPlan(repeated), false, 'a duplicate count does not replace a missing fact');
+    assert.equal(canOpenPlan({ ...state, view: 'home' }), false, 'a hidden mission cannot advance');
+    assert.equal(apply(state, 'OPEN_PLAN').activeMission.step, 'plan');
+  }
+});
+
 test('a wrong plan can reopen its actual clues without erasing the plan or help history', () => {
   const mission = MISSIONS[0];
   const slotId = mission.slots[0].id;
@@ -143,7 +165,7 @@ test('navigation preserves active work, settings and optional decoration choice'
   for (const view of ['home', 'book', 'grownups', 'mission']) state = apply(state, 'NAVIGATE', { view });
   assert.equal(state.activeMission, active);
   assert.equal(state.settings.mode, 'challenge');
-  assert.equal(state.settings.narration, false);
+  assert.equal(state.settings.narration, true);
   state = apply(state, 'NAVIGATE', { view: 'grownups' });
   assert.equal(apply(state, 'COMPLETE_MISSION'), state, 'Hidden stale callbacks cannot finish a mission');
 });
@@ -160,8 +182,8 @@ test('animation is fixed on while stale motion-setting actions remain harmless',
     assert.equal(saveProgress(state, storage), true);
     state = loadProgress(storage).state;
     assert.equal(state.settings.motion, 'full', 'Reload retains animated graphics');
-    assert.equal(state.settings.narration, false);
-    assert.equal(state.settings.sound, false);
+    assert.equal(state.settings.narration, true);
+    assert.equal(state.settings.sound, true);
   }
   assert.equal(original.settings.motion, 'full', 'Validation does not mutate an earlier save');
 });
@@ -190,6 +212,22 @@ test('old motion preferences migrate to animated graphics without losing earned 
   delete missingSettings.settings;
   assert.equal(hydrateState(missingSettings).settings.motion, 'full');
   assert.deepEqual(hydrateState(missingSettings).sortedItems, expected.sortedItems);
+});
+
+test('new adventures enable sensory feedback while explicit saved off choices remain off', () => {
+  const fresh = deepFreeze(createState());
+  assert.deepEqual(fresh.settings, { mode: 'guided', narration: true, sound: true, haptics: true, motion: 'full' });
+  for (const key of ['narration', 'sound', 'haptics']) {
+    const muted = apply(fresh, 'SET_SETTING', { key, value: false });
+    assert.equal(muted.settings[key], false);
+    assert.equal(hydrateState(muted).settings[key], false, `${key} off survives a reload`);
+    assert.equal(fresh.settings[key], true, 'settings do not mutate the previous save');
+    for (const value of [undefined, null, 'true', 'false', 1, {}]) {
+      assert.equal(hydrateState({ ...fresh, settings: { ...fresh.settings, [key]: value } }).settings[key], true, 'older missing or malformed fields use the new default');
+      assert.equal(apply(fresh, 'SET_SETTING', { key, value }), fresh, 'controls still accept only booleans');
+    }
+  }
+  assert.deepEqual(hydrateState({ version: fresh.version }).settings, fresh.settings);
 });
 
 test('suggestions use reviewed concepts, remain optional and cover unfinished missions', () => {

@@ -76,7 +76,7 @@ test('missing, unknown, or malformed choices cannot produce successful feedback'
 test('retrying retains the useful choice and changing the other one earns no early points', () => {
   let state = transition(createState(), { type: 'CHOOSE_MISSION', id: box.id });
   for (const action of [
-    { type: 'START_MISSION' }, { type: 'COLLECT_CLUE', id: box.clues[0].id }, { type: 'OPEN_PLAN' },
+    { type: 'START_MISSION' }, ...box.clues.map(clue => ({ type: 'COLLECT_CLUE', id: clue.id })), { type: 'OPEN_PLAN' },
     { type: 'SET_PLAN', slotId: 'toaster', actionId: 'reuse' },
     { type: 'SET_PLAN', slotId: 'cardboard', actionId: 'ewaste' }, { type: 'CHECK_PLAN' }, { type: 'RETRY_PLAN' }
   ]) state = transition(state, action);

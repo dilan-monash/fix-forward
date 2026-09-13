@@ -18,7 +18,8 @@ const act = (state, type, fields = {}) => transition(state, { type, ...fields })
 function finish(mission, state = createState(), assisted = false) {
   state = act(state, 'CHOOSE_MISSION', { id: mission.id });
   state = act(state, 'START_MISSION');
-  state = act(state, 'COLLECT_CLUE', { id: mission.clues[0].id });
+  // Earn through every authored clue; the fixture cannot skip the learning gate.
+  for (const clue of mission.clues) state = act(state, 'COLLECT_CLUE', { id: clue.id });
   if (assisted) state = act(state, 'HINT');
   state = act(state, 'OPEN_PLAN');
   for (const [slotId, actionId] of Object.entries(mission.acceptedPlans[0])) state = act(state, 'SET_PLAN', { slotId, actionId });

@@ -21,6 +21,11 @@ test('the restored family welcome explains the game without an age debate or lea
   assert.match(page.querySelector('.q-family-welcome').textContent, /picture-story game about caring for the things around us/);
   assert.match(page.querySelector('.q-family-welcome').textContent, /Your child is the decision-maker/);
   assert.match(page.querySelector('.q-family-welcome').textContent, /try again, ask for a hint or hear the words/);
+  const practicalGuide = page.querySelector('.q-family-quick-facts').textContent;
+  assert.match(practicalGuide, /Designed for ages 7–12/);
+  assert.match(practicalGuide, /about 5–10 minutes.*one story.*five-picture sorting round/s);
+  assert.match(practicalGuide, /planning guide.*take their time.*stop whenever they like/s);
+  assert.doesNotMatch(practicalGuide, /must|guarantee|complete within/i, 'time and ages are guidance, not entry rules or promised outcomes');
   assert.equal(page.querySelector('#q-parent-age-title'), null);
   assert.doesNotMatch(copy, /Why ages|What about 6 or 13|birthday does not decide/);
   assert.match(copy, /not measured learning improvements or tested this version with children/);
@@ -92,7 +97,9 @@ test('privacy and local-fixture details remain accurate and source links are exp
   assert.match(preview.body.textContent, /story voice is made with AI and included with the game/);
   assert.match(preview.body.textContent, /words stay visible.*device's voice.*recording cannot play/s);
   assert.match(preview.body.textContent, /does not record your child or send their voice anywhere/);
-  assert.match(preview.body.textContent, /Game sounds start off.*separate from Hear it/s);
+  assert.match(preview.body.textContent, /new adventure, game sounds and story reading are ready after the first tap.*Saved choices are remembered/s);
+  assert.match(preview.body.textContent, /Sound mutes the short chimes.*automatic reading or supported touch feedback off/s);
+  assert.match(preview.body.textContent, /Winning uses musical chimes, without spoken congratulations/);
   assert.match(preview.body.textContent, /Pause and Resume control reading aloud; Stop ends the reading/);
   assert.match(preview.body.textContent, /Every appliance, check and report in Quest is fictional/);
   assert.match(preview.body.textContent, /leave the item alone and tell a trusted adult/);

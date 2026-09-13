@@ -42,6 +42,9 @@
       <!-- The token binds this POST to the visitor session; the password field is intentionally never prefilled. -->
       <form id="access-login-form" method="post" action="{{ url_for('access.login') }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <!-- Only an allowlisted page is returned here; the server validates this
+             field again on POST so editing it cannot create an external redirect. -->
+        <input type="hidden" name="next" value="{{ next_path }}">
         <label for="website-password">Website password</label>
         <!-- These optional controls start hidden: ordinary password submission also works without JavaScript. -->
         <div class="password-controls">

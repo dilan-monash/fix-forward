@@ -11,6 +11,7 @@ import re
 import unittest
 from pathlib import Path
 from unittest.mock import patch
+from urllib.parse import parse_qs, urlsplit
 
 
 WEB_DEPENDENCIES = all(importlib.util.find_spec(name) for name in ("flask", "dotenv"))
@@ -21,7 +22,7 @@ QUEST_ASSETS = (
     "/quest/play-effects.css", "/quest/postcard.js", "/quest/postcard-options.js",
     "/quest/progression.js", "/quest/tablet-play.css",
     "/quest/navigation.js", "/quest/narration.js", "/quest/parent-guide.js",
-    "/quest/visual-play.js", "/quest/visual-play.css", "/quest/reward-voice.js", "/quest/reward-fx.js", "/quest/sounds.js", "/quest/game-feel.css",
+    "/quest/visual-play.js", "/quest/visual-play.css", "/quest/word-help.js", "/quest/word-help.css", "/quest/haptics.js", "/quest/reward-voice.js", "/quest/reward-fx.js", "/quest/sounds.js", "/quest/game-feel.css",
     "/quest/picture-help.js", "/quest/feedback.js", "/quest/clue-play.css",
     "/quest/family-guide.css", "/quest/story-audio.js", "/quest/audio/story-manifest.js",
 )
@@ -63,7 +64,9 @@ class QuestRouteTests(unittest.TestCase):
                 with self.subTest(path=path, method=method):
                     with self.client.open(path, method=method) as response:
                         self.assertEqual(response.status_code, 303)
-                        self.assertEqual(response.headers["Location"], "/login")
+                        login = urlsplit(response.headers["Location"])
+                        self.assertEqual(login.path, "/login")
+                        self.assertEqual(parse_qs(login.query), {"next": [path]} if path in QUEST_ENTRIES else {})
                         self.assertEqual(response.headers["Cache-Control"], "private, no-store")
                         self.assertNotIn(b"quest-app", response.data)
 
@@ -158,7 +161,9 @@ class QuestRouteTests(unittest.TestCase):
                 with self.subTest(path=path):
                     with self.client.get(path) as response:
                         self.assertEqual(response.status_code, 303)
-                        self.assertEqual(response.headers["Location"], "/login")
+                        login = urlsplit(response.headers["Location"])
+                        self.assertEqual(login.path, "/login")
+                        self.assertEqual(parse_qs(login.query), {"next": [path]} if path == "/quest" else {})
 
     def test_quest_fails_closed_when_access_configuration_is_missing(self):
         self.app.config["SITE_PASSWORD"] = ""

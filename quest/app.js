@@ -4,7 +4,7 @@
 // A typical click follows bind -> dispatch -> transition -> persist -> render.
 // There is no Quest API request here. See docs/DEVELOPER_HANDOVER.md for the full map.
 import { MISSIONS, SORT_ITEMS, CONCEPTS, SOURCES, LOCATIONS } from './content.js';
-import { createState, transition, suggestedMission, hydrateState } from './engine.js';
+import { createState, transition, suggestedMission, hydrateState, canOpenPlan } from './engine.js';
 import { loadProgress, saveProgress, clearProgress } from './storage.js';
 import { bindDrag } from './drag.js';
 import { artwork, neighborhood, scene, passportStamp, rewardBurst, levelBadge } from './art.js';
@@ -15,6 +15,8 @@ import { createNavigation, NAVIGATION_KEY } from './navigation.js';
 import { createNarration } from './narration.js';
 import { createRewardFx } from './reward-fx.js';
 import { createGameSounds } from './sounds.js';
+import { createHaptics } from './haptics.js';
+import { addWordHelp } from './word-help.js';
 import { sceneClues, pictureHelp as renderPictureHelp, sortingPictureHelp } from './picture-help.js';
 import { planFeedback, celebrationCopy, rewardPreview } from './feedback.js';
 import { STORY_LINES } from './story-audio.js';
@@ -55,6 +57,8 @@ let checkedPlan = null;
 // Celebrations belong to this screen visit, never to the saved score or history.
 let celebration = false;
 let audioRequested = false;
+// Remember the input that caused feedback; a mouse or keyboard never makes a phone buzz.
+let lastPointerType = 'mouse';
 let spokenWords = '';
 let navigation = null;
 let historyEpoch = Number.isSafeInteger(window.history?.state?.[NAVIGATION_KEY]?.route?.epoch) ? window.history.state[NAVIGATION_KEY].route.epoch : 0;
@@ -70,6 +74,7 @@ const sounds = createGameSounds({ AudioContext: window.AudioContext || window.we
 // Quest always plays its character and reward animations. The effects controller
 // still settles the score if a browser cannot animate; effects never own progress.
 const rewardFx = createRewardFx({ document });
+const haptics = createHaptics({ navigator: window.navigator, isEnabled: () => state.settings.haptics });
 // Treat inserted text as text, not executable HTML. attr uses the same escaping for attributes.
 const escape = (text) => String(text ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');
 const attr = escape;
@@ -145,6 +150,10 @@ function updateHud(progress = progression(state)) {
 function measureChrome() {
   const height = document.querySelector('.q-game-chrome')?.getBoundingClientRect().height;
   if (height) document.documentElement.style.setProperty('--q-chrome-height', `${Math.ceil(height)}px`);
+  // Phone sorting reserves the visible voice toolbar so it never covers a bin.
+  const dock = document.querySelector('body > [data-audio-dock]');
+  const audioHeight = dock && !dock.hidden && !dialog.open && window.getComputedStyle(dock).position === 'fixed' ? dock.getBoundingClientRect().height + 24 : 0;
+  document.documentElement.style.setProperty('--q-audio-height', `${Math.ceil(audioHeight)}px`);
 }
 // Arrival updates the accessible total immediately, then decorates that true
 // total with a short count-up and meter fill. Neither animation changes state.
@@ -198,6 +207,7 @@ function updateAudio(status = narration.getState()) {
   // focus to a visible reading control instead of leaving keyboard users stranded.
   if (focusedDock?.hidden) (dialog.open ? dialog.querySelector('#q-dialog-close') : document.querySelector('#read-aloud')).focus();
   if (audioRequested && (status.status === 'error' || status.status === 'unavailable')) announce(status.message);
+  measureChrome();
 }
 // Bind both persistent audio toolbars once. Resuming does not restart the sentence.
 function bindAudio() {
@@ -308,22 +318,30 @@ function dispatch(action, { focusTarget = '[data-focus]', speak = true } = {}) {
     const joy = celebrationCopy({ kind, missionId: next.activeMission?.id, conceptId: kind === 'sorting' ? card?.conceptId : '', points: amount, levelUp, replay: amount === 0, seed: card?.id || action.type });
     rewardFx.play({ points: amount, origin: rewardOrigin, target: hud.querySelector('[data-spark-target]'), levelUp,
       label: joy.headline,
-      onArrive: () => { collectSparks(previousProgress, nextProgress); if (!audioRequested) sounds.play(levelUp ? 'level' : 'tap'); } });
+      onArrive: () => { collectSparks(previousProgress, nextProgress); if (!audioRequested) sounds.play(levelUp ? 'level' : 'spark'); } });
     sounds.play('win');
+    haptics.play('correct', { pointerType: lastPointerType });
     announce(`${joy.headline} ${joy.pointsLine} ${nextProgress.points} Sparks in your score bar.`);
   } else if (action.type === 'CHECK_PLAN' || action.type === 'ANSWER_SORT') {
     const correct = action.type === 'CHECK_PLAN' ? next.activeMission?.feedback?.correct : next.sorting?.feedback?.correct;
     showGameFeedback(Boolean(correct), correct ? 'Your plan works!' : 'Not yet. Try again!');
     winFeedback = Boolean(correct);
-    if (correct || !state.settings.narration) sounds.play(correct ? 'win' : 'retry');
+    sounds.play(correct ? 'win' : 'retry');
+    haptics.play(correct ? 'correct' : 'retry', { pointerType: lastPointerType });
   }
-  if (speak && state.settings.narration && !winFeedback) readScene();
+  // Physical interaction cues confirm an action before the story explains it.
+  // They may share a moment with narration, but never replace a winning melody.
+  if (!winFeedback && action.type !== 'CHECK_PLAN' && action.type !== 'ANSWER_SORT') {
+    if (action.type === 'SET_PLAN') sounds.play('choose');
+    else if (newScene && action.type !== 'SET_SETTING') sounds.play('page');
+  }
+  if (speak && state.settings.narration && !winFeedback) readScene({ keepSounds: true });
   return true;
 }
 // Change the persistent top-level view and clear temporary panels/selections.
 // Finishing a dialog or switching screens must not leave speech, drag or download resources behind.
 function navigate(view) {
-  sounds.stop();
+  sounds.stop(); haptics.stop();
   picker = null; postcardId = null; selectedAction = null; selectedDecoration = null; openClueList = false; lastReward = null; reflectionHint = null;
   cleanDownload();
   closeDialog();
@@ -356,8 +374,8 @@ function closeDialog() {
 // Play a packaged recording when its transcript matches these exact words;
 // otherwise narration.js selects an available device voice for the current text.
 // A browser may use an online voice; unavailable speech leaves the visible words usable.
-function speakText(text) {
-  sounds.stop();
+function speakText(text, { keepSounds = false } = {}) {
+  if (!keepSounds) sounds.stop();
   audioRequested = true;
   spokenWords = text || 'Look at the pictures. What do you notice?';
   narration.speak(spokenWords);
@@ -365,22 +383,23 @@ function speakText(text) {
 // Hear the authored story, not a scrape of button labels and score numbers.
 // Exact transcripts select packaged neural clips; edited/dynamic words use the
 // device voice. The audio dock always lets the child see the words being spoken.
-function readScene() {
+function readScene({ keepSounds = false } = {}) {
+  const read = text => speakText(text, { keepSounds });
   const item = mission();
   const active = state.activeMission;
   const card = SORT_ITEMS.find(entry => entry.id === state.sorting?.itemIds[state.sorting.index]);
   if (!dialog.open) {
     const fact = app.querySelector('[data-picture-help-text]');
-    if (fact) { speakText(fact.textContent); return; }
-    if (state.view === 'sorting' && card) { speakText(state.sorting.feedback ? state.sorting.feedback.correct ? card.explanation : card.clue : card.condition); return; }
+    if (fact) { read(fact.textContent); return; }
+    if (state.view === 'sorting' && card) { read(state.sorting.feedback ? state.sorting.feedback.correct ? card.explanation : card.clue : card.condition); return; }
     if (state.view === 'mission' && item && !picker && !postcardId) {
-      speakText(active.step === 'intro' ? `${item.fictionalContext} ${item.guideLines.intro}` : active.step === 'outcome' ? item.outcome.text : active.step === 'feedback' && !active.feedback?.correct ? feedbackText(item, active) : guideLine(item, active)); return;
+      read(active.step === 'intro' ? `${item.fictionalContext} ${item.guideLines.intro}` : active.step === 'outcome' ? item.outcome.text : active.step === 'feedback' && !active.feedback?.correct ? feedbackText(item, active) : guideLine(item, active)); return;
     }
-    if (state.view === 'home' && !picker) { speakText(STORY_LINES.home); return; }
+    if (state.view === 'home' && !picker) { read(STORY_LINES.home); return; }
   }
   const reading = app.querySelector('.q-feedback') || app.querySelector('.q-reflection') || app.querySelector('.q-plan-instruction') || app.querySelector('.q-sort-object') || app.querySelector('[data-read]');
   const text = dialog.open ? dialogBody.innerText : reading?.innerText || app.querySelector('h1')?.textContent;
-  speakText(text);
+  read(text);
 }
 // Return shared button markup; bind() attaches the context-specific speech action.
 function listenButton(text = 'Hear it', extra = '') {
@@ -388,7 +407,7 @@ function listenButton(text = 'Hear it', extra = '') {
 }
 // Build the level badge and progress meter from derived rewards, not a stored score.
 function renderHud(progress = progression(state)) {
-  return `<div class="q-player-strip" aria-label="Your Quest progress"><button class="q-level-chip" data-level-info aria-label="Level ${progress.level}: ${escape(progress.title)}. ${progress.points} Sparks. See rewards."><span>${levelBadge(progress.level)}</span><span><small>LEVEL ${progress.level}</small><strong>${escape(progress.title)}</strong></span></button><div class="q-spark-meter"><div><b data-spark-target><span aria-hidden="true">✦</span> <span data-spark-value>${progress.points}</span> <span>Sparks</span></b><small>${progress.nextThreshold ? `${progress.pointsRemaining} to Level ${progress.level+1}` : 'All four level badges earned'}</small></div><div class="q-spark-track" role="progressbar" aria-label="Progress to your next level" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(progress.percent)}"><span data-spark-bar style="width:${progress.percent}%"></span></div></div><div class="q-hud-tools"><button class="q-game-sound" data-game-sound aria-pressed="${state.settings.sound}"><span aria-hidden="true">♫</span><span data-sound-label>${state.settings.sound ? 'Sound on' : 'Sound off'}</span></button><button class="q-hud-listen" data-hear aria-label="Read this screen aloud"><span aria-hidden="true">${soundIcon}</span><span>Hear it</span></button><button class="q-game-settings" data-game-settings aria-label="Game settings" title="Game settings"><span aria-hidden="true">⚙</span></button></div></div>${renderActivityProgress()}`;
+  return `<div class="q-player-strip" aria-label="Your Quest progress"><button class="q-level-chip" data-level-info aria-label="Level ${progress.level}: ${escape(progress.title)}. ${progress.points} Sparks. See rewards."><span>${levelBadge(progress.level)}</span><span><small>LEVEL ${progress.level}</small><strong>${escape(progress.title)}</strong></span></button><div class="q-spark-meter"><div><b data-spark-target><span aria-hidden="true">✦</span> <span data-spark-value>${progress.points}</span> <span>Sparks</span></b><small>${progress.nextThreshold ? `${progress.pointsRemaining} to Level ${progress.level+1}` : 'All four level badges earned'}</small></div><div class="q-spark-track" role="progressbar" aria-label="Progress to your next level" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(progress.percent)}"><span data-spark-bar style="width:${progress.percent}%"></span></div></div><div class="q-hud-tools"><button class="q-game-sound" data-game-sound aria-pressed="${state.settings.sound}"><span aria-hidden="true">♫</span><span data-sound-label>${state.settings.sound ? 'Sound on' : 'Sound off'}</span></button><button class="q-hud-listen" data-hear aria-label="Read this screen aloud"><span aria-hidden="true">${soundIcon}</span><span>Read to me</span></button><button class="q-game-settings" data-game-settings aria-label="Game settings" title="Game settings"><span aria-hidden="true">⚙</span></button></div></div>${renderActivityProgress()}`;
 }
 // Keep the current goal next to the score, even when a child scrolls to a picture.
 // Replaying always advances this round, while each different picture earns Sparks once.
@@ -441,7 +460,7 @@ function renderHome() {
   return `<section class="q-home q-adventure-cover">
     <div class="q-home-intro" data-read><p class="q-eyebrow"><span aria-hidden="true">✦</span> Small choices. Big adventures.</p><h1 tabindex="-1" data-focus>You choose <em>what happens next.</em></h1><p class="q-hero-invitation">Meet Pip the toaster and Flo the fan.</p>${playTrail({step:'look'})}
       <div class="q-start-actions">${state.activeMission && state.activeMission.step !== 'outcome' ? button('Continue your adventure <span aria-hidden="true">→</span>', 'data-continue') : button(`${done ? 'Continue your adventure' : 'Start a mission'} <span aria-hidden="true">→</span>`, 'data-picker')}${state.activeMission ? button('Choose a different mission', 'data-picker', 'quiet') : ''}${state.sorting && state.sorting.status !== 'complete' ? button('Continue sorting', 'data-nav="sorting"', 'secondary') : ''}</div>
-      ${!state.settings.sound ? '<button class="q-sound-invite" data-enable-game-sound><span aria-hidden="true">♫</span> Turn on game sounds <small>Little chimes as you play</small></button>' : ''}<p class="q-boundary">Your adventure stays on screen. Real appliances need adult help.</p>
+      <p class="q-boundary">Your adventure stays on screen. Real appliances need adult help.</p>
     </div>
     <div class="q-play-doors" aria-label="Choose a game"><button data-picker><span>${artwork('flo')}</span><div><small>LOOK · CHOOSE · DISCOVER</small><strong>Story quests</strong><p>Help a friend. Earn a stamp.</p></div><b aria-hidden="true">→</b></button><button data-sort-start><span>${artwork('cardboard')}</span><div><small>TAP · MOVE · MATCH</small><strong>Sorting game</strong><p>Find a home for each picture.</p></div><b aria-hidden="true">→</b></button><button data-nav="creations"><span>${artwork('flowers')}</span><div><small>COLLECT · MAKE · KEEP</small><strong>My creations</strong><p>Make your world look like you.</p></div><b aria-hidden="true">→</b></button></div>
     <div class="q-world-wrap"><div class="q-world" aria-label="Three places on the adventure map">${neighborhood({ unlocked: state.discoveries, decorations: state.decorations })}${placeButtons()}<span class="q-world-caption">Pick a place. Find its story.</span></div><div class="q-world-greetings"><div class="q-greeting-friends">${['pip','flo'].map(id => `<button data-greet="${id}" aria-label="Say hello to ${id === 'pip' ? 'Pip' : 'Flo'}">${artwork(id)}<span>${id === 'pip' ? 'Pip' : 'Flo'}</span></button>`).join('')}</div><p class="q-world-dialogue" role="status">Pip the toaster. Flo the fan.<br>Tap a friend to say hello!</p></div></div>
@@ -502,16 +521,46 @@ function showFacts() {
   pictureView = { missionId: item.id, clueId: item.clues[0]?.id, returnSelector: '[data-show-facts]' };
   stopReading(); render(); focus('[data-picture-help-focus]');
 }
-// Mark only facts that were actually shown on the Guided explore screen, then
-// request the same engine plan transition used by Challenge mode's found clues.
+// Guided play shows one fact at a time. The main button takes the child to the
+// next picture clue before planning; Challenge asks them to find each numbered clue.
+// Both routes earn the facts tick only after every authored clue has been seen.
 function openPlan() {
-  if (state.settings.mode === 'guided' && state.activeMission?.step === 'explore') {
-    const item = mission();
+  const item = mission();
+  if (!item || state.activeMission?.step !== 'explore') return;
+  if (state.settings.mode === 'guided') {
     const shown = pictureView?.missionId === item.id ? pictureView.clueId : item.clues[0]?.id;
     state = transition(state, { type: 'COLLECT_CLUE', id: shown });
-    rememberRoute(true);
+    persist(); rememberRoute(true);
+  }
+  if (!canOpenPlan(state)) {
+    const missing = item.clues.find(entry => !state.activeMission.clueIds.includes(entry.id));
+    if (state.settings.mode === 'guided') { clue(missing.id); return; }
+    const message = `Find clue ${item.clues.indexOf(missing) + 1} in the picture first. It can help your plan.`;
+    showGameFeedback(false, message); announce(message);
+    const pin = app.querySelector(`[data-clue="${missing.id}"]`);
+    pin?.focus({ preventScroll: true });
+    if (state.settings.narration) speakText(message);
+    return;
   }
   dispatch({ type: 'OPEN_PLAN' }, { focusTarget: '[data-plan-focus]' });
+}
+// A button with an incomplete plan responds with a useful next step. The engine
+// still refuses an empty submission; no attempt, penalty or reward is recorded.
+function checkPlan() {
+  const item = mission();
+  const empty = item?.slots.find(slot => !state.activeMission.plan[slot.id]);
+  if (empty) {
+    const message = item.slots.length === 1 ? 'Choose a picture first. Then see what happens!' : `Choose a picture for ${empty.label.toLowerCase()} first.`;
+    const help = app.querySelector('[data-plan-help]');
+    if (help) help.textContent = message;
+    showGameFeedback(false, message); announce(message);
+    sounds.play('retry');
+    app.querySelector('[data-action-select]')?.focus({ preventScroll: true });
+    if (state.settings.narration) speakText(message, { keepSounds: true });
+    return;
+  }
+  selectedAction = null;
+  dispatch({ type: 'CHECK_PLAN' }, { focusTarget: '[data-feedback-focus]' });
 }
 // Select the introduction, exploration, plan, feedback or outcome markup from activeMission.step.
 // The engine decides whether a step is allowed; this function shows that decision.
@@ -532,10 +581,10 @@ function renderMission() {
     ${final ? `<div class="q-projector-controls"><span><b aria-hidden="true">▶</b> Your story projector</span><div role="group" aria-label="Compare your story before and after"><button data-story-view="before" aria-pressed="${storyBefore}">Before your choice</button><button data-story-view="after" aria-pressed="${!storyBefore}">The next chapter</button><button data-play-ending aria-label="Play the story ending again">▶ Play ending</button></div></div>` : ''}
     <div class="q-mission-scene ${stage === 'plan' || feedback ? 'q-scene-small' : ''}" data-story-scene>${scene(item.locationId, item.artworkId, final && !storyBefore ? item.outcome.scene : null)}${stage === 'explore' && state.settings.mode === 'challenge' ? clueButtons(item, active, true) : stage === 'explore' || pictureOpen ? sceneClues(item, clueId) : ''}<span class="q-scene-tag">${final ? (storyBefore ? 'Where our story started' : 'What your choice changed') : stage === 'intro' ? 'Meet the friend in our picture story' : 'Our picture story · Look for a numbered clue'}</span></div>
     ${stage === 'intro' ? `<div class="q-mission-intro">${playTrail({step:'look'})}<p class="q-first-clue">Tap a number in the picture to find a clue.</p><div class="q-points-preview"><b>✦ ${escape(preview.label)}</b><small>${preview.reflectionPoints ? `Then +${preview.reflectionPoints} for the picture question. ` : ''}Hints and retries are free.</small></div>${button('Find the clues →', 'data-start-mission')}${item.cooperative ? button('Open the secret envelope', 'data-evidence', 'secondary') : ''}</div>` : ''}
-    ${stage === 'explore' ? `<div class="q-explore-controls">${state.settings.mode === 'guided' || pictureOpen ? renderPictureHelp(item, clueId, { close: pictureView?.returnSelector === '[data-hint]', closeLabel: 'Back to clues' }) : ''}${state.settings.mode === 'challenge' ? `${cluePocket(item, active)}<div>${button(openClueList ? 'Hide fact list' : 'Show fact list', 'data-clue-list', 'quiet')}<div class="q-clue-list" ${!openClueList ? 'hidden' : ''}>${clueButtons(item, active)}</div></div>` : ''}<div class="q-step-actions">${button('Help me choose', 'data-hint', 'quiet')}${button('Make a plan →', 'data-open-plan' + (state.settings.mode === 'guided' || active.clueIds.length ? '' : ' disabled'))}</div></div>` : ''}
+    ${stage === 'explore' ? `<div class="q-explore-controls">${state.settings.mode === 'guided' || pictureOpen ? renderPictureHelp(item, clueId, { close: pictureView?.returnSelector === '[data-hint]', closeLabel: 'Back to clues' }) : ''}${state.settings.mode === 'challenge' ? `${cluePocket(item, active)}<div>${button(openClueList ? 'Hide fact list' : 'Show fact list', 'data-clue-list', 'quiet')}<div class="q-clue-list" ${!openClueList ? 'hidden' : ''}>${clueButtons(item, active)}</div></div>` : ''}<div class="q-step-actions">${button('Help me choose', 'data-hint', 'quiet')}${button(state.settings.mode === 'guided' && item.clues.some(entry => entry.id !== clueId && !active.clueIds.includes(entry.id)) ? 'Next clue →' : 'Make a plan →', 'data-open-plan')}</div></div>` : ''}
     ${stage === 'plan' ? `<div class="q-plan-desk">${pictureOpen ? renderPictureHelp(item, clueId, { close: true }) : state.settings.mode === 'guided' ? factRecap(item) : cluePocket(item, active)}${renderPlan(item, active)}</div>` : ''}
     ${feedback ? `<section class="q-feedback q-plan-feedback ${correct ? 'correct' : 'retry'}" data-read><div class="q-feedback-mark" aria-hidden="true">${correct ? '✦' : result.mixed ? '✓' : '×'}</div><div><h2 tabindex="-1" data-feedback-focus>${escape(correct ? 'Your clues unlocked the next chapter!' : result.summary)}</h2>${renderChoiceResults(result)}<p class="q-points-preview">${correct ? escape(preview.completionPoints ? `See your ending to collect ${preview.completionPoints} Sparks.` : 'Enjoy your ending again. You keep your Sparks.') : 'Trying again is free. Your Sparks stay with you.'}</p>${button(correct ? 'See the next chapter →' : 'Try again', correct ? 'data-complete' : 'data-retry')}${!correct ? button('Revisit the clues', 'data-revisit-clues', 'quiet') : ''}</div></section>` : ''}
-    ${final ? `<div class="q-outcome">${renderCelebration()}${renderReward()}<div class="q-unlocked"><div class="q-earned-story-stamp q-stamp-earned">${passportStamp(item.id)}</div><div><p class="q-eyebrow">One story. Your stamp.</p><h2>${escape(item.conceptIds.map(id => concept(id)?.title).filter(Boolean).join(' + '))}</h2><p>${escape(item.postcardLine || 'A next chapter worth keeping.')}</p></div></div>${renderReflection(item)}<div class="q-creative-invite"><div><h2>Make a postcard of your story.</h2><p>Pick its colours. Add your mark. Keep your creation.</p></div>${button('Create my story postcard ✦', `data-postcard="${attr(item.id)}"`)}</div><div class="q-step-actions">${button('Choose another mission →', 'data-picker')}${button('Open my Discovery Book', 'data-nav="book"', 'secondary')}${button('Finish for now', 'data-nav="home"', 'quiet')}</div><p class="q-small-note">${active.assisted ? 'You followed a clue and found your way. That’s exploring.' : 'You connected the clues yourself.'} ${button('Play this story again', 'data-replay', 'text')}</p></div>` : ''}
+    ${final ? `<div class="q-outcome">${renderCelebration()}${renderReward()}<div class="q-unlocked"><div class="q-earned-story-stamp q-stamp-earned">${passportStamp(item.id)}</div><div><p class="q-eyebrow">One story. Your stamp.</p><h2>${escape(item.conceptIds.map(id => concept(id)?.title).filter(Boolean).join(' + '))}</h2><p>${escape(item.postcardLine || 'A next chapter worth keeping.')}</p></div></div>${renderReflection(item)}<div class="q-step-actions">${button('Choose another mission →', 'data-picker')}</div><details class="q-outcome-more"><summary>Make, replay or finish</summary><div class="q-creative-invite"><div><h2>Make a postcard of your story.</h2><p>Pick its colours. Add your mark. Keep your creation.</p></div>${button('Create my story postcard ✦', `data-postcard="${attr(item.id)}"`)}</div><div class="q-step-actions">${button('Open my Discovery Book', 'data-nav="book"', 'secondary')}${button('Finish for now', 'data-nav="home"', 'quiet')}${button('Play this story again', 'data-replay', 'quiet')}</div></details><p class="q-small-note">${active.assisted ? 'You followed a clue and found your way. That’s exploring.' : 'You connected the clues yourself.'}</p></div>` : ''}
   </section>`;
 }
 
@@ -557,10 +606,10 @@ function renderChoiceResults(result) {
 // Drag handles are an optional second way to fill those same spaces.
 function renderPlan(item, active) {
   const single = item.slots.length === 1;
-  return `<section class="q-plan-section ${single ? 'q-single-plan' : ''}"><div class="q-plan-instruction" data-read><h2 tabindex="-1" data-plan-focus>What should happen next?</h2><p>${single ? 'Tap a picture to choose your plan.' : 'Tap a picture. Then tap where it belongs.'}</p><p class="q-selection" role="status">${selectedAction ? `Your choice: ${escape(item.allowedActions.find(action => action.id === selectedAction)?.label)}${single ? '' : '. Tap a space below.'}` : 'Use the clues to help you choose.'}</p></div>
+  return `<section class="q-plan-section ${single ? 'q-single-plan' : ''}"><div class="q-plan-instruction" data-read><h2 tabindex="-1" data-plan-focus>What should happen next?</h2><p>${single ? 'Tap a picture to choose. Or drag it to your plan.' : 'Drag a picture to a space. Or tap the picture, then the space.'}</p><p class="q-selection" role="status">${selectedAction ? `Your choice: ${escape(item.allowedActions.find(action => action.id === selectedAction)?.label)}${single ? '' : '. Tap a space below.'}` : 'Use the clues to help you choose.'}</p></div>
     <div class="q-plan-layout"><div class="q-action-bank" aria-label="Actions to choose">${item.allowedActions.map(action => `<div class="q-action-tile ${selectedAction === action.id || Object.values(active.plan).includes(action.id) ? 'selected' : ''}"><button data-action-select="${attr(action.id)}" aria-pressed="${selectedAction === action.id || Object.values(active.plan).includes(action.id)}"><span class="q-action-art">${artwork(action.artworkId || item.artworkId)}</span><strong>${escape(action.label)}</strong>${Object.values(active.plan).includes(action.id) ? '<span class="q-choice-tick">Chosen</span>' : ''}</button><button class="q-drag-handle" data-action-drag="${attr(action.id)}" aria-label="Drag action: ${attr(action.label)}"><span aria-hidden="true">⠿</span><small>Move</small></button></div>`).join('')}</div>
     <div class="q-plan-slots">${item.slots.map((slot, index) => { const action = item.allowedActions.find(action => action.id === active.plan[slot.id]); const prior = checkedPlan?.slots.find(row => row.slotId === slot.id && row.chosenActionId === action?.id); return `<div class="q-slot-wrap ${prior?.chosenCorrect ? 'q-kept-choice' : ''}">${prior ? `<small class="q-slot-review">${prior.chosenCorrect ? '✓ Keep this choice' : 'Try another picture for this item'}</small>` : ''}<span>${index + 1}. ${escape(slot.label)}</span><button class="q-plan-slot ${action ? 'filled' : ''}" data-plan-slot="${attr(slot.id)}" aria-label="${attr(slot.label)}: ${attr(action?.label || 'empty, choose an action first')}"><span aria-hidden="true">${prior?.chosenCorrect ? '✓' : action ? '●' : '+'}</span>${escape(action?.label || 'Your plan goes here')}</button>${action ? `<button class="q-back" data-remove-slot="${attr(slot.id)}">Change my choice</button>` : ''}</div>`; }).join('')}</div></div>
-    <div class="q-step-actions">${button('Help me choose', 'data-hint', 'quiet')}${button('See what happens →', 'data-check-plan' + (item.slots.every(slot => active.plan[slot.id]) ? '' : ' disabled'))}</div></section>`;
+    <div class="q-step-actions">${button('Help me choose', 'data-hint', 'quiet')}${button('See what happens →', `data-check-plan aria-describedby="q-plan-help" aria-disabled="${!item.slots.every(slot => active.plan[slot.id])}"`)}</div><p id="q-plan-help" data-plan-help class="q-small-note" role="status">${item.slots.every(slot => active.plan[slot.id]) ? 'Your plan is ready to try.' : 'Choose a picture for each empty space first.'}</p></section>`;
 }
 
 const destinations = [
@@ -589,9 +638,9 @@ function renderSorting() {
   const joy = celebrationCopy({ kind: 'sorting', conceptId: item.conceptId, points: lastReward?.amount || 0, seed: item.id });
   // Restoring an already solved card is not another attempt or a new reward.
   if (correct && !celebration) joy.pointsLine = 'Picture solved. Your Sparks are saved in the top bar.';
-  return `<section class="q-page q-sort"><div class="q-mission-top"><button class="q-back" data-nav="home">← Adventure map</button><span>Picture ${run.index + 1} of 5</span><span class="q-sort-ticket" aria-label="Untimed picture challenge">Think it through ✦</span></div><div class="q-sort-heading"><p class="q-eyebrow">Sorting Station</p><h1 data-focus tabindex="-1">Where does this picture go?</h1><p class="q-sort-rule">Choose a next step for each picture. <strong>A warning or a missing clue? Pause and ask.</strong></p></div>
-    <div class="q-sort-board"><div class="q-sort-round-track" aria-label="Picture ${run.index + 1} of 5">${Array.from({length:5}, (_,i) => `<span class="${i < run.index || (i === run.index && correct) ? 'done' : i === run.index ? 'current' : ''}">${i < run.index || (i === run.index && correct) ? '✓' : i+1}</span>`).join('')}</div><article class="q-sort-object ${correct ? 'placed' : ''} ${sortPicked ? 'q-picked-object' : ''}" data-read><button class="q-sort-art q-sort-picture" data-sort-picture aria-label="Move ${attr(item.title)} picture" aria-pressed="${sortPicked}" ${feedback ? 'disabled' : ''}>${artwork(item.artworkId)}<span class="q-card-number">${run.index + 1}/5</span></button><div class="q-sort-object-copy"><h2>${escape(item.title)}</h2>${visualClues}<details class="q-full-clue" ${visualClues ? '' : 'open'}><summary>Read the full clue</summary><p>${escape(item.condition)}</p></details>${!feedback ? `<p class="q-sort-point-note">✦ ${escape(preview.label)}</p>` : ''}${!feedback ? `<button class="q-drag-handle q-lift" data-sort-drag aria-label="Pick up ${attr(item.title)}"><span aria-hidden="true">⠿</span> Move</button>` : ''}</div></article>
-    <p class="q-sort-instruction">${feedback ? (correct ? 'You found a place that fits.' : 'Read the help, then press Try again.') : 'Drag the picture to a place. Or tap the picture, then a place.'}</p>
+  return `<section class="q-page q-sort"><div class="q-mission-top"><button class="q-back" data-nav="home">← Adventure map</button><span>Picture ${run.index + 1} of 5</span><span class="q-sort-ticket" aria-label="Untimed picture challenge">Think it through ✦</span></div><div class="q-sort-heading"><p class="q-eyebrow">Sorting Station</p><h1 data-focus tabindex="-1">Where does this picture go?</h1><p class="q-sort-rule"><strong>A warning or a missing clue? Pause and ask.</strong></p></div>
+    <div class="q-sort-board"><div class="q-sort-round-track" aria-label="Picture ${run.index + 1} of 5">${Array.from({length:5}, (_,i) => `<span class="${i < run.index || (i === run.index && correct) ? 'done' : i === run.index ? 'current' : ''}">${i < run.index || (i === run.index && correct) ? '✓' : i+1}</span>`).join('')}</div><article class="q-sort-object ${correct ? 'placed' : ''} ${sortPicked ? 'q-picked-object' : ''}" data-read tabindex="0" aria-label="Picture and clues"><button class="q-sort-art q-sort-picture" data-sort-picture aria-label="Move ${attr(item.title)} picture" aria-pressed="${sortPicked}" ${feedback ? 'disabled' : ''}>${artwork(item.artworkId)}<span class="q-card-number">${run.index + 1}/5</span></button><div class="q-sort-object-copy"><h2>${escape(item.title)}</h2>${visualClues}<details class="q-full-clue" ${visualClues ? '' : 'open'}><summary>Read the full clue</summary><p>${escape(item.condition)}</p></details>${!feedback ? `<p class="q-sort-point-note">✦ ${escape(preview.label)}</p>` : ''}${!feedback ? `<button class="q-drag-handle q-lift" data-sort-drag aria-label="Pick up ${attr(item.title)}"><span aria-hidden="true">⠿</span> Move</button>` : ''}</div></article>
+    <p class="q-sort-instruction">${feedback ? (correct ? 'You found a place that fits.' : 'Read the help, then press Try again.') : 'Drag the picture, or tap a place.'}</p>
     <div class="q-destinations" aria-label="Choose a place">${destinations.map(destination => `<button class="q-destination dest-${destination.id} ${feedback && run.feedback.destinationId === destination.id ? (correct ? 'q-accepted' : 'q-sort-retry') : ''}" data-destination="${destination.id}" ${feedback ? 'disabled' : ''}><span class="q-destination-drawing" aria-hidden="true">${destination.id === 'ewaste' ? '<svg viewBox="0 0 90 65"><path d="M10 55V26L45 8l35 18v29H10Z" fill="#d7e9dd"/><path d="M20 55V30h50v25M36 55V37h18v18"/><path d="M8 26 45 7l37 19"/><path d="m38 20 5-6 5 6m0-6h-5v9"/></svg>' : destination.id === 'paper' ? artwork('cardboard') : '<svg viewBox="0 0 90 65"><path d="M12 7h66v43H43L29 60V50H12Z" fill="#f8d39c"/><path d="M36 23q1-12 14-9t3 16l-8 5v5M45 44v2"/></svg>'}</span>${feedback && !correct && run.feedback.destinationId === destination.id ? '<span class="q-destination-cross" aria-label="Try again">×</span>' : ''}<strong>${escape(destination.title)}</strong><small>${escape(destination.short)}</small>${correct && run.feedback.destinationId === destination.id ? `<span class="q-placed-picture" aria-hidden="true">${artwork(item.artworkId)}</span>` : ''}${correct && run.feedback.destinationId === destination.id ? '<b class="q-destination-tick">✓ Placed</b>' : ''}</button>`).join('')}</div></div>
     ${feedback ? `${renderReward()}<section class="q-feedback ${correct ? 'correct' : 'retry'}" data-read>${correct ? `${renderCelebration()}<div class="q-sort-reaction q-play-enter" aria-hidden="true">${artwork(item.explanation.startsWith('Flo:') ? 'flo' : 'pip', {expression:'success'})}<span class="q-reaction-star">✦</span><span class="q-reaction-star">✦</span></div>` : ''}<span class="q-feedback-mark" aria-hidden="true">${correct ? '✓' : '×'}</span><div><h2 data-feedback-focus tabindex="-1">${correct ? escape(joy.headline) : 'Not this place. Try again.'}</h2><p>${escape(correct ? item.explanation : item.clue)}</p>${correct ? `<p class="q-earned-note">${escape(joy.pointsLine)}</p>` : ''}${button(correct ? (run.index === 4 ? 'Finish this round →' : 'Next picture →') : 'Try again', correct ? 'data-sort-next' : 'data-sort-retry')}</div></section>` : `${pictureView?.sortId === item.id ? sortingPictureHelp(item) : ''}<div class="q-sort-help">${button('Help me choose', 'data-hint', 'quiet')}<p id="q-drag-message" role="status"></p></div>`}
   </section>`;
@@ -645,6 +694,7 @@ function render(effect = '', { fromProgress = null } = {}) {
   app.innerHTML = (postcardId ? renderPostcard() : picker ? renderPicker() : ({ home: renderHome, mission: renderMission, sorting: renderSorting, book: renderBook, creations: renderCreations, grownups: renderGrownups }[state.view] || renderHome)());
   document.querySelector('#book-count').textContent = String(state.discoveries.length);
   document.title = `${postcardId ? 'My story postcard' : picker ? 'Choose a mission' : state.view === 'mission' ? mission()?.title || 'Adventure' : state.view === 'book' ? 'Discovery Book' : state.view === 'creations' ? 'My creations' : state.view === 'sorting' ? 'Sorting Station' : state.view === 'grownups' ? 'About this adventure' : 'Help Pip and Flo'} | FixForward Quest`;
+  addWordHelp(app, { read: speakText });
   bind();
   updateAudio();
 }
@@ -683,7 +733,7 @@ function greet(id) {
 }
 
 // Open a temporary mission chooser, optionally limited to a neighbourhood place.
-function openPicker(place = null) { stopReading(); cleanDownload(); postcardId = null; picker = { place, character: null }; render('q-play-enter'); rememberRoute(); focus(); window.scrollTo({ top: 0, behavior: 'auto' }); }
+function openPicker(place = null) { stopReading(); cleanDownload(); postcardId = null; picker = { place, character: null }; render('q-play-enter'); sounds.play('page'); rememberRoute(); focus(); window.scrollTo({ top: 0, behavior: 'auto' }); }
 // Record a valid clue, then highlight it in the same story scene. The larger
 // picture and exact words explain the evidence; a clue alone does not add Sparks.
 function clue(id) {
@@ -693,7 +743,8 @@ function clue(id) {
   const found = dispatch({ type: 'COLLECT_CLUE', id }, { focusTarget: null, speak: false });
   if (!found) { stopReading(); render(); }
   focus('[data-picture-help-focus]');
-  if (state.settings.narration) speakText(entry.text);
+  sounds.play('choose');
+  if (state.settings.narration) speakText(entry.text, { keepSounds: true });
   if (found) showGameFeedback(true, 'Aha! You found the clue!');
 }
 
@@ -715,6 +766,8 @@ function closePictureHelp() {
 // Touching the actual picture offers the same tap-to-place alternative as Move.
 // This is only a visual selection: the rule engine waits for a destination/drop.
 function pickSortPicture() {
+  sounds.play('pickup');
+  haptics.play('lift', { pointerType: lastPointerType });
   sortPicked = true;
   app.querySelector('.q-sort-object')?.classList.add('q-picked-object');
   app.querySelector('[data-sort-picture]')?.setAttribute('aria-pressed', 'true');
@@ -735,24 +788,33 @@ function companion() {
 // Wire the saved play and reading preferences, plus an explicit reset confirmation.
 // Reset clears only Quest progress and temporary UI state, not the adult journey.
 function settings() {
-  modal('Your adventure, your way', `<div class="q-settings"><label>Play style<select id="q-mode"><option value="guided" ${state.settings.mode === 'guided' ? 'selected' : ''}>Guided — picture facts stay visible</option><option value="challenge" ${state.settings.mode === 'challenge' ? 'selected' : ''}>Challenge — discover the clues</option></select></label><label class="q-check"><input id="q-narration" type="checkbox" ${state.settings.narration ? 'checked' : ''}> Read story steps aloud</label><p>Our story voice is made with AI. Other words may use your device voice, which can need an online service. Story words, Pause, Resume and Stop stay available while listening.</p><p>${storageAvailable ? 'Your discoveries are saved in this browser.' : 'Saving is blocked here. You can still play during this visit.'}</p><button class="q-button secondary" id="q-reset">Reset my adventure</button><p class="q-small-note">Reset clears your stories, Sparks, postcards and decorations.</p></div>`);
-  for (const [id, key] of [['q-mode', 'mode'], ['q-narration', 'narration']]) dialogBody.querySelector(`#${id}`).onchange = event => {
-    dispatch({ type: 'SET_SETTING', key, value: key === 'narration' ? event.target.checked : event.target.value }, { focusTarget: null, speak: false });
+  modal('Your adventure, your way', `<div class="q-settings"><label>Play style<select id="q-mode"><option value="guided" ${state.settings.mode === 'guided' ? 'selected' : ''}>Guided — picture facts stay visible</option><option value="challenge" ${state.settings.mode === 'challenge' ? 'selected' : ''}>Challenge — discover the clues</option></select></label><label class="q-check"><input id="q-sound" type="checkbox" ${state.settings.sound ? 'checked' : ''}> Game sounds</label><label class="q-check"><input id="q-haptics" type="checkbox" ${state.settings.haptics ? 'checked' : ''}> Touch feedback (supported devices)</label><label class="q-check"><input id="q-narration" type="checkbox" ${state.settings.narration ? 'checked' : ''}> Read story steps aloud</label><p>Our story voice is made with AI. Other words may use your device voice, which can need an online service. Story words, Pause, Resume and Stop stay available while listening.</p><p>${storageAvailable ? 'Your discoveries are saved in this browser.' : 'Saving is blocked here. You can still play during this visit.'}</p><button class="q-button secondary" id="q-reset">Reset my adventure</button><p class="q-small-note">Reset clears your stories, Sparks, postcards and decorations.</p></div>`);
+  for (const [id, key] of [['q-mode', 'mode'], ['q-narration', 'narration'], ['q-sound', 'sound'], ['q-haptics', 'haptics']]) dialogBody.querySelector(`#${id}`).onchange = event => {
+    dispatch({ type: 'SET_SETTING', key, value: key === 'mode' ? event.target.value : event.target.checked }, { focusTarget: null, speak: false });
+    if (key === 'sound') void sounds.enable(state.settings.sound, { gesture: true });
+    if (key === 'haptics' && !state.settings.haptics) haptics.stop();
     if (key === 'narration' && state.settings.narration) readScene();
   };
   dialogBody.querySelector('#q-reset').onclick = () => {
     modal('Start a new adventure?', `<p>This clears your stories, Sparks, postcards and decorations in this browser. The other FixForward tab stays as it is.</p><div class="q-step-actions">${button('Keep my adventure', 'id="q-keep"', 'secondary')}${button('Yes, reset my adventure', 'id="q-confirm-reset"')}</div>`);
     dialogBody.querySelector('#q-keep').onclick = closeDialog;
-    dialogBody.querySelector('#q-confirm-reset').onclick = () => { stopReading(); if (!clearProgress()) { announce('This browser could not clear saved progress. Your adventure is still here.'); dialogBody.querySelector('#q-confirm-reset').textContent = 'Could not reset. Try again'; return; } historyEpoch += 1; state = createState(); sounds.enable(false); picker = null; selectedAction = null; selectedDecoration = null; postcardId = null; storyBefore = false; lastReward = null; reflectionHint = null; cleanDownload(); closeDialog(); render('q-play-enter'); focus(); rememberRoute(true); announce('Your new adventure is ready.'); };
+    dialogBody.querySelector('#q-confirm-reset').onclick = () => { stopReading(); if (!clearProgress()) { announce('This browser could not clear saved progress. Your adventure is still here.'); dialogBody.querySelector('#q-confirm-reset').textContent = 'Could not reset. Try again'; return; } historyEpoch += 1; state = createState(); sounds.enable(state.settings.sound, { gesture: true }); picker = null; selectedAction = null; selectedDecoration = null; postcardId = null; storyBefore = false; lastReward = null; reflectionHint = null; cleanDownload(); closeDialog(); render('q-play-enter'); focus(); rememberRoute(true); announce('Your new adventure is ready.'); };
   };
 }
 // Adapt the generic pointer helper to this screen and remember its cleanup callback.
 // Targets are read when needed so scrolling/resizing cannot reuse stale drop positions.
 function drag(handle, targets, onDrop, source) {
+  let hovered = null;
   dragCleanups.push(bindDrag(handle, {
-    targets, onDrop, ghostSource: source,
-    onHover: id => targets().forEach(target => target.element.classList.toggle('q-drag-over', target.id === id)),
-    onLift: () => announce('Picture picked up. Move to a labelled place, or cancel and use the tap buttons.'),
+    targets, ghostSource: source,
+    onDrop: id => { sounds.play('drop'); onDrop(id); },
+    onHover: id => {
+      targets().forEach(target => target.element.classList.toggle('q-drag-over', target.id === id));
+      // One soft cue per destination entry, not hundreds during finger movement.
+      if (id !== null && id !== hovered) sounds.play('target');
+      hovered = id;
+    },
+    onLift: () => { sounds.play('pickup'); haptics.play('lift', { pointerType: lastPointerType }); announce('Picture picked up. Move to a labelled place, or cancel and use the tap buttons.'); },
     onCancel: () => { const message = app.querySelector('#q-drag-message'); if (message) message.textContent = 'No answer recorded. Try again, or tap a place.'; announce('Returned to the start. No answer recorded.'); }
   }));
 }
@@ -828,11 +890,13 @@ function bind() {
   app.querySelector('[data-clue-list]')?.addEventListener('click', () => { openClueList = !openClueList; render(); focus('[data-clue-list]'); });
   app.querySelector('[data-open-plan]')?.addEventListener('click', openPlan);
 //   A single slot is filled immediately. Multiple slots ask which item receives the selected action.
-  app.querySelectorAll('[data-action-select]').forEach(el => el.onclick = () => { selectedAction = el.dataset.actionSelect; const item = mission(); if (item?.slots.length === 1) dispatch({ type:'SET_PLAN', slotId:item.slots[0].id, actionId:selectedAction }, {focusTarget:`[data-action-select="${selectedAction}"]`, speak:false}); else { render(); focus(`[data-action-select="${selectedAction}"]`); } });
+  app.querySelectorAll('[data-action-select]').forEach(el => el.onclick = () => { selectedAction = el.dataset.actionSelect; const item = mission(); if (item?.slots.length === 1) dispatch({ type:'SET_PLAN', slotId:item.slots[0].id, actionId:selectedAction }, {focusTarget:`[data-action-select="${selectedAction}"]`, speak:false}); else { stopReading(); render(); sounds.play('choose'); focus(`[data-action-select="${selectedAction}"]`); } });
   app.querySelectorAll('[data-plan-slot]').forEach(el => el.onclick = () => { if (selectedAction) { dispatch({ type: 'SET_PLAN', slotId: el.dataset.planSlot, actionId: selectedAction }, { focusTarget: `[data-plan-slot="${el.dataset.planSlot}"]`, speak: false }); announce('Action added to your plan.'); } else announce('Choose an action first, then choose this space.'); });
   app.querySelectorAll('[data-remove-slot]').forEach(el => el.onclick = () => dispatch({ type: 'REMOVE_PLAN', slotId: el.dataset.removeSlot }, { focusTarget: `[data-plan-slot="${el.dataset.removeSlot}"]`, speak: false }));
-  app.querySelectorAll('[data-action-drag]').forEach(el => drag(el, () => [...app.querySelectorAll('[data-plan-slot]')].map(slot => ({ id: slot.dataset.planSlot, element: slot })), slotId => { selectedAction = null; dispatch({ type: 'SET_PLAN', slotId, actionId: el.dataset.actionDrag }, { focusTarget: `[data-plan-slot="${slotId}"]`, speak: false }); }, el.closest('.q-action-tile').querySelector('.q-action-art')));
-  for (const [selector, type, target] of [['data-check-plan', 'CHECK_PLAN', '[data-feedback-focus]'], ['data-retry', 'RETRY_PLAN', '[data-plan-focus]'], ['data-complete', 'COMPLETE_MISSION', '[data-focus]'], ['data-replay', 'REPLAY_MISSION', '[data-focus]']]) app.querySelector(`[${selector}]`)?.addEventListener('click', () => { selectedAction = null; dispatch({ type }, { focusTarget: target }); });
+  // The whole picture button and the Move handle share one drag rule. Only art lifts.
+  app.querySelectorAll('[data-action-drag], [data-action-select]').forEach(el => drag(el, () => [...app.querySelectorAll('[data-plan-slot]')].map(slot => ({ id: slot.dataset.planSlot, element: slot })), slotId => { selectedAction = null; dispatch({ type: 'SET_PLAN', slotId, actionId: el.dataset.actionDrag || el.dataset.actionSelect }, { focusTarget: `[data-plan-slot="${slotId}"]`, speak: false }); }, el.closest('.q-action-tile').querySelector('.q-action-art')));
+  app.querySelector('[data-check-plan]')?.addEventListener('click', checkPlan);
+  for (const [selector, type, target] of [ ['data-retry', 'RETRY_PLAN', '[data-plan-focus]'], ['data-complete', 'COMPLETE_MISSION', '[data-focus]'], ['data-replay', 'REPLAY_MISSION', '[data-focus]']]) app.querySelector(`[${selector}]`)?.addEventListener('click', () => { selectedAction = null; dispatch({ type }, { focusTarget: target }); });
   app.querySelector('[data-revisit-clues]')?.addEventListener('click', () => dispatch({ type: 'EXPLORE_AGAIN' }));
   app.querySelectorAll('[data-sort-start]').forEach(el => el.onclick = () => { picker = null; if (state.sorting && state.sorting.status !== 'complete') navigate('sorting'); else if (!dispatch({ type: 'START_SORT' })) { render(); focus(); } window.scrollTo({ top: 0, behavior: 'auto' }); });
 //   Both a destination button and a successful drop use this one answer path.
@@ -868,8 +932,8 @@ function showTouch(event) {
   ring.addEventListener('animationend', () => { ring.remove(); touchRings.delete(ring); }, { once: true });
   touchRings.add(ring); document.body.append(ring);
 }
-document.addEventListener('pointerdown', event => { unlockGameAudio(event); showTouch(event); }, { passive: true });
-document.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') unlockGameAudio(event); });
+document.addEventListener('pointerdown', event => { lastPointerType = event.pointerType || 'mouse'; unlockGameAudio(event); showTouch(event); }, { passive: true });
+document.addEventListener('keydown', event => { lastPointerType = 'keyboard'; if (event.key === 'Enter' || event.key === ' ') unlockGameAudio(event); });
 // Play the press in capture phase, so a success/retry chime can replace it after
 // the game checks the answer. Narration and its controls always take priority.
 document.addEventListener('click', event => {
@@ -879,6 +943,15 @@ document.addEventListener('click', event => {
 }, true);
 const chromeObserver = typeof window.ResizeObserver === 'function' ? new window.ResizeObserver(measureChrome) : null;
 chromeObserver?.observe(document.querySelector('.q-game-chrome'));
+chromeObserver?.observe(document.querySelector('body > [data-audio-dock]'));
+// A phone's expanded transcript becomes a normal-flow reading panel. Bring that
+// deliberate reading choice into view instead of placing it over the destinations.
+const pageTranscript = document.querySelector('body > [data-audio-dock] details');
+pageTranscript?.addEventListener('toggle', () => {
+  measureChrome();
+  const dock = pageTranscript.closest('[data-audio-dock]');
+  if (pageTranscript.open && !dock.hidden && window.getComputedStyle(dock).position !== 'fixed') dock.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+});
 window.addEventListener('resize', measureChrome);
 
 // The header/footer survive render(), so attach their handlers once at startup.
@@ -888,7 +961,7 @@ dialog.addEventListener('cancel', () => { stopReading(); });
 document.querySelector('#quest-settings').onclick = settings;
 document.querySelector('#read-aloud').onclick = readScene;
 // Release temporary browser resources when leaving the page; saved progress remains.
-window.addEventListener('pagehide', event => { stopReading(); sounds.stop(); clearGameEffects(); cleanDrag(); cleanDownload(); cleanDemo(); if (!event.persisted) { navigation?.dispose(); narration.dispose(); sounds.dispose(); rewardFx.destroy(); chromeObserver?.disconnect(); } });
+window.addEventListener('pagehide', event => { stopReading(); sounds.stop(); haptics.stop(); clearGameEffects(); cleanDrag(); cleanDownload(); cleanDemo(); if (!event.persisted) { navigation?.dispose(); narration.dispose(); sounds.dispose(); haptics.dispose(); rewardFx.destroy(); chromeObserver?.disconnect(); } });
 // A browser may cache the whole page when leaving Quest. Reattach cleaned drag
 // listeners on return, without replaying a celebration or any completion action.
 window.addEventListener('pageshow', event => { if (event.persisted) { celebration = false; lastReward = null; render(); } });

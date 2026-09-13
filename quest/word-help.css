@@ -1,0 +1,12 @@
+/* A dotted underline identifies optional word help in its original sentence.
+   Generous vertical padding gives touch users a target without changing the text. */
+body.quest .q-inline-word { display:inline-block; min-height:44px; vertical-align:baseline; font:inherit; font-weight:700; color:#245f5b; background:#e4f0e4; border:0; border-bottom:2px dotted currentColor; border-radius:4px; padding:6px 3px; margin:0 1px; cursor:pointer; box-decoration-break:clone; }
+body.quest .q-inline-word:focus-visible { outline:3px solid #285e78; outline-offset:3px; }
+body.quest .q-inline-definition { margin:.65rem 0; padding:.8rem; background:#e5f1e6; border:2px solid #91b3a1; border-radius:15px; color:#244654; }
+body.quest .q-inline-definition[hidden] { display:none; }
+body.quest .q-inline-definition>p { font-size:1rem; line-height:1.5; margin:0 0 .6rem; }
+body.quest .q-inline-definition>button { min-height:44px; font:inherit; font-weight:700; margin:.2rem .45rem .2rem 0; padding:.5rem .7rem; background:#fffaf0; border:1px solid #527e71; border-radius:12px; color:#244654; }
+/* The ending keeps its learning question and one clear next mission. Extras are
+   optional, visible through a native disclosure that works with touch or keyboard. */
+.q-outcome-more { margin:1rem 0; padding:.75rem 1rem; border:2px solid #b8cdbd; border-radius:18px; background:#f8f4e8; }
+.q-outcome-more>summary { min-height:44px; padding:.6rem 0; font-size:1rem; font-weight:800; cursor:pointer; }

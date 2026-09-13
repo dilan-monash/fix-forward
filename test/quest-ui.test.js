@@ -204,7 +204,7 @@ test('rendered mission supports wrong choice, retry, tap planning, saved discove
   q.click(`[data-mission="${item.id}"]`);
   assert.equal(q.required('.q-mission-intro .q-play-trail [aria-current="step"] strong').textContent, 'Look', 'The story introduction keeps the same picture route before any clue is found');
   q.click('[data-start-mission]');
-  assert.equal(q.required('[data-open-plan]').disabled, false, 'Guided facts are visible without opening every clue');
+  assert.equal(q.required('[data-open-plan]').disabled, false, 'Guided play offers a next-clue action before planning');
   q.inspect(item);
   assert.equal(q.document.activeElement, q.required('[data-plan-focus]'));
   const wrong = item.allowedActions.find(action => !item.acceptedPlans.some(plan => plan[item.slots[0].id] === action.id));
@@ -626,6 +626,132 @@ test('postcard editor stays usable when the browser cannot create a download', a
   assert.ok(q.query('[data-postcard-preview] > svg'));
 });
 
+test('dragging an action picture fills only its actual plan slot and keeps the words on the card', async t => {
+  const q = await createQuest(t);
+  const item = MISSIONS.find(mission => mission.slots.length === 2);
+  q.selectMission(item);
+  q.inspect(item);
+  const [slotId, actionId] = Object.entries(item.acceptedPlans[0])[0];
+  const otherSlot = item.slots.find(slot => slot.id !== slotId);
+  const picture = q.required(`[data-action-select="${actionId}"]`);
+  const art = picture.querySelector('.q-action-art');
+  const label = picture.querySelector('strong');
+  const originalLabel = label.outerHTML;
+  const historyLength = q.window.history.length;
+  art.getBoundingClientRect = () => new q.window.DOMRect(30, 30, 90, 90);
+  q.required(`[data-plan-slot="${slotId}"]`).getBoundingClientRect = () => new q.window.DOMRect(200, 300, 130, 100);
+  q.required(`[data-plan-slot="${otherSlot.id}"]`).getBoundingClientRect = () => new q.window.DOMRect(360, 300, 130, 100);
+  // Exercise the actual pointer listeners on the large action button. Rectangles
+  // model layout only; the app still performs its own target lookup and save.
+  function point(target, type, x, y) {
+    const event = new q.window.PointerEvent(type, { bubbles: true, cancelable: true, pointerId: 57, pointerType: 'touch', isPrimary: true, button: type === 'pointermove' ? -1 : 0, clientX: x, clientY: y });
+    target.dispatchEvent(event);
+  }
+  point(picture, 'pointerdown', 70, 70);
+  point(q.document, 'pointermove', 250, 350);
+  const ghost = q.required('.q-drag-ghost');
+  assert.ok(ghost.querySelector('svg'));
+  assert.equal(ghost.querySelector('button, strong, h2, p, .q-drag-handle'), null, 'The lifted copy contains artwork, not the choice wording or Move control');
+  assert.equal(label.outerHTML, originalLabel);
+  assert.equal(picture.style.transform, '');
+  assert.deepEqual(q.savedState().activeMission.plan, {}, 'A lift alone is not an answer');
+  point(q.document, 'pointerup', 250, 350);
+  assert.equal(q.query('.q-drag-ghost'), null);
+  assert.deepEqual(q.savedState().activeMission.plan, { [slotId]: actionId });
+  assert.equal(q.document.activeElement, q.required(`[data-plan-slot="${slotId}"]`));
+  const dropped = q.actualStorage.getItem(STORAGE_KEY);
+  // A repeated release or the destination's follow-up pointer click must not
+  // treat the same action as another selected item for the remaining space.
+  point(q.document, 'pointerup', 250, 350);
+  q.required(`[data-plan-slot="${slotId}"]`).dispatchEvent(new q.window.MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 }));
+  assert.equal(q.actualStorage.getItem(STORAGE_KEY), dropped);
+  assert.equal(q.savedState().activeMission.plan[otherSlot.id], undefined);
+  assert.equal(q.window.history.length, historyLength);
+  assert.equal(Number(q.required('[data-spark-value]').textContent), 0);
+});
+
+test('an empty plan responds with guidance without submitting an attempt or changing points', async t => {
+  const q = await createQuest(t);
+  const item = MISSIONS.find(mission => mission.slots.length === 2);
+  q.selectMission(item);
+  q.inspect(item);
+  const saved = q.actualStorage.getItem(STORAGE_KEY);
+  assert.equal(q.required('[data-check-plan]').disabled, false);
+  assert.equal(q.required('[data-check-plan]').getAttribute('aria-disabled'), 'true');
+  q.keyboardActivate('[data-check-plan]');
+  assert.ok(q.query('.q-stage-plan'));
+  assert.match(q.required('[data-plan-help]').textContent, /Choose a picture.*first/);
+  assert.match(q.required('#q-announcement').textContent, /Choose a picture.*first/);
+  assert.equal(q.document.activeElement, q.required('[data-action-select]'));
+  assert.equal(q.actualStorage.getItem(STORAGE_KEY), saved);
+  assert.equal(q.savedState().activeMission.feedback, null);
+  assert.equal(q.savedState().activeMission.assisted, false);
+  assert.equal(Number(q.required('[data-spark-value]').textContent), 0);
+});
+
+test('Challenge planning names a missing clue and cannot skip any authored fact', async t => {
+  const q = await createQuest(t);
+  const item = MISSIONS.find(mission => mission.clues.length > 1);
+  q.click('[data-mode="challenge"]');
+  q.selectMission(item);
+  const initial = q.actualStorage.getItem(STORAGE_KEY);
+  q.keyboardActivate('[data-open-plan]');
+  assert.ok(q.query('.q-stage-explore'));
+  assert.equal(q.actualStorage.getItem(STORAGE_KEY), initial);
+  assert.match(q.required('#q-announcement').textContent, /Find clue 1/);
+  assert.equal(q.document.activeElement, q.required(`[data-clue="${item.clues[0].id}"]`));
+  for (let index = 0; index < item.clues.length; index += 1) {
+    q.click(`[data-clue="${item.clues[index].id}"]`);
+    const inspected = q.actualStorage.getItem(STORAGE_KEY);
+    q.keyboardActivate('[data-open-plan]');
+    if (index < item.clues.length - 1) {
+      assert.ok(q.query('.q-stage-explore'));
+      assert.equal(q.actualStorage.getItem(STORAGE_KEY), inspected);
+      assert.match(q.required('#q-announcement').textContent, new RegExp('Find clue ' + (index + 2)));
+    }
+  }
+  assert.ok(q.query('.q-stage-plan'));
+  assert.deepEqual(q.savedState().activeMission.clueIds, item.clues.map(clue => clue.id));
+  assert.equal(q.savedState().activeMission.assisted, false);
+  assert.equal(Number(q.required('[data-spark-value]').textContent), 0);
+});
+
+test('fresh sensory defaults wait for interaction and saved sound and reading choices remain independent', async t => {
+  let q = await createQuest(t);
+  assert.equal(q.narration.utterances.length, 0, 'No voice starts merely because the page loads');
+  assert.equal(q.required('[data-game-sound]').getAttribute('aria-pressed'), 'true');
+  assert.equal(q.actualStorage.getItem(STORAGE_KEY), null);
+  q.click('[data-picker]');
+  assert.equal(q.narration.utterances.length, 0, 'Choosing a game screen does not begin an unrelated reading');
+  q.click(`[data-mission="${MISSIONS[0].id}"]`);
+  assert.equal(q.savedState().settings.narration, true);
+  assert.equal(q.savedState().settings.sound, true);
+  assert.ok(q.narration.utterances.length > 0, 'A deliberately opened story begins its narration');
+  assert.ok(q.narration.utterances.at(-1).text.includes(MISSIONS[0].guideLines.intro));
+  q.click('[data-game-settings]');
+  assert.equal(q.required('#q-sound').checked, true);
+  q.change('#q-sound', false);
+  assert.equal(q.savedState().settings.sound, false);
+  assert.equal(q.required('[data-game-sound]').getAttribute('aria-pressed'), 'false');
+  assert.equal(q.savedState().settings.narration, true);
+  q.change('#q-narration', false);
+  q.click('#q-dialog-close');
+  const saved = q.savedState();
+  q.dispose();
+  q = await createQuest(t, { saved });
+  assert.equal(q.narration.utterances.length, 0);
+  assert.equal(q.required('[data-game-sound]').getAttribute('aria-pressed'), 'false', 'Reload keeps an existing explicit Sound off preference');
+  q.click('[data-game-settings]');
+  assert.equal(q.required('#q-sound').checked, false);
+  assert.equal(q.required('#q-narration').checked, false);
+  q.click('#q-dialog-close');
+  q.click('[data-game-sound]');
+  assert.equal(q.savedState().settings.sound, true);
+  assert.equal(q.savedState().settings.narration, false, 'Turning tones back on does not opt back into reading');
+  q.click('[data-game-settings]');
+  assert.equal(q.required('#q-sound').checked, true, 'Settings reflects the same sound choice as the HUD');
+});
+
 test('a one-slot plan takes one picture tap, lets the child change it and needs no extra placement tap', async t => {
   const q = await createQuest(t);
   const item = MISSIONS.find(mission => mission.slots.length === 1);
@@ -635,10 +761,12 @@ test('a one-slot plan takes one picture tap, lets the child change it and needs 
   const correctId = item.acceptedPlans[0][slotId];
   const otherId = item.allowedActions.find(action => action.id !== correctId).id;
   assert.ok(q.required('.q-single-plan'));
-  assert.equal(q.required('[data-check-plan]').disabled, true);
+  assert.equal(q.required('[data-check-plan]').disabled, false, 'An incomplete plan still offers helpful guidance on activation');
+  assert.equal(q.required('[data-check-plan]').getAttribute('aria-disabled'), 'true');
   q.click(`[data-action-select="${otherId}"]`);
   assert.equal(q.savedState().activeMission.plan[slotId], otherId);
   assert.equal(q.required('[data-check-plan]').disabled, false);
+  assert.equal(q.required('[data-check-plan]').getAttribute('aria-disabled'), 'false');
   q.keyboardActivate(`[data-action-select="${correctId}"]`);
   assert.equal(q.savedState().activeMission.plan[slotId], correctId);
   assert.equal(q.required(`[data-action-select="${otherId}"]`).getAttribute('aria-pressed'), 'false');
@@ -679,6 +807,11 @@ test('the level HUD explains all rewards, keeps hints free and never locks stori
 
 test('inline picture listening reads its actual evidence and Word help explains terms without changing progress', async t => {
   const q = await createQuest(t);
+  // This case tests the explicit reading alternative after a child turns off
+  // automatic narration, rather than hiding the new default in every fixture.
+  q.click('[data-game-settings]');
+  q.change('#q-narration', false);
+  q.click('#q-dialog-close');
   const item = MISSIONS[0];
   const clue = item.clues[0];
   q.click('[data-mode="challenge"]');
@@ -761,7 +894,7 @@ test('the plain game URL opens child home even after saving the parent view, the
   assert.equal(q.savedState().view, 'mission');
 });
 
-test('Guided stories put numbered illustrated evidence on the current picture and open a plan without any dialog', async t => {
+test('Guided Next clue visits every fact before planning and keeps the scene free of dialogs', async t => {
   const q = await createQuest(t);
   const item = MISSIONS.find(mission => mission.slots.length === 2);
   q.selectMission(item);
@@ -773,10 +906,19 @@ test('Guided stories put numbered illustrated evidence on the current picture an
   assert.ok(q.required('[data-picture-help]').querySelector('svg'));
   assert.equal(q.required('#q-dialog').open, false);
   assert.equal(q.required('[data-open-plan]').disabled, false);
+  for (let index = 1; index < item.clues.length; index += 1) {
+    assert.match(q.required('[data-open-plan]').textContent, /Next clue/);
+    q.keyboardActivate('[data-open-plan]');
+    assert.ok(q.query('.q-stage-explore'), 'The next fact appears before the child can leave this stage');
+    assert.ok(q.required('[data-picture-help-text]').textContent.includes(item.clues[index].text));
+    assert.deepEqual(q.savedState().activeMission.clueIds, item.clues.slice(0, index + 1).map(clue => clue.id));
+    assert.equal(q.required('#q-dialog').open, false);
+    assert.equal(Number(q.required('[data-spark-value]').textContent), 0);
+  }
+  assert.match(q.required('[data-open-plan]').textContent, /Make a plan/);
   q.keyboardActivate('[data-open-plan]');
   assert.ok(q.query('.q-stage-plan'));
-  // The enlarged first clue was visible; unseen tabs must not become inspected facts.
-  assert.deepEqual(q.savedState().activeMission.clueIds, [item.clues[0].id]);
+  assert.deepEqual(q.savedState().activeMission.clueIds, item.clues.map(clue => clue.id));
   assert.equal(q.savedState().activeMission.assisted, false, 'Reading visible facts is ordinary Guided play');
   assert.deepEqual(q.savedState().completed, {});
   assert.deepEqual(q.savedState().discoveries, []);
@@ -1238,19 +1380,19 @@ test('the tablet progress bar remains outside changing play screens and sound is
   assert.ok(hud.closest('.q-game-chrome'), 'The score belongs to the persistent game chrome');
   assert.equal(q.required('#quest-app').contains(hud), false, 'Scrolling or replacing a scene cannot bury or remove the score container');
   assert.equal(q.document.querySelectorAll('#q-game-hud').length, 1);
-  assert.equal(q.required('[data-game-sound]').getAttribute('aria-pressed'), 'false');
+  assert.equal(q.required('[data-game-sound]').getAttribute('aria-pressed'), 'true');
   q.selectMission(MISSIONS[0]);
   const beforeSound = q.savedState();
   q.click('[data-game-sound]');
-  assert.equal(q.savedState().settings.sound, true);
-  assert.equal(q.savedState().settings.narration, false, 'Game tones do not turn on automatic reading');
-  assert.equal(q.required('[data-game-sound]').getAttribute('aria-pressed'), 'true');
+  assert.equal(q.savedState().settings.sound, false);
+  assert.equal(q.savedState().settings.narration, true, 'Changing game tones does not change the separate story-reading preference');
+  assert.equal(q.required('[data-game-sound]').getAttribute('aria-pressed'), 'false');
   const afterSound = q.savedState();
   assert.deepEqual({ ...afterSound, settings: { ...afterSound.settings, sound: beforeSound.settings.sound } }, beforeSound, 'Choosing sound changes no answer, discovery or reward');
   assert.equal(q.required('#q-game-hud'), hud, 'A scene render retains the original HUD container');
   q.click('[data-game-sound]');
-  assert.equal(q.savedState().settings.sound, false);
-  assert.equal(q.required('[data-game-sound]').getAttribute('aria-pressed'), 'false');
+  assert.equal(q.savedState().settings.sound, true);
+  assert.equal(q.required('[data-game-sound]').getAttribute('aria-pressed'), 'true');
   q.click('.q-header [data-nav="home"]');
   assert.equal(q.required('#q-game-hud'), hud);
   assert.equal(q.document.querySelectorAll('#q-game-hud').length, 1);
@@ -1482,8 +1624,7 @@ test('sorting shows picture facts first while the full original clue and control
 test('success uses game sounds without automatic speech even when story reading is enabled', async t => {
   const q = await createQuest(t);
   const item = MISSIONS[0];
-  q.click('[data-game-sound]');
-  assert.equal(q.savedState().settings.sound, true);
+  assert.equal(q.required('[data-game-sound]').getAttribute('aria-pressed'), 'true');
   q.selectMission(item);
   q.click('[data-game-settings]');
   q.change('#q-narration', true);
