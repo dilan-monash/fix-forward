@@ -100,6 +100,12 @@ def stylesheet():
     return send_from_directory(Path(__file__).resolve().parent, "access.css")
 
 
+@access.get("/access.js")
+# Expose only this standalone public control script, never arbitrary backend files.
+def script():
+    return send_from_directory(Path(__file__).resolve().parent, "access.js")
+
+
 @access.route("/login", methods=["GET", "POST"])
 # Check CSRF and the exact shared password, then replace the old session and redirect only to home.
 def login():
@@ -158,7 +164,7 @@ def configure_access(app):
         if not _enabled():
             return None
         public_asset = request.endpoint == "frontend_asset" and request.path == "/favicon.svg"
-        if request.endpoint in {"api.health", "access.stylesheet"} or public_asset:
+        if request.endpoint in {"api.health", "access.stylesheet", "access.script"} or public_asset:
             return None
         if not _configured():
             if request.path.startswith("/api/"):

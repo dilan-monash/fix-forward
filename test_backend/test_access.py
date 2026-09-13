@@ -63,7 +63,7 @@ class AccessTests(unittest.TestCase):
         health_check.assert_not_called()
 
     def test_only_minimal_access_assets_and_liveness_are_public(self):
-        for path in ("/api/health", "/favicon.svg", "/access.css", "/login"):
+        for path in ("/api/health", "/favicon.svg", "/access.css", "/access.js", "/login"):
             with self.subTest(path=path):
                 response = self.client.get(path)
                 self.assertEqual(response.status_code, 200)
@@ -81,6 +81,38 @@ class AccessTests(unittest.TestCase):
         self.assertNotIn(self.app.config["SECRET_KEY"], html)
         self.assertNotIn("src/app.js", html)
         self.assertNotIn("DATABASE_URL", html)
+
+    # The visibility control is optional client-side help, never another submit
+    # action or a reason to populate the shared password in returned HTML.
+    def test_login_has_accessible_progressive_password_controls(self):
+        with self.client.get("/login") as response:
+            html = response.get_data(as_text=True)
+        self.assertRegex(html, r'<script[^>]*src="/access\.js"[^>]*defer')
+        self.assertIn('id="access-login-form"', html)
+        self.assertRegex(html, r'<button(?=[^>]*id="password-toggle")(?=[^>]*type="button")(?=[^>]*hidden)[^>]*>')
+        self.assertIn('aria-controls="website-password"', html)
+        self.assertIn('aria-pressed="false"', html)
+        self.assertIn('id="caps-lock-status"', html)
+        self.assertIn('role="status"', html)
+        self.assertIn('aria-live="polite"', html)
+        self.assertNotIn('value="fixforward"', html)
+
+    # Only the public presentation script is allowed before authentication;
+    # neither its backend-directory alias nor any Python source is exposed.
+    def test_password_helper_is_public_javascript_without_access_or_database_work(self):
+        with patch("backend.api.repository.health_check") as health_check:
+            with self.client.get("/access.js") as response:
+                self.assertEqual(response.status_code, 200)
+                self.assertIn(response.mimetype, ("application/javascript", "text/javascript"))
+                self.assertNotIn("Set-Cookie", response.headers)
+                self.assertIn(b"getModifierState", response.data)
+                self.assertIn("script-src 'self'", response.headers["Content-Security-Policy"])
+            health_check.assert_not_called()
+        self.assertEqual(self.client.get("/api/sources").status_code, 401)
+        self.assertEqual(self.client.get("/backend/access.js").status_code, 303)
+        self.login()
+        with self.client.get("/backend/access.js") as response:
+            self.assertEqual(response.status_code, 404)
 
     def test_wrong_and_whitespace_changed_passwords_stay_locked(self):
         for password in ("incorrect-private-input", " fixforward", "fixforward ", "", "FIXFORWARD"):

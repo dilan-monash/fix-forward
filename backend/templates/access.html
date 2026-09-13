@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- Shared server-rendered access view from backend/access.py: login, logout confirmation or unavailable mode.
-     It loads only its own stylesheet/favicon and never embeds the password or appliance application scripts. -->
+     Its small local password controls do not load either application or ever store the password. -->
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -10,6 +10,7 @@
   <title>{% if mode == 'logout' %}Lock website{% elif mode == 'unavailable' %}Website unavailable{% else %}Enter website{% endif %} | FixForward</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" sizes="any">
   <link rel="stylesheet" href="{{ url_for('access.stylesheet') }}">
+  {% if mode == 'login' %}<script src="{{ url_for('access.script') }}" defer></script>{% endif %}
 </head>
 <body>
   <main aria-labelledby="access-title">
@@ -39,10 +40,15 @@
       <p id="password-help">Use the shared password from the FixForward team. You do not need an account.</p>
       {% if error %}<p class="error" role="alert" id="access-error">{{ error }}</p>{% endif %}
       <!-- The token binds this POST to the visitor session; the password field is intentionally never prefilled. -->
-      <form method="post" action="{{ url_for('access.login') }}">
+      <form id="access-login-form" method="post" action="{{ url_for('access.login') }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
         <label for="website-password">Website password</label>
-        <input id="website-password" name="password" type="password" autocomplete="current-password" maxlength="1024" required aria-describedby="password-help{% if error %} access-error{% endif %}"{% if error %} aria-invalid="true" autofocus{% endif %}>
+        <!-- These optional controls start hidden: ordinary password submission also works without JavaScript. -->
+        <div class="password-controls">
+          <input id="website-password" name="password" type="password" autocomplete="current-password" autocapitalize="none" spellcheck="false" maxlength="1024" required aria-describedby="password-help{% if error %} access-error{% endif %}"{% if error %} aria-invalid="true"{% endif %}>
+          <button id="password-toggle" class="password-toggle" type="button" aria-controls="website-password" aria-pressed="false" hidden>Show password</button>
+        </div>
+        <p id="caps-lock-status" class="caps-lock-status" role="status" aria-live="polite" aria-atomic="true" data-state="unknown" hidden>Caps Lock: press a letter key to check.</p>
         <button type="submit">Open FixForward</button>
       </form>
       <p class="footnote">Access lasts up to 4 hours. Choose <strong>Lock website</strong> when you finish on a shared device.</p>

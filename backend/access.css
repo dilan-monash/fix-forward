@@ -21,6 +21,19 @@ input { border: 1px solid #8196aa; background: #fff; color: #071c49; }
 input[aria-invalid="true"] { border: 2px solid #b93835; }
 button { margin-top: .3rem; border: 2px solid #061f57; color: #fff; background: #061f57; font-weight: 800; cursor: pointer; }
 button:hover { background: #0a2e70; }
+/* Keep Show password beside the field with a separate, comfortable touch target.
+   Without JavaScript the hidden toggle leaves the original input at full width. */
+.password-controls { display: flex; align-items: stretch; gap: .5rem; min-width: 0; }
+.password-controls input { flex: 1 1 0; width: 0; }
+.password-toggle { flex: 0 0 auto; width: auto; margin: 0; padding: .7rem .75rem; color: #061f57; background: #edf6fc; border-color: #a1bad0; font-size: .85rem; white-space: nowrap; }
+.password-toggle:hover { background: #dceef9; }
+.password-toggle[aria-pressed="true"] { background: #dceef9; border-color: #061f57; }
+/* Text states make Caps Lock understandable without depending on colour alone.
+   Updates are quiet until the keyboard provides evidence or touch cannot report it. */
+.caps-lock-status { margin: 0; padding: .55rem .7rem; border-radius: 8px; font-size: .82rem; line-height: 1.45; color: #4b6076; background: #f2f6fa; }
+.caps-lock-status[data-state="on"] { color: #774405; background: #fff0ce; border-left: 3px solid #aa6710; }
+.caps-lock-status[data-state="off"] { color: #205e51; background: #ebf7f2; }
+[hidden] { display: none !important; }
 .secondary { display: flex; align-items: center; justify-content: center; min-height: 48px; padding: .7rem; color: #006b9f; text-underline-offset: 3px; font-weight: 800; }
 /* Keyboard focus and errors remain visible without relying on hover or colour alone. */
 :focus-visible { outline: 3px solid #006b9f; outline-offset: 3px; }
