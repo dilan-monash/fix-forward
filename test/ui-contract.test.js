@@ -1,3 +1,5 @@
+// TEST SUITE: Checks source/UI contracts that preserve adult usability and safety wording.
+// Each test name describes its expected behavior; fixtures are invented test inputs.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";

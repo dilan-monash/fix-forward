@@ -1,3 +1,6 @@
+-- DATABASE-WRITING schema phase; apply_migration.py executes this after the base public tables exist.
+-- Creates category/safety/suburb structures and candidate-location fields used by subsequent seeds and enrichers.
+
 -- FixForward Iteration 1 usability migration (NON-DESTRUCTIVE)
 -- Adds catalogue, safety rules, suburb lookup, and location enrichment columns.
 -- Does NOT drop existing public evidence tables.

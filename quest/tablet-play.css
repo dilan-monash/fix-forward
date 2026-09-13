@@ -1,0 +1,296 @@
+/* Touch-led game surfaces. Scrolling works everywhere outside a move handle. */
+body.quest { --play-yellow:#f8d777; --play-mint:#d8ebdd; --play-blue:#dbe7f3; }
+.q-header { padding-block:.8rem; }
+.q-header nav { gap:1rem; }
+/* Level badge, Sparks meter and read-aloud control. Display values come from progression.js through app.js. */
+.q-player-strip { display:flex; align-items:center; gap:1.3rem; width:min(1280px,calc(100% - 3rem)); margin:.1rem auto .5rem; padding:.4rem 1rem .5rem .3rem; border:1px solid #d6d9c6; border-radius:21px; background:#fffdf5; }
+.q-level-chip { display:flex; align-items:center; gap:.3rem; border:0; background:none; text-align:left; min-height:62px; padding:0 .5rem 0 0; border-radius:14px; }
+.q-level-chip>span:first-child { width:56px; flex:0 0 56px; }
+.q-level-chip svg { height:60px; }
+.q-level-chip small { display:block; color:var(--teal); font-size:.67rem; letter-spacing:.09em; font-weight:800; }
+.q-level-chip strong { display:block; font-size:.9rem; margin-top:.25rem; }
+.q-spark-meter { flex:1; max-width:570px; margin-left:auto; }
+.q-spark-meter>div:first-child { display:flex; justify-content:space-between; align-items:center; gap:.7rem; margin-bottom:.4rem; }
+.q-spark-meter b { font-size:1.06rem; }
+.q-spark-meter b>span:first-child { color:#916519; }
+.q-spark-meter b>span:last-child { font-size:.8rem; }
+.q-spark-meter small { font-size:.7rem; color:var(--muted); }
+.q-spark-track { background:#e9e8d5; height:9px; overflow:hidden; border-radius:8px; }
+.q-spark-track>span { display:block; height:100%; background:linear-gradient(90deg,#e4b341,#f4d778); border-radius:inherit; }
+.q-hud-listen,.q-listen { display:inline-flex; align-items:center; justify-content:center; gap:.5rem; padding:.55rem .85rem; min-height:48px; border:1px solid #b8cbb8; border-radius:13px; background:#eaf1e4; font-size:.8rem; font-weight:800; }
+.q-hud-listen>span:first-child,.q-listen>span { font-size:1.05rem; white-space:nowrap; }
+.q-hud-listen>span:first-child,.q-listen>span { display:block; width:23px; height:23px; flex:0 0 23px; }
+.q-hud-listen { margin-left:auto; }
+.q-adventure-cover { padding-top:.9rem; gap:.7rem 1rem; }
+.q-adventure-cover h1 { font-size:clamp(2.4rem,3.7vw,3.9rem); }
+/* Three large entry buttons lead directly to stories, sorting and creations. */
+.q-play-doors { grid-column:1/-1; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; margin-top:1.25rem; }
+.q-play-doors>button { position:relative; display:flex; align-items:center; gap:.9rem; padding:1rem .9rem; min-height:134px; min-width:0; text-align:left; border:1.5px solid #a9beaa; border-radius:22px 22px 22px 6px; background:var(--play-mint); box-shadow:0 5px 0 #c0cdb4; }
+.q-play-doors>button:nth-child(2) { background:#f5e3aa; border-color:#cfb977; box-shadow:0 5px 0 #dfd0a0; }
+.q-play-doors>button:nth-child(3) { background:#dde8f5; border-color:#afbdd1; box-shadow:0 5px 0 #c4d1dd; }
+.q-play-doors>button>span { flex:0 0 77px; }
+.q-play-doors>button svg { height:85px; }
+.q-play-doors small { display:block; font-size:.58rem; letter-spacing:.07em; color:#445d53; font-weight:800; }
+.q-play-doors strong { display:block; font-size:1.2rem; margin:.4rem 0; }
+.q-play-doors p { font-size:.78rem; margin:0; line-height:1.45; color:#40595a; }
+.q-play-doors b { margin-left:auto; font-size:1.5rem; color:var(--teal); }
+.q-play-doors button:hover { outline:2px solid var(--teal); outline-offset:3px; }
+.q-play-doors button:active { box-shadow:0 2px 0 #bdc4b3; transform:translateY(3px); }
+.q-guide-dialogue { max-width:none; border:1px solid #c7d8be; gap:.6rem; padding:.5rem .8rem .5rem .3rem; }
+.q-guide-dialogue>div:nth-child(2) { flex:1; }
+.q-guide-dialogue p { font-size:1rem; }
+.q-guide-tools { display:flex; gap:.35rem; align-items:center; }
+.q-word-help { min-height:48px; padding:.55rem .6rem; border:0; background:none; color:var(--teal); text-decoration:underline; text-underline-offset:4px; font-size:.78rem; font-weight:700; }
+.q-touch-how { display:flex; align-items:center; gap:.75rem; margin-right:auto; }
+.q-touch-how>span { display:grid; place-items:center; width:46px; height:46px; border-radius:50%; background:var(--play-yellow); font-size:1.7rem; }
+.q-touch-how p { margin:0; font-size:.84rem; line-height:1.5; }
+.q-mission { max-width:1220px; }
+.q-story-heading { max-width:850px; }
+.q-story-heading h1 { font-size:clamp(1.9rem,3vw,2.65rem); }
+.q-story-heading>p:last-child { font-size:1rem; line-height:1.55; }
+.q-step-track { max-width:820px; margin-bottom:1rem; }
+.q-hotspot { min-width:56px; min-height:56px; font-size:.87rem; border-radius:16px; box-shadow:0 4px 0 #b5a779; }
+.q-hotspot b { width:30px; height:30px; }
+.q-hotspot:active { background:#f6d46b; }
+.q-pocket-pieces button { min-height:48px; font-size:.82rem; }
+.q-clue-list-button { min-height:48px; font-size:.83rem; }
+.q-clue-reveal { display:flex; align-items:center; justify-content:center; gap:1rem; }
+.q-clue-reveal .q-clue-art { width:150px; margin:.25rem 0; }
+.q-clue-spark { width:155px; }
+.q-clue-text { font-size:1.13rem; line-height:1.6; }
+.q-clue-dialog-actions { display:flex; align-items:center; justify-content:space-between; gap:.7rem; margin-top:1.2rem; }
+#q-dialog-body>.q-listen { margin-right:.7rem; }
+.q-word-list { margin:1.4rem 0; }
+.q-word-list>div { padding:.7rem 0; border-bottom:1px solid var(--line); }
+.q-word-list dt { font-weight:800; color:var(--teal); }
+.q-word-list dd { margin:.3rem 0 0; line-height:1.6; }
+/* Picture choices and larger tap areas; the separate Move handle is optional. */
+.q-plan-instruction>p { font-size:.94rem; }
+.q-plan-layout { grid-template-columns:1.25fr 1fr; }
+.q-action-bank { gap:.85rem; }
+.q-action-tile { min-height:97px; }
+.q-action-tile>button:first-child { display:flex; position:relative; gap:.9rem; align-items:center; padding:.75rem; min-height:90px; font-size:1rem; }
+.q-action-tile strong { line-height:1.45; }
+.q-action-art { flex:0 0 70px; }
+.q-action-art svg { height:66px; }
+.q-drag-handle { min-width:52px; }
+.q-action-tile>.q-drag-handle { flex-direction:column; gap:.15rem; }
+.q-drag-handle small { font-size:.65rem; font-weight:800; }
+.q-choice-tick { position:absolute; top:.5rem; right:.5rem; display:grid; place-items:center; width:23px; height:23px; border-radius:50%; background:var(--teal); color:white; }
+.q-action-tile.selected { border:2px solid var(--teal); background:#e0efdb; box-shadow:0 4px 0 #a3c6a7; }
+.q-plan-slot { min-height:100px; font-size:1rem; }
+.q-single-plan .q-plan-layout { display:block; }
+.q-single-plan .q-action-bank { grid-template-columns:repeat(3,minmax(0,1fr)); align-items:stretch; }
+.q-single-plan .q-action-tile { flex-direction:column; }
+.q-single-plan .q-action-tile>button:first-child { flex-direction:column; text-align:center; min-height:155px; padding:1rem .7rem; gap:.65rem; }
+.q-single-plan .q-action-art { flex-basis:auto; width:95px; }
+.q-single-plan .q-action-art svg { height:85px; }
+.q-single-plan .q-drag-handle { flex-direction:row; border-left:0; border-top:1px dashed #acbd9e; min-height:46px; }
+.q-single-plan .q-plan-slots { margin-top:1rem; }
+.q-single-plan .q-slot-wrap>span { font-size:.72rem; }
+.q-single-plan .q-plan-slot { min-height:62px; }
+.q-single-plan .q-slot-wrap>.q-back { font-size:.75rem; }
+/* Reward and reflection panels show validated game progress; CSS never changes points. */
+.q-reward-strip { display:flex; align-items:center; gap:.9rem; padding:.55rem 1rem; border:1px solid #c9b565; border-radius:18px; background:#f9ebbb; margin:1rem 0; }
+.q-reward-strip>span { width:96px; flex:0 0 96px; }
+.q-reward-strip>span>svg { max-height:75px; }
+.q-reward-strip strong { display:block; font-size:1.2rem; }
+.q-reward-strip p { font-size:.88rem; margin:.2rem 0; }
+.q-reflection { padding:1.3rem; margin:1.3rem 0; background:#e4edf4; border:1px solid #b7cbd9; border-radius:22px 6px 22px 22px; }
+.q-reflection-heading { display:flex; align-items:center; justify-content:space-between; gap:.7rem; }
+.q-reflection h2 { margin:.25rem 0 .7rem; font-size:1.35rem; }
+.q-reflection-options { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:.8rem; }
+.q-reflection-options button { display:flex; align-items:center; gap:.85rem; padding:.9rem; min-height:105px; border:2px solid #a5bbc8; border-radius:17px; background:#fffdf4; text-align:left; font-size:1rem; }
+.q-reflection-options button:hover { border-color:var(--teal); background:#f9edc8; }
+.q-reflection-options button>span { width:80px; flex:0 0 80px; }
+.q-reflection-options svg { height:80px; }
+.q-reflection-hint { border-left:4px solid var(--teal); padding:.6rem .8rem; background:#f8faf0; font-size:.95rem; }
+.q-reflection.answered { background:#e5efdd; border-color:#a6bd9e; }
+.q-projector-controls [role=group] { gap:.4rem; }
+.q-projector-controls button { min-height:48px; }
+.q-sort { max-width:970px; }
+.q-sort-heading h1 { font-size:clamp(1.75rem,3vw,2.45rem); }
+.q-sort-rule { font-size:.88rem; }
+.q-sort-round-track { display:flex; justify-content:center; gap:.65rem; grid-column:1/-1; margin:0 0 1rem; }
+.q-sort-round-track span { display:grid; place-items:center; border:1px solid #b1bda5; border-radius:50%; width:31px; height:31px; background:#fffbee; font-size:.8rem; font-weight:800; }
+.q-sort-round-track .current { border:2px solid var(--teal); background:#f5d46c; }
+.q-sort-round-track .done { background:var(--teal); color:white; }
+.q-sort-board { position:relative; background:linear-gradient(150deg,#e5eddc,#f5eccb); border:2px solid #b3c3a7; }
+.q-sort-object h2 { font-size:1.2rem; }
+.q-sort-object p { font-size:.94rem; }
+.q-lift { min-width:100px; min-height:52px; }
+.q-sort-instruction { font-size:.85rem; }
+.q-destination { min-height:185px; padding:.9rem .65rem; }
+.q-destination strong { font-size:1.03rem; }
+.q-destination small { font-size:.82rem; }
+.q-destination:active:not(:disabled) { background:#f8db86; }
+.q-destination-drawing svg path:not([fill]) { fill:none; }
+.q-level-trail { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.6rem; margin:1.5rem 0; }
+.q-level-trail>div { display:grid; justify-items:center; align-content:start; gap:.25rem; padding:.5rem .2rem; text-align:center; border:1px dashed #aebba2; border-radius:14px; background:#f1ecdb; }
+.q-level-trail .earned { background:#e2edda; border-style:solid; }
+.q-level-trail svg { height:90px; }
+.q-level-trail strong { font-size:.8rem; }
+.q-level-trail span { font-size:.75rem; line-height:1.4; }
+.q-spark-rules { line-height:1.9; padding-left:1.4rem; }
+/* Parent guide layout is scoped to the child page and does not restyle the adult app. */
+.q-parent-guide { max-width:1200px; }
+.q-parent-hero { display:grid; grid-template-columns:1.1fr 1fr; gap:2rem; align-items:center; padding:1rem 0 2rem; }
+.q-parent-hero h1 { font-size:clamp(2rem,4vw,3.7rem); }
+.q-parent-picture { border-radius:28px; overflow:hidden; background:#eee6ce; }
+.q-parent-why { max-width:870px; margin:1.5rem auto 2.5rem; text-align:center; }
+.q-parent-why h2 { font-size:clamp(1.5rem,2.5vw,2rem); }
+.q-parent-why p:not(.q-eyebrow) { color:#415763; }
+.q-parent-learning>h2 { font-size:1.7rem; }
+.q-parent-goals { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:1.5rem; margin:1.6rem 0 2.5rem; }
+.q-parent-goals article { padding:0 .5rem; }
+.q-parent-goals svg { width:100px; height:85px; }
+.q-parent-goals h3 { font-size:1.1rem; }
+.q-parent-goals p { font-size:.92rem; }
+.q-parent-pair { display:grid; grid-template-columns:1fr 1fr; gap:2.5rem; margin:2.5rem 0; }
+.q-parent-pair h2 { font-size:1.5rem; }
+.q-parent-progress { padding:1rem; background:var(--mint); border-radius:15px; }
+/* Use tablet width for a scene beside its clues when there is also enough vertical room. */
+@media(min-width:760px) and (min-height:600px) {
+  .q-stage-explore { display:grid; grid-template-columns:minmax(0,1.6fr) minmax(265px,.9fr); gap:0 1.3rem; align-items:start; }
+  .q-stage-explore>.q-mission-top,.q-stage-explore>.q-step-track,.q-stage-explore>.q-story-heading,.q-stage-explore>.q-guide-dialogue { grid-column:1/-1; }
+  .q-stage-explore>.q-mission-scene { aspect-ratio:900/620; min-height:350px; }
+  .q-stage-explore>.q-explore-controls { margin:0; }
+  .q-stage-explore .q-clue-pocket { margin-top:0; }
+  .q-stage-explore .q-clue-list { display:grid; }
+  .q-stage-explore .q-step-actions { justify-content:flex-start; }
+  .q-stage-plan>.q-mission-scene { max-height:160px; }
+}
+/* On short landscape screens, put the sorting item beside its destinations. */
+@media(min-width:800px) and (max-height:800px) {
+  .q-sort-board { display:grid; grid-template-columns:minmax(230px,.85fr) minmax(0,1.5fr); gap:0 1rem; align-items:center; }
+  .q-sort-object { display:block; padding:.7rem 1rem; }
+  .q-sort-art { width:130px; margin:auto; }
+  .q-sort-object-copy { text-align:center; }
+  .q-sort-object p { font-size:.85rem; }
+  .q-sort-instruction { grid-row:3; grid-column:1/-1; margin:.8rem 0 .2rem; }
+  .q-destination { min-height:215px; }
+}
+@media(max-width:900px) {
+  .q-play-doors { gap:.65rem; }
+  .q-play-doors>button { gap:.4rem; padding:.8rem .65rem; }
+  .q-play-doors>button>span { flex-basis:56px; }
+  .q-play-doors strong { font-size:1.02rem; }
+  .q-play-doors small { display:none; }
+  .q-play-doors p { font-size:.74rem; }
+  .q-guide-tools { flex-direction:column; gap:0; }
+  .q-parent-goals { grid-template-columns:1fr 1fr; }
+  .q-parent-hero { grid-template-columns:1fr; }
+  .q-parent-picture { max-width:650px; }
+}
+/* Phone layout shortens picture cards and keeps sorting choices near the source. */
+@media(max-width:600px) {
+  .q-header nav { gap:.55rem; }
+  .q-header nav button { font-size:.73rem; }
+  .q-player-strip { width:calc(100% - 2rem); padding:.25rem .5rem .35rem .1rem; gap:.35rem; border-radius:15px; }
+  .q-level-chip { min-height:56px; gap:.15rem; padding-right:0; }
+  .q-level-chip>span:first-child { flex-basis:40px; width:40px; }
+  .q-level-chip svg { height:49px; }
+  .q-level-chip small { font-size:.6rem; }
+  .q-level-chip strong { font-size:.72rem; max-width:96px; }
+  .q-spark-meter { max-width:165px; }
+  .q-spark-meter>div:first-child { display:block; }
+  .q-spark-meter b { font-size:.93rem; }
+  .q-spark-meter small { display:block; font-size:.64rem; margin-top:.2rem; }
+  .q-spark-meter b>span:last-child { font-size:.72rem; }
+  .q-hud-listen { min-width:44px; min-height:48px; padding:.4rem; font-size:.68rem; }
+  .q-hud-listen>span:last-child { display:none; }
+  .q-hud-listen>span:first-child { font-size:.85rem; }
+  .q-adventure-cover h1 { font-size:2.2rem; }
+  .q-play-doors { grid-template-columns:1fr; gap:.85rem; }
+  .q-play-doors>button { min-height:112px; padding:.75rem 1rem; gap:1rem; }
+  .q-play-doors>button>span { flex-basis:72px; }
+  .q-play-doors strong { font-size:1.2rem; }
+  .q-play-doors small { display:block; font-size:.6rem; }
+  .q-play-doors p { font-size:.85rem; }
+  .q-story-heading>p:last-child { font-size:.95rem; }
+  .q-guide-dialogue { flex-wrap:wrap; gap:.35rem; }
+  .q-guide-dialogue p { font-size:.92rem; }
+  .q-guide-tools { flex-direction:row; width:100%; justify-content:flex-end; }
+  .q-listen { font-size:.78rem; padding:.5rem .65rem; }
+  .q-guide-tools .q-listen,.q-guide-tools .q-word-help { min-height:44px; }
+  .q-hotspot { min-height:52px; min-width:52px; font-size:.73rem; max-width:145px; }
+  .q-hotspot b { width:25px; height:25px; }
+  .q-pocket-pieces button { font-size:.78rem; }
+  .q-clue-list-button { font-size:.8rem; }
+  .q-clue-reveal .q-clue-art { width:125px; }
+  .q-clue-spark { width:110px; }
+  .q-clue-text { font-size:1.05rem; }
+  .q-clue-dialog-actions { flex-wrap:wrap; }
+  .q-clue-dialog-actions>.q-button { flex:1; }
+  .q-plan-layout { grid-template-columns:1fr; }
+  .q-single-plan .q-action-bank { grid-template-columns:1fr; gap:.65rem; }
+  .q-single-plan .q-action-tile { flex-direction:row; }
+  .q-single-plan .q-action-tile>button:first-child { flex-direction:row; min-height:86px; text-align:left; padding:.6rem; font-size:.95rem; }
+  .q-single-plan .q-action-art { flex:0 0 62px; width:62px; }
+  .q-single-plan .q-action-art svg { height:64px; }
+  .q-single-plan .q-drag-handle { flex-direction:column; border-top:0; border-left:1px dashed #acbd9e; }
+  .q-action-tile>button:first-child { font-size:.95rem; }
+  .q-choice-tick { top:.2rem; right:.25rem; width:19px; height:19px; font-size:.68rem; }
+  .q-plan-instruction>p { font-size:.9rem; }
+  .q-plan-slot { font-size:.93rem; }
+  .q-reflection { padding:1rem; }
+  .q-reflection h2 { font-size:1.2rem; }
+  .q-reflection-heading { align-items:flex-start; flex-wrap:wrap; }
+  .q-reflection-options { gap:.6rem; }
+  .q-reflection-options button { flex-direction:column; align-items:center; text-align:center; padding:.75rem .5rem; font-size:.91rem; gap:.5rem; }
+  .q-reflection-options button>span { width:80px; flex-basis:80px; }
+  .q-reward-strip { gap:.4rem; padding:.5rem; }
+  .q-reward-strip strong { font-size:1.05rem; }
+  .q-reward-strip p { font-size:.8rem; }
+  .q-projector-controls [role=group] { flex-wrap:wrap; }
+  .q-projector-controls button { flex:1 1 40%; font-size:.78rem; }
+  .q-projector-controls [data-play-ending] { flex-basis:100%; }
+  .q-sort-rule { font-size:.8rem; }
+  .q-sort-board { padding:.65rem; }
+  .q-sort-round-track { margin:0 0 .75rem; }
+  .q-sort-round-track span { width:27px; height:27px; }
+  .q-sort-object { gap:.65rem; padding:.65rem; }
+  .q-sort-art { flex-basis:82px; }
+  .q-sort-art svg { height:94px; }
+  .q-sort-object h2 { font-size:1rem; }
+  .q-sort-object p { font-size:.85rem; line-height:1.45; }
+  .q-lift { min-height:48px; min-width:90px; }
+  .q-sort-instruction { font-size:.76rem; margin:.9rem 0 .7rem; }
+  .q-destination { min-height:152px; padding:.6rem .3rem; }
+  .q-destination strong { font-size:.8rem; }
+  .q-destination small { font-size:.72rem; }
+  .q-destination-drawing { height:52px; }
+  .q-parent-pair { grid-template-columns:1fr; gap:1.3rem; }
+  .q-parent-goals { gap:1rem; }
+  .q-parent-goals article { padding:0; }
+  .q-parent-goals h3 { font-size:1rem; }
+  .q-parent-goals p { font-size:.86rem; }
+  .q-level-trail { grid-template-columns:1fr 1fr; }
+}
+/* At the narrowest width, stack destinations to preserve readable words and usable targets. */
+@media(max-width:350px) {
+  .q-player-strip { flex-wrap:wrap; padding:.35rem; }
+  .q-level-chip { flex:1; }
+  .q-level-chip strong { max-width:none; }
+  .q-spark-meter { order:3; flex:1 1 100%; max-width:none; }
+  .q-spark-meter>div:first-child { display:flex; }
+  .q-destination { min-height:80px; }
+  .q-sort-art { flex-basis:72px; }
+  .q-reflection-options { grid-template-columns:1fr; }
+  .q-reflection-options button { flex-direction:row; text-align:left; }
+}
+/* One-shot entry/selection effects also require data-motion=full from the app setting. */
+@media(prefers-reduced-motion:no-preference) {
+  html[data-motion=full] .q-play-enter .q-play-doors>button { animation:q-door-arrive 450ms ease-out both; }
+  html[data-motion=full] .q-play-enter .q-play-doors>button:nth-child(2) { animation-delay:80ms; }
+  html[data-motion=full] .q-play-enter .q-play-doors>button:nth-child(3) { animation-delay:160ms; }
+  html[data-motion=full] .q-action-tile.selected .q-action-art { animation:q-chosen-picture 360ms ease-out; }
+  html[data-motion=full] .q-play-enter .q-sort-object { animation:q-sort-deal 420ms ease-out both; }
+  html[data-motion=full] .q-destination.q-accepted .q-placed-picture { animation:q-sort-arrive 450ms ease-out; }
+  html[data-motion=full] .q-reflection.answered { animation:q-answer-reveal 400ms ease-out; }
+}
+@keyframes q-door-arrive { from { opacity:.4; transform:translateY(12px); } to { opacity:1; transform:none; } }
+@keyframes q-chosen-picture { 0% { transform:scale(.94); } 65% { transform:scale(1.04); } 100% { transform:scale(1); } }
+@keyframes q-sort-deal { from { opacity:.5; transform:translateX(-18px) rotate(-2deg); } to { opacity:1; transform:none; } }
+@keyframes q-sort-arrive { from { opacity:.5; transform:translateY(-14px) scale(.85); } to { opacity:1; transform:none; } }
+@keyframes q-answer-reveal { from { background:#f4e4a8; } to { background:#e5efdd; } }

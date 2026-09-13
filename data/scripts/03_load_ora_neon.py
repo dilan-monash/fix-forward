@@ -1,3 +1,6 @@
+# DATABASE-WRITING import: replace repair_statistics and repair_barriers with the outputs of 02_build_ora_stats.py.
+# Requires the base tables and import-run migration 006; source metadata and checksums travel with the imported aggregates.
+
 """
 Step 5d: Load ORA repair statistics and barriers into Neon.
 
@@ -43,11 +46,13 @@ ORA_SOURCE = {
 }
 
 
+# Read a complete generated CSV into dictionaries before inserting its records.
 def load_csv(path: str) -> list[dict[str, str]]:
     with open(path, newline="", encoding="utf-8") as f:
         return list(csv.DictReader(f))
 
 
+# Require both aggregate files, replace their database tables and record source/import metadata before committing.
 def main() -> int:
     load_dotenv(os.path.join(REPO_ROOT, ".env"))
     database_url = os.getenv("DATABASE_URL")
@@ -74,6 +79,7 @@ def main() -> int:
     barriers = load_csv(BARRIERS_PATH)
 
     print("Loading ORA data into Neon...")
+    # This operator connection can write: normal context exit commits; an escaping exception rolls back its transaction.
     with psycopg.connect(database_url) as conn:
         with conn.cursor() as cur:
             # Refresh ORA repair tables (other sources not loaded yet)

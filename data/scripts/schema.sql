@@ -1,3 +1,7 @@
+-- DATABASE-WRITING RESET: apply_schema.py executes this file; DROP ... CASCADE removes existing base tables and dependencies.
+-- Use an intentionally disposable/bootstrap database for a reset, not this file as an incremental production migration.
+-- After bootstrap, the separate numbered schema, import and validation stages provide the later tables and constraints.
+
 -- FixForward Victoria — Iteration 1 public data schema (PostgreSQL / Neon)
 -- Public open data only. No user answers, sessions, or personal data.
 

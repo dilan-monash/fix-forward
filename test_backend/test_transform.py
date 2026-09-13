@@ -1,3 +1,6 @@
+# Pure API-transform unit suite; small dictionary fixtures stand in for database rows.
+# The cases check recall links, structured fields, incomplete outcomes and honest location verification labels.
+
 """Unit tests for backend transformations that do not require a live database."""
 
 from datetime import date
@@ -12,6 +15,7 @@ from backend.transform import (
 )
 
 
+# Group row-to-JSON contract checks that need no Flask server or database.
 class TransformTests(unittest.TestCase):
     def test_recall_record_keeps_only_reviewed_structured_fields(self):
         row = {

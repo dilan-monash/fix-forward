@@ -1,3 +1,6 @@
+# Local-file transformation: map the verified ORA aggregate through data/mapping/appliance_families.csv.
+# The cleaned mapped rows feed 02_build_ora_stats.py; no hosted database is accessed.
+
 """
 Step 5b: Clean ORA raw data and map to FixForward appliance families.
 
@@ -35,6 +38,7 @@ OUT_COLUMNS = [
 ]
 
 
+# Read the repository category mapping, preserving all family/category targets for each source category.
 def load_mapping() -> dict[str, list[tuple[str, str]]]:
     """Map each ORA product_category to one or more (family, category) pairs."""
     mapping: dict[str, list[tuple[str, str]]] = defaultdict(list)
@@ -48,6 +52,7 @@ def load_mapping() -> dict[str, list[tuple[str, str]]]:
     return mapping
 
 
+# Read the raw ORA snapshot, apply category mappings and write the selected fields for benchmark construction.
 def main() -> int:
     if not os.path.exists(RAW_PATH):
         print(f"ERROR: Missing raw file: {RAW_PATH}")

@@ -1,3 +1,7 @@
+# DATABASE-WRITING import: replace the recalls snapshot from 01_clean_accc.py and record source/import provenance.
+# Requires the base schema and import-run migration 006; changes are committed through the configured database connection.
+# Replacing recall rows can remove dependent matches through foreign keys. Downstream pattern/product review must be revisited.
+
 """
 Step 6c: Load ACCC recalls into Neon and record the snapshot as an import run.
 
@@ -32,6 +36,7 @@ RECALLS_PATH = os.path.join(SCRIPT_DIR, "..", "clean", "recalls.csv")
 ACCC_RAW_DIR = os.path.join(SCRIPT_DIR, "..", "raw", "accc")
 
 
+# Load the clean recalls, replace database rows and record the actual raw snapshot checksum and coverage window.
 def main() -> int:
     load_dotenv(os.path.join(REPO_ROOT, ".env"))
     database_url = os.getenv("DATABASE_URL")
@@ -84,6 +89,7 @@ def main() -> int:
     }
 
     print("Loading ACCC recalls into Neon...")
+    # This operator connection can write: normal context exit commits; an escaping exception rolls back its transaction.
     with psycopg.connect(database_url) as conn:
         with conn.cursor() as cur:
             cur.execute("DELETE FROM recalls;")

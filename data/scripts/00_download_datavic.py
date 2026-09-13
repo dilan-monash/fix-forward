@@ -1,3 +1,6 @@
+# Network download and local-file write: collect pages from the configured DataVic datastore resource.
+# The resulting raw JSON is input to 01_clean_datavic.py; downloading a facility record does not verify its acceptance.
+
 """
 Step 7a: Download Victoria waste infrastructure data from DataVic API.
 
@@ -27,6 +30,7 @@ API_BASE = "https://discover.data.vic.gov.au/api/3/action/datastore_search"
 PAGE_SIZE = 500
 
 
+# Request one fixed-size API page at the supplied offset and decode its JSON response.
 def fetch_page(offset: int) -> dict:
     params = urlencode(
         {
@@ -40,6 +44,7 @@ def fetch_page(offset: int) -> dict:
         return json.loads(response.read().decode("utf-8"))
 
 
+# Fetch all reported pages, attach the source metadata and replace the configured raw JSON snapshot.
 def main() -> int:
     os.makedirs(OUT_DIR, exist_ok=True)
 

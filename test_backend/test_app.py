@@ -1,3 +1,6 @@
+# Backend route and JSON-contract suite using repository mocks rather than a live Neon database.
+# Only an explicitly configured test app bypasses visitor access; production gate behavior is tested separately.
+
 """Integration tests for Flask routing using repository fakes, not Neon."""
 
 from datetime import date
@@ -8,7 +11,9 @@ from backend import create_app
 from backend.db import DatabaseUnavailable
 
 
+# Group route, public-data contract and failure/recovery cases.
 class AppTests(unittest.TestCase):
+    # Create a fresh internally unlocked Flask client with database calls replaced by each case as needed.
     def setUp(self):
         self.app = create_app({"TESTING": True, "SITE_ACCESS_ENABLED": False, "DATABASE_URL": "unused-in-fake"})
         self.client = self.app.test_client()

@@ -1,3 +1,6 @@
+-- DATABASE-WRITING schema phase before 06_load_abs_suburbs.py; add provenance fields for the approximate ABS lookup.
+-- Migration 009 validates the populated rows afterward. Adding columns does not import or improve coordinates by itself.
+
 -- FixForward migration 007 — suburb provenance columns (schema phase)
 --
 -- Columns only, so 06_load_abs_suburbs.py has somewhere to write. The matching

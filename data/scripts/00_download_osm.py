@@ -1,3 +1,7 @@
+# Network download and local-file write: query the existing Overpass source for Victorian repair-related places.
+# 01_clean_osm.py consumes this raw JSON. These community-maintained records are candidate leads, not verified services.
+# This legacy import path is separate from Quest fiction and is not called when a child plays.
+
 """
 Step 8a: Download repair-related POIs from OpenStreetMap (Victoria) via Overpass API.
 
@@ -42,6 +46,7 @@ out center tags;
 """
 
 
+# Submit the configured Overpass query and save its response for later local cleaning.
 def main() -> int:
     os.makedirs(OUT_DIR, exist_ok=True)
 

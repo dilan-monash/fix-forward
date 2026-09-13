@@ -1,3 +1,6 @@
+-- DATABASE-WRITING schema phase; represent a location decision separately for each appliance category.
+-- The absence of evidence remains unknown. Later validation and views require confirmed acceptance plus public-access evidence.
+
 -- FixForward migration 004 — per-appliance acceptance at each location
 --
 -- locations.accepts_electrical_appliances is a single boolean for the whole

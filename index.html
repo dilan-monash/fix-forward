@@ -1,32 +1,54 @@
+<!-- Use the browser's modern HTML standards mode for predictable page layout. -->
 <!doctype html>
+<!-- Adult page shell. src/app.js draws the journey inside #app; styles.css presents it. -->
+<!-- Website access is enforced by Flask before serving the page, not by this HTML. -->
+<!-- lang tells screen readers and translation tools that the page is written in English. -->
 <html lang="en">
 <head>
+  <!-- UTF-8 supports punctuation and symbols such as the arrow in the Quest link. -->
   <meta charset="utf-8">
+  <!-- Match the layout to the device width so phones and tablets use the responsive CSS. -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Page summary for tools that read metadata; the visible introduction is rendered by app.js. -->
   <meta name="description" content="FixForward helps Melbourne households decide what to do with a faulty household appliance: check important safety concerns, explore repair, compare costs and find recycling options.">
+  <!-- Suggest a browser-interface colour on browsers that support theme-color. -->
   <meta name="theme-color" content="#061f57">
+  <!-- Initial tab title; app.js updates it when the visitor changes screens. -->
   <title>Home | FixForward</title>
+  <!-- The small icon shown beside the browser tab title comes from this local SVG file. -->
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" sizes="any">
+  <!-- CSS controls colours, spacing and responsive layouts; it does not make appliance decisions. -->
   <link rel="stylesheet" href="styles.css">
+  <!-- Native browser modules load the controller and its local imports; there is no bundled app here. -->
   <script type="module" src="src/app.js"></script>
 </head>
 <body>
+  <!-- Keyboard users can jump past repeated navigation directly to the main task. -->
   <a class="skip-link" href="#main">Skip to main content</a>
 
+  <!-- Shared controls remain outside the area replaced during screen navigation. -->
   <div class="site-chrome">
   <header class="site-header">
+    <!-- id connects this button to the home handler; aria-label supplies its accessible name. -->
     <button class="brand" id="home-button" type="button" aria-label="Go to FixForward home">
+      <!-- Decorative artwork is hidden from screen readers because the button already has a name. -->
       <span class="brand-mark" aria-hidden="true"></span>
       <span><strong>FixForward</strong><small>Know your options</small></span>
     </button>
     <nav class="header-actions" aria-label="Main navigation">
+      <!-- Open Quest in another tab so this tab's in-memory adult answers remain available. -->
+      <!-- noopener prevents the opened page from receiving a window.opener reference. -->
+      <a class="text-button" href="/quest" target="_blank" rel="noopener">Quest for kids <span class="sr-only">(opens in a new tab)</span> ↗</a>
+      <!-- These IDs are selected by app.js to open the source panel and restart confirmation. -->
       <button class="text-button" id="about-button" type="button">About the information</button>
       <button class="text-button restart-link" id="restart-button" type="button">Start again</button>
     </nav>
   </header>
 
+  <!-- setStage in app.js updates this indicator; it is hidden on the landing screen. -->
   <div class="journey-shell" id="journey-shell" hidden>
     <ol class="journey-progress" id="journey-progress" aria-label="Your FixForward journey">
+      <!-- data-stage is an internal label: setStage selects the matching journey step. -->
       <li data-stage="appliance"><span>1</span><b>Your appliance</b></li>
       <li data-stage="check"><span>2</span><b>Quick safety check</b></li>
       <li data-stage="options"><span>3</span><b>Your options</b></li>
@@ -34,11 +56,15 @@
   </div>
   </div>
 
+  <!-- Focusable main region supports keyboard navigation; #app receives the current screen. -->
   <main id="main" tabindex="-1">
+    <!-- Show an explanation when scripts are disabled; the dynamic guide requires JavaScript. -->
     <noscript><div class="notice danger">FixForward needs JavaScript to show the appliance guide. Enable JavaScript in your browser, then reload this page.</div></noscript>
+    <!-- renderScreen in src/app.js places the current form or result in this initially empty element. -->
     <div id="app"></div>
   </main>
 
+  <!-- The footer keeps the household-guide purpose and decision-support limit visible across screens. -->
   <footer class="site-footer">
     <div>
       <strong>FixForward · household appliance guide</strong>
@@ -47,26 +73,34 @@
     <div class="footer-meta"><span>For Melbourne households</span></div>
   </footer>
 
+  <!-- app.js fills source/availability details here without replacing the current journey. -->
   <dialog id="about-dialog" aria-labelledby="about-title">
+    <!-- aria-labelledby connects the dialog's accessible name to the heading with this ID. -->
     <div class="dialog-head">
       <div><p class="eyebrow">About FixForward</p><h2 id="about-title">Where this information comes from</h2></div>
+      <!-- The visible multiplication symbol is a close icon; the text label explains its action. -->
       <button class="icon-button" id="close-about" type="button" aria-label="Close">×</button>
     </div>
+    <!-- renderAbout supplies current source details and data-availability messages here. -->
     <div id="about-content"></div>
   </dialog>
 
+  <!-- Confirm before clearing this tab's adult answers; Quest has a separate reset flow. -->
   <dialog id="restart-dialog" aria-labelledby="restart-title" aria-describedby="restart-description">
+    <!-- The heading names this panel; aria-describedby makes its consequence text available to assistive tools. -->
     <div class="dialog-head">
       <div><p class="eyebrow">Start again?</p><h2 id="restart-title">Clear this journey</h2></div>
       <button class="icon-button" data-close-restart type="button" aria-label="Close">×</button>
     </div>
     <p id="restart-description">Starting again clears the appliance details, answers and prices you entered in this tab.</p>
     <div class="button-row">
+      <!-- data-close-restart keeps the current answers; confirm-restart invokes the actual reset handler. -->
       <button class="button secondary" data-close-restart type="button">Keep my progress</button>
       <button class="button danger" id="confirm-restart" type="button">Start again</button>
     </div>
   </dialog>
 
+  <!-- Brief status announcements share one live region rather than interrupting the form. -->
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

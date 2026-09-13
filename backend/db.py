@@ -1,12 +1,18 @@
+# Runtime PostgreSQL boundary used only by repository.py reads.
+# Connections use read-only transactions and parameterized queries; deployment should also supply a SELECT-only database role.
+# Import and migration scripts have separate write paths and do not call these helpers.
+
 """Small read-only PostgreSQL access layer."""
 
 from flask import current_app
 
 
+# Represent a database-read failure that the API can report without connection details.
 class DatabaseUnavailable(RuntimeError):
     """Raised when public data cannot be read without exposing DB details."""
 
 
+# Open a bounded pooled connection, apply a transaction-local timeout and return dictionary rows.
 def fetch_all(query, params=()):
     """Execute one parameterised SELECT and return rows as dictionaries.
 
@@ -44,6 +50,7 @@ def fetch_all(query, params=()):
         raise DatabaseUnavailable("The public database could not be read") from error
 
 
+# Reuse the same read-only query path and return its first row, or None when the result is empty.
 def fetch_one(query, params=()):
     rows = fetch_all(query, params)
     return rows[0] if rows else None

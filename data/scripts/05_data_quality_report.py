@@ -1,3 +1,7 @@
+# Database diagnostic with local report output: issue SELECT audits and write data/docs/DATA_QUALITY_REPORT.json.
+# Run after imports, enrichment and validation migrations; it does not issue data-changing SQL.
+# A source-provenance count is intentionally separate from facility verification and confirmed appliance acceptance.
+
 """
 Data-quality report for the FixForward Neon database.
 
@@ -31,10 +35,12 @@ OUT_PATH = os.path.join(SCRIPT_DIR, "..", "docs", "DATA_QUALITY_REPORT.json")
 OFFICIAL_RECALL_SEARCH = "https://www.productsafety.gov.au/recalls"
 
 
+# Express a count as a percentage while avoiding division by zero for an empty dataset.
 def pct(part: int, whole: int) -> float:
     return 0.0 if whole == 0 else round(100.0 * part / whole, 1)
 
 
+# Query the current data invariants, write the structured local report and fail when a hard requirement is broken.
 def main() -> int:
     load_dotenv(os.path.join(REPO_ROOT, ".env"))
     database_url = os.getenv("DATABASE_URL")

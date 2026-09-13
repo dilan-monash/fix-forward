@@ -1,3 +1,6 @@
+# Local-file transformation: convert Overpass objects into locations_repair.csv for the repair-location loader.
+# Only available tags supply contact details. Coordinates and a repair label do not establish a qualified service.
+
 """
 Step 8b: Clean OSM repair POIs for the locations table.
 
@@ -42,6 +45,7 @@ OUT_COLUMNS = [
 ]
 
 
+# Return the first populated tag from the listed alternatives, or an empty value when none exists.
 def tag(tags: dict, *keys: str) -> str:
     for key in keys:
         if key in tags and tags[key]:
@@ -49,6 +53,7 @@ def tag(tags: dict, *keys: str) -> str:
     return ""
 
 
+# Assemble the available house/street fields, falling back to a full address tag when needed.
 def build_address(tags: dict) -> str:
     parts = []
     housenumber = tag(tags, "addr:housenumber")
@@ -62,6 +67,7 @@ def build_address(tags: dict) -> str:
     return ", ".join(parts)
 
 
+# Derive a broad provider label from source tags and names without claiming appliance acceptance.
 def build_facility_type(tags: dict) -> str:
     if tag(tags, "amenity") == "repair_cafe":
         return "Repair café"
@@ -77,6 +83,7 @@ def build_facility_type(tags: dict) -> str:
     return "Repair service"
 
 
+# Read a node coordinate or the reported center of a non-node object, leaving missing values empty.
 def coords(element: dict) -> tuple[str, str]:
     if element["type"] == "node":
         return str(element.get("lat", "")), str(element.get("lon", ""))
@@ -84,6 +91,7 @@ def coords(element: dict) -> tuple[str, str]:
     return str(center.get("lat", "")), str(center.get("lon", ""))
 
 
+# Filter usable named places, deduplicate their source details and write the repair-location CSV.
 def main() -> int:
     if not os.path.exists(RAW_PATH):
         print(f"ERROR: Run 00_download_osm.py first. Missing: {RAW_PATH}")

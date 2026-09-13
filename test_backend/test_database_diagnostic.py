@@ -1,3 +1,6 @@
+# Diagnostic-output suite driven by fake Flask clients and response objects; no database or web server is started.
+# Assertions cover honest readiness/count reporting and ensure output omits connection details.
+
 """Diagnostic behavior tests without a live database or installed web server."""
 
 from contextlib import redirect_stdout
@@ -8,6 +11,7 @@ from unittest.mock import MagicMock, patch
 from backend import check_database
 
 
+# Create a configurable fake app/client so diagnostic control flow can be tested without Flask requests.
 def fake_app(responses=None, database_url="postgresql://private-user:private-pass@private-host/database"):
     app = MagicMock()
     app.config = {"DATABASE_URL": database_url}
@@ -17,6 +21,7 @@ def fake_app(responses=None, database_url="postgresql://private-user:private-pas
     return app, client
 
 
+# Build the minimum response interface used by the diagnostic: status code and JSON payload.
 def response(payload, status=200):
     result = MagicMock()
     result.status_code = status
@@ -24,6 +29,7 @@ def response(payload, status=200):
     return result
 
 
+# Supply valid readiness and dataset responses as a baseline that individual cases can alter.
 def passing_responses():
     return [
         response({"database": "available"}),
@@ -34,7 +40,9 @@ def passing_responses():
     ]
 
 
+# Group diagnostic setup, short-circuit, malformed-payload and output-safety checks.
 class DatabaseDiagnosticTests(unittest.TestCase):
+    # Run the diagnostic against a supplied fake and capture its exit code and printed report.
     def run_main(self, app):
         output = StringIO()
         with patch.object(check_database, "create_app", return_value=app), redirect_stdout(output):

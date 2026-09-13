@@ -1,3 +1,7 @@
+-- OPTIONAL DATABASE-WRITING schema for future PostgreSQL price storage.
+-- The current runtime reads local SQLite via backend/price_catalogue.py; this table is not used by that reader.
+-- This file is not part of the Render build command or automatic Flask startup.
+
 -- OPTIONAL future PostgreSQL storage for the public replacement-price catalogue.
 -- This migration is NOT required by the explicit local SQLite snapshot and has
 -- NOT been run on Neon. Applying it does not change the application's reader.

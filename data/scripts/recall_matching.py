@@ -1,3 +1,7 @@
+# Pure shared pattern definitions and matching functions used by seed, candidate-refresh and regression scripts.
+# Importing this module does not contact a database. Matches remain auditable category candidates requiring human review.
+# Title and summary are matched separately; broad RSS category/legacy keyword text does not supply a product match.
+
 """
 Pattern definitions and matching logic for ACCC recall candidates.
 
@@ -48,6 +52,7 @@ KETTLE_NOT_APPLIANCE = r"kettle[\s\-]*(chips?|corn|bell)"
 
 
 @dataclass(frozen=True)
+# Hold one reviewed category pattern together with its required/excluded context and confidence.
 class Pattern:
     category_code: str
     pattern: str
@@ -58,10 +63,12 @@ class Pattern:
     notes: str | None = None
 
 
+# Construct a literal-phrase pattern definition with common defaults for the reviewed registry.
 def _phrase(category: str, phrase: str, confidence: str = "high", **kw) -> Pattern:
     return Pattern(category, phrase, "exact_phrase", confidence, **kw)
 
 
+# Construct an explicit regular-expression pattern with common confidence and context defaults.
 def _word(category: str, regex: str, confidence: str = "medium", **kw) -> Pattern:
     return Pattern(category, regex, "word_regex", confidence, **kw)
 
@@ -194,12 +201,14 @@ PATTERNS: list[Pattern] = [
 ]
 
 
+# Escape literal words and add boundaries while tolerating whitespace or hyphens between them.
 def phrase_to_regex(phrase: str) -> str:
     """Whole-word regex for a phrase, tolerating hyphens and extra spaces."""
     words = [re.escape(w) for w in phrase.split()]
     return r"\b" + r"[\s\-]+".join(words) + r"\b"
 
 
+# Resolve a supported pattern kind to its regular expression and reject unknown kinds.
 def pattern_regex(pattern: str, pattern_type: str) -> str:
     if pattern_type == "exact_phrase":
         return phrase_to_regex(pattern)
@@ -208,11 +217,13 @@ def pattern_regex(pattern: str, pattern_type: str) -> str:
     raise ValueError(f"Unknown pattern_type: {pattern_type}")
 
 
+# Join available title/summary text for callers that need the combined display/search input.
 def searchable_text(title: str | None, summary: str | None) -> str:
     """Title and summary only. See the module docstring for why."""
     return " ".join(p for p in (title, summary) if p)
 
 
+# Require a pattern hit and its contextual rules before returning the actual matching substring.
 def match_one(text: str, pattern: Pattern) -> str | None:
     """Return the matched substring, or None if the pattern does not apply."""
     if not text:
@@ -231,6 +242,7 @@ def match_one(text: str, pattern: Pattern) -> str | None:
     return hit.group(0)
 
 
+# Try title before summary and retain the exact field that produced an acceptable match.
 def match_fields(
     title: str | None, summary: str | None, pattern: Pattern
 ) -> tuple[str, str] | None:
@@ -244,6 +256,7 @@ def match_fields(
     return None
 
 
+# Keep the strongest candidate per category, preferring title evidence when confidence ties.
 def best_matches(
     title: str | None, summary: str | None, patterns: list[Pattern]
 ) -> dict[str, dict]:

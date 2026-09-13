@@ -1,3 +1,7 @@
+# DATABASE-WRITING seed: synchronize active patterns from recall_matching.py into the reviewable pattern table.
+# Requires category seed 04 and migration 005. Removed source patterns are deactivated, preserving their audit rows.
+# Run 06_match_recalls.py afterward to refresh the stored candidates.
+
 """
 Seed appliance_recall_patterns from the reviewed pattern list.
 
@@ -26,6 +30,7 @@ sys.path.insert(0, SCRIPT_DIR)
 from recall_matching import PATTERNS  # noqa: E402
 
 
+# Reject unknown categories, upsert reviewed pattern definitions and deactivate definitions removed from the source list.
 def main() -> int:
     load_dotenv(os.path.join(REPO_ROOT, ".env"))
     database_url = os.getenv("DATABASE_URL")
@@ -39,6 +44,7 @@ def main() -> int:
         print("ERROR: pip install -r requirements-data.txt")
         return 1
 
+    # This operator connection can write: normal context exit commits; an escaping exception rolls back its transaction.
     with psycopg.connect(database_url) as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT category_code FROM appliance_categories;")

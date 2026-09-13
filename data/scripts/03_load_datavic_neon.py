@@ -1,3 +1,7 @@
+# DATABASE-WRITING import: replace only recycling-type locations from the cleaned DataVic CSV.
+# Requires the base schema, location-enrichment/provenance columns and import-run migration 006.
+# Repair rows are outside this replacement; imported recycling candidates start without facility-specific verification.
+
 """
 Step 7c: Load DataVic recycling locations into Neon.
 
@@ -41,6 +45,7 @@ DATAVIC_SOURCE = {
 }
 
 
+# Load recycling candidates and provenance in one connection transaction, then report resulting counts.
 def main() -> int:
     load_dotenv(os.path.join(REPO_ROOT, ".env"))
     database_url = os.getenv("DATABASE_URL")
@@ -67,6 +72,7 @@ def main() -> int:
         locations = list(csv.DictReader(f))
 
     print("Loading DataVic recycling locations into Neon...")
+    # This operator connection can write: normal context exit commits; an escaping exception rolls back its transaction.
     with psycopg.connect(database_url) as conn:
         with conn.cursor() as cur:
             cur.execute("DELETE FROM locations WHERE location_type = 'recycling';")

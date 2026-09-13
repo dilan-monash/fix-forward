@@ -1,3 +1,7 @@
+# DATABASE-WRITING replacement: populate safety_rules from the reviewed repository JSON.
+# Requires migration 001. Run 06_seed_safety_rule_sources.py afterward to attach the full source records.
+# Replacing rules can remove dependent citation rows through their foreign key; this is not a read-only validation command.
+
 """
 Seed safety_rules from reviewed version-controlled JSON.
 
@@ -22,6 +26,7 @@ REPO_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, "..", ".."))
 SEED_PATH = os.path.join(SCRIPT_DIR, "..", "seed", "safety_rules.json")
 
 
+# Validate the configured rule input, replace stored rules and report active rule coverage.
 def main() -> int:
     load_dotenv(os.path.join(REPO_ROOT, ".env"))
     database_url = os.getenv("DATABASE_URL")
@@ -40,6 +45,7 @@ def main() -> int:
 
     reviewed = date.today().isoformat()
     print(f"Seeding {len(rules)} safety rules...")
+    # This operator connection can write: normal context exit commits; an escaping exception rolls back its transaction.
     with psycopg.connect(database_url) as conn:
         with conn.cursor() as cur:
             cur.execute("DELETE FROM safety_rules;")

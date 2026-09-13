@@ -1,3 +1,5 @@
+// TEST SUITE: Checks local brand/model suggestions and category filtering; no external product search runs.
+// Each test name describes its expected behavior; fixtures are invented test inputs.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { productSuggestions } from "../src/product-suggestions.js";

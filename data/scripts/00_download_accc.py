@@ -1,3 +1,6 @@
+# Network download and local-file write: save the published ACCC RSS response under data/raw/accc.
+# Run only when intentionally refreshing the source; 01_clean_accc.py consumes the dated XML. No database is opened.
+
 """
 Step 6a: Download ACCC Product Safety recall RSS feed.
 
@@ -20,6 +23,7 @@ RSS_URL = "https://www.productsafety.gov.au/rss/feed.xml/psa_recall"
 OFFICIAL_SEARCH_URL = "https://www.productsafety.gov.au/recalls"
 
 
+# Download the configured RSS feed and save the raw bytes for the later cleaner and import checksum.
 def main() -> int:
     os.makedirs(OUT_DIR, exist_ok=True)
     out_path = os.path.join(OUT_DIR, f"accc_recalls_{date.today().isoformat()}.xml")

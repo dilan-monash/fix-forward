@@ -1,3 +1,6 @@
+-- DATABASE-WRITING schema phase before 06_seed_safety_rule_sources.py; allow multiple precise citations per rule.
+-- The seeder keeps the older single primary URL aligned while this table stores the fuller evidence record.
+
 -- FixForward migration 008 — allow a safety rule to cite more than one source
 --
 -- safety_rules.source_url holds a single URL, which forced compromises: the

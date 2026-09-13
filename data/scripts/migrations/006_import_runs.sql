@@ -1,3 +1,6 @@
+-- DATABASE-WRITING schema/data migration: create per-source import history and move existing recall-window metadata into it.
+-- The 03 loaders use import_utils.py to write these rows; backend recall metadata reads the latest successful source run.
+
 -- FixForward migration 006 — normalise import metadata into import runs
 --
 -- feed_retrieved_at, feed_window_start and feed_window_end were repeated

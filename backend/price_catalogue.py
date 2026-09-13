@@ -1,3 +1,7 @@
+# Reviewed-price support shared by the build script, replacement-prices API and isolated tests.
+# Build functions write a local SQLite snapshot; read_catalogue opens that exact file read-only. Neither path contacts Neon.
+# Keep observation validation and snapshot identity together so the API and generated static preview agree.
+
 """Reviewed public price snapshots, kept separate from the Neon public datasets.
 
 The build command writes SQLite; web requests only open it with mode=ro. No
@@ -51,14 +55,17 @@ LIMITATION = (
 )
 
 
+# Report rejected authored price metadata or an invalid snapshot before it can be presented as reviewed.
 class CatalogueValidationError(ValueError):
     """The reviewed input is incomplete or fails the source/data rules."""
 
 
+# Hide storage details behind the API-safe missing or untrusted snapshot condition.
 class PriceCatalogueUnavailable(RuntimeError):
     """The explicit local public snapshot cannot be read or trusted."""
 
 
+# Validate one dated AUD offer, including exact cents, supported category and named-retailer product URL.
 def validate_observation(record, today=None):
     """Return a clean record, rejecting uncertain numeric or source metadata."""
     if not isinstance(record, dict):
@@ -86,6 +93,7 @@ def validate_observation(record, today=None):
         raise CatalogueValidationError("Only advertised AUD observations are supported")
     if result["availability"] not in {"not-verified", "in-stock", "out-of-stock"}:
         raise CatalogueValidationError("Unknown availability value")
+    # Boolean is a Python number subtype, so reject it before accepting a currency amount.
     value = record["priceAud"]
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise CatalogueValidationError("priceAud must be a number")
@@ -117,6 +125,7 @@ def validate_observation(record, today=None):
     return {key: result[key] for key in FIELDS}
 
 
+# Validate the whole nonempty input, reject duplicate offers and return a stable ID ordering.
 def validate_observations(records, today=None):
     if not isinstance(records, list) or not records:
         raise CatalogueValidationError("At least one reviewed observation is required")
@@ -140,6 +149,7 @@ def validate_observations(records, today=None):
     return sorted(clean, key=lambda row: row["id"])
 
 
+# Read only observation-array JSON files from the explicit source directory and validate their combined content.
 def load_reviewed_observations(source_dir=DEFAULT_SOURCE_DIR):
     files = sorted(Path(source_dir).glob("*-observations.json"))
     if not files:
@@ -156,9 +166,11 @@ def load_reviewed_observations(source_dir=DEFAULT_SOURCE_DIR):
     return validate_observations(records)
 
 
+# Create the shared response payload and deterministic content hash from validated observations.
 def snapshot_payload(records):
     """Shared contract for the SQLite API and explicit static-preview bundle."""
     clean = validate_observations(records)
+    # Stable keys and row ordering make the content hash repeatable across the SQLite and browser exports.
     canonical = json.dumps(clean, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     observed_dates = [row["observedAt"] for row in clean]
     meta = {
@@ -204,6 +216,7 @@ CREATE TABLE replacement_price_catalogue_meta (
 """
 
 
+# Build and check a temporary SQLite file before atomically replacing the previous public snapshot.
 def build_database(records, destination=DEFAULT_DATABASE_PATH):
     """Validate everything before atomically replacing a public snapshot file."""
     payload = snapshot_payload(records)
@@ -235,12 +248,14 @@ def build_database(records, destination=DEFAULT_DATABASE_PATH):
                 raise CatalogueValidationError("Built snapshot failed SQLite integrity check")
         finally:
             connection.close()
+        # Readers keep the previous complete snapshot until the new file has passed validation and integrity checks.
         temporary_path.replace(destination)
     finally:
         temporary_path.unlink(missing_ok=True)
     return payload
 
 
+# Open the existing SQLite file read-only and revalidate content against its stored snapshot metadata.
 def read_catalogue(database_path=DEFAULT_DATABASE_PATH):
     """Read only this explicit database; a missing file never creates a new one."""
     try:
@@ -273,6 +288,7 @@ def read_catalogue(database_path=DEFAULT_DATABASE_PATH):
             item["priceAud"] = cents / 100
             records.append(item)
         payload = snapshot_payload(records)
+        # Recompute rather than trust stored labels: edited rows must not retain an older reviewed snapshot identity.
         if stored_meta != payload["meta"]:
             raise CatalogueValidationError("Price catalogue content does not match its reviewed snapshot metadata")
         return payload

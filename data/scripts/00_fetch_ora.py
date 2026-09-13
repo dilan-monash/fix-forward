@@ -1,3 +1,6 @@
+# Read-only local-file diagnostic despite its historical fetch name: verify the manually supplied ORA snapshot.
+# It neither downloads the email-gated source nor connects to Neon. The checksum must pass before 01_clean_ora.py.
+
 """
 Verify the manually placed Open Repair Alliance aggregate snapshot.
 
@@ -33,6 +36,7 @@ EXPECTED_FILENAME = "OpenRepairData_v0.3_aggregate_202507.csv"
 EXPECTED_SHA256 = "364d741b39b40ce955a5a9f83adf9776b3f40f2f857cc2cd96b6ae1818aabe82"
 
 
+# Check the expected ORA file and hash, explaining manual setup or returning failure for a different snapshot.
 def main() -> int:
     if not os.path.exists(RAW_PATH):
         print("ERROR: ORA snapshot is not present.")

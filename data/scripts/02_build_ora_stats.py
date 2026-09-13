@@ -1,3 +1,6 @@
+# Local-file transformation: aggregate 01_clean_ora.py output into statistics and barrier CSVs.
+# 03_load_ora_neon.py consumes both outputs. Australian/global fallback and small samples remain explicitly labelled.
+
 """
 Step 5c: Build repair statistics and barriers from cleaned ORA data.
 
@@ -56,11 +59,13 @@ BARRIER_COLUMNS = [
 ]
 
 
+# Read the mapped ORA rows from the preceding cleaner without changing them.
 def load_clean_rows() -> list[dict[str, str]]:
     with open(CLEAN_PATH, newline="", encoding="utf-8") as f:
         return list(csv.DictReader(f))
 
 
+# Count only the three named repair outcomes; other statuses remain part of the sample denominator.
 def count_status(rows: list[dict[str, str]]) -> dict[str, int]:
     counts = Counter(row["repair_status"] for row in rows)
     return {
@@ -70,6 +75,7 @@ def count_status(rows: list[dict[str, str]]) -> dict[str, int]:
     }
 
 
+# Choose Australian, labelled global-fallback or insufficient samples for each mapped appliance category.
 def build_stats(rows: list[dict[str, str]]) -> list[dict[str, str]]:
     grouped: dict[tuple[str, str], list[dict[str, str]]] = defaultdict(list)
     for row in rows:
@@ -127,6 +133,7 @@ def build_stats(rows: list[dict[str, str]]) -> list[dict[str, str]]:
     return results
 
 
+# Count reported end-of-life barriers using the same geography selected for the category benchmark.
 def build_barriers(rows: list[dict[str, str]], stats: list[dict[str, str]]) -> list[dict[str, str]]:
     geo_by_key = {
         (s["appliance_family"], s["appliance_category"]): s["geography"] for s in stats
@@ -164,6 +171,7 @@ def build_barriers(rows: list[dict[str, str]], stats: list[dict[str, str]]) -> l
     return barrier_rows
 
 
+# Require mapped input, build both aggregates and replace their local CSV outputs for the loader.
 def main() -> int:
     if not os.path.exists(CLEAN_PATH):
         print(f"ERROR: Run 01_clean_ora.py first. Missing: {CLEAN_PATH}")

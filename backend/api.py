@@ -1,3 +1,7 @@
+# Public-data JSON contract consumed by the adult browser through src/data-service.js.
+# Neon-backed routes use repository.py and pure row transforms; replacement prices use the separate reviewed SQLite snapshot.
+# Quest fiction does not fetch these datasets. The shared gate runs before protected API requests.
+
 """Read-only JSON endpoints consumed by the browser application."""
 
 from flask import Blueprint, current_app, jsonify, request
@@ -21,6 +25,7 @@ from .transform import (
 api = Blueprint("api", __name__, url_prefix="/api")
 
 
+# Attach the configured release label and optional dataset-specific provenance to a response.
 def release_meta(extra=None):
     meta = {"releaseVersion": current_app.config["RELEASE_VERSION"]}
     if extra:
@@ -29,6 +34,7 @@ def release_meta(extra=None):
 
 
 @api.after_request
+# Set JSON type and default dataset caching; the access gate later overrides caching when enabled.
 def public_api_headers(response):
     # Public datasets change only when the governed import pipeline changes.
     # Short caching reduces repeated Neon reads without hiding release updates.
@@ -41,6 +47,7 @@ def public_api_headers(response):
 
 
 @api.errorhandler(DatabaseUnavailable)
+# Translate an unavailable PostgreSQL read into a generic recoverable 503 response.
 def database_unavailable(_error):
     return jsonify(
         error={
@@ -51,6 +58,7 @@ def database_unavailable(_error):
 
 
 @api.errorhandler(PriceCatalogueUnavailable)
+# Report a missing or untrusted price snapshot while preserving the manual-price option.
 def price_catalogue_unavailable(_error):
     return jsonify(
         error={
@@ -61,6 +69,7 @@ def price_catalogue_unavailable(_error):
 
 
 @api.errorhandler(Exception)
+# Log only the route and exception type, then return a generic API failure.
 def unexpected_api_error(error):
     # Log only the exception class; database messages can contain infrastructure
     # details that should not be returned to users or routine application logs.
@@ -78,12 +87,14 @@ def unexpected_api_error(error):
 
 
 @api.get("/health")
+# Answer liveness without a database read; this route alone does not prove data readiness.
 def health():
     """Liveness check: prove the Flask process can answer without depending on Neon."""
     return jsonify(status="ok", service="available", **release_meta())
 
 
 @api.get("/ready")
+# Require a successful SELECT 1 result before reporting the PostgreSQL connection ready.
 def ready():
     """Readiness check: prove the public database can be queried."""
     result = repository.health_check()
@@ -93,6 +104,7 @@ def ready():
 
 
 @api.get("/recalls")
+# Combine the latest recorded recall-source coverage with manually reviewed structured products.
 def recalls():
     metadata = repository.recall_metadata() or {}
     rows = repository.reviewed_recall_products()
@@ -110,6 +122,7 @@ def recalls():
 
 
 @api.get("/sources")
+# Expose dataset provenance with validated links and consistent date formatting.
 def sources():
     rows = repository.sources()
     public_sources = [
@@ -127,6 +140,7 @@ def sources():
 
 
 @api.get("/repair-evidence")
+# Join category statistics to their barriers and preserve geography and sample limitations.
 def repair_evidence():
     evidence = group_repair_evidence(
         repository.repair_statistics(), repository.repair_barriers()
@@ -135,6 +149,7 @@ def repair_evidence():
 
 
 @api.get("/replacement-prices")
+# Read reviewed local price observations without treating them as evidence of Neon availability.
 def replacement_prices():
     # This is an explicit, independent public price snapshot. It never replaces
     # Neon recalls, repair evidence or locations, and does not prove Neon health.
@@ -146,6 +161,7 @@ def replacement_prices():
 
 
 @api.get("/locations")
+# Return eligible location candidates for browser-side filtering; the visitor area is not sent here.
 def locations():
     # User suburb/postcode filtering happens in browser memory. This endpoint
     # therefore never receives or logs the user's area selection.

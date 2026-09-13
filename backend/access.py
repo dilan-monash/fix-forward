@@ -1,3 +1,7 @@
+# Shared access boundary for both adult and Quest routes; configured once by create_app.
+# Flask signed cookies hold a time-limited access marker and CSRF token, not an account or appliance data.
+# All protected responses are private/no-store; only liveness and the minimal access-page assets bypass the gate.
+
 """Shared prototype access gate, enforced before frontend and API responses.
 
 The shared password and cookie signing key are server environment settings.
@@ -21,6 +25,7 @@ ACCESS_SECONDS = 4 * 60 * 60
 access = Blueprint("access", __name__, template_folder="templates")
 
 
+# Keep the gate enabled except for an explicitly marked internal test/diagnostic application.
 def _enabled():
     # The bypass is exclusively for internal diagnostic/test app instances.
     # There is no request header, URL parameter or environment toggle to bypass.
@@ -30,6 +35,7 @@ def _enabled():
     )
 
 
+# Require usable password and signing-key settings before allowing the access flow.
 def _configured():
     password = current_app.config.get("SITE_PASSWORD")
     key = current_app.config.get("SECRET_KEY")
@@ -39,6 +45,7 @@ def _configured():
     )
 
 
+# Tie existing signed sessions to the current shared password without putting that password in the cookie.
 def _password_marker():
     # Sessions are signed, not encrypted. Store a keyed marker, never the
     # password or an unkeyed digest that could reveal a short shared password.
@@ -49,6 +56,7 @@ def _password_marker():
     ).hexdigest()
 
 
+# Reject missing, expired, future-dated or password-stale session markers.
 def _authenticated():
     issued_at = session.get("access_issued_at")
     marker = session.get("access_marker")
@@ -60,6 +68,7 @@ def _authenticated():
     )
 
 
+# Reuse or create the unpredictable token used by this browser session to submit access forms.
 def _csrf_token():
     token = session.get("access_csrf")
     if not isinstance(token, str):
@@ -68,6 +77,7 @@ def _csrf_token():
     return token
 
 
+# Compare the posted form token with this session so another site cannot submit the action for the visitor.
 def _valid_csrf():
     supplied = request.form.get("csrf_token", "")
     expected = session.get("access_csrf")
@@ -76,6 +86,7 @@ def _valid_csrf():
     )
 
 
+# Render one access-page mode and issue a CSRF token only when its form is usable.
 def _page(mode="login", error=None, status=200):
     return render_template(
         "access.html", mode=mode, error=error,
@@ -84,11 +95,13 @@ def _page(mode="login", error=None, status=200):
 
 
 @access.get("/access.css")
+# Serve the gate stylesheet without loading either application or contacting the database.
 def stylesheet():
     return send_from_directory(Path(__file__).resolve().parent, "access.css")
 
 
 @access.route("/login", methods=["GET", "POST"])
+# Check CSRF and the exact shared password, then replace the old session and redirect only to home.
 def login():
     if not _enabled():
         return redirect(url_for("index"), code=303)
@@ -114,6 +127,7 @@ def login():
 
 
 @access.route("/logout", methods=["GET", "POST"])
+# Show confirmation on GET; clear access only after a POST with a valid CSRF token.
 def logout():
     if not _enabled():
         return redirect(url_for("index"), code=303)
@@ -125,6 +139,7 @@ def logout():
     return _page(mode="logout")
 
 
+# Configure cookie/session limits and install request and response hooks for every protected route.
 def configure_access(app):
     app.config.update(
         SESSION_COOKIE_HTTPONLY=True,
@@ -138,6 +153,7 @@ def configure_access(app):
     app.register_blueprint(access)
 
     @app.before_request
+    # Allow the narrow public exceptions, fail closed on missing configuration and otherwise require valid access.
     def require_website_access():
         if not _enabled():
             return None
@@ -167,6 +183,7 @@ def configure_access(app):
         return redirect(url_for("access.login"), code=303)
 
     @app.after_request
+    # Replace dataset cache headers so an authenticated response is not reusable after access expires.
     def protect_response_caching(response):
         if _enabled():
             # This runs after API blueprint hooks, replacing their former public

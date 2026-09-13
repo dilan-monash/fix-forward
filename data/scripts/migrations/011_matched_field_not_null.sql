@@ -1,3 +1,6 @@
+-- DATABASE-WRITING validation phase; requires 06_match_recalls.py to backfill the exact source field for each candidate.
+-- The audit fails before adding NOT NULL when candidates still lack that evidence.
+
 -- FixForward migration 011 — matched_field is required on every candidate
 --
 -- Validate phase. Run AFTER 06_match_recalls.py has backfilled matched_field.

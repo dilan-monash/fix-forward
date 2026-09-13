@@ -1,3 +1,6 @@
+# Compatibility wrapper for the read-only backend.check_database diagnostic, not a database-writing test.
+# It adds the repository to Python imports and delegates to the shared diagnostic only when run as a script.
+
 """Compatibility entry point for the application's read-only database check.
 
 Run: python data/scripts/test_neon_connection.py

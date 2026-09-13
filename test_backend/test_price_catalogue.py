@@ -1,3 +1,6 @@
+# Price validation and API suite using temporary local SQLite files and reviewed example records.
+# Tests intentionally modify those temporary files to probe integrity; they do not change the project catalogue or contact Neon.
+
 """Price provenance/storage tests using temporary databases and standard library."""
 
 from copy import deepcopy
@@ -23,6 +26,7 @@ from backend.price_catalogue import (
 )
 
 
+# Return one complete synthetic price observation with optional field overrides for a focused case.
 def example(**overrides):
     # Synthetic fixture: no claim that this product or price is a real offer.
     record = {
@@ -37,12 +41,15 @@ def example(**overrides):
     return record
 
 
+# Group pure validation and temporary SQLite build/read integrity checks.
 class PriceCatalogueTests(unittest.TestCase):
+    # Create isolated temporary paths and fixtures for this test instance.
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.root = Path(self.temp.name)
         self.database = self.root / "catalogue.sqlite"
 
+    # Remove the temporary directory created by the test so its local database does not persist.
     def tearDown(self):
         self.temp.cleanup()
 
@@ -159,7 +166,9 @@ HAS_WEB_DEPENDENCIES = bool(importlib.util.find_spec("flask") and importlib.util
 
 
 @unittest.skipUnless(HAS_WEB_DEPENDENCIES, "Flask/python-dotenv are not installed; stdlib catalogue tests still run")
+# Check price API availability independently from PostgreSQL readiness.
 class PriceCatalogueApiTests(unittest.TestCase):
+    # Create isolated temporary paths and fixtures for this test instance.
     def setUp(self):
         from backend import create_app
         self.temp = tempfile.TemporaryDirectory()
@@ -167,6 +176,7 @@ class PriceCatalogueApiTests(unittest.TestCase):
         self.app = create_app({"TESTING": True, "SITE_ACCESS_ENABLED": False, "DATABASE_URL": "", "PRICE_CATALOGUE_PATH": self.database})
         self.client = self.app.test_client()
 
+    # Remove the temporary directory created by the test so its local database does not persist.
     def tearDown(self):
         self.temp.cleanup()
 

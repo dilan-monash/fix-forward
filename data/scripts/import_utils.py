@@ -1,3 +1,6 @@
+# Shared provenance helpers imported by the database loaders, not a standalone import command.
+# Hash helpers read local files; upsert_import_run writes through the caller cursor and leaves commit/rollback to that caller.
+
 """
 Shared helpers for import provenance.
 
@@ -12,6 +15,7 @@ from datetime import date, datetime
 from typing import Any
 
 
+# Hash the exact source bytes in chunks without loading the entire snapshot into memory.
 def sha256_file(path: str) -> str:
     digest = hashlib.sha256()
     with open(path, "rb") as f:
@@ -20,6 +24,7 @@ def sha256_file(path: str) -> str:
     return digest.hexdigest()
 
 
+# Combine the source basename and digest in the provenance format stored on an import run.
 def checksum_label(path: str) -> str:
     """sha256(<basename>)=<hex> — the format stored on data_import_runs."""
     import os
@@ -27,6 +32,7 @@ def checksum_label(path: str) -> str:
     return f"sha256({os.path.basename(path)})={sha256_file(path)}"
 
 
+# Write or refresh one successful source/timestamp import record within the caller transaction.
 def upsert_import_run(
     cur: Any,
     *,

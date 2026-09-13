@@ -1,3 +1,6 @@
+# Read-only database diagnostic: print table totals and selected coverage checks for the current configured database.
+# It uses SELECT queries and does not seed, migrate or repair missing data; it is separate from runtime liveness.
+
 """
 QA: print Neon table counts and key coverage checks for PGP / mentor demos.
 
@@ -16,6 +19,7 @@ SCRIPT_DIR = os.path.dirname(__file__)
 REPO_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, "..", ".."))
 
 
+# Query table and coverage totals after checking configuration/dependencies, then print the local diagnostic summary.
 def main() -> int:
     load_dotenv(os.path.join(REPO_ROOT, ".env"))
     database_url = os.getenv("DATABASE_URL")
