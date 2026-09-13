@@ -2,7 +2,8 @@
 <!doctype html>
 <!-- CHILD ENTRY: Flask serves this at /quest after website access; the local fixture helper also serves it for review. -->
 <!-- English page language helps screen readers choose the correct pronunciation. -->
-<html lang="en">
+<!-- Character movement starts automatically; no animation switch is needed. -->
+<html lang="en" data-motion="full">
 <head>
   <!-- UTF-8 preserves the story punctuation, arrows and reward symbols. -->
   <meta charset="utf-8">
@@ -24,6 +25,8 @@
   <link rel="stylesheet" href="/quest/game-feel.css">
   <link rel="stylesheet" href="/quest/clue-play.css">
   <link rel="stylesheet" href="/quest/family-guide.css">
+  <!-- Large picture clues and the illustrated play trail keep child screens visual. -->
+  <link rel="stylesheet" href="/quest/visual-play.css">
 <!-- Native ES modules load app.js and its imports; there is no bundler or hot reload in this checkout. -->
   <script type="module" src="/quest/app.js"></script>
 </head>

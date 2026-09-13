@@ -14,6 +14,13 @@ const MELODIES = Object.freeze({
   win: [[523.25, 0, 0.16], [659.25, 0.10, 0.18], [783.99, 0.20, 0.20], [1046.50, 0.32, 0.25]],
   level: [[523.25, 0, 0.16], [659.25, 0.10, 0.18], [783.99, 0.20, 0.20], [1046.50, 0.32, 0.24], [1318.51, 0.46, 0.28]]
 });
+// Keep the familiar first win exactly as it was. Two related, gentle chimes add
+// a little variety on later wins without spoken congratulations or longer audio.
+const WIN_MELODIES = Object.freeze([
+  MELODIES.win,
+  [[659.25, 0, 0.14], [783.99, 0.10, 0.17], [1046.50, 0.22, 0.24]],
+  [[523.25, 0, 0.12], [783.99, 0.10, 0.14], [659.25, 0.20, 0.14], [1046.50, 0.32, 0.24]]
+]);
 const PEAK_VOLUME = 0.045;
 
 /**
@@ -34,6 +41,9 @@ export function createGameSounds({
   let disposed = false;
   let pendingUnlock = null;
   let revision = 0;
+  // This small session-only counter varies successful chimes, never game points.
+  // Muted, blocked and failed play requests must not skip a melody.
+  let nextWin = 0;
   let status = selected ? (typeof AudioContext === 'function' ? 'locked' : 'unavailable') : 'off';
   const voices = new Set();
 
@@ -135,7 +145,8 @@ export function createGameSounds({
     stop();
     try {
       const now = context.currentTime;
-      for (const [frequency, delay, duration] of MELODIES[kind]) {
+      const melody = kind === 'win' ? WIN_MELODIES[nextWin] : MELODIES[kind];
+      for (const [frequency, delay, duration] of melody) {
         const oscillator = context.createOscillator();
         const gain = context.createGain();
         const voice = { oscillator, gain, timer: null };
@@ -155,6 +166,9 @@ export function createGameSounds({
           release(voice);
         }, (delay + duration + 0.12) * 1000);
       }
+      // Advance only after every note was scheduled successfully. A later win
+      // replaces these notes through stop(), so variations cannot overlap.
+      if (kind === 'win') nextWin = (nextWin + 1) % WIN_MELODIES.length;
       return true;
     } catch {
       stop();

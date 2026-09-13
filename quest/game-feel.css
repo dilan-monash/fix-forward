@@ -24,16 +24,11 @@ body.quest[data-quest-view=grownups] { background:radial-gradient(ellipse at 85%
 .q-game-chrome .q-spark-track { height:13px; border:1px solid #638591; border-radius:9px; background:#0b2938; box-shadow:inset 0 2px 3px #0003; }
 .q-game-chrome .q-spark-track>span { background:linear-gradient(180deg,#fff4b0,#f4b82f); border:1px solid #ffdc74; box-shadow:0 0 10px #ffc75d80; }
 .q-hud-tools { display:flex; align-items:center; gap:.45rem; }
-/* Movement settings stay in reach, including when a device requests still art. */
+/* Sound, reading and play settings stay in reach while the child is playing. */
 .q-game-settings { display:grid; place-items:center; min-width:44px; min-height:48px; border:1px solid #7dadaf; border-radius:13px; background:#284f60; color:#fff7da; font-size:1.6rem; }
 .q-game-sound { display:flex; align-items:center; justify-content:center; gap:.35rem; min-height:48px; padding:.4rem .7rem; border:1px solid #7dadaf; border-radius:13px; background:#284f60; color:#fff7da; font-size:.78rem; font-weight:800; }
 .q-game-sound>span:first-child { font-size:1.45rem; }
 .q-game-sound[aria-pressed=true] { background:#c6e8d1; color:#174f43; border-color:#ddf4df; }
-/* Movement has its own reachable pause control: sound and animation choices are
-   independent. The label names the current state rather than hiding it in Settings. */
-.q-motion-control { display:flex; align-items:center; justify-content:center; gap:.35rem; min-height:48px; min-width:44px; padding:.4rem .7rem; border:1px solid #7dadaf; border-radius:13px; background:#284f60; color:#fff7da; font-size:.78rem; font-weight:800; }
-.q-motion-control>span:first-child { font-size:1.35rem; }
-.q-motion-control[aria-pressed=true] { background:#c6e8d1; color:#174f43; border-color:#ddf4df; }
 /* Show the current round beside the score, including replay progress when a
    picture has already earned Sparks. Counts remain visible while the board scrolls. */
 .q-round-hud { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.15rem .7rem; width:min(1200px,calc(100% - 3rem)); min-height:27px; margin:.35rem auto 0; color:#254e50; font-size:.78rem; }
@@ -43,11 +38,6 @@ body.quest[data-quest-view=grownups] { background:radial-gradient(ellipse at 85%
 .q-sound-invite { display:inline-flex; align-items:center; flex-wrap:wrap; gap:.4rem .6rem; margin:.9rem 0 0; min-height:48px; padding:.55rem .85rem; border:1.5px solid #ad9871; border-radius:14px; background:#ffefbb; font-weight:800; color:#4a442e; box-shadow:0 3px 0 #d9c795; }
 .q-sound-invite>span { font-size:1.4rem; }
 .q-sound-invite small { font-size:.74rem; font-weight:400; }
-/* A child can deliberately enable moving companions when the device defaults
-   to less motion; arriving on the page never overrides that device preference. */
-.q-motion-invite { display:inline-flex; flex-wrap:wrap; align-items:center; gap:.25rem .55rem; min-height:48px; margin:.65rem .5rem 0 0; padding:.5rem .8rem; border:1.5px solid #779f9a; border-radius:14px; background:#e2efe6; color:#224f49; font-weight:800; }
-.q-motion-invite small { font-size:.76rem; font-weight:400; }
-
 /* Play screens use compact stages and large touch choices, with details available
    on demand. Normal scrolling remains available for small screens and zoom. */
 body.quest:not([data-quest-view=grownups]) #quest-main { min-height:calc(100dvh - var(--q-chrome-height)); }
@@ -130,7 +120,7 @@ body.quest:not([data-quest-view=grownups]) #quest-main { min-height:calc(100dvh 
 .q-parent-restored-game>p { font-size:1rem; line-height:1.8; }
 
 /* Every touch/feedback effect is finite. The actual points and text are identical
-   with reduced motion; Follow my device honors the operating-system choice; Game animations is an explicit opt-in. */
+   when browser animation is unavailable. Quest starts moving without an extra setting. */
 @keyframes q-touch-ripple { from { opacity:1; transform:translate(-50%,-50%) scale(.35); } to { opacity:0; transform:translate(-50%,-50%) scale(2.1); } }
 @keyframes q-feedback-pop { 0% { opacity:0; translate:0 8px; scale:.9; } 65% { opacity:1; translate:0 0; scale:1.035; } 100% { scale:1; } }
 @media screen {
@@ -162,20 +152,19 @@ body.quest:not([data-quest-view=grownups]) #quest-main { min-height:calc(100dvh 
   .q-game-chrome .q-level-chip strong { max-width:110px; font-size:.82rem; }
   .q-game-chrome .q-player-strip { gap:.5rem; }
   .q-hud-tools { gap:.3rem; }
-  .q-game-sound,.q-motion-control,.q-game-chrome .q-hud-listen { font-size:.72rem; padding:.35rem .5rem; }
+  .q-game-sound,.q-game-chrome .q-hud-listen { font-size:.72rem; padding:.35rem .5rem; }
   .q-parent-restored-preview { grid-template-columns:1fr; }
 }
-/* Four 44px-or-larger controls need their own row on a narrow tablet or phone.
+/* Three 44px-or-larger controls need their own row on a narrow tablet or phone.
    Keeping the score above them prevents squeezed words and horizontal scrolling. */
 @media (max-width:760px) {
   .q-game-chrome .q-player-strip { display:grid; grid-template-columns:58px minmax(0,1fr); row-gap:.35rem; }
   .q-game-chrome .q-level-chip { min-width:0; }
   .q-game-chrome .q-level-chip>span:last-child { display:none; }
   .q-game-chrome .q-spark-meter { min-width:0; }
-  .q-hud-tools { grid-column:1/-1; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.35rem; }
+  .q-hud-tools { grid-column:1/-1; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.35rem; }
   .q-hud-tools>button { min-width:44px; width:100%; }
-  .q-game-sound,.q-motion-control { flex-direction:column; gap:0; font-size:.7rem; line-height:1.15; }
-  .q-motion-control>span:first-child { font-size:1.15rem; }
+  .q-game-sound { flex-direction:column; gap:0; font-size:.7rem; line-height:1.15; }
   .q-round-hud { font-size:.72rem; }
 }
 @media (max-width:600px) {
@@ -197,8 +186,8 @@ body.quest:not([data-quest-view=grownups]) #quest-main { min-height:calc(100dvh 
   .q-game-sound { flex-direction:column; gap:0; width:53px; padding:.2rem; font-size:.61rem; }
   .q-game-sound>span:first-child { font-size:1.15rem; }
   .q-game-chrome .q-hud-listen { width:46px; min-width:44px; padding:.3rem; }
-  /* Override the older single-row fixed widths now that all four share a grid. */
-  .q-hud-tools>.q-game-sound,.q-hud-tools>.q-motion-control,.q-game-chrome .q-hud-tools>.q-hud-listen { width:100%; }
+  /* Override the older single-row fixed widths now that all three share a grid. */
+  .q-hud-tools>.q-game-sound,.q-game-chrome .q-hud-tools>.q-hud-listen { width:100%; }
   .q-game-chrome .q-hud-listen>span:last-child { display:none; }
   .q-mission,.q-sort,.q-sort-finish { padding:.4rem .8rem 1rem; margin:.5rem auto; }
   .q-story-heading h1,.q-sort-heading h1 { font-size:1.65rem; }

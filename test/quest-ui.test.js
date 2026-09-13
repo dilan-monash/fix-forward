@@ -65,7 +65,8 @@ async function createQuest(t, { saved, storageBlocked = false, storageRemovalBlo
     animations.push(animation);
     return animation;
   };
-  // Let scenarios change the device motion preference and notify the real app listener.
+  // Model device preference changes so regressions can prove they do not switch
+  // off the currently requested always-animated game presentation.
   const media = { matches: reducedMotion, callbacks: [], addEventListener(type, callback) { if (type === 'change') this.callbacks.push(callback); } };
   window.matchMedia = () => media;
   // Record actual controller calls without producing audio or using a voice service.
@@ -198,7 +199,11 @@ test('rendered mission supports wrong choice, retry, tap planning, saved discove
   const item = MISSIONS[0];
   assert.ok(q.query('.q-home'));
   assert.match(q.required('.q-boundary').textContent, /Real appliances need adult help/);
-  q.selectMission(item);
+  assert.equal(q.required('.q-home-intro .q-play-trail [aria-current="step"] strong').textContent, 'Look', 'The home picture route shows where play begins');
+  q.click('[data-picker]');
+  q.click(`[data-mission="${item.id}"]`);
+  assert.equal(q.required('.q-mission-intro .q-play-trail [aria-current="step"] strong').textContent, 'Look', 'The story introduction keeps the same picture route before any clue is found');
+  q.click('[data-start-mission]');
   assert.equal(q.required('[data-open-plan]').disabled, false, 'Guided facts are visible without opening every clue');
   q.inspect(item);
   assert.equal(q.document.activeElement, q.required('[data-plan-focus]'));
@@ -243,7 +248,7 @@ test('semantic keyboard alternatives complete a two-slot story and preserve opti
   q.keyboardActivate('[data-complete]');
   assert.equal(q.savedState().activeMission.step, 'outcome');
   assert.equal(q.savedState().completed[item.id].assisted, false);
-  assert.equal(q.document.documentElement.dataset.motion, 'reduce');
+  assert.equal(q.document.documentElement.dataset.motion, 'full');
   const cooperative = MISSIONS.find(mission => mission.cooperative);
   q.keyboardActivate('[data-picker]');
   q.keyboardActivate(`[data-mission="${cooperative.id}"]`);
@@ -438,8 +443,8 @@ test('reload resumes an unfinished plan and settings; reset requires confirmatio
   q.click('[data-check-plan]');
   q.click('[data-complete]');
   q.click('#quest-settings');
-  q.change('#q-motion', 'reduce');
-  assert.equal(q.document.documentElement.dataset.motion, 'reduce');
+  assert.equal(q.query('#q-motion'), null, 'The removed movement setting cannot change the current design');
+  assert.equal(q.document.documentElement.dataset.motion, 'full');
   q.click('#q-reset');
   assert.match(q.required('#q-dialog-title').textContent, /Start a new adventure/);
   assert.equal(Object.keys(q.savedState().completed).length, 1);
@@ -1343,7 +1348,7 @@ test('the compact plan reveals pictures inline without resetting either choice o
   assert.equal(q.actualStorage.getItem(STORAGE_KEY), before);
 });
 
-test('reduced motion awards the same Sparks immediately without requiring a star flight', async t => {
+test('animated rewards still fly and fill the score when the device requests less motion', async t => {
   const q = await createQuest(t, { controlledAnimations: true, reducedMotion: true });
   const item = MISSIONS[0];
   q.selectMission(item);
@@ -1351,12 +1356,24 @@ test('reduced motion awards the same Sparks immediately without requiring a star
   q.plan(item.acceptedPlans[0]);
   q.click('[data-check-plan]');
   q.click('[data-complete]');
-  assert.equal(Number(q.required('[data-spark-value]').textContent), 20 + new Set(item.conceptIds).size * 5);
-  assert.equal(q.required('.q-reward-fx').dataset.reducedMotion, 'true');
-  assert.equal(q.query('.q-reward-fx__star'), null);
-  assert.equal(q.animations.filter(animation => animation.element.matches('.q-reward-fx__star')).length, 0);
+  const earned = 20 + new Set(item.conceptIds).size * 5;
+  assert.equal(Number(q.required('[data-spark-value]').textContent), 0, 'The display waits for the stars, but the earned story is already saved');
+  assert.equal(q.required('.q-reward-fx').dataset.reducedMotion, 'false');
+  assert.equal(q.document.querySelectorAll('.q-reward-fx__star').length, 12);
   assert.ok(q.savedState().completed[item.id]);
-  assert.ok(q.required('[data-picker]'), 'The child can continue immediately without waiting for an effect');
+  assert.ok(q.required('[data-picker]'), 'The child can continue without waiting for an effect');
+  const finalStar = q.animations.findLast(animation => animation.element.matches('.q-reward-fx__star') && typeof animation.onfinish === 'function');
+  assert.ok(finalStar);
+  const beforePreferenceChange = q.required('#q-game-hud').innerHTML;
+  for (const matches of [false, true]) {
+    q.media.matches = matches;
+    for (const callback of q.media.callbacks) callback({ matches });
+    assert.equal(q.document.documentElement.dataset.motion, 'full');
+    assert.equal(finalStar.cancelled, false, 'A device change does not interrupt the star trail');
+    assert.equal(q.required('#q-game-hud').innerHTML, beforePreferenceChange, 'It also cannot release the displayed score before the stars arrive');
+  }
+  finalStar.finish();
+  assert.equal(Number(q.required('[data-spark-value]').textContent), earned);
 });
 
 test('rejected browser animations retain the completed story and a usable up-to-date score', async t => {
@@ -1375,115 +1392,131 @@ test('rejected browser animations retain the completed story and a usable up-to-
   assert.equal(q.query('.q-reward-fx'), null);
 });
 
-test('device reduced motion stays the default while an explicit Game animations choice can enable and disable flight', async t => {
-  const q = await createQuest(t, { controlledAnimations: true, reducedMotion: true });
+test('older movement saves retain progress while the new game has no animation switches', async t => {
+  let q = await createQuest(t);
   const item = MISSIONS[0];
-  assert.equal(q.document.documentElement.dataset.motion, 'reduce');
   q.selectMission(item);
-  assert.equal(q.savedState().settings.motion, 'auto');
   q.inspect(item);
   q.plan(item.acceptedPlans[0]);
   q.click('[data-check-plan]');
   q.click('[data-complete]');
-  const firstTotal = 20 + new Set(item.conceptIds).size * 5;
-  assert.equal(q.query('.q-reward-fx__star'), null, 'Default play follows the device request for less movement');
-  assert.equal(Number(q.required('[data-spark-value]').textContent), firstTotal);
-
-  // The user changes only the game preference; the simulated device keeps its
-  // reduced-motion preference, proving the override is deliberate and reversible.
-  q.keyboardActivate('[data-game-settings]');
-  assert.match(q.required('#q-motion option[value="full"]').textContent, /Game animations/);
-  q.change('#q-motion', 'full');
-  q.click('#q-dialog-close');
-  // Changing a setting replaces HUD contents; modal close finds the new gear,
-  // rather than returning focus to the removed button that opened the dialog.
-  assert.equal(q.document.activeElement, q.required('[data-game-settings]'));
-  assert.equal(q.media.matches, true);
-  assert.equal(q.savedState().settings.motion, 'full');
-  assert.equal(q.document.documentElement.dataset.motion, 'full');
-  q.keyboardActivate(`[data-reflection="${item.reflection.correctId}"]`);
-  assert.equal(q.savedState().reflections[item.id], item.reflection.correctId);
-  assert.equal(q.required('.q-reward-fx').dataset.reducedMotion, 'false');
-  assert.equal(q.document.querySelectorAll('.q-reward-fx__star').length, 12);
-  const finalStar = q.animations.findLast(animation => animation.element.matches('.q-reward-fx__star') && typeof animation.onfinish === 'function');
-  assert.ok(finalStar);
-  finalStar.finish();
-  assert.equal(Number(q.required('[data-spark-value]').textContent), firstTotal + 10);
-
-  q.keyboardActivate('[data-game-settings]');
-  q.change('#q-motion', 'reduce');
-  q.click('#q-dialog-close');
-  assert.equal(q.document.activeElement, q.required('[data-game-settings]'));
-  assert.equal(q.savedState().settings.motion, 'reduce');
-  assert.equal(q.document.documentElement.dataset.motion, 'reduce');
-  q.click('[data-replay]');
-  q.click('[data-start-mission]');
-  q.inspect(item);
-  q.plan(item.acceptedPlans[0]);
-  q.click('[data-check-plan]');
-  q.click('[data-complete]');
-  assert.equal(q.required('.q-reward-fx').dataset.reducedMotion, 'true');
-  assert.equal(q.query('.q-reward-fx__star'), null, 'Less movement immediately restores static celebration');
-  assert.equal(Number(q.required('[data-spark-value]').textContent), firstTotal + 10);
-});
-
-test('the visible animation button explicitly overrides the device, preserves progress and survives reload', async t => {
-  let q = await createQuest(t, { reducedMotion: true });
-  assert.ok(q.required('#quest-app').classList.contains('q-play-enter'), 'Arrival includes the character greeting hook');
-  assert.equal(q.document.documentElement.dataset.motion, 'reduce');
-  assert.equal(q.required('[data-game-motion]').getAttribute('aria-pressed'), 'false');
-  assert.match(q.required('[data-game-motion]').textContent, /Animations off/);
-  assert.equal(q.actualStorage.getItem(STORAGE_KEY), null, 'Merely visiting never opts into animation or rewrites a save');
-  q.keyboardActivate('[data-game-motion]');
-  assert.equal(q.media.matches, true, 'The device itself still requests reduced motion');
-  assert.equal(q.savedState().settings.motion, 'full');
-  assert.equal(q.document.documentElement.dataset.motion, 'full');
-  assert.equal(q.required('[data-game-motion]').getAttribute('aria-pressed'), 'true');
-  assert.equal(q.document.activeElement, q.required('[data-game-motion]'));
-  assert.equal(Number(q.required('[data-spark-value]').textContent), 0);
-  assert.deepEqual(q.savedState().sortedItems, []);
-  assert.deepEqual(q.savedState().completed, {});
-  const saved = q.actualStorage.getItem(STORAGE_KEY);
+  const earned = q.savedState();
+  const total = Number(q.required('[data-spark-value]').textContent);
   q.dispose();
-  q = await createQuest(t, { saved, reducedMotion: true });
-  assert.equal(q.document.documentElement.dataset.motion, 'full');
-  assert.equal(q.required('[data-game-motion]').getAttribute('aria-pressed'), 'true');
-  assert.ok(q.required('#quest-app').classList.contains('q-play-enter'));
-  q.keyboardActivate('[data-game-motion]');
-  assert.equal(q.savedState().settings.motion, 'reduce');
-  assert.equal(q.document.documentElement.dataset.motion, 'reduce');
-  assert.equal(q.required('[data-game-motion]').getAttribute('aria-pressed'), 'false');
-  assert.match(q.required('#q-announcement').textContent, /Animations paused/);
-  assert.equal(Number(q.required('[data-spark-value]').textContent), 0);
-  assert.deepEqual(q.savedState().sortedItems, []);
+  for (const motion of ['reduce', 'auto']) {
+    const saved = { ...earned, settings: { ...earned.settings, motion } };
+    q = await createQuest(t, { saved, reducedMotion: true });
+    assert.equal(q.document.documentElement.dataset.motion, 'full');
+    assert.equal(Number(q.required('[data-spark-value]').textContent), total);
+    assert.ok(q.required('#quest-app').classList.contains('q-play-enter'), 'Reload restores the character greeting');
+    assert.equal(q.query('[data-game-motion], [data-enable-game-motion]'), null);
+    q.keyboardActivate('[data-game-settings]');
+    assert.equal(q.query('#q-motion'), null, 'Settings has no removed movement control');
+    q.change('#q-mode', 'challenge');
+    q.click('#q-dialog-close');
+    assert.equal(q.document.activeElement, q.required('[data-game-settings]'), 'Other settings still restore focus to the rebuilt HUD');
+    assert.equal(q.savedState().settings.motion, 'full', 'The next real save normalises the old presentation setting');
+    assert.deepEqual(q.savedState().completed, earned.completed);
+    assert.deepEqual(q.savedState().discoveries, earned.discoveries);
+    assert.deepEqual(q.savedState().sortedItems, earned.sortedItems);
+    assert.equal(Number(q.required('[data-spark-value]').textContent), total);
+    q.dispose();
+  }
 });
 
-test('the home animation invitation still enables motion after the device preference changes while the page is open', async t => {
+test('arrival keeps graphics animated without showing an opt-in invitation or rewriting the adventure', async t => {
   const q = await createQuest(t, { reducedMotion: true });
-  const invitation = q.required('[data-enable-game-motion]');
-  assert.match(invitation.textContent, /Make Pip and Flo move/);
-  assert.equal(q.document.documentElement.dataset.motion, 'reduce');
-  // The OS can change while the child is looking at an already-rendered button.
-  // Send the real media listener a new preference without rebuilding that screen.
-  q.media.matches = false;
-  for (const callback of q.media.callbacks) callback({ matches: false });
   assert.equal(q.document.documentElement.dataset.motion, 'full');
-  assert.equal(q.required('[data-game-motion]').getAttribute('aria-pressed'), 'true', 'The visible HUD follows the new device setting immediately');
-  assert.equal(q.required('[data-enable-game-motion]'), invitation);
-  assert.equal(q.actualStorage.getItem(STORAGE_KEY), null, 'A device change itself does not save an explicit choice');
-  q.keyboardActivate('[data-enable-game-motion]');
-  assert.equal(q.savedState().settings.motion, 'full', 'Turn on must never act as a toggle that turns moving characters off');
-  assert.equal(q.document.documentElement.dataset.motion, 'full');
-  assert.equal(q.required('[data-game-motion]').getAttribute('aria-pressed'), 'true');
-  assert.equal(q.query('[data-enable-game-motion]'), null);
-  assert.equal(q.document.activeElement, q.required('[data-game-motion]'));
-  assert.equal(Number(q.required('[data-spark-value]').textContent), 0);
-  assert.deepEqual(q.savedState().sortedItems, []);
-  assert.deepEqual(q.savedState().completed, {});
+  assert.equal(q.query('[data-game-motion], [data-enable-game-motion], #q-motion'), null);
+  assert.equal(q.actualStorage.getItem(STORAGE_KEY), null, 'Visiting alone does not create game progress');
+  for (const matches of [false, true]) {
+    q.media.matches = matches;
+    for (const callback of q.media.callbacks) callback({ matches });
+    assert.equal(q.document.documentElement.dataset.motion, 'full');
+    assert.equal(q.query('[data-game-motion], [data-enable-game-motion]'), null);
+    assert.equal(q.actualStorage.getItem(STORAGE_KEY), null);
+  }
 });
 
 // Saying hello is an explicit audio request. The visible words teach the names,
 // while progress and sound-effect preferences remain independent of narration.
+
+test('sorting shows picture facts first while the full original clue and controlled reading remain available', async t => {
+  const q = await createQuest(t);
+  q.click('[data-sort-start]');
+  const saved = q.actualStorage.getItem(STORAGE_KEY);
+  const run = q.savedState().sorting;
+  const item = SORT_ITEMS.find(card => card.id === run.itemIds[run.index]);
+  const points = q.required('[data-spark-value]').textContent;
+  const facts = q.required('.q-sort-object .q-visual-clues');
+  assert.equal(facts.hidden, false);
+  assert.equal(facts.closest('details'), null, 'Picture clues are available before opening the optional full sentence');
+  assert.ok(facts.querySelectorAll('li').length >= 2);
+  assert.ok([...facts.querySelectorAll('li')].every(fact => fact.querySelector('svg') && fact.querySelector('strong')?.textContent.trim()), 'Each visible fact pairs a picture with short words');
+  const detail = q.required('.q-sort-object .q-full-clue');
+  assert.equal(detail.open, false);
+  assert.equal(detail.querySelector('p').textContent, item.condition, 'The complete authored condition is retained exactly');
+  const summary = detail.querySelector('summary');
+  assert.equal(summary.tagName, 'SUMMARY');
+  // Native Enter/Space activates summary through its click default action. This
+  // models that activation without altering the details.open property ourselves.
+  summary.focus();
+  summary.dispatchEvent(new q.window.MouseEvent('click', { bubbles: true, cancelable: true, detail: 0 }));
+  assert.equal(detail.open, true);
+  assert.equal(q.document.activeElement, summary);
+  assert.equal(q.actualStorage.getItem(STORAGE_KEY), saved, 'Reading more does not answer the card or alter earned points');
+  assert.equal(q.required('[data-spark-value]').textContent, points);
+  summary.dispatchEvent(new q.window.MouseEvent('click', { bubbles: true, cancelable: true, detail: 0 }));
+  assert.equal(detail.open, false);
+  q.keyboardActivate('[data-hear]');
+  assert.equal(q.narration.utterances.at(-1).text, item.condition, 'Hear reads the complete clue even while its detail is closed');
+  const dock = q.required('body > [data-audio-dock]');
+  assert.equal(dock.querySelector('[data-audio-transcript]').textContent, item.condition);
+  q.keyboardActivate('body > [data-audio-dock] [data-audio-pause]');
+  assert.equal(q.narration.paused, true);
+  assert.equal(dock.querySelector('[data-audio-resume]').hidden, false);
+  assert.equal(q.actualStorage.getItem(STORAGE_KEY), saved);
+  assert.deepEqual(q.savedState().sorting, run);
+});
+
+test('success uses game sounds without automatic speech even when story reading is enabled', async t => {
+  const q = await createQuest(t);
+  const item = MISSIONS[0];
+  q.click('[data-game-sound]');
+  assert.equal(q.savedState().settings.sound, true);
+  q.selectMission(item);
+  q.click('[data-game-settings]');
+  q.change('#q-narration', true);
+  q.click('#q-dialog-close');
+  assert.equal(q.savedState().settings.narration, true);
+  q.inspect(item);
+  q.plan(item.acceptedPlans[0]);
+  const beforeSuccess = q.narration.utterances.length;
+  q.click('[data-check-plan]');
+  assert.equal(q.savedState().activeMission.feedback.correct, true);
+  assert.equal(q.narration.utterances.length, beforeSuccess, 'A correct plan does not launch a spoken cheer or read the feedback');
+  assert.equal(q.required('body > [data-audio-dock]').hidden, true);
+  q.click('[data-complete]');
+  assert.ok(q.savedState().completed[item.id]);
+  assert.equal(q.narration.utterances.length, beforeSuccess, 'Winning the story also leaves speech quiet');
+  assert.equal(q.required('body > [data-audio-dock]').hidden, true);
+  q.click('[data-hear]');
+  assert.equal(q.narration.utterances.length, beforeSuccess + 1, 'The child can still deliberately hear the ending');
+  assert.equal(q.narration.utterances.at(-1).text, item.outcome.text);
+  q.click('.q-header [data-nav="home"]');
+  q.click('[data-sort-start]');
+  const run = q.savedState().sorting;
+  const picture = SORT_ITEMS.find(card => card.id === run.itemIds[run.index]);
+  const beforeSort = q.narration.utterances.length;
+  q.click(`[data-destination="${picture.answer}"]`);
+  assert.equal(q.savedState().sorting.feedback.correct, true);
+  assert.equal(q.narration.utterances.length, beforeSort, 'Sorting success does not replace the chime with narration');
+  assert.equal(q.required('body > [data-audio-dock]').hidden, true);
+  q.click('[data-hear]');
+  assert.equal(q.narration.utterances.length, beforeSort + 1);
+  assert.equal(q.narration.utterances.at(-1).text, picture.explanation);
+});
+
 test('character hello taps read the visible introduction without changing progress', async t => {
   const q = await createQuest(t);
   const saved = q.actualStorage.getItem(STORAGE_KEY);

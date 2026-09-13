@@ -148,35 +148,48 @@ test('navigation preserves active work, settings and optional decoration choice'
   assert.equal(apply(state, 'COMPLETE_MISSION'), state, 'Hidden stale callbacks cannot finish a mission');
 });
 
-// A child can explicitly choose game animations without changing a tablet's own
-// accessibility settings. Unrecognised save data must never make that choice.
-test('motion starts with the device preference and explicit full or reduce survives a real save', () => {
+// The current design keeps its graphics animated. A stale movement control or
+// older browser save must not switch that presentation off or erase progress.
+test('animation is fixed on while stale motion-setting actions remain harmless', () => {
   const original = deepFreeze(createState());
-  assert.equal(original.settings.motion, 'auto');
+  assert.equal(original.settings.motion, 'full');
   let state = original;
   const storage = memoryStorage();
-  for (const motion of ['full', 'reduce', 'auto']) {
-    state = apply(state, 'SET_SETTING', { key: 'motion', value: motion });
-    assert.equal(state.settings.motion, motion);
+  for (const motion of ['full', 'reduce', 'auto', undefined, null, true, false, 1, 'always', 'FULL', {}, []]) {
+    assert.equal(apply(state, 'SET_SETTING', { key: 'motion', value: motion }), state, 'Removed motion controls cannot change the state');
     assert.equal(saveProgress(state, storage), true);
     state = loadProgress(storage).state;
-    assert.equal(state.settings.motion, motion, 'Reload keeps the actual user choice');
+    assert.equal(state.settings.motion, 'full', 'Reload retains animated graphics');
     assert.equal(state.settings.narration, false);
     assert.equal(state.settings.sound, false);
-    assert.equal(apply(state, 'SET_SETTING', { key: 'motion', value: motion }), state, 'Repeating the same choice is a no-op');
   }
-  assert.equal(original.settings.motion, 'auto', 'Setting changes do not mutate the earlier save');
+  assert.equal(original.settings.motion, 'full', 'Validation does not mutate an earlier save');
 });
 
-test('old or malformed motion preferences follow the device and cannot force full animation', () => {
-  const full = apply(createState(), 'SET_SETTING', { key: 'motion', value: 'full' });
-  for (const value of [undefined, null, true, false, 1, 'always', 'FULL', {}, []]) {
-    assert.equal(apply(full, 'SET_SETTING', { key: 'motion', value }), full, 'Unknown live choices are ignored');
-    const raw = { ...full, settings: { ...full.settings, motion: value } };
-    assert.equal(hydrateState(raw).settings.motion, 'auto', 'Unknown saved choices fall back to the device');
+test('old motion preferences migrate to animated graphics without losing earned play or sound choices', () => {
+  const mission = MISSIONS[0];
+  let earned = completed(mission);
+  earned = apply(earned, 'DESIGN_POSTCARD', { id: mission.id, theme: 'mint' });
+  earned = apply(earned, 'PLACE_DECORATION', { slotId: 'home', conceptId: mission.conceptIds[0] });
+  earned = apply(earned, 'SET_SETTING', { key: 'mode', value: 'challenge' });
+  earned = apply(earned, 'SET_SETTING', { key: 'sound', value: true });
+  earned = apply(earned, 'SET_SETTING', { key: 'narration', value: true });
+  earned = apply(earned, 'START_SORT');
+  const picture = SORT_ITEMS.find(item => item.id === earned.sorting.itemIds[0]);
+  earned = apply(earned, 'ANSWER_SORT', { destinationId: picture.answer });
+  const expected = deepFreeze(hydrateState(earned));
+  const storage = memoryStorage();
+  for (const value of ['reduce', 'auto', 'full', undefined, null, true, false, 1, 'always', 'FULL', {}, []]) {
+    const oldSave = deepFreeze({ ...earned, settings: { ...earned.settings, motion: value } });
+    assert.equal(saveProgress(oldSave, storage), true);
+    const restored = loadProgress(storage).state;
+    assert.deepEqual(restored, expected, 'Only the obsolete movement choice is normalised');
+    assert.deepEqual(progression(restored), progression(expected), 'Earned Sparks and sorting credit are unchanged');
   }
-  const oldSave = { ...full, settings: { mode: 'guided', narration: false } };
-  assert.equal(hydrateState(oldSave).settings.motion, 'auto');
+  const missingSettings = { ...earned };
+  delete missingSettings.settings;
+  assert.equal(hydrateState(missingSettings).settings.motion, 'full');
+  assert.deepEqual(hydrateState(missingSettings).sortedItems, expected.sortedItems);
 });
 
 test('suggestions use reviewed concepts, remain optional and cover unfinished missions', () => {

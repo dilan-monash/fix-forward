@@ -35,11 +35,11 @@ const validIds = (values, ids) => Array.isArray(values) ? unique(values.filter(i
 // Keep the deterministic round seed finite and within the range used by START_SORT.
 const boundedRound = value => Number.isSafeInteger(value) && value >= 0 && value <= 1000000;
 
-/** Return a fresh, independent save shape with quiet, guided defaults. */
+/** Return a fresh, independent save with guided play, sound off and animated graphics. */
 export function createState() {
   return {
     version: STATE_VERSION, view: 'home', activeMission: null, completed: {}, discoveries: [],
-    settings: { mode: 'guided', narration: false, sound: false, motion: 'auto' },
+    settings: { mode: 'guided', narration: false, sound: false, motion: 'full' },
     decorations: { home: null, studio: null, station: null }, postcards: {}, reflections: {}, sorting: null, sortRound: 0, practice: [], sortedItems: []
   };
 }
@@ -194,9 +194,9 @@ export function transition(state, action) {
     }
     case 'SET_SETTING': {
       // Sound effects and read-aloud are separate choices; both start quietly off.
-      // Auto follows the device preference. Full is a deliberate in-game choice,
-      // while Reduce always keeps travel and celebration animations quiet.
-      const allowed = { mode: ['guided', 'challenge'], narration: [true, false], sound: [true, false], motion: ['auto', 'reduce', 'full'] };
+      // The current requested design always animates its graphics. Motion is no
+      // longer a switchable setting; stale controls cannot change that policy.
+      const allowed = { mode: ['guided', 'challenge'], narration: [true, false], sound: [true, false] };
       if (!Object.hasOwn(allowed, action.key) || !allowed[action.key].includes(action.value) || state.settings[action.key] === action.value) return state;
       return { ...state, settings: { ...state.settings, [action.key]: action.value } };
     }
@@ -374,9 +374,9 @@ export function hydrateState(raw) {
     state.settings.narration = raw.settings.narration === true;
     // Old saves have no sound field. Only an explicit true opts into game sounds.
     state.settings.sound = raw.settings.sound === true;
-    // Preserve only reviewed motion choices; old and unknown values follow the
-    // device setting rather than silently opting a child into extra animation.
-    state.settings.motion = ['reduce', 'full'].includes(raw.settings.motion) ? raw.settings.motion : 'auto';
+    // Keep createState's fixed full motion for this requested design. Older
+    // auto/reduce saves retain every valid story, point and picture below;
+    // changing presentation never resets the child's adventure.
   }
   state.activeMission = hydrateMission(raw.activeMission, state.completed);
   state.sorting = hydrateSorting(raw.sorting);

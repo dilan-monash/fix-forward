@@ -4,8 +4,8 @@
  * and q-level-up for a newly reached game level. Story effects finish in 1100 ms;
  * the friends' greeting lasts 2400 ms so a child has time to notice the wave.
  * Removing/replacing the owning screen cancels CSS animations automatically.
- * The home/picker companions keep moving while Game animations is on; the
- * always-visible movement button pauses them. Motion never changes game points.
+ * The home/picker companions keep moving automatically. Motion is decorative
+ * and never changes game points or prevents children from choosing a story.
  */
 /* SVG motion uses local artwork bounds; positioning remains on an outer SVG group in art.js. */
 body.quest .q-pip-arm {
@@ -46,9 +46,8 @@ body.quest .q-passport-stamp { overflow: visible; }
 body.quest .q-reward-art,
 body.quest .q-level-badge { overflow: visible; pointer-events: none; }
 
-/* Motion follows the device unless the player explicitly chooses Game animations.
- * app.js resolves that choice into data-motion; Less movement remains available. The static illustration retains the story.
- */
+/* Quest renders with data-motion=full from the first frame. These animated
+ * illustrations carry the story; words and warning evidence remain still. */
 @media screen {
   html[data-motion="full"] body.quest .q-play-enter .q-guide-character .q-pip-arm {
     animation: q-quest-pip-greeting 2400ms ease-in-out 1;
@@ -156,8 +155,8 @@ body.quest .q-level-badge { overflow: visible; pointer-events: none; }
 }
 
 /* Keep the friendly map and chooser alive while a child decides what to play.
- * The visible Animations button switches data-motion to reduce and immediately
- * stops both loops. Only named guides move; a fan in a warning story stays still.
+ * Animation starts automatically. Only named guides move; a fan in a warning
+ * story stays still so decoration cannot imply the broken appliance works.
  * Pip has a long rest between waves, and the wording/controls never move. */
 @media screen {
   html[data-motion="full"] body.quest .q-world .q-guide-character .q-flo-blades,

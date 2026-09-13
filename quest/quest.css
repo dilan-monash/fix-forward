@@ -243,8 +243,8 @@ dialog p { font-size:.95rem; }
 .q-check { display:flex; align-items:center; gap:.7rem; min-height:48px; }
 .q-check input { width:22px; height:22px; accent-color:var(--teal); }
 .q-settings p { margin:.2rem 0; }
-/* app.js resolves Follow my device, Game animations or Less movement into data-motion.
-   Without an explicit game preference, the device reduction rule still applies. */
+/* The child document starts with data-motion=full for automatic game movement.
+   The static fallback remains available if this stylesheet is reused without it. */
 @media screen {
   html[data-motion=full] .q-feedback.correct { animation:q-settle 160ms ease-out; }
   html[data-motion=full] .q-hotspot.found { animation:q-settle 140ms ease-out; }

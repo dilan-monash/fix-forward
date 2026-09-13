@@ -116,6 +116,61 @@ test('the Sound gesture resumes synchronously and enables distinct short soft fe
   f.sounds.dispose();
 });
 
+test('wins begin with the original melody, rotate through two gentle variations and never overlap', async () => {
+  const f = audioFixture();
+  await f.sounds.enable(true, { gesture: true });
+  const context = f.contexts[0];
+  const played = [];
+  for (let index = 0; index < 4; index += 1) {
+    const previous = [...context.oscillators];
+    const first = context.oscillators.length;
+    assert.equal(f.sounds.play('win'), true);
+    assert.ok(previous.every(note => note.disconnected === 1), 'a new chime releases every earlier note');
+    const notes = context.oscillators.slice(first);
+    played.push(notes.map(note => note.frequency.values[0][1]));
+    assert.ok(f.timers.size <= 4, 'wins cannot accumulate a background sound queue');
+    for (const note of notes) {
+      assert.equal(note.type, 'sine');
+      assert.ok(note.stops[0] - context.currentTime < 0.6, 'each win remains brief');
+      assert.ok(note.connections[0].gain.values.every(([, volume]) => volume <= 0.045));
+    }
+  }
+  assert.deepEqual(played[0], [523.25, 659.25, 783.99, 1046.50], 'the first chime preserves the old win');
+  assert.notDeepEqual(played[1], played[0]);
+  assert.notDeepEqual(played[2], played[0]);
+  assert.notDeepEqual(played[2], played[1]);
+  assert.deepEqual(played[3], played[0], 'the sequence returns to the familiar original');
+  f.sounds.dispose();
+});
+
+test('muted, locked and partly failed wins do not advance the next celebration chime', async () => {
+  const f = audioFixture();
+  assert.equal(f.sounds.play('win'), false, 'muted requests stay quiet');
+  await f.sounds.enable(true);
+  assert.equal(f.sounds.play('win'), false, 'a restored preference still needs a gesture');
+  await f.sounds.unlock();
+  const context = f.contexts[0];
+  f.sounds.play('win');
+  assert.deepEqual(context.oscillators.map(note => note.frequency.values[0][1]), [523.25, 659.25, 783.99, 1046.50]);
+  const originalCreate = context.createOscillator;
+  let count = 0;
+  context.createOscillator = function () {
+    count += 1;
+    if (count === 2) throw new Error('Device interrupted partway through scheduling');
+    return originalCreate.call(this);
+  };
+  assert.equal(f.sounds.play('win'), false);
+  assert.equal(f.timers.size, 0, 'a partly scheduled win is cleaned up');
+  context.createOscillator = originalCreate;
+  await f.sounds.enable(false);
+  assert.equal(f.sounds.play('win'), false);
+  await f.sounds.enable(true, { gesture: true });
+  const first = context.oscillators.length;
+  assert.equal(f.sounds.play('win'), true);
+  assert.deepEqual(context.oscillators.slice(first).map(note => note.frequency.values[0][1]), [659.25, 783.99, 1046.50], 'the next success still uses the second melody');
+  f.sounds.dispose();
+});
+
 test('Sound off stops and disconnects every note immediately without touching narration', async () => {
   const f = audioFixture();
   await f.sounds.enable(true, { gesture: true });

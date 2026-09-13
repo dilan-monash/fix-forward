@@ -21,7 +21,7 @@ QUEST_ASSETS = (
     "/quest/play-effects.css", "/quest/postcard.js", "/quest/postcard-options.js",
     "/quest/progression.js", "/quest/tablet-play.css",
     "/quest/navigation.js", "/quest/narration.js", "/quest/parent-guide.js",
-    "/quest/reward-voice.js", "/quest/reward-fx.js", "/quest/sounds.js", "/quest/game-feel.css",
+    "/quest/visual-play.js", "/quest/visual-play.css", "/quest/reward-voice.js", "/quest/reward-fx.js", "/quest/sounds.js", "/quest/game-feel.css",
     "/quest/picture-help.js", "/quest/feedback.js", "/quest/clue-play.css",
     "/quest/family-guide.css", "/quest/story-audio.js", "/quest/audio/story-manifest.js",
 )
