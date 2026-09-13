@@ -89,7 +89,7 @@ const JOY_LINES = Object.freeze({
   mission: ['You gave this story a new ending!', 'Clues connected. Story solved!', 'Look what your thinking did!', 'A bright idea. A brand-new chapter!'],
   sorting: ['Aha! You found the clue!', 'That choice clicks!', 'Picture matched. Great thinking!', 'You looked, you thought, you got it!'],
   reflection: ['You spotted what mattered!', 'That clue made the difference!', 'You can tell us why. Brilliant!', 'You joined the dots!'],
-  round: ['Five stories, lots of smart thinking!', 'Round complete. Look what you learned!', 'Your clue-finding powers are growing!']
+  round: ['Five pictures, lots of great thinking!', 'Round complete. Look what you learned!', 'Your clue-finding powers are growing!']
 });
 const IDEA_LINES = Object.freeze({
   reuse: 'You spotted a chance for another home.',
