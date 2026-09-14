@@ -8,6 +8,19 @@ import { planFeedback, celebrationCopy, rewardPreview } from '../quest/feedback.
 
 const box = MISSIONS.find(mission => mission.id === 'moving-day-box');
 
+test('sequence feedback asks for the other step without inventing another item', () => {
+  const sequence = MISSIONS.find(mission => mission.planKind === 'sequence');
+  assert.ok(sequence, 'the optional harder story supplies an ordered plan');
+  const first = sequence.slots[0];
+  const partial = { [first.id]: sequence.acceptedPlans[0][first.id] };
+  assert.equal(planFeedback(sequence, {}).summary, 'Choose a picture for each step.');
+  assert.equal(planFeedback(sequence, partial).summary, 'One choice fits! Choose a plan for the other step.');
+  assert.equal(planFeedback(sequence, sequence.acceptedPlans[0]).correct, true);
+  // The original two-item story keeps its existing, item-specific explanation.
+  assert.equal(planFeedback(box, {}).summary, 'Choose a picture for each item.');
+  assert.equal(planFeedback(box, { toaster: 'reuse' }).summary, 'One choice fits! Choose a plan for the other item.');
+});
+
 test('two-item feedback identifies which chosen item is correct and why the other needs a retry', () => {
   for (const [plan, correctId, wrongText] of [
     [{ toaster: 'reuse', cardboard: 'ewaste' }, 'toaster', /box has no electrical parts/i],

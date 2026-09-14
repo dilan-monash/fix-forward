@@ -1,4 +1,4 @@
-/** HOME STORY TRAIL: draws a small, local SVG world around the eight authored
+/** HOME STORY TRAIL: draws a small, local SVG world around the authored
  * missions. It reads saved completion state but never changes progress, gives
  * rewards, starts audio, or fetches images. app.js owns the button actions. */
 import { artwork } from './art.js';
@@ -13,7 +13,8 @@ const chapters = Object.freeze({
   'kettle-last-chapter': { title: 'The next stop', art: 'kettle', place: 'studio' },
   'moving-day-box': { title: 'Two different paths', art: 'boxed-toaster', place: 'station' },
   'bulging-gadget': { title: 'Pause the plan', art: 'battery-shaver', place: 'station' },
-  'mystery-glass-jug': { title: 'A missing answer', art: 'glass-jug', place: 'station' }
+  'mystery-glass-jug': { title: 'A missing answer', art: 'glass-jug', place: 'station' },
+  'fan-no-takers': { title: 'A fan nobody wants', art: 'fan', place: 'studio' }
 });
 
 // Dynamic words and attributes are escaped together. No caller can introduce
@@ -22,7 +23,7 @@ const escape = value => String(value ?? '').replace(/[&<>"']/g, character => ({ 
 
 // A tiny original backdrop reuses the neighbourhood palette. Its building and
 // path identify the place; the appliance itself is supplied by artwork() above.
-// Only the separate flag can wave: no animation can imply an appliance is safe.
+// Flags are landmarks, not answers: no animation may imply an appliance is safe.
 function island(place) {
   const landmark = place === 'home'
     ? '<path d="M24 91V62l23-17 24 17v29Z" fill="#fff8e9"/><path d="m18 64 29-22 30 22" fill="none"/><path d="M41 91V75h13v16" fill="#e99a7a"/><path d="M28 65h9v9h-9Z" fill="#91b8e8"/>'
@@ -39,8 +40,8 @@ function route() {
 }
 
 /** Render available missions and earned stamps from the controller's state.
- * Completed chapters retain data-postcard: collecting a stamp still opens the
- * creation editor. Unfinished chapters retain data-mission to start their story.
+ * Every island opens its story, including completed ones. Earned stamps remain
+ * visible; the separate My creations page owns postcard editing.
  * Only valid authored completion records count; this renderer never repairs or
  * overwrites a save, and duplicate/unknown input missions cannot inflate totals. */
 export function renderAdventureTrail({ missions = [], completed = {}, suggestedId = '' } = {}) {
@@ -56,13 +57,13 @@ export function renderAdventureTrail({ missions = [], completed = {}, suggestedI
   const count = stories.filter(item => isEarned(item.id)).length;
   const allEarned = count === stories.length;
   return `<section class="q-adventure-trail" aria-label="Your story trail">
-    <header class="q-adventure-heading"><div><p class="q-adventure-kicker">Your story trail</p><h2>${allEarned ? 'Look how far you have explored!' : 'A little world. Eight big stories.'}</h2><p>${allEarned ? 'Your stamps are ready. Tap one and create!' : 'Pick any island. Find a clue. Collect its stamp.'}</p></div><div class="q-adventure-progress"><span class="q-adventure-progress-star" aria-hidden="true">✦</span><p><strong>${count} / ${stories.length}</strong> stamps</p><meter min="0" max="${stories.length}" value="${count}" aria-label="Story stamps collected">${count} of ${stories.length}</meter></div></header>
+    <header class="q-adventure-heading"><div><p class="q-adventure-kicker">Your story trail</p><h2>${allEarned ? 'Look how far you have explored!' : `A little world. ${stories.length} big stories.`}</h2><p>${allEarned ? 'Every stamp tells a story. Pick one to play again.' : 'Pick any island. Find a clue. Collect its stamp.'}</p></div><div class="q-adventure-progress"><span class="q-adventure-progress-star" aria-hidden="true">✦</span><p><strong>${count} / ${stories.length}</strong> stamps</p><meter min="0" max="${stories.length}" value="${count}" aria-label="Story stamps collected">${count} of ${stories.length}</meter></div></header>
     <div class="q-adventure-map"><span class="q-adventure-cloud q-adventure-cloud--one" aria-hidden="true"></span><span class="q-adventure-cloud q-adventure-cloud--two" aria-hidden="true"></span>${route()}<ol class="q-adventure-islands">${stories.map((item, index) => {
       const chapter = chapters[item.id];
       const earned = isEarned(item.id);
       const suggested = !earned && item.id === suggestedId;
       const title = typeof item.title === 'string' && item.title.trim() ? item.title : chapter.title;
-      return `<li class="q-adventure-stop${earned ? ' is-earned' : ''}${suggested ? ' is-suggested' : ''}" data-chapter="${index + 1}"><button type="button" class="q-adventure-island" ${earned ? 'data-postcard' : 'data-mission'}="${escape(item.id)}" aria-label="${escape(`${earned ? 'Design a postcard for' : 'Explore'} ${title}${suggested ? '. A story to try next' : ''}`)}"><span class="q-adventure-chapter"><span aria-hidden="true">${earned ? '✓' : index + 1}</span><span class="q-sr">Chapter ${index + 1}${earned ? ', stamp collected' : ''}</span></span>${suggested ? '<span class="q-adventure-next">Try this!</span>' : ''}<span class="q-island-stage" aria-hidden="true">${island(chapter.place)}<span class="q-island-story-art">${artwork(chapter.art)}</span>${earned ? '<span class="q-island-earned-star">✦</span>' : ''}</span><strong class="q-adventure-title">${chapter.title}</strong><span class="q-adventure-action">${earned ? 'Make a postcard' : 'Explore story'} <span aria-hidden="true">${earned ? '✦' : '→'}</span></span></button></li>`;
+      return `<li class="q-adventure-stop${earned ? ' is-earned' : ''}${suggested ? ' is-suggested' : ''}" data-chapter="${index + 1}"><button type="button" class="q-adventure-island" data-mission="${escape(item.id)}" aria-label="${escape(`${earned ? 'Replay' : 'Explore'} ${title}${suggested ? '. A story to try next' : ''}`)}"><span class="q-adventure-chapter"><span aria-hidden="true">${earned ? '✓' : index + 1}</span><span class="q-sr">Chapter ${index + 1}${earned ? ', stamp collected' : ''}</span></span>${suggested ? '<span class="q-adventure-next">Try this!</span>' : ''}<span class="q-island-stage" aria-hidden="true">${island(chapter.place)}<span class="q-island-story-art">${artwork(chapter.art)}</span>${earned ? '<span class="q-island-earned-star">✦</span>' : ''}</span><strong class="q-adventure-title">${chapter.title}</strong><span class="q-adventure-action">${earned ? 'Replay story' : item.difficulty === 'trickier' ? 'Trickier story' : 'Explore story'} <span aria-hidden="true">${earned ? '✦' : '→'}</span></span></button></li>`;
     }).join('')}</ol></div>
   </section>`;
 }

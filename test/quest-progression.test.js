@@ -72,16 +72,16 @@ test('reflections require an earned mission and an authored option; a wrong answ
   assert.equal(act(state, 'CHECK_REFLECTION', { missionId: mission.id, answerId: wrongId }), state, 'A later wrong click cannot remove earned Sparks');
 });
 
-test('all eight authored reflection answers work and the full reviewed bank has a finite points total', () => {
+test('all nine authored reflection answers work and the full reviewed bank has a finite points total', () => {
   let state = createState();
   for (const mission of MISSIONS) {
     assert.equal(mission.reflection.options.length, 2);
     assert.ok(mission.reflection.options.some(option => option.id === mission.reflection.correctId));
     state = reflect(finish(mission, state), mission);
   }
-  assert.equal(Object.keys(state.reflections).length, 8);
-  assert.equal(progression(state).points, 8 * 20 + CONCEPTS.length * 5 + 8 * 10);
-  assert.equal(progression(state).points, 280);
+  assert.equal(Object.keys(state.reflections).length, MISSIONS.length);
+  assert.equal(progression(state).points, MISSIONS.length * 20 + CONCEPTS.length * 5 + MISSIONS.length * 10);
+  assert.equal(progression(state).points, 310);
   assert.equal(progression(state).level, 4);
   assert.equal(progression(state).title, 'Quest Guide');
   assert.equal(progression(state).nextThreshold, null);
@@ -97,8 +97,8 @@ test('all eight authored reflection answers work and the full reviewed bank has 
     }
   }
   assert.equal(state.sortedItems.length, SORT_ITEMS.length);
-  assert.equal(progression(state).points, 280 + SORT_ITEMS.length * 5);
-  assert.equal(progression(state).points, 340, 'All authored progress has a finite total, even after extra rounds');
+  assert.equal(progression(state).points, 310 + SORT_ITEMS.length * 5);
+  assert.equal(progression(state).points, 370, 'All authored progress has a finite total, even after extra rounds');
 });
 
 test('help and repeated stories never reduce points or create replay farming', () => {

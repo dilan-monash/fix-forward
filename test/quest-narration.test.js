@@ -11,6 +11,26 @@ import { MISSIONS, SORT_ITEMS } from '../quest/content.js';
 import { planFeedback } from '../quest/feedback.js';
 import { REWARD_LINES } from '../quest/reward-voice.js';
 
+// The approved eight-story release has a complete packaged voice bank. The
+// optional ninth story deliberately uses device speech until its words receive
+// a reviewed recording; naming both groups prevents silent coverage exemptions.
+const RECORDED_MISSION_IDS = [
+  'flo-next-home', 'quiet-fan', 'pip-damaged-cable', 'kettle-second-chance',
+  'kettle-last-chapter', 'moving-day-box', 'bulging-gadget', 'mystery-glass-jug'
+];
+const DEVICE_VOICE_MISSION_IDS = ['fan-no-takers'];
+
+// Derive every static sentence and two-slot retry combination from authored
+// content, independently of the audio manifest. Exact facts remain the contract.
+function authoredMissionWords(mission) {
+  const words = [`${mission.fictionalContext} ${mission.guideLines.intro}`, ...Object.values(mission.guideLines), ...mission.clues.map(clue => clue.text), mission.reflection.prompt, mission.reflection.explanation, mission.outcome.text, mission.helpText, ...mission.allowedActions.map(action => action.feedback)];
+  if (mission.slots.length === 2) for (const first of mission.allowedActions) for (const second of mission.allowedActions) {
+    const result = planFeedback(mission, { [mission.slots[0].id]: first.id, [mission.slots[1].id]: second.id });
+    if (!result.correct) words.push(`${result.summary} ${result.slots.map(row => `${row.label}. ${row.message}`).join(' ')}`);
+  }
+  return words;
+}
+
 // Capture the words and native callback properties assigned by the controller.
 class Utterance {
   constructor(text) { this.text = text; }
@@ -347,16 +367,10 @@ test('recorded text lookup normalizes typography without fuzzy-matching differen
 test('every packaged story recording is a valid MP3 linked to exact current authored words', async () => {
   // Build the permitted transcript bank independently from the manifest. This
   // catches stale safety facts if content changes without regenerating audio.
-  const texts = [...Object.values(STORY_LINES), ...Object.values(REWARD_LINES).flat()];
-  for (const mission of MISSIONS) {
-    texts.push(`${mission.fictionalContext} ${mission.guideLines.intro}`, ...Object.values(mission.guideLines), ...mission.clues.map(clue => clue.text), mission.reflection.prompt, mission.reflection.explanation, mission.outcome.text, mission.helpText, ...mission.allowedActions.map(action => action.feedback));
-    if (mission.slots.length === 2) for (const first of mission.allowedActions) for (const second of mission.allowedActions) {
-      const result = planFeedback(mission, { [mission.slots[0].id]: first.id, [mission.slots[1].id]: second.id });
-      if (!result.correct) texts.push(`${result.summary} ${result.slots.map(row => `${row.label}. ${row.message}`).join(' ')}`);
-    }
-  }
-  for (const item of SORT_ITEMS) texts.push(item.condition, item.clue, item.explanation);
-  const currentWords = new Set(texts.map(normalizeStoryText));
+  assert.deepEqual(MISSIONS.map(mission => mission.id).sort(), [...RECORDED_MISSION_IDS, ...DEVICE_VOICE_MISSION_IDS].sort(), 'every added story needs an explicit reviewed voice coverage choice');
+  const sharedWords = [...Object.values(STORY_LINES), ...Object.values(REWARD_LINES).flat(), ...SORT_ITEMS.flatMap(item => [item.condition, item.clue, item.explanation])];
+  const currentWords = new Set([...sharedWords, ...MISSIONS.flatMap(authoredMissionWords)].map(normalizeStoryText));
+  const requiredRecordings = new Set([...sharedWords, ...MISSIONS.filter(mission => RECORDED_MISSION_IDS.includes(mission.id)).flatMap(authoredMissionWords)].map(normalizeStoryText));
   const seen = new Set();
   for (const recording of STORY_RECORDINGS) {
     const text = normalizeStoryText(recording.text);
@@ -382,7 +396,36 @@ test('every packaged story recording is a valid MP3 linked to exact current auth
     assert.equal(offset, bytes.length, 'no partial or corrupt trailing frame');
     assert.ok(Math.abs(frames * 576 / 24000 - recording.seconds) < 0.2, 'encoded duration matches the generated waveform');
   }
-  // The shipped bank covers every fixed story line, not just whichever clips
-  // happened to finish generation. New authored words need reviewed audio too.
-  assert.deepEqual([...currentWords].filter(text => !seen.has(text)), [], 'regenerate the story pack for missing authored transcripts');
+  // All original eight stories, sorting cards and shared lines retain full
+  // recorded coverage. The explicit ninth-story exception is tested below.
+  assert.deepEqual([...requiredRecordings].filter(text => !seen.has(text)), [], 'the original recorded story pack must not lose authored transcript coverage');
+});
+
+test('the optional ninth story reads its exact words with device speech and usable controls', () => {
+  const fixture = speechFixture();
+  const audioRequests = [];
+  const controller = createNarration({ synth: fixture.synth, Utterance,
+    Audio: class { constructor(src) { audioRequests.push(src); } }
+  });
+  for (const id of DEVICE_VOICE_MISSION_IDS) {
+    const mission = MISSIONS.find(item => item.id === id);
+    assert.ok(mission, `the explicitly device-read story exists: ${id}`);
+    for (const words of new Set(authoredMissionWords(mission))) {
+      assert.equal(storyAudioFor(words), null, 'new facts must not reuse a similar older recording');
+      assert.equal(controller.speak(words), true);
+      assert.equal(fixture.utterances.at(-1).text, words, 'the voice receives exactly the displayed authored sentence');
+      assert.equal(controller.getState().canPause, true);
+      controller.pause();
+      assert.equal(controller.getState().status, 'paused');
+      assert.equal(controller.getState().canResume, true);
+      const count = fixture.utterances.length;
+      controller.resume();
+      assert.equal(fixture.utterances.length, count, 'resume continues instead of restarting the sentence');
+      controller.stop();
+      assert.equal(controller.getState().status, 'idle');
+    }
+  }
+  assert.deepEqual(audioRequests, [], 'device fallback never requests an invented recording or paid voice service');
+  controller.dispose();
+  fixture.controller.dispose();
 });

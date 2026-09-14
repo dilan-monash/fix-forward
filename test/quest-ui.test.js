@@ -153,10 +153,9 @@ async function createQuest(t, { saved, storageBlocked = false, storageRemovalBlo
   };
   // Read serialized output rather than importing or reaching into app.js private state.
   const savedState = () => JSON.parse(actualStorage.getItem(STORAGE_KEY));
-  // Open a story through the picker; an injected activator exercises tap or keyboard paths.
+  // Choose the single Home chapter trail; an injected activator exercises tap or keyboard paths.
   const selectMission = (mission, activate = click) => {
-    if (!query('[data-picker]')) activate('.q-header [data-nav="home"]');
-    activate('[data-picker]');
+    if (!query('.q-home')) activate('.q-header [data-nav="home"]');
     activate(`[data-mission="${mission.id}"]`);
     activate('[data-start-mission]');
   };
@@ -200,7 +199,7 @@ test('rendered mission supports wrong choice, retry, tap planning, saved discove
   assert.ok(q.query('.q-home'));
   assert.match(q.required('.q-boundary').textContent, /Real appliances need adult help/);
   assert.equal(q.required('.q-home-intro .q-play-trail [aria-current="step"] strong').textContent, 'Look', 'The home picture route shows where play begins');
-  q.click('[data-picker]');
+  q.click('.q-header [data-nav="home"]');
   q.click(`[data-mission="${item.id}"]`);
   assert.equal(q.required('.q-mission-intro .q-play-trail [aria-current="step"] strong').textContent, 'Look', 'The story introduction keeps the same picture route before any clue is found');
   q.click('[data-start-mission]');
@@ -250,7 +249,7 @@ test('semantic keyboard alternatives complete a two-slot story and preserve opti
   assert.equal(q.savedState().completed[item.id].assisted, false);
   assert.equal(q.document.documentElement.dataset.motion, 'full');
   const cooperative = MISSIONS.find(mission => mission.cooperative);
-  q.keyboardActivate('[data-picker]');
+  q.keyboardActivate('.q-header [data-nav="home"]');
   q.keyboardActivate(`[data-mission="${cooperative.id}"]`);
   q.keyboardActivate('[data-evidence]');
   assert.ok(q.required('#q-dialog-body').textContent.includes(cooperative.cooperative.text));
@@ -267,7 +266,9 @@ test('semantic keyboard alternatives complete a two-slot story and preserve opti
 test('Revisit the clues from wrong feedback opens the scene and preserves a helped retry', async t => {
   const q = await createQuest(t);
   const item = MISSIONS[0];
-  q.click('[data-mode="challenge"]');
+  q.click('[data-game-settings]');
+  q.change('#q-mode', 'challenge');
+  q.click('#q-dialog-close');
   q.selectMission(item);
   q.inspect(item);
   const slotId = item.slots[0].id;
@@ -288,7 +289,7 @@ test('Revisit the clues from wrong feedback opens the scene and preserves a help
   assert.equal(q.savedState().completed[item.id].assisted, true);
 });
 
-test('all eight rendered stories and reflection retries award Sparks once and update every level badge', async t => {
+test('all nine rendered stories and reflection retries award Sparks once and update every level badge', async t => {
   const q = await createQuest(t);
   // Calculate expected rewards independently from observed UI progress, so calling the
   // production progression() function cannot accidentally repeat the same scoring bug.
@@ -332,9 +333,9 @@ test('all eight rendered stories and reflection retries award Sparks once and up
     q.click('[data-play-ending]');
     assert.deepEqual(q.savedState(), afterCorrect, 'Playing an ending is creative replay, not another award');
   }
-  assert.equal(Object.keys(q.savedState().completed).length, 8);
-  assert.equal(Object.keys(q.savedState().reflections).length, 8);
-  assert.equal(expectedPoints, 280);
+  assert.equal(Object.keys(q.savedState().completed).length, 9);
+  assert.equal(Object.keys(q.savedState().reflections).length, 9);
+  assert.equal(expectedPoints, 310);
   assert.equal(q.required('[role="progressbar"]').getAttribute('aria-valuenow'), '100');
   assert.match(q.required('.q-spark-meter').textContent, /All four level badges earned/);
   q.click('[data-nav="book"]');
@@ -345,7 +346,6 @@ test('Collection Station tap and keyboard controls finish five cards, distinguis
   // Static reward rendering makes the number assertions independent of the
   // separate star-flight timing suite while exercising the same real actions.
   const q = await createQuest(t, { reducedMotion: true });
-  q.click('[data-place="station"]');
   q.click('[data-sort-start]');
   const firstIds = q.savedState().sorting.itemIds;
   const learned = new Set();
@@ -400,9 +400,8 @@ test('Collection Station tap and keyboard controls finish five cards, distinguis
   assert.match(q.required('.q-round-hud').textContent, /5\s*\/\s*12 different pictures/);
 });
 
-test('partial sorting resumes from its companion, home and station without replacing the card or help history', async t => {
+test('partial sorting resumes from its companion and the single Home sorting tile without replacing help history', async t => {
   const q = await createQuest(t);
-  q.click('[data-place="station"]');
   q.click('[data-sort-start]');
   const first = SORT_ITEMS.find(item => item.id === q.savedState().sorting.itemIds[0]);
   q.click(`[data-destination="${first.answer}"]`);
@@ -417,10 +416,9 @@ test('partial sorting resumes from its companion, home and station without repla
   assert.deepEqual(q.savedState().sorting, partial);
   assert.ok(q.required('.q-sort-object').textContent.includes(current.title));
   q.click('.q-header [data-nav="home"]');
-  q.click('[data-nav="sorting"]');
+  q.click('[data-sort-start]');
   assert.deepEqual(q.savedState().sorting, partial);
   q.click('.q-header [data-nav="home"]');
-  q.click('[data-place="station"]');
   q.click('[data-sort-start]');
   assert.deepEqual(q.savedState().sorting, partial);
   assert.ok(q.required('.q-sort-object').textContent.includes(current.title));
@@ -429,7 +427,9 @@ test('partial sorting resumes from its companion, home and station without repla
 test('reload resumes an unfinished plan and settings; reset requires confirmation and preserves adult data', async t => {
   let q = await createQuest(t);
   const item = MISSIONS[0];
-  q.click('[data-mode="challenge"]');
+  q.click('[data-game-settings]');
+  q.change('#q-mode', 'challenge');
+  q.click('#q-dialog-close');
   q.selectMission(item);
   q.click('[data-clue-list]');
   assert.equal(q.required('.q-clue-list').hidden, false);
@@ -486,7 +486,7 @@ test('read aloud is optional, cancels on navigation and page exit, and has a vis
   assert.match(q.narration.utterances[0].text, /Pip the toaster and Flo the fan/);
   assert.match(q.narration.utterances[0].text, /Look for a clue.*Choose what happens next/s, 'The opening voice tells the child how to join the story');
   let previous = q.narration.cancelled;
-  q.click('[data-picker]');
+  q.click('.q-header [data-nav="home"]');
   assert.ok(q.narration.cancelled > previous);
   q.click(`[data-mission="${MISSIONS[0].id}"]`);
   q.click('#quest-settings');
@@ -516,10 +516,8 @@ test('read aloud is optional, cancels on navigation and page exit, and has a vis
 test('story projector compares before and after without awarding again; earned postcard design survives creations reload', async t => {
   let q = await createQuest(t, { reducedMotion: true });
   const item = MISSIONS[0];
-  q.click('[data-nav="creations"]');
+  assert.equal(q.query('[data-nav="creations"]'), null, 'A fresh save offers working activities instead of a locked creations page');
   assert.equal(q.query('[data-postcard]'), null, 'Unexplored stories offer a mission, not an unearned postcard');
-  assert.match(q.required('.q-created-postcards').textContent, /Finish one story to unlock its postcard/);
-  assert.ok(q.query('[data-picker]'), 'The empty creations screen offers a clear first activity');
   q.selectMission(item);
   q.inspect(item);
   q.plan(item.acceptedPlans[0]);
@@ -528,9 +526,13 @@ test('story projector compares before and after without awarding again; earned p
   const completedState = q.savedState();
   const afterScene = q.required('[data-story-scene] svg').outerHTML;
   for (let repeat = 0; repeat < 2; repeat += 1) {
+    const beforePanel = q.required('[data-story-view="before"]').closest('details');
+    if (beforePanel && !beforePanel.open) beforePanel.querySelector('summary').click();
     q.keyboardActivate('[data-story-view="before"]');
     assert.equal(q.required('[data-story-view="before"]').getAttribute('aria-pressed'), 'true');
     assert.notEqual(q.required('[data-story-scene] svg').outerHTML, afterScene);
+    const afterPanel = q.required('[data-story-view="after"]').closest('details');
+    if (afterPanel && !afterPanel.open) afterPanel.querySelector('summary').click();
     q.keyboardActivate('[data-story-view="after"]');
     assert.equal(q.required('[data-story-view="after"]').getAttribute('aria-pressed'), 'true');
     assert.equal(q.required('[data-story-scene] svg').outerHTML, afterScene);
@@ -604,8 +606,7 @@ test('postcard downloads occur only on request, contain local SVG artwork, revok
   q.click('#q-reset');
   q.click('#q-confirm-reset');
   assert.equal(q.actualStorage.getItem(STORAGE_KEY), null);
-  q.click('[data-nav="creations"]');
-  assert.deepEqual(q.savedState().postcards, {});
+  assert.equal(q.query('[data-nav="creations"]'), null, 'Reset hides creations until a new discovery is earned');
   assert.equal(q.query('[data-postcard]'), null);
   assert.equal(q.actualStorage.getItem('adult-session-fixture'), 'Adult journey remains separate');
 });
@@ -692,7 +693,9 @@ test('an empty plan responds with guidance without submitting an attempt or chan
 test('Challenge planning names a missing clue and cannot skip any authored fact', async t => {
   const q = await createQuest(t);
   const item = MISSIONS.find(mission => mission.clues.length > 1);
-  q.click('[data-mode="challenge"]');
+  q.click('[data-game-settings]');
+  q.change('#q-mode', 'challenge');
+  q.click('#q-dialog-close');
   q.selectMission(item);
   const initial = q.actualStorage.getItem(STORAGE_KEY);
   q.keyboardActivate('[data-open-plan]');
@@ -721,7 +724,7 @@ test('fresh sensory defaults wait for interaction and saved sound and reading ch
   assert.equal(q.narration.utterances.length, 0, 'No voice starts merely because the page loads');
   assert.equal(q.required('[data-game-sound]').getAttribute('aria-pressed'), 'true');
   assert.equal(q.actualStorage.getItem(STORAGE_KEY), null);
-  q.click('[data-picker]');
+  q.click('.q-header [data-nav="home"]');
   assert.equal(q.narration.utterances.length, 0, 'Choosing a game screen does not begin an unrelated reading');
   q.click(`[data-mission="${MISSIONS[0].id}"]`);
   assert.equal(q.savedState().settings.narration, true);
@@ -761,6 +764,7 @@ test('a one-slot plan takes one picture tap, lets the child change it and needs 
   const correctId = item.acceptedPlans[0][slotId];
   const otherId = item.allowedActions.find(action => action.id !== correctId).id;
   assert.ok(q.required('.q-single-plan'));
+  assert.equal(q.query('[data-action-drag], .q-action-tile .q-drag-handle'), null, 'The picture itself replaces the redundant Move control');
   assert.equal(q.required('[data-check-plan]').disabled, false, 'An incomplete plan still offers helpful guidance on activation');
   assert.equal(q.required('[data-check-plan]').getAttribute('aria-disabled'), 'true');
   q.click(`[data-action-select="${otherId}"]`);
@@ -794,9 +798,9 @@ test('the level HUD explains all rewards, keeps hints free and never locks stori
   assert.match(text, /Hints are free/);
   assert.match(text, /every story at any level/);
   q.keyboardActivate('[data-close-clue]');
-  q.click('[data-picker]');
-  assert.equal(q.document.querySelectorAll('.q-mission-row').length, MISSIONS.length);
-  assert.equal(q.document.querySelectorAll('.q-mission-row:disabled').length, 0);
+  q.click('.q-header [data-nav="home"]');
+  assert.equal(q.document.querySelectorAll('.q-adventure-trail [data-mission]').length, MISSIONS.length);
+  assert.equal(q.document.querySelectorAll('.q-adventure-trail [data-mission]:disabled').length, 0);
   q.click(`[data-mission="${MISSIONS[0].id}"]`);
   q.click('[data-start-mission]');
   q.click('[data-hint]');
@@ -814,7 +818,9 @@ test('inline picture listening reads its actual evidence and Word help explains 
   q.click('#q-dialog-close');
   const item = MISSIONS[0];
   const clue = item.clues[0];
-  q.click('[data-mode="challenge"]');
+  q.click('[data-game-settings]');
+  q.change('#q-mode', 'challenge');
+  q.click('#q-dialog-close');
   q.selectMission(item);
   q.click(`[data-clue="${clue.id}"]`);
   const afterClue = q.savedState();
@@ -969,7 +975,9 @@ test('page and dialog reading controls pause, resume and stop without changing g
   assert.equal(pageDock.hidden, true);
   assert.equal(q.actualStorage.getItem(STORAGE_KEY), initial);
 
-  q.click('[data-mode="challenge"]');
+  q.click('[data-game-settings]');
+  q.change('#q-mode', 'challenge');
+  q.click('#q-dialog-close');
   const item = MISSIONS[0];
   q.selectMission(item);
   q.click(`[data-clue="${item.clues[0].id}"]`);
@@ -987,7 +995,7 @@ test('page and dialog reading controls pause, resume and stop without changing g
   assert.deepEqual(q.savedState(), afterClue);
 });
 
-test('native Back and Forward follow story steps and picker without duplicate entries for a plan choice', async t => {
+test('native Back and Forward follow story steps and the Home trail without duplicate entries for a plan choice', async t => {
   const q = await createQuest(t);
   const item = MISSIONS[0];
   q.selectMission(item);
@@ -1000,7 +1008,7 @@ test('native Back and Forward follow story steps and picker without duplicate en
   await q.historyMove('back');
   assert.ok(q.query('.q-stage-intro'));
   await q.historyMove('back');
-  assert.ok(q.query('.q-picker'));
+  assert.ok(q.query('.q-home'));
   assert.equal(q.query('.q-mission'), null);
   await q.historyMove('forward');
   assert.ok(q.query('.q-stage-intro'));
@@ -1122,7 +1130,6 @@ test('reset then Back then reload cannot adopt the old entry epoch or resurrect 
 test('a cached-page return rebinds real sorting drags without awarding or changing saved progress', async t => {
   const q = await createQuest(t);
   q.click('[data-sort-start]');
-  const saved = q.actualStorage.getItem(STORAGE_KEY);
   const card = SORT_ITEMS.find(item => item.id === q.savedState().sorting.itemIds[0]);
   // Dispatch the same pointer protocol used by a browser; layout rectangles are
   // supplied because jsdom has no visual layout, not to bypass drag callbacks.
@@ -1131,16 +1138,17 @@ test('a cached-page return rebinds real sorting drags without awarding or changi
     Object.defineProperties(event, { pointerId: { value: 17 }, isPrimary: { value: true }, pointerType: { value: 'mouse' } });
     target.dispatchEvent(event);
   }
-  pointer(q.required('[data-sort-drag]'), 'pointerdown', 10, 10);
+  pointer(q.required('[data-sort-picture]'), 'pointerdown', 10, 10);
   pointer(q.document, 'pointermove', 30, 30);
   assert.ok(q.query('.q-drag-ghost'));
+  const saved = q.actualStorage.getItem(STORAGE_KEY); // The first lift can finish the optional practice introduction.
   q.window.dispatchEvent(new q.window.PageTransitionEvent('pagehide', { persisted: true }));
   assert.equal(q.query('.q-drag-ghost'), null);
   q.window.dispatchEvent(new q.window.PageTransitionEvent('pageshow', { persisted: true }));
   assert.equal(q.actualStorage.getItem(STORAGE_KEY), saved, 'cache restoration is presentation only');
   const destination = q.required(`[data-destination="${card.answer}"]`);
   destination.getBoundingClientRect = () => ({ left: 100, top: 100, right: 180, bottom: 180, width: 80, height: 80 });
-  pointer(q.required('[data-sort-drag]'), 'pointerdown', 10, 10);
+  pointer(q.required('[data-sort-picture]'), 'pointerdown', 10, 10);
   pointer(q.document, 'pointermove', 130, 130);
   assert.ok(q.query('.q-drag-ghost'), 'the returned screen has an active drag binding');
   pointer(q.document, 'pointerup', 130, 130);
@@ -1154,7 +1162,7 @@ test('a child can drag the item picture itself with a finger, or tap it and then
   q.click('[data-sort-start]');
   const first = SORT_ITEMS.find(item => item.id === q.savedState().sorting.itemIds[0]);
   const picture = q.required('[data-sort-picture]');
-  assert.equal(picture.tagName, 'BUTTON', 'The artwork has the same keyboard and tap access as Move');
+  assert.equal(picture.tagName, 'BUTTON', 'The artwork itself has semantic keyboard and tap access');
   assert.ok(picture.querySelector('svg'), 'The drag begins on the actual illustrated item');
   const wrong = ['ewaste', 'paper', 'ask'].find(id => id !== first.answer);
   q.required(`[data-destination="${wrong}"]`).getBoundingClientRect = () => ({ left: 100, top: 100, right: 180, bottom: 180, width: 80, height: 80 });
@@ -1338,7 +1346,7 @@ test('a failed reset leaves the existing sorting drag usable after closing its m
   q.click('#q-dialog-close');
   q.required(`[data-destination="${card.answer}"]`).getBoundingClientRect = () => ({ left: 100, top: 100, right: 180, bottom: 180, width: 80, height: 80 });
   // A real drag sequence detects removed listeners that a tap-only check would miss.
-  for (const [target, type, coordinate] of [[q.required('[data-sort-drag]'), 'pointerdown', 10], [q.document, 'pointermove', 130], [q.document, 'pointerup', 130]]) {
+  for (const [target, type, coordinate] of [[q.required('[data-sort-picture]'), 'pointerdown', 10], [q.document, 'pointermove', 130], [q.document, 'pointerup', 130]]) {
     const event = new q.window.MouseEvent(type, { bubbles: true, cancelable: true, button: 0, clientX: coordinate, clientY: coordinate });
     Object.defineProperties(event, { pointerId: { value: 23 }, isPrimary: { value: true }, pointerType: { value: 'mouse' } });
     target.dispatchEvent(event);
@@ -1468,7 +1476,6 @@ test('sorting touch stamps target the visible destination after retry and succes
     if (this.matches('.q-sort-picture > svg')) return { left: 80, top: 180, width: 120, height: 110 };
     return baseRect.call(this);
   };
-  q.click('[data-place="station"]');
   q.click('[data-sort-start]');
   const run = q.savedState().sorting;
   const item = SORT_ITEMS.find(card => card.id === run.itemIds[0]);
@@ -1657,6 +1664,7 @@ test('arrival keeps graphics animated without showing an opt-in invitation or re
 test('sorting shows picture facts first while the full original clue and controlled reading remain available', async t => {
   const q = await createQuest(t);
   q.click('[data-sort-start]');
+  q.click('[data-sort-demo-skip]'); // Begin the real card after the optional first-use example.
   const saved = q.actualStorage.getItem(STORAGE_KEY);
   const run = q.savedState().sorting;
   const item = SORT_ITEMS.find(card => card.id === run.itemIds[run.index]);
@@ -1740,4 +1748,238 @@ test('character hello taps read the visible introduction without changing progre
     assert.equal(q.required('body > [data-audio-dock] [data-audio-transcript]').textContent, words);
     assert.equal(q.actualStorage.getItem(STORAGE_KEY), saved);
   }
+});
+
+// The fresh Home screen must offer clear routes to actual play. A second
+// collection activity becomes relevant only after a child has earned something.
+test('Home offers one story start, one chapter trail and working activities without duplicate doors', async t => {
+  const q = await createQuest(t);
+  const home = q.required('.q-home');
+  assert.equal(home.querySelectorAll('.q-start-actions button').length, 1);
+  assert.equal(home.querySelectorAll('.q-adventure-trail [data-mission]').length, MISSIONS.length);
+  assert.equal(home.querySelector('[data-mode], [data-place], .q-suggestion, .q-play-doors [data-picker]'), null);
+  assert.equal(home.querySelector('[data-nav="creations"]'), null);
+  assert.equal(home.querySelectorAll('.q-play-doors > button').length, 1);
+  assert.ok(home.querySelector('.q-play-doors [data-sort-start]'));
+  assert.equal(home.querySelector('.q-play-doors [data-mission]'), null);
+  q.click('[data-sort-start]');
+  const first = SORT_ITEMS.find(item => item.id === q.savedState().sorting.itemIds[0]);
+  q.click(`[data-destination="${first.answer}"]`);
+  q.click('.q-header [data-nav="home"]');
+  assert.equal(q.required('.q-home').querySelectorAll('.q-play-doors > button').length, 2);
+  assert.ok(q.query('.q-home [data-nav="creations"]'), 'An earned idea makes the creative activity useful');
+  assert.equal(q.required('.q-home').querySelectorAll('[data-sort-start]').length, 1, 'The existing sorting round resumes through the same tile');
+});
+
+test('clues, plans and the Discovery Book are still while narration pauses and rewards remain responsive', async t => {
+  const q = await createQuest(t, { controlledAnimations:true });
+  assert.equal(q.document.body.dataset.learningQuiet, 'false');
+  q.keyboardActivate('#q-game-hud [data-hear]');
+  assert.equal(q.document.body.dataset.learningQuiet, 'true');
+  assert.equal(q.document.activeElement, q.required('#q-game-hud [data-hear]'), 'Settling the HUD preserves the reading button keyboard focus');
+  q.click('body > [data-audio-dock] [data-audio-pause]');
+  assert.equal(q.document.body.dataset.learningQuiet, 'true', 'Pausing a sentence does not restart competing decoration');
+  q.click('body > [data-audio-dock] [data-audio-stop]');
+  assert.equal(q.document.body.dataset.learningQuiet, 'false');
+  q.click('[data-game-settings]');
+  q.change('#q-narration', false);
+  q.click('#q-dialog-close');
+  const item = MISSIONS[0];
+  q.selectMission(item);
+  assert.equal(q.document.body.dataset.learningQuiet, 'true');
+  q.inspect(item);
+  assert.equal(q.document.body.dataset.learningQuiet, 'true');
+  assert.equal(q.query('.q-touch-fx[data-effect="clue"]'), null, 'The clue itself receives no distracting lens or star burst');
+  q.plan(item.acceptedPlans[0]);
+  assert.equal(q.document.body.dataset.learningQuiet, 'true');
+  q.click('[data-check-plan]');
+  assert.equal(q.document.body.dataset.learningQuiet, 'false');
+  q.click('[data-complete]');
+  assert.equal(q.document.body.dataset.learningQuiet, 'false');
+  assert.ok(q.query('.q-reward-fx'), 'Teaching calmness does not remove the earned star flight');
+  q.click('[data-nav="book"]');
+  assert.equal(q.document.body.dataset.learningQuiet, 'true');
+  q.click('.q-header [data-nav="home"]');
+  assert.equal(q.document.body.dataset.learningQuiet, 'false');
+});
+
+test('a brief sorting practice can be skipped, replayed or interrupted without answering the real picture', async t => {
+  let q = await createQuest(t, { controlledAnimations:true });
+  q.click('[data-sort-start]');
+  const started = q.savedState();
+  assert.equal(started.onboarding.sortingDemoSeen, false, 'Opening the example is not a completed tutorial');
+  assert.equal(q.required('[data-sort-practice]').hidden, false);
+  assert.equal(q.query('[data-sort-drag], .q-sort-object .q-drag-handle'), null, 'Direct picture input needs no second Move handle');
+  assert.ok(q.query('.q-sort-demo__paper'));
+  assert.equal(q.document.querySelectorAll('[data-destination]').length, 3);
+  assert.ok([...q.document.querySelectorAll('[data-destination]')].every(button => !button.disabled));
+  assert.equal(Number(q.required('[data-spark-value]').textContent), 0);
+  const firstAnimations = q.animations.filter(animation => animation.element.closest('.q-sort-demo'));
+  assert.ok(firstAnimations.length > 0);
+  q.click('[data-sort-demo-skip]');
+  assert.equal(q.savedState().onboarding.sortingDemoSeen, true, 'Skip remembers the introduction without recording an answer');
+  assert.equal(q.required('[data-sort-practice]').hidden, true);
+  assert.equal(q.query('.q-sort-demo'), null);
+  assert.ok(firstAnimations.every(animation => animation.cancelled));
+  assert.deepEqual(q.savedState().sorting, started.sorting);
+  assert.deepEqual(q.savedState().sortedItems, started.sortedItems);
+  // Skip may begin the requested story reading; Stop gives Replay a quiet turn.
+  if (!q.required('body > [data-audio-dock]').hidden) q.click('body > [data-audio-dock] [data-audio-stop]');
+  q.click('[data-sort-demo-replay]');
+  assert.ok(q.query('.q-sort-demo'));
+  q.click('[data-sort-picture]');
+  assert.equal(q.query('.q-sort-demo'), null, 'Touching the actual item takes over immediately');
+  assert.equal(q.required('[data-sort-practice]').hidden, true);
+  assert.deepEqual(q.savedState().sorting, started.sorting);
+  q.click('[data-sort-demo-replay]');
+  assert.ok(q.query('.q-sort-demo'));
+  q.click('[data-hear]');
+  assert.equal(q.query('.q-sort-demo'), null, 'The practice never competes with requested narration');
+  q.click('[data-sort-demo-replay]');
+  assert.equal(q.query('.q-sort-demo'), null, 'Replay waits until the story voice stops');
+  q.click('body > [data-audio-dock] [data-audio-pause]');
+  q.click('[data-sort-demo-replay]');
+  assert.equal(q.query('.q-sort-demo'), null, 'A paused sentence is still a reading turn');
+  q.click('body > [data-audio-dock] [data-audio-stop]');
+  q.click('[data-sort-demo-replay]');
+  assert.ok(q.query('.q-sort-demo'));
+  const lastAnimations = q.animations.filter(animation => animation.element.closest('.q-sort-demo') && !animation.cancelled);
+  q.click('.q-header [data-nav="home"]');
+  assert.equal(q.query('.q-sort-demo'), null);
+  assert.ok(lastAnimations.every(animation => animation.cancelled));
+  assert.deepEqual(q.savedState().sorting, started.sorting);
+  assert.deepEqual(q.savedState().completed, started.completed);
+  assert.equal(Number(q.required('[data-spark-value]').textContent), 0);
+  q.dispose();
+  q = await createQuest(t, { controlledAnimations:true });
+  q.click('[data-sort-start]');
+  assert.ok(q.query('.q-sort-demo'));
+  q.click('.q-header [data-nav="home"]');
+  assert.equal(q.savedState().onboarding.sortingDemoSeen, true, 'Leaving during the first example remembers that introduction');
+  assert.deepEqual(q.savedState().sorting.answers, {});
+  q.click('[data-sort-start]');
+  assert.equal(q.query('.q-sort-demo'), null, 'Returning does not repeatedly interrupt the child with the same example');
+  assert.equal(Number(q.required('[data-spark-value]').textContent), 0);
+});
+
+test('listening during earned stars settles their score, and a reflection retry returns to quiet thinking', async t => {
+  const q = await createQuest(t, { controlledAnimations:true });
+  const item = MISSIONS[0];
+  q.selectMission(item);
+  q.inspect(item);
+  q.plan(item.acceptedPlans[0]);
+  q.click('[data-check-plan]');
+  q.click('[data-complete]');
+  const earned = 20 + new Set(item.conceptIds).size * 5;
+  const completed = q.savedState();
+  assert.ok(q.query('.q-reward-fx'));
+  assert.equal(Number(q.required('[data-spark-value]').textContent), 0);
+  q.click('[data-hear]');
+  assert.equal(q.document.body.dataset.learningQuiet, 'true');
+  assert.equal(q.query('.q-reward-fx, .q-touch-fx'), null, 'Reading starts without residual reward particles crossing the words');
+  assert.equal(Number(q.required('[data-spark-value]').textContent), earned, 'Cancelling decoration never loses already saved points');
+  assert.deepEqual(q.savedState(), completed);
+  q.click('body > [data-audio-dock] [data-audio-stop]');
+  const wrong = item.reflection.options.find(option => option.id !== item.reflection.correctId);
+  q.click(`[data-reflection="${wrong.id}"]`);
+  assert.equal(q.document.body.dataset.learningQuiet, 'true', 'A wrong picture answer is a reading and reconsidering step');
+  assert.ok(q.required('.q-reflection-hint').textContent.includes(item.reflection.explanation));
+  assert.deepEqual(q.savedState(), completed);
+  q.click(`[data-reflection="${item.reflection.correctId}"]`);
+  assert.equal(q.document.body.dataset.learningQuiet, 'false');
+  assert.equal(q.savedState().reflections[item.id], item.reflection.correctId);
+  assert.ok(q.query('.q-reward-fx'), 'The new correct reflection can celebrate its own earned points');
+});
+
+test('an earned celebration settles into quiet reading and an explicit ending replay is brief and awards nothing', async t => {
+  const q = await createQuest(t, { controlledAnimations:true });
+  // Hold only the page's finite UI timers. Native animation completion remains
+  // explicit, so this checks the transition without a real multi-second sleep.
+  let now = 0;
+  let serial = 0;
+  const pending = new Map();
+  t.mock.method(q.window, 'setTimeout', (callback, delay = 0, ...args) => {
+    const id = ++serial;
+    pending.set(id, { at:now + Number(delay), run:() => callback(...args) });
+    return id;
+  });
+  t.mock.method(q.window, 'clearTimeout', id => pending.delete(id));
+  const advance = milliseconds => {
+    const until = now + milliseconds;
+    for (;;) {
+      const next = [...pending.entries()].filter(([,job]) => job.at <= until).sort((a,b) => a[1].at - b[1].at)[0];
+      if (!next) break;
+      now = next[1].at;
+      pending.delete(next[0]);
+      next[1].run();
+    }
+    now = until;
+  };
+  const item = MISSIONS[0];
+  q.selectMission(item);
+  q.inspect(item);
+  q.plan(item.acceptedPlans[0]);
+  q.click('[data-check-plan]');
+  q.click('[data-complete]');
+  const saved = q.actualStorage.getItem(STORAGE_KEY);
+  const earned = 20 + new Set(item.conceptIds).size * 5;
+  const finalStar = q.animations.findLast(animation => animation.element.matches('.q-reward-fx__star') && typeof animation.onfinish === 'function');
+  assert.ok(finalStar);
+  assert.equal(q.document.body.dataset.learningQuiet, 'false');
+  finalStar.finish();
+  assert.equal(Number(q.required('[data-spark-value]').textContent), earned);
+  advance(699);
+  assert.equal(q.document.body.dataset.learningQuiet, 'false', 'The meter receives a brief fill response');
+  advance(1);
+  assert.equal(q.document.body.dataset.learningQuiet, 'true', 'The outcome reason and picture question become still after the reward');
+  assert.equal(q.query('.q-reward-fx'), null);
+  assert.ok(q.query('.q-reflection'));
+  assert.equal(q.actualStorage.getItem(STORAGE_KEY), saved);
+  q.click('[data-play-ending]');
+  assert.equal(q.document.body.dataset.learningQuiet, 'false', 'An explicit replay may animate the illustrated ending');
+  assert.equal(q.query('.q-reward-fx'), null, 'A scene replay is not another points flight');
+  advance(1599);
+  assert.equal(q.document.body.dataset.learningQuiet, 'false');
+  advance(1);
+  assert.equal(q.document.body.dataset.learningQuiet, 'true', 'The requested replay also finishes by returning to quiet reading');
+  assert.equal(Number(q.required('[data-spark-value]').textContent), earned);
+  assert.equal(q.actualStorage.getItem(STORAGE_KEY), saved, 'Timing and replay cannot change completion, discoveries or Sparks');
+});
+
+test('Challenge is offered after two independent stories and either answer is remembered without changing rewards', async t => {
+  let q = await createQuest(t);
+  assert.equal(q.query('[data-challenge-accept], [data-challenge-dismiss]'), null);
+  for (const [index,item] of MISSIONS.slice(0,2).entries()) {
+    q.selectMission(item);
+    q.inspect(item);
+    q.plan(item.acceptedPlans[0]);
+    q.click('[data-check-plan]');
+    q.click('[data-complete]');
+    q.click('.q-header [data-nav="home"]');
+    if (index === 0) assert.equal(q.query('[data-challenge-accept]'), null);
+  }
+  const eligible = q.savedState();
+  assert.ok(q.query('[data-challenge-accept]'));
+  assert.ok(q.query('[data-challenge-dismiss]'));
+  q.click('[data-challenge-dismiss]');
+  assert.equal(q.savedState().settings.mode, 'guided');
+  assert.equal(q.savedState().onboarding.challengeChoice, 'dismissed');
+  assert.deepEqual(q.savedState().completed, eligible.completed);
+  assert.deepEqual(q.savedState().discoveries, eligible.discoveries);
+  const dismissed = q.savedState();
+  q.dispose();
+  q = await createQuest(t, { saved:dismissed });
+  assert.equal(q.query('[data-challenge-accept], [data-challenge-dismiss]'), null, 'Reload does not ask the same question again');
+  q.dispose();
+  q = await createQuest(t, { saved:eligible });
+  q.keyboardActivate('[data-challenge-accept]');
+  assert.equal(q.savedState().settings.mode, 'challenge');
+  assert.equal(q.savedState().onboarding.challengeChoice, 'accepted');
+  assert.deepEqual(q.savedState().completed, eligible.completed);
+  assert.deepEqual(q.savedState().discoveries, eligible.discoveries);
+  q.click('[data-game-settings]');
+  assert.equal(q.required('#q-mode').value, 'challenge');
+  q.change('#q-mode', 'guided');
+  q.click('#q-dialog-close');
+  assert.equal(q.query('[data-challenge-accept]'), null, 'Returning to Guided is allowed without repeating the offer');
 });

@@ -134,7 +134,8 @@ const server = http.createServer(async (request, response) => {
 
   // An explicit frontend allowlist prevents accidentally exposing credentials,
   // backend files, local reports, fixtures or any file outside this workspace.
-  const permitted = route === "/" || ["/index.html", "/styles.css", "/404.html", "/500.html", "/favicon.svg", "/quest", "/quest/", "/quest/index.html", "/quest/quest.css", "/quest/play-effects.css", "/quest/tablet-play.css", "/quest/game-feel.css", "/quest/clue-play.css", "/quest/family-guide.css", "/quest/visual-play.css", "/quest/word-help.css", "/quest/touch-fx.css", "/quest/scene-play.css", "/quest/adventure-world.css", "/quest/audio/story-manifest.js", "/quest/audio/KOKORO-LICENSE.txt"].includes(route)
+  // Keep browser review aligned with Flask's explicitly served local styles.
+  const permitted = route === "/" || ["/index.html", "/styles.css", "/404.html", "/500.html", "/favicon.svg", "/quest", "/quest/", "/quest/index.html", "/quest/quest.css", "/quest/play-effects.css", "/quest/tablet-play.css", "/quest/game-feel.css", "/quest/clue-play.css", "/quest/family-guide.css", "/quest/visual-play.css", "/quest/word-help.css", "/quest/touch-fx.css", "/quest/scene-play.css", "/quest/adventure-world.css", "/quest/sort-demo.css", "/quest/learning-focus.css", "/quest/audio/story-manifest.js", "/quest/audio/KOKORO-LICENSE.txt"].includes(route)
     || /^\/quest\/audio\/[a-f0-9]{16}\.mp3$/.test(route)
     || /^\/(src|quest)\/[a-zA-Z0-9_-]+\.js$/.test(route);
   if (!permitted) { send(request, response, 404, "Not found."); return; }

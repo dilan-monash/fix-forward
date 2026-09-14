@@ -43,7 +43,7 @@ function deepFreeze(value) {
 }
 
 test('every authored mission and accepted alternative reaches one complete outcome without mutating its input', () => {
-  assert.equal(MISSIONS.length, 8);
+  assert.equal(MISSIONS.length, 9);
   let all = createState();
   for (const mission of MISSIONS) {
     assert.ok(mission.clues.length >= 2 && mission.clues.length <= 3);
@@ -63,7 +63,7 @@ test('every authored mission and accepted alternative reaches one complete outco
     }
     all = completed(mission, all);
   }
-  assert.equal(Object.keys(all.completed).length, 8);
+  assert.equal(Object.keys(all.completed).length, MISSIONS.length);
   assert.equal(new Set(all.discoveries).size, all.discoveries.length);
 });
 
