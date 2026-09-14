@@ -2,7 +2,7 @@
 
 13 September 2026. FixForward Quest is an adventure **for children aged 7–12**, alongside the adult website. The creative refresh gives children more character dialogue, visual discoveries and choices about what they make. Playing with a companion is optional. The current release branch is `iteration-2`; the dated verification below describes local checks, not a verified live deployment. Those implementation checks did not change production databases or hosting settings.
 
-For mentor comparison, retain `main` and its existing Render website as Iteration 1. Publish Iteration 2 through a separate service linked to `iteration-2`, with its own URL. The existing Iteration 1 service must keep its branch and website. Verify the new service before claiming it is live.
+Use `iteration-2` for ongoing development and review. Main at `fixforward.me` stays stable until the user explicitly approves the reviewed release, and `iteration-1` remains the preserved original website. Follow the canonical [site roles](../README.md#branches-and-websites), [I2 manual deployment workflow](../README.md#development-and-review-workflow) and [shared database boundary](../README.md#shared-database-boundary). The dated implementation evidence below remains separate from current deployment verification.
 
 The new creative controls are implemented and the current automated checks pass. Desktop browser checks, saved postcard choices, reduced motion and adult-state isolation were also verified. Phone screenshots, actual downloaded-file inspection, a precise successful pointer drop after the final font change and 200% zoom remain unverified. See [QUEST_CREATIVE_REFRESH.md](QUEST_CREATIVE_REFRESH.md) for the rationale and evidence limits.
 

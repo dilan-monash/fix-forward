@@ -20,7 +20,7 @@ export const DECORATION_SLOTS = ['home', 'studio', 'station'];
 // Match sorting-card answers and the three destination controls in app.js.
 export const DESTINATION_IDS = ['ewaste', 'paper', 'ask'];
 // A view is a whole screen; a step is the current stage inside one mission.
-const VIEWS = ['home', 'mission', 'sorting', 'book', 'grownups'];
+const VIEWS = ['home', 'mission', 'sorting', 'book', 'creations', 'grownups'];
 const STEPS = ['intro', 'explore', 'plan', 'feedback', 'outcome'];
 // Resolve only authored missions; an unknown action or saved ID returns undefined.
 const missionById = id => MISSIONS.find(mission => mission.id === id);
@@ -35,13 +35,24 @@ const validIds = (values, ids) => Array.isArray(values) ? unique(values.filter(i
 // Keep the deterministic round seed finite and within the range used by START_SORT.
 const boundedRound = value => Number.isSafeInteger(value) && value >= 0 && value <= 1000000;
 
-/** Return a fresh, independent save shape with quiet, guided defaults. */
+/** Return a fresh adventure with sensory feedback ready for the first game tap.
+ * Browser audio still waits for a gesture; these defaults never start a speaker. */
 export function createState() {
   return {
     version: STATE_VERSION, view: 'home', activeMission: null, completed: {}, discoveries: [],
-    settings: { mode: 'guided', narration: false, motion: 'auto' },
-    decorations: { home: null, studio: null, station: null }, postcards: {}, reflections: {}, sorting: null, sortRound: 0, practice: []
+    settings: { mode: 'guided', narration: true, sound: true, haptics: true, motion: 'full' },
+    decorations: { home: null, studio: null, station: null }, postcards: {}, reflections: {}, sorting: null, sortRound: 0, practice: [], sortedItems: []
   };
+}
+
+/** Both play styles need every authored fact before planning. Guided reveals
+ * them in order; Challenge lets children find them. Counting exact IDs prevents
+ * duplicates or unrelated clues from unlocking a story's next step. */
+export function canOpenPlan(state) {
+  const active = state?.activeMission;
+  const mission = missionById(active?.id);
+  return Boolean(state?.view === 'mission' && active?.step === 'explore' && mission
+    && Array.isArray(active.clueIds) && mission.clues.every(clue => active.clueIds.includes(clue.id)));
 }
 
 // Start or replay a known story without clearing previously earned discoveries.
@@ -138,8 +149,8 @@ export function transition(state, action) {
       if (!mission || !['explore', 'plan'].includes(active.step) || !mission.clues.some(clue => clue.id === action.id) || active.clueIds.includes(action.id)) return state;
       return updateMission(state, { clueIds: [...active.clueIds, action.id] });
     case 'OPEN_PLAN':
-      // One inspected clue is enough to plan; children can return for more evidence.
-      return active?.step === 'explore' && active.clueIds.length > 0 ? updateMission(state, { step: 'plan' }) : state;
+      // The visible next-step control and the rule engine share this same gate.
+      return canOpenPlan(state) ? updateMission(state, { step: 'plan' }) : state;
     case 'EXPLORE_AGAIN':
       // A wrong answer can return to clues without losing the plan or help history.
       return active?.step === 'plan' || (active?.step === 'feedback' && !active.feedback?.correct)
@@ -193,8 +204,11 @@ export function transition(state, action) {
       return { ...state, practice: markPractice(state, [item.conceptId]), sorting: { ...sorting, assistedIds: [...sorting.assistedIds, item.id] } };
     }
     case 'SET_SETTING': {
-      // Accept only fixed setting choices; narration remains an explicit opt-in.
-      const allowed = { mode: ['guided', 'challenge'], narration: [true, false], motion: ['auto', 'reduce'] };
+      // Sound, story voice and touch feedback are independent choices. Muting
+      // the speaker does not remove gentle touch feedback in a quiet room.
+      // The current requested design always animates its graphics. Motion is no
+      // longer a switchable setting; stale controls cannot change that policy.
+      const allowed = { mode: ['guided', 'challenge'], narration: [true, false], sound: [true, false], haptics: [true, false] };
       if (!Object.hasOwn(allowed, action.key) || !allowed[action.key].includes(action.value) || state.settings[action.key] === action.value) return state;
       return { ...state, settings: { ...state.settings, [action.key]: action.value } };
     }
@@ -234,6 +248,9 @@ export function transition(state, action) {
       return {
         ...state,
         discoveries: correct ? unique([...state.discoveries, item.conceptId]) : state.discoveries,
+        // Each different picture earns its own mastery reward, even when its
+        // idea was learned in another story. Replays still count in this round.
+        sortedItems: correct ? unique([...(state.sortedItems || []), item.id]) : (state.sortedItems || []),
         practice: correct ? state.practice : markPractice(state, [item.conceptId]),
         sorting: {
           ...sorting, status: 'feedback', feedback: { correct, destinationId: action.destinationId },
@@ -366,11 +383,23 @@ export function hydrateState(raw) {
   state.practice = validIds(raw.practice, conceptIds);
   if (isRecord(raw.settings)) {
     state.settings.mode = raw.settings.mode === 'challenge' ? 'challenge' : 'guided';
-    state.settings.narration = raw.settings.narration === true;
-    state.settings.motion = raw.settings.motion === 'reduce' ? 'reduce' : 'auto';
+    // Keep a child's explicit off choices. Missing or malformed older fields
+    // inherit the new first-run defaults, still subject to browser gesture rules.
+    for (const key of ['narration', 'sound', 'haptics']) {
+      if (typeof raw.settings[key] === 'boolean') state.settings[key] = raw.settings[key];
+    }
+    // Keep createState's fixed full motion for this requested design. Older
+    // auto/reduce saves retain every valid story, point and picture below;
+    // changing presentation never resets the child's adventure.
   }
   state.activeMission = hydrateMission(raw.activeMission, state.completed);
   state.sorting = hydrateSorting(raw.sorting);
+  // Keep known picture IDs across rounds. Older saves can recover credit from
+  // their last valid board; never infer a solved picture from a concept alone.
+  state.sortedItems = unique([
+    ...validIds(raw.sortedItems, SORT_ITEMS.map(item => item.id)),
+    ...Object.keys(state.sorting?.answers || {})
+  ]);
   // A usable saved board supplies a safe next seed if the counter itself is damaged.
   state.sortRound = boundedRound(raw.sortRound) ? raw.sortRound : state.sorting ? (state.sorting.round + 1) % 1000001 : 0;
   if (state.sorting) state.discoveries = unique([...state.discoveries, ...Object.keys(state.sorting.answers).map(id => itemById(id).conceptId)]);

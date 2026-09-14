@@ -1,0 +1,213 @@
+/* QUEST GAME FEEDBACK. Loaded after tablet-play.css. The rule engine awards
+   progress; this file supplies the game frame, response and reward presentation. */
+:root { --q-chrome-height:145px; }
+html { scroll-padding-top:calc(var(--q-chrome-height) + 16px); }
+body.quest { background:radial-gradient(ellipse at 10% 0,#d7ece9 0,transparent 52%),radial-gradient(ellipse at 100% 40%,#f9e5b9 0,transparent 55%),#fff9ed; }
+body.quest[data-quest-view=grownups] { background:radial-gradient(ellipse at 85% 0,#f7efd9,transparent 60%),#fffaf0; }
+
+/* The whole chrome stays at the top. Scores never scroll out of the game. */
+.q-game-chrome { position:sticky; top:0; z-index:80; padding-bottom:.4rem; background:#fffaf0f5; backdrop-filter:blur(12px); box-shadow:0 3px 16px #193b4f12; }
+.q-game-chrome .q-header { max-width:1280px; min-height:58px; padding:.3rem 1.3rem; }
+.q-game-chrome .q-brand-symbol { width:35px; height:35px; border-radius:12px 12px 12px 4px; font-size:1.7rem; }
+.q-game-chrome .q-header nav button { min-height:44px; }
+.q-game-chrome .q-player-strip { width:min(1220px,calc(100% - 2rem)); min-height:77px; margin:0 auto; padding:.35rem .75rem .35rem .35rem; border:2px solid #315e70; border-radius:23px; gap:.9rem; background:linear-gradient(115deg,#20485e,#163d4b); color:#fff7da; box-shadow:0 4px 0 #102f40, inset 0 1px 0 #ffffff36; }
+.q-game-chrome .q-level-chip { min-height:58px; color:#fff7da; }
+.q-game-chrome .q-level-chip small { color:#bcdedb; }
+.q-game-chrome .q-level-chip strong { color:#fff7da; }
+.q-game-chrome .q-level-chip>span:first-child { width:58px; flex-basis:58px; }
+.q-game-chrome .q-level-chip svg { height:60px; }
+.q-game-chrome .q-spark-meter { max-width:none; min-width:100px; flex:1; }
+.q-game-chrome .q-spark-meter small { color:#c8e2df; }
+.q-game-chrome .q-spark-meter b { display:inline-flex; align-items:center; gap:.3rem; font-size:1.16rem; font-variant-numeric:tabular-nums; color:#fff7da; transform-origin:center; }
+.q-game-chrome .q-spark-meter b>span:first-child { color:#ffd568; font-size:1.6rem; text-shadow:0 0 12px #ffcc6a70; }
+.q-game-chrome [data-spark-value] { min-width:1.7ch; text-align:right; }
+.q-game-chrome .q-spark-track { height:13px; border:1px solid #638591; border-radius:9px; background:#0b2938; box-shadow:inset 0 2px 3px #0003; }
+.q-game-chrome .q-spark-track>span { background:linear-gradient(180deg,#fff4b0,#f4b82f); border:1px solid #ffdc74; box-shadow:0 0 10px #ffc75d80; }
+.q-hud-tools { display:flex; align-items:center; gap:.45rem; }
+/* Sound, reading and play settings stay in reach while the child is playing. */
+.q-game-settings { display:grid; place-items:center; min-width:44px; min-height:48px; border:1px solid #7dadaf; border-radius:13px; background:#284f60; color:#fff7da; font-size:1.6rem; }
+.q-game-sound { display:flex; align-items:center; justify-content:center; gap:.35rem; min-height:48px; padding:.4rem .7rem; border:1px solid #7dadaf; border-radius:13px; background:#284f60; color:#fff7da; font-size:.78rem; font-weight:800; }
+.q-game-sound>span:first-child { font-size:1.45rem; }
+.q-game-sound[aria-pressed=true] { background:#c6e8d1; color:#174f43; border-color:#ddf4df; }
+/* Show the current round beside the score, including replay progress when a
+   picture has already earned Sparks. Counts remain visible while the board scrolls. */
+.q-round-hud { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.15rem .7rem; width:min(1200px,calc(100% - 3rem)); min-height:27px; margin:.35rem auto 0; color:#254e50; font-size:.78rem; }
+.q-round-hud strong { color:#173f4b; }
+.q-game-chrome .q-hud-listen { min-height:48px; padding:.4rem .7rem; border-color:#f4dfa3; background:#fff5d6; color:#23445a; }
+.q-game-chrome button:focus-visible { outline-color:#e7a434; outline-offset:3px; }
+.q-sound-invite { display:inline-flex; align-items:center; flex-wrap:wrap; gap:.4rem .6rem; margin:.9rem 0 0; min-height:48px; padding:.55rem .85rem; border:1.5px solid #ad9871; border-radius:14px; background:#ffefbb; font-weight:800; color:#4a442e; box-shadow:0 3px 0 #d9c795; }
+.q-sound-invite>span { font-size:1.4rem; }
+.q-sound-invite small { font-size:.74rem; font-weight:400; }
+/* Play screens use compact stages and large touch choices, with details available
+   on demand. Normal scrolling remains available for small screens and zoom. */
+body.quest:not([data-quest-view=grownups]) #quest-main { min-height:calc(100dvh - var(--q-chrome-height)); }
+.q-mission,.q-sort,.q-sort-finish { margin:.7rem auto; padding:.65rem 1.2rem 1.3rem; }
+.q-mission-top { margin-bottom:.3rem; min-height:32px; }
+.q-mission-top .q-back { min-height:36px; padding:.25rem 0; }
+.q-step-track { margin:.35rem 0 .75rem; }
+.q-story-heading h1,.q-sort-heading h1 { margin:.35rem 0 .6rem; font-size:clamp(1.6rem,3vw,2.25rem); letter-spacing:-.025em; }
+.q-story-heading p:empty { display:none; }
+.q-story-heading>p:not(.q-eyebrow) { max-width:880px; margin:.4rem 0 .7rem; font-size:.97rem; }
+.q-guide-dialogue { margin:.7rem 0; padding:.55rem .75rem; border-radius:18px; min-height:0; box-shadow:0 3px 0 #bdcdb84d; }
+.q-guide-portrait { width:62px; flex-basis:62px; }
+.q-guide-dialogue p { margin:.2rem 0; font-size:.98rem; }
+.q-mission-scene { border:3px solid #fffdf4; box-shadow:0 5px 0 #b7c9b9; }
+.q-stage-plan>.q-mission-scene,.q-stage-feedback>.q-mission-scene { max-height:115px; min-height:0; }
+.q-fact-recap { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.5rem; margin:.7rem 0; padding:.45rem .65rem; background:#e6eee0; border-radius:13px; }
+.q-fact-recap>div { display:flex; flex-wrap:wrap; gap:.4rem; }
+.q-fact-recap>div>span { padding:.3rem .5rem; border-radius:9px; color:#2c5c4e; background:#fffaf0; font-size:.78rem; }
+.q-fact-recap .q-button { min-height:44px; padding:.35rem .5rem; font-size:.82rem; }
+.q-plan-section .q-plan-instruction>h2 { margin:.35rem 0; font-size:1.45rem; }
+.q-plan-instruction .q-selection { margin:.3rem 0; }
+.q-action-tile { border-width:2px; border-radius:18px; box-shadow:0 5px 0 #bec6ba; }
+.q-action-tile.selected { background:#d1edc8; box-shadow:0 5px 0 #90b788,0 0 0 3px #eaf5c5; }
+.q-step-actions { margin:.75rem 0 .25rem; gap:.65rem; }
+.q-step-actions>.q-button.primary { min-height:52px; padding:.8rem 1.3rem; border-radius:17px; }
+.q-feedback { margin:.8rem 0; border-width:2px; box-shadow:0 5px 0 #d6cbb5; }
+.q-feedback h2 { font-size:1.35rem; }
+.q-feedback.correct { background:#e2f0cc; border-color:#9db987; box-shadow:0 5px 0 #b4c69e; }
+.q-feedback .q-button { min-height:52px; }
+.q-sort-heading>p { margin:.4rem 0 .65rem; }
+.q-sort-board { padding:.9rem; border:2px solid #aec5a7; border-radius:28px; box-shadow:0 7px 0 #bdcdae; }
+.q-sort-object { margin:.7rem auto; min-height:128px; }
+.q-sort-art { flex-basis:110px; }
+.q-sort-object-copy h2 { font-size:1.2rem; }
+.q-sort-object-copy p { font-size:.94rem; }
+.q-destinations { gap:.8rem; }
+.q-destination { min-height:145px; border-width:2px; box-shadow:0 5px 0 #adbda2; border-radius:20px; }
+.q-destination-drawing { width:80px; margin:.2rem auto; }
+.q-destination strong { font-size:1rem; }
+.q-destination.q-accepted { box-shadow:0 5px 0 #88ad8a,0 0 0 4px #cae8a5; }
+.q-drag-over { outline:4px solid #ffcb54!important; outline-offset:3px; box-shadow:0 0 0 8px #fff1b277!important; }
+.q-picture-facts { margin:.5rem 0!important; }
+.q-picture-fact { padding:.65rem!important; }
+.q-game-chrome~main [data-focus],.q-game-chrome~main [tabindex='-1'] { scroll-margin-top:calc(var(--q-chrome-height) + 18px); }
+
+/* Viewport rewards are decoration, not dialogs. They cannot block a touch,
+   capture focus, trigger a scroll, or turn an animation into game progress. */
+.q-reward-fx { contain:layout paint; }
+.q-reward-fx__popup { display:grid; place-items:center; min-width:230px; max-width:calc(100vw - 3rem); padding:1rem 2rem .75rem; border:4px solid #fffdf3; border-radius:34px 34px 34px 11px; color:#1c4255; background:radial-gradient(ellipse at 50% 15%,#fff9d9,#ffd877); box-shadow:0 8px 0 #b58939,0 22px 65px #244b5d4d; text-align:center; }
+.q-reward-fx__label { font-size:1.03rem; font-weight:900; letter-spacing:.03em; }
+.q-reward-fx__amount { font-size:clamp(3.8rem,8vw,5.5rem); line-height:1.12; font-weight:900; text-shadow:0 3px 0 #fff4c9; }
+.q-reward-fx__popup::before,.q-reward-fx__popup::after { content:'✦'; position:absolute; font-size:2.8rem; color:#fff8ce; text-shadow:0 2px 0 #a87a36; }
+.q-reward-fx__popup::before { left:-1.1rem; top:.35rem; rotate:-14deg; }
+.q-reward-fx__popup::after { right:-1rem; bottom:.1rem; rotate:18deg; }
+.q-reward-fx[data-level-up=true] .q-reward-fx__popup { background:radial-gradient(ellipse at 50% 10%,#f2f0ff,#c6b9f5); box-shadow:0 8px 0 #8a79b1,0 22px 65px #5143834d; }
+.q-reward-fx svg.q-reward-fx__star { width:32px; height:32px; color:#ffd14c; filter:drop-shadow(0 0 3px #fff9d9) drop-shadow(0 2px 1px #9f671f); }
+.q-reward-fx svg.q-reward-fx__star:nth-of-type(3n) { width:37px; height:37px; color:#ffeaa1; }
+.q-reward-fx svg.q-reward-fx__glint { width:10px; height:10px; color:#fff8ce; filter:drop-shadow(0 0 4px #efa62e); }
+.q-reward-fx__ring { border:5px solid #ffc954; border-radius:50%; box-shadow:0 0 0 7px #fff7ba88; }
+.q-game-feedback { position:fixed; left:50%; top:calc(var(--q-chrome-height) + 20px); z-index:120; display:flex; align-items:center; gap:.7rem; width:max-content; max-width:calc(100vw - 2rem); padding:.75rem 1.3rem; border:3px solid white; border-radius:22px; color:#214735; background:#d4edba; box-shadow:0 5px 0 #93b97c,0 14px 35px #224b5133; transform:translateX(-50%); pointer-events:none; }
+.q-game-feedback b { font-size:1.8rem; }
+.q-game-feedback strong { font-size:1.15rem; }
+.q-game-feedback--retry { color:#774633; background:#ffe8d0; box-shadow:0 5px 0 #d5a080,0 14px 35px #224b5133; }
+.q-tap-ring { position:fixed; width:28px; height:28px; border:3px solid #fff6ba; border-radius:50%; box-shadow:0 0 0 2px #e4ac41; pointer-events:none; z-index:100; animation:q-touch-ripple 320ms ease-out both; }
+
+/* Restore the parent's preferred explanatory sections and retain the newer FAQs. */
+.q-parent-restored-intro { text-align:center; margin:1.5rem auto 3rem; max-width:1130px; }
+.q-parent-restored-intro h1 { max-width:1120px; margin:1.25rem auto 2rem; font-size:clamp(1.9rem,3.6vw,3rem); line-height:1.28; letter-spacing:-.025em; }
+.q-parent-restored-intro>p:last-child { max-width:1060px; margin:auto; font-size:1.12rem; line-height:1.8; }
+.q-parent-restored-goals { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:2rem; margin:1.8rem 0 3rem; }
+.q-parent-restored-goals article { background:none; padding:0; border:0; box-shadow:none; }
+.q-parent-restored-goals svg { width:125px; height:125px; margin:0 0 1rem; }
+.q-parent-restored-goals h3 { font-size:1.25rem; line-height:1.4; }
+.q-parent-restored-goals p { font-size:1rem; line-height:1.8; }
+.q-parent-restored-join { display:grid; grid-template-columns:210px minmax(0,1fr); gap:3rem; align-items:center; padding:2rem 3rem; margin:2rem 0; background:#dcece1; border-radius:28px; }
+.q-parent-restored-companion svg { width:210px; height:230px; }
+.q-parent-restored-join-copy h2 { font-size:1.8rem; margin:.5rem 0 1rem; }
+.q-parent-restored-join-copy blockquote { margin:1rem 0; border-left:3px solid #d9b96d; padding:.3rem 0 .3rem 1rem; font-size:1.2rem; }
+.q-parent-restored-preview { display:grid; grid-template-columns:1fr 1fr; align-items:center; gap:2rem; margin:2rem 0 3rem; }
+.q-parent-restored-game>p { font-size:1rem; line-height:1.8; }
+
+/* Every touch/feedback effect is finite. The actual points and text are identical
+   when browser animation is unavailable. Quest starts moving without an extra setting. */
+@keyframes q-touch-ripple { from { opacity:1; transform:translate(-50%,-50%) scale(.35); } to { opacity:0; transform:translate(-50%,-50%) scale(2.1); } }
+@keyframes q-feedback-pop { 0% { opacity:0; translate:0 8px; scale:.9; } 65% { opacity:1; translate:0 0; scale:1.035; } 100% { scale:1; } }
+@media screen {
+  html[data-motion=full] .q-game-feedback { animation:q-feedback-pop 230ms ease-out; }
+}
+@media (min-width:760px) {
+  .q-stage-explore>.q-mission-scene { min-height:260px; max-height:390px; }
+  /* Keep the next action beside short feedback on a tablet, so children do not
+     have to scroll past the explanation to retry or collect another picture. */
+  .q-sort>.q-feedback>div { display:grid; grid-template-columns:1fr auto; gap:.2rem 1rem; align-items:center; width:100%; }
+  .q-sort>.q-feedback h2,.q-sort>.q-feedback p { grid-column:1; margin:.15rem 0; }
+  .q-sort>.q-feedback .q-button { grid-column:2; grid-row:1/3; white-space:nowrap; }
+}
+@media(min-width:800px) and (max-height:800px) {
+  /* Landscape tablets have less vertical space. Keep the picture legible while
+     leaving room for the answer and its always-visible score destination. */
+  .q-sort-art { width:100px; }
+  .q-sort-art svg { height:95px; }
+  .q-sort-object { margin:.35rem auto; }
+  .q-sort-object p { font-size:.85rem; margin-bottom:.4rem; }
+  .q-sort-round-track { margin-bottom:.4rem; }
+  .q-sort-instruction { margin:.5rem 0 .1rem; }
+  .q-sort:has(.q-feedback) .q-sort-instruction { display:none; }
+}
+@media (max-width:900px) {
+  .q-parent-restored-goals { grid-template-columns:repeat(2,minmax(0,1fr)); gap:1.4rem; }
+  .q-parent-restored-join { grid-template-columns:150px 1fr; gap:1.5rem; padding:1.5rem; }
+  .q-parent-restored-companion svg { width:150px; height:170px; }
+  .q-game-chrome .q-level-chip strong { max-width:110px; font-size:.82rem; }
+  .q-game-chrome .q-player-strip { gap:.5rem; }
+  .q-hud-tools { gap:.3rem; }
+  .q-game-sound,.q-game-chrome .q-hud-listen { font-size:.72rem; padding:.35rem .5rem; }
+  .q-parent-restored-preview { grid-template-columns:1fr; }
+}
+/* Three 44px-or-larger controls need their own row on a narrow tablet or phone.
+   Keeping the score above them prevents squeezed words and horizontal scrolling. */
+@media (max-width:760px) {
+  .q-game-chrome .q-player-strip { display:grid; grid-template-columns:58px minmax(0,1fr); row-gap:.35rem; }
+  .q-game-chrome .q-level-chip { min-width:0; }
+  .q-game-chrome .q-level-chip>span:last-child { display:none; }
+  .q-game-chrome .q-spark-meter { min-width:0; }
+  .q-hud-tools { grid-column:1/-1; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.35rem; }
+  .q-hud-tools>button { min-width:44px; width:100%; }
+  .q-game-sound { flex-direction:column; gap:0; font-size:.7rem; line-height:1.15; }
+  .q-round-hud { font-size:.72rem; }
+}
+@media (max-width:600px) {
+  .q-game-chrome .q-header { gap:.4rem; padding:.3rem .65rem; }
+  .q-game-chrome .q-header nav { gap:.4rem; }
+  .q-game-chrome .q-header nav button { font-size:.68rem; }
+  .q-game-chrome .q-brand { font-size:.9rem; gap:.4rem; }
+  .q-game-chrome .q-player-strip { width:calc(100% - 1rem); gap:.45rem; min-height:75px; padding:.25rem .4rem; border-radius:17px; }
+  .q-round-hud { width:calc(100% - 1.5rem); }
+  .q-game-chrome .q-level-chip { flex:0 0 54px; padding:0; }
+  .q-game-chrome .q-level-chip>span:last-child { display:none; }
+  .q-game-chrome .q-level-chip>span:first-child { width:51px; flex-basis:51px; }
+  .q-game-chrome .q-level-chip svg { height:55px; }
+  .q-game-chrome .q-spark-meter { max-width:none; margin:0; }
+  .q-game-chrome .q-spark-meter>div:first-child { display:block; margin-bottom:.2rem; }
+  .q-game-chrome .q-spark-meter b { font-size:1rem; }
+  .q-game-chrome .q-spark-meter small { font-size:.62rem; }
+  .q-hud-tools { gap:.2rem; }
+  .q-game-sound { flex-direction:column; gap:0; width:53px; padding:.2rem; font-size:.61rem; }
+  .q-game-sound>span:first-child { font-size:1.15rem; }
+  .q-game-chrome .q-hud-listen { width:46px; min-width:44px; padding:.3rem; }
+  /* Override the older single-row fixed widths now that all three share a grid. */
+  .q-hud-tools>.q-game-sound,.q-game-chrome .q-hud-tools>.q-hud-listen { width:100%; }
+  .q-game-chrome .q-hud-listen>span:last-child { display:none; }
+  .q-mission,.q-sort,.q-sort-finish { padding:.4rem .8rem 1rem; margin:.5rem auto; }
+  .q-story-heading h1,.q-sort-heading h1 { font-size:1.65rem; }
+  .q-guide-dialogue { gap:.5rem; padding:.5rem; }
+  .q-guide-portrait { width:48px; flex-basis:48px; }
+  .q-guide-dialogue p { font-size:.9rem; }
+  .q-stage-plan>.q-mission-scene { display:none; }
+  .q-sort-board { padding:.6rem; }
+  .q-destinations { gap:.5rem; }
+  .q-destination { min-height:133px; padding:.5rem .3rem; }
+  .q-destination-drawing { width:57px; }
+  .q-destination strong { font-size:.83rem; }
+  .q-destination small { font-size:.67rem; }
+  .q-feedback { padding:.8rem; }
+  .q-parent-restored-intro>p:last-child { font-size:1rem; }
+  .q-parent-restored-goals { gap:1.3rem; }
+  .q-parent-restored-goals svg { width:88px; height:88px; }
+  .q-parent-restored-goals h3 { font-size:1.05rem; }
+  .q-parent-restored-goals p { font-size:.9rem; }
+  .q-parent-restored-join { display:block; padding:1.3rem; }
+  .q-parent-restored-companion svg { width:120px; height:120px; }
+}
+@media(max-width:350px) { .q-game-chrome .q-player-strip { grid-template-columns:minmax(0,1fr); } .q-game-chrome .q-spark-meter { order:initial; min-width:0; } .q-game-chrome .q-level-chip { display:none; } }

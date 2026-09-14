@@ -65,7 +65,7 @@ export const SOURCES = [
     url: "https://www.unicef.org/innocenti/projects/responsible-innovation-technology-children",
     jurisdiction: "International design research", licence: null, checkedAt: CHECKED_AT,
     rule: "Design reference for player choice, mastery, creativity and connection. It does not validate this prototype or establish improved learning, retention or behaviour.",
-    retrievalNote: "Search retrieval supplied the framework and project text; direct opening timed out. Used as design rationale, never as an appliance scoring rule.",
+    retrievalNote: "The primary project page was opened during the local parent-guide refresh. Its methods include studies with ages 6–12 and 7–13; it does not prescribe Quest's 7–12 design scope. Used as design rationale, never as an appliance scoring rule.",
   },
   {
     id: "w3c-dragging", title: "Understanding SC 2.5.7: Dragging Movements", publisher: "W3C Web Accessibility Initiative", designReference: true,
@@ -77,20 +77,20 @@ export const SOURCES = [
 
 // Three illustrated places used by mission selection, scenes and decoration slots.
 export const LOCATIONS = [
-  { id: "home", title: "Home Corner", subtitle: "Meet a character. Find the clues.", artworkId: "home" },
-  { id: "studio", title: "Second-Chance Studio", subtitle: "Use the story clues to make a plan.", artworkId: "studio" },
-  { id: "station", title: "Collection Station", subtitle: "Different items. Different next stops.", artworkId: "station" },
+  { id: "home", title: "Home Corner", subtitle: "Meet Pip and Flo. Find a clue.", artworkId: "home" },
+  { id: "studio", title: "Story Studio", subtitle: "Read the clues. Choose what happens next.", artworkId: "studio" },
+  { id: "station", title: "Sorting Station", subtitle: "Match each picture to a place.", artworkId: "station" },
 ];
 
 // Reusable ideas earned once across stories/cards. Each idea also unlocks one fixed
 // decoration ID; multiple ideas can intentionally unlock the same kind of decoration.
 export const CONCEPTS = [
-  {"id":"reuse","title":"Another home","text":"Flo: My checks were done, and Bea wanted a fan. Something you don't need might help someone else.","artworkId":"fan","decoration":"tree"},
+  {"id":"reuse","title":"Another home","text":"Flo: My checks were done, and Bea wanted a fan. An item you don't need might help someone else.","artworkId":"fan","decoration":"tree"},
   {"id":"assessment","title":"Find out before deciding","text":"Flo: Quiet doesn't tell us what went wrong. Jo, a qualified repairer, can find out more.","artworkId":"fan","decoration":"flowers"},
   {"id":"warning","title":"Asking is helping","text":"Pip: You can help without fixing anything. Leave the appliance alone. Tell an adult you trust about the warning.","artworkId":"toaster-damaged","decoration":"flag"},
   {"id":"repair","title":"A repairer's clue","text":"Pip: Jo says a repair is possible. Sam chooses it. Jo will do the work. The repair isn't finished yet.","artworkId":"kettle","decoration":"bench"},
-  {"id":"collection","title":"Check the next stop","text":"Flo: E-waste means electrical items people no longer want or use. Sam checks which service takes this exact item.","artworkId":"kettle","decoration":"tree"},
-  {"id":"packaging","title":"One box, two stories","text":"Pip: The toaster and box can take different paths. Clean cardboard goes with paper under our Merri-bek story rules.","artworkId":"cardboard","decoration":"flowers"},
+  {"id":"collection","title":"Ask before collection","text":"Flo: E-waste means electrical items people no longer want or use. Sam asks the collection place if it takes this item.","artworkId":"kettle","decoration":"tree"},
+  {"id":"packaging","title":"An item and its box","text":"Pip: The toaster and box need different plans. Our story follows Merri-bek's rules. Clean cardboard goes with paper.","artworkId":"cardboard","decoration":"flowers"},
   {"id":"battery","title":"A warning changes the plan","text":"Flo: A bulging battery is a warning. Leave the device alone. Tell a trusted adult, who gets official advice.","artworkId":"battery-shaver","decoration":"flag"},
   {"id":"uncertainty","title":"We can say: we don't know","text":"Pip: We can say we don't know. Ask a trusted adult for the local answer. A shape alone isn't enough.","artworkId":"glass-jug","decoration":"bench"},
 ];
@@ -122,36 +122,36 @@ export const MISSIONS = [
     applianceCategory: "fan", conceptIds: ["reuse"], variantGroup: "fan-conditions", difficulty: "gentle",
     learningGoal: "Connect completed reuse checks with a household that wants the item.",
     childSummary: "Find Flo a new home using two clues.",
-    fictionalContext: "Flo's family no longer needs a fan. Next door, Bea wants a breeze for her reading nook. Could Flo move there?",
+    fictionalContext: "Flo is a fan. Her family no longer needs her. Bea wants a fan for her reading corner. Could Flo help?",
     guideLines: {
       intro: "I'd love a new reading spot. Can you help?",
       explore: "I've found two notes. Let's see what they say.",
       plan: "I need a choice that fits both clues.",
       success: "You found my match! Bea has room for me.",
       retry: "I'm still working. Which note gives me another home?",
-      outcome: "I've found my next chapter. What will you find?",
+      outcome: "I've found a new home. Which story will you try next?",
     },
     postcardLine: "A new home. A fresh breeze.",
     reflection: {
       prompt: "What helped Flo find a new home?",
       options: [
-        { id: "empty-report", label: "No one had checked Flo.", artworkId: "paper" },
+        { id: "empty-report", label: "No one had checked Flo.", artworkId: "empty-report" },
         { id: "checked-and-wanted", label: "Checks done. Bea wanted Flo.", artworkId: "fan" },
       ],
       correctId: "checked-and-wanted",
       explanation: "Flo's checks were done, and Bea wanted a fan. Both clues mattered.",
     },
     clues: [
-      clue("adult-check", "Sam's check", "Sam, Flo's adult owner, finished the reuse checks. Jo is a qualified repairer. Jo checked Flo too. Flo is working.", "paper", 25, 64),
-      clue("new-home", "Bea's invitation", "Bea's household wants Flo. Sam and Bea agree to arrange Flo's move.", "fan", 70, 46),
+      clue("adult-check", "Flo works", "Flo works. Sam, her adult owner, finished the checks for sharing her. Jo, a qualified repairer, checked her too.", "paper", 25, 64),
+      clue("new-home", "Bea wants Flo", "Bea wants Flo in her home. Sam and Bea agree to plan Flo's move.", "fan", 70, 46),
     ],
     allowedActions: [
-      action("handover", "Sam arranges Flo's new home", "Flo: My checks are done. Bea wants me. Sam can arrange my move.", "person"),
+      action("handover", "Sam plans Flo's move to Bea", "Flo: My checks are done. Bea wants me. Sam can plan my move.", "person"),
       action("discard", "Send Flo for collection now", "Flo: I still work, and Bea wants me. Look at both notes again.", "fan"),
       action("guess-repair", "Book a repair for Flo", "Flo: Jo's check says I'm working. What could I do with Bea?", "evidence"),
     ],
     acceptedPlans: [{"next":"handover"}],
-    outcome: { title: "A welcome for Flo", text: "Sam and Bea arrange Flo's move. Flo joins Bea's reading nook. Your two clues found Flo a new home.", scene: "reuse" },
+    outcome: { title: "A welcome for Flo", text: "Sam and Bea plan Flo's move. Flo joins Bea's reading corner. Your two clues found Flo a new home.", scene: "reuse" },
     helpText: "Flo: My checks are done. Bea wants a fan. What fits?",
     discussionPrompt: "What helped you choose a new home for Flo?", artworkId: "fan",
     sourceIds: ["esv-secondhand","merri-ewaste","sv-reuse"],
@@ -161,31 +161,32 @@ export const MISSIONS = [
     applianceCategory: "fan", conceptIds: ["assessment"], variantGroup: "fan-conditions", difficulty: "gentle",
     learningGoal: "Notice missing evidence and seek a qualified repairer's check before deciding.",
     childSummary: "Find the missing clue in the quiet fan's story.",
-    fictionalContext: "A fan has gone quiet. Flo finds its report folder. The folder is empty! What do we still need to know?",
+    fictionalContext: "Flo finds another fan that has stopped working. Its folder should hold a note about its check. But the folder is empty! Who can find out why?",
     guideLines: {
       intro: "My fan friend has gone quiet. I wonder why.",
       explore: "I'm looking for a clue we don't have yet.",
       plan: "I can't guess the cause. Who could find out?",
       success: "You spotted the gap! We need a repairer's check.",
       retry: "I don't know which part is wrong. What clue is missing?",
-      outcome: "I'm leaving this story open while Jo finds out more.",
+      outcome: "Sam will ask Jo why the fan stopped. We can wait.",
     },
     postcardLine: "An empty folder. A good question.",
     reflection: {
       prompt: "What clue showed we needed more help?",
       options: [
-        { id: "empty-report", label: "The report was empty.", artworkId: "paper" },
+        { id: "empty-report", label: "The report was empty.", artworkId: "empty-report" },
         { id: "ready-home", label: "A new home was ready.", artworkId: "person" },
       ],
       correctId: "empty-report",
       explanation: "The empty report meant nobody had checked the cause. Sam asks a qualified repairer before choosing the next step.",
     },
     clues: [
-      clue("stopped", "A quiet fan", "Sam, the adult owner, says the fan stopped working. We have no other clues about why.", "fan", 66, 46),
-      clue("no-report", "Empty report", "No qualified repairer has checked the cause yet. The picture cannot tell us if repair is possible.", "paper", 27, 64),
+      clue("stopped", "Fan stopped", "The fan stopped working. Sam, its adult owner, does not know why.", "fan", 66, 46),
+      // A blank folder must not borrow the green tick from a completed report.
+      clue("no-report", "No check yet", "No qualified repairer has checked why it stopped. The picture cannot tell us if it can be repaired.", "empty-report", 27, 64),
     ],
     allowedActions: [
-      action("assessment", "Ask Sam for a repairer's check", "Flo: Sam can ask Jo to find out more. Jo is a qualified repairer.", "evidence"),
+      action("assessment", "Sam asks a repairer to check", "Flo: Sam can ask Jo why it stopped. Jo is a qualified repairer.", "evidence"),
       action("new-motor", "Guess it needs a new motor", "Flo: Quiet doesn't tell us which part is wrong. Remember the empty folder?", "fan"),
       action("rubbish", "Decide the fan is rubbish", "Flo: We don't know why it stopped. A repair might still be possible.", "cardboard"),
     ],
@@ -200,7 +201,7 @@ export const MISSIONS = [
     applianceCategory: "toaster", conceptIds: ["warning"], variantGroup: "toaster-conditions", difficulty: "gentle",
     learningGoal: "Recognise cable damage as a reason to leave an appliance alone and tell a trusted adult.",
     childSummary: "Spot Pip's warning and choose who can help.",
-    fictionalContext: "Pip's picture shows a damaged cable. Sam is nearby. Can you choose the help Pip needs?",
+    fictionalContext: "Pip is a toaster. His picture shows a damaged cable. Sam is a trusted adult nearby. How can Pip get help?",
     guideLines: {
       intro: "I've got a warning to share. Who can help?",
       explore: "My cable damage is in the story. Use the picture clues.",
@@ -221,7 +222,7 @@ export const MISSIONS = [
     },
     clues: [
       clue("damage", "Cable warning", "The story says Pip's cable is damaged. You don't need to check any real cable.", "toaster-damaged", 70, 61),
-      clue("adult", "Sam can help", "Sam is a trusted adult. Leave Pip alone while Sam arranges help.", "paper", 27, 46),
+      clue("adult", "Sam can help", "Sam is a trusted adult. Leave Pip alone while Sam gets help.", "paper", 27, 46),
     ],
     allowedActions: [
       action("tell-adult", "Leave Pip alone; tell a trusted adult", "Pip: Leave me alone and tell Sam about my cable. You don't need to touch or fix anything.", "person"),
@@ -229,7 +230,7 @@ export const MISSIONS = [
       action("handover", "Find Pip a new home now", "Pip: My cable needs help first. Leave me alone and tell Sam, a trusted adult.", "toaster"),
     ],
     acceptedPlans: [{"next":"tell-adult"}],
-    outcome: { title: "Pip is heard", text: "You leave Pip alone and tell Sam about the cable. Sam arranges help. You helped by speaking up.", scene: "help" },
+    outcome: { title: "Pip is heard", text: "You leave Pip alone and tell Sam about the cable. Sam gets help. You helped by speaking up.", scene: "help" },
     helpText: "Pip: Leave me alone. Tell an adult you trust about the warning.",
     discussionPrompt: "How did telling Sam help Pip?", artworkId: "toaster-damaged",
     sourceIds: ["esv-home"],
@@ -238,8 +239,8 @@ export const MISSIONS = [
     id: "kettle-second-chance", title: "The kettle's second chance", character: "pip", locationId: "studio",
     applianceCategory: "kettle", conceptIds: ["repair"], variantGroup: "kettle-conditions", difficulty: "connect",
     learningGoal: "Use a qualified repairer's report and the owner's choice to support a repair plan.",
-    childSummary: "Open Kiki's report and find a second chance.",
-    fictionalContext: "Kiki the kettle has an envelope from Jo. Pip hopes it holds good news. What does Jo say? What does Kiki's owner want?",
+    childSummary: "Read Kiki's repair note. What should happen next?",
+    fictionalContext: "Kiki is a kettle. Jo, a qualified repairer, has checked her. Sam is her adult owner. Pip finds two notes about what could happen next.",
     guideLines: {
       intro: "I'm hoping this envelope has good news for Kiki.",
       explore: "I'll follow Jo's report. What does Kiki's owner want?",
@@ -259,8 +260,8 @@ export const MISSIONS = [
       explanation: "Jo said repair was possible, and Sam wanted it. A repair plan does not mean Kiki is fixed.",
     },
     clues: [
-      clue("repair-report", "Jo's report", "Jo is a qualified repairer. Jo checked Kiki and says repair is possible. This story gives no price.", "paper", 24, 47),
-      clue("owner-choice", "Sam's choice", "Sam, Kiki's adult owner, wants the repair. Jo will do the work.", "kettle", 67, 61),
+      clue("repair-report", "Jo can repair", "Jo is a qualified repairer. Jo checked Kiki and says she can be repaired. There is no price in this story.", "paper", 24, 47),
+      clue("owner-choice", "Sam wants repair", "Sam, Kiki's adult owner, wants Jo to repair her. Jo will do the work.", "kettle", 67, 61),
     ],
     allowedActions: [
       action("repair", "Sam books Kiki's repair with Jo", "Pip: Jo says repair is possible. Sam wants it. We can choose a repair plan.", "evidence"),
@@ -282,32 +283,32 @@ export const MISSIONS = [
     id: "kettle-last-chapter", title: "The kettle's last chapter", character: "flo", locationId: "studio",
     applianceCategory: "kettle", conceptIds: ["collection"], variantGroup: "kettle-conditions", difficulty: "connect",
     learningGoal: "Check that a service accepts the exact electrical item before arranging collection.",
-    childSummary: "Find the missing answer about the kettle's next stop.",
-    fictionalContext: "Flo finds another kettle. Its shape looks the same, but its story is different. The report is ready. The next stop is still a puzzle.",
+    childSummary: "Find out who can collect this kettle.",
+    fictionalContext: "Flo finds another kettle. This one won't be used again. Sam found a place that collects electrical things. Will it take this kettle?",
     guideLines: {
       intro: "I've found another kettle. This one's story is different.",
       explore: "I have a report. I'm missing the collection service's answer.",
       plan: "I need a place that takes this exact kettle.",
       success: "You found the question! Sam needs the service's answer.",
       retry: "I'm still missing one answer. Will that place take this kettle?",
-      outcome: "I've marked our route with a question. Sam will ask.",
+      outcome: "Sam will ask if that place takes this kettle.",
     },
     postcardLine: "A good route starts with a question.",
     reflection: {
       prompt: "Why did Sam need to ask?",
       options: [
         { id: "nearby-service", label: "The service was nearby.", artworkId: "kettle" },
-        { id: "missing-answer", label: "The service had not answered.", artworkId: "paper" },
+        { id: "missing-answer", label: "The service had not answered.", artworkId: "missing-answer" },
       ],
       correctId: "missing-answer",
       explanation: "Sam didn't know if the service took this kettle. Nearby does not mean it takes every item.",
     },
     clues: [
-      clue("final-report", "Final report", "Jo, a qualified repairer, finished this kettle's check. It won't be repaired or used again. Sam, its adult owner, has it ready for collection planning.", "paper", 25, 48),
-      clue("acceptance", "Which service?", "Sam found a nearby collection service. Sam hasn't checked if it takes this kettle.", "kettle", 67, 63),
+      clue("final-report", "Check finished", "Jo, a qualified repairer, finished this kettle's check. It won't be repaired or used again. Sam, its adult owner, is planning its collection.", "paper", 25, 48),
+      clue("acceptance", "Will they collect?", "Sam found a place that collects electrical items. Sam has not asked if it takes this kettle.", "kettle", 67, 63),
     ],
     allowedActions: [
-      action("check-service", "Sam asks which service takes it", "Flo: Sam asks an e-waste service about this exact kettle. That comes before collection.", "person"),
+      action("check-service", "Sam asks if they take this kettle", "Flo: Sam asks the collection place about this exact kettle. That comes before collection.", "person"),
       action("nearest", "Pick the nearest place", "Flo: A nearby place might not take this kettle. Sam needs to ask.", "kettle"),
       action("paper", "Choose paper recycling", "Flo: This is an electrical kettle. Its collection plan is different from paper.", "paper"),
     ],
@@ -321,8 +322,8 @@ export const MISSIONS = [
     id: "moving-day-box", title: "The moving-day box", character: "pip", locationId: "station",
     applianceCategory: "toaster", conceptIds: ["packaging","reuse"], variantGroup: "toaster-conditions", difficulty: "connect",
     learningGoal: "Use each item's condition and material to choose separate reuse and recycling plans.",
-    childSummary: "Give a toaster and its box two different next stops.",
-    fictionalContext: "Moving day brings a toaster and an empty cardboard box. Pip has two spaces for the plan. Do both items need the same next stop?",
+    childSummary: "Choose a plan for a toaster and its empty box.",
+    fictionalContext: "Pip finds a toaster and its empty cardboard box. The toaster works. The box is clean. Do they need the same plan?",
     guideLines: {
       intro: "I've got a box-shaped puzzle. Where should each item go?",
       explore: "I'm following the toaster's note. What is the box made of?",
@@ -342,19 +343,19 @@ export const MISSIONS = [
       explanation: "The checked toaster had a new home. The clean box followed our local cardboard recycling rule.",
     },
     clues: [
-      clue("toaster-plan", "New-home note", "The toaster works. Sam, its adult owner, finished the reuse checks. Those include a check by a qualified repairer. Bea's household wants it. Sam and Bea agree to arrange its move.", "toaster", 30, 56),
+      clue("toaster-plan", "A new home", "The toaster works. Sam, its adult owner, finished the checks for sharing it. A qualified repairer checked it too. Bea wants it. Sam and Bea agree to plan its move.", "toaster", 30, 56),
       clue("empty-box", "Empty box", "The separate box is clean, plain cardboard. It has no food or plastic inside. Nobody needs the box now.", "cardboard", 74, 67),
       clue("local-note", "Recycling note", "This story uses Merri-bek's recycling rules. Clean cardboard goes with paper in mixed recycling.", "paper", 56, 33),
     ],
     slots: [{"id":"toaster","label":"Working toaster"},{"id":"cardboard","label":"Empty cardboard box"}],
     // Item slots may be filled in either order.
     allowedActions: [
-      action("reuse", "Sam arranges a new home", "Pip: The toaster has finished checks and a new home. The empty box needs its own plan.", "person"),
+      action("reuse", "Sam plans its move to Bea", "Pip: The toaster has finished checks and a new home. The empty box needs its own plan.", "person"),
       action("paper", "Paper and cardboard recycling", "Pip: The clean box fits our local cardboard rule. The electrical toaster needs a different plan.", "cardboard"),
-      action("ewaste", "Choose e-waste collection", "Pip: The toaster already has a checked new home. Its box is clean cardboard. Try their other paths.", "toaster"),
+      action("ewaste", "Choose e-waste collection", "Pip: The toaster's checks are done. Bea wants it. The box is clean cardboard. Try their other plans.", "toaster"),
     ],
     acceptedPlans: [{"toaster":"reuse","cardboard":"paper"}],
-    outcome: { title: "Two items, two next chapters", text: "Sam arranges the toaster's move to Bea. The empty box goes for paper and cardboard recycling. You chose a path for each item.", scene: "separate" },
+    outcome: { title: "Two items, two plans", text: "Sam plans the toaster's move to Bea. The empty box goes for paper and cardboard recycling. You chose a plan for each item.", scene: "separate" },
     helpText: "Pip: The checked toaster has a new home. The box is cardboard.",
     discussionPrompt: "Why did the toaster and its box need different plans?", artworkId: "boxed-toaster",
     sourceIds: ["esv-secondhand","merri-paper","merri-ewaste"],
@@ -363,8 +364,8 @@ export const MISSIONS = [
     id: "bulging-gadget", title: "The bulging gadget", character: "flo", locationId: "station",
     applianceCategory: "shaver", conceptIds: ["battery"], variantGroup: "shaver-conditions", difficulty: "connect",
     learningGoal: "Treat a bulging battery as a warning that needs trusted-adult and official guidance.",
-    childSummary: "Spot the battery warning and pause the collection plan.",
-    fictionalContext: "Flo spots a warning on the collection board. A shaver's battery is bulging. Its usual plan needs to stop.",
+    childSummary: "Spot a swollen battery. Who needs to know?",
+    fictionalContext: "Flo sees a shaver with a battery warning. Its battery is bulging, which means swollen. Sam's usual collection plan must stop.",
     guideLines: {
       intro: "I'm pausing here. This picture has a battery warning.",
       explore: "I can use these picture clues. No real device is needed.",
@@ -384,8 +385,9 @@ export const MISSIONS = [
       explanation: "The bulging battery was the warning. Leave it alone and tell a trusted adult. Sam gets official advice.",
     },
     clues: [
-      clue("bulging", "Battery warning", "The story says this shaver's battery is bulging. Bulging means it sticks out where it should not. You don't need to touch any real device.", "battery-shaver", 65, 51),
-      clue("not-ready", "Paused plan", "This shaver is not ready for normal collection. Sam is a trusted adult. Sam needs official advice about the warning and handling.", "paper", 25, 66),
+      clue("bulging", "Swollen battery", "This picture shows a bulging battery. Bulging means swollen. Leave the device alone. You don't need to touch any real device.", "battery-shaver", 65, 51),
+      // The helper picture invites telling Sam; a ticked paper could imply approval.
+      clue("not-ready", "Stop and ask", "This shaver is not ready for normal collection. Tell Sam, a trusted adult. Sam needs official advice about the warning and handling.", "person", 25, 66),
     ],
     allowedActions: [
       action("official-help", "Leave it alone; tell a trusted adult", "Flo: Leave the device alone and tell Sam. Sam gets official advice about the warning.", "person"),
@@ -403,20 +405,20 @@ export const MISSIONS = [
     applianceCategory: "appliance-jug", conceptIds: ["uncertainty"], variantGroup: "glass-evidence", difficulty: "connect",
     learningGoal: "Notice that a material label alone does not confirm a local recycling destination.",
     childSummary: "Find out why this glass jug needs another clue.",
-    fictionalContext: "Pip finds a glass jug with no next-stop note. It came from an appliance. Its next stop is a mystery.",
+    fictionalContext: "Pip finds a glass jug from an appliance. A recycling list names bottles and jars. Does that tell us where this jug goes?",
     guideLines: {
       intro: "I've found a mystery with a handle. Where does it belong?",
       explore: "I'm reading the jug's story and our local list.",
       plan: "I can't find this jug on the list. Who could ask?",
       success: "You spotted the gap! We need this jug's own answer.",
       retry: "I'm not sure that list means every glass object.",
-      outcome: "I'm keeping the question open. Good detectives know when to ask.",
+      outcome: "We don't know yet. Sam will ask about this jug.",
     },
     postcardLine: "A mystery jug. A useful question.",
     reflection: {
       prompt: "What clue showed we needed to ask?",
       options: [
-        { id: "limited-list", label: "The list named bottles and jars.", artworkId: "paper" },
+        { id: "limited-list", label: "The list named bottles and jars.", artworkId: "glass-list" },
         { id: "glass-material", label: "The jug was made of glass.", artworkId: "glass-jug" },
       ],
       correctId: "limited-list",
@@ -424,7 +426,8 @@ export const MISSIONS = [
     },
     clues: [
       clue("jug-origin", "Appliance part", "This glass jug came from an appliance. It is not a drink bottle or a food jar.", "glass-jug", 65, 48),
-      clue("missing-rule", "Missing answer", "Merri-bek's glass list names bottles and jars. We have no confirmed answer for this appliance jug.", "paper", 27, 65),
+      // Show the two listed shapes and keep the question-mark jug outside them.
+      clue("missing-rule", "Jug not listed", "Merri-bek's glass list names bottles and jars. This appliance jug is not listed. We still need to ask about it.", "glass-list", 27, 65),
     ],
     allowedActions: [
       action("ask-local", "Ask a trusted adult to check locally", "Pip: Sam can ask the local service about this exact jug. You spotted the missing answer.", "person"),

@@ -4,10 +4,10 @@
  * Help and retries have no penalty; replaying a story cannot earn its points twice.
  * These rewards describe on-device play, not environmental impact or an assessment.
  */
-import { MISSIONS, CONCEPTS } from './content.js';
+import { MISSIONS, CONCEPTS, SORT_ITEMS } from './content.js';
 
-// Fixed values for one finished story, one new idea and one correct story reflection.
-export const SPARK_VALUES = Object.freeze({ mission: 20, discovery: 5, reflection: 10 });
+// Fixed values for one finished story, new idea, correct reflection or different sorted picture.
+export const SPARK_VALUES = Object.freeze({ mission: 20, discovery: 5, reflection: 10, sorting: 5 });
 // Thresholds must stay in ascending order; the UI displays these same names and levels.
 export const LEVELS = Object.freeze([
   Object.freeze({ level: 1, threshold: 0, title: 'Clue Scout' }),
@@ -41,14 +41,20 @@ export function progression(state) {
     ? state.discoveries.filter(id => CONCEPTS.some(concept => concept.id === id)) : []);
   const reflected = finished.filter(mission => Object.hasOwn(reflections, mission.id)
     && isReflectionCorrect(mission, reflections[mission.id]));
+  // Solving another picture of a known idea is still new learning practice.
+  // Only distinct authored picture IDs count, so reload or double-tap cannot
+  // award the same picture twice. The current round has its own visible count.
+  const sorted = new Set(Array.isArray(state?.sortedItems)
+    ? state.sortedItems.filter(id => SORT_ITEMS.some(item => item.id === id)) : []);
   // Assistance changes neither the value of a story nor its discovery. Replays
   // and repeated correct answers cannot create a second authored ID to count.
   const breakdown = {
     missions: finished.length * SPARK_VALUES.mission,
     discoveries: discoveries.size * SPARK_VALUES.discovery,
-    reflections: reflected.length * SPARK_VALUES.reflection
+    reflections: reflected.length * SPARK_VALUES.reflection,
+    sorting: sorted.size * SPARK_VALUES.sorting
   };
-  const points = breakdown.missions + breakdown.discoveries + breakdown.reflections;
+  const points = breakdown.missions + breakdown.discoveries + breakdown.reflections + breakdown.sorting;
   const current = LEVELS.findLast(level => points >= level.threshold);
   // Levels are numbered from one, so the current level number indexes the next entry.
   const next = LEVELS[current.level];

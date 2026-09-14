@@ -1,6 +1,8 @@
 /**
  * Pointer interaction shared by plan tiles and sorting cards. This module only
  * reports a real drop target; app.js decides which engine action that means.
+ * The handle may be a large touch button, while ghostSource is only the product
+ * illustration. Keeping these separate leaves the item's words in place.
  * A drag, cancellation or visual ghost is never progress on its own. Native tap
  * buttons remain the alternative for children who do not want to drag.
  */
@@ -49,6 +51,9 @@ export function bindDrag(handle, { targets, onDrop, onCancel = () => {}, onLift 
     current = null;
     const targetId = reason === 'drop' && drag.lifted ? hitTest(event.clientX, event.clientY, targets()) : null;
     drag.ghost?.remove();
+    // Restore the original picture before the app renders feedback. Its layout and
+    // instruction card never move, including when a finger misses every place.
+    drag.source?.classList.remove('q-drag-source');
     handle.classList.remove('q-dragging');
     removeCapture(drag);
     onHover(null);
@@ -66,7 +71,7 @@ export function bindDrag(handle, { targets, onDrop, onCancel = () => {}, onLift 
     if (!current.lifted && Math.hypot(dx, dy) < 6) return;
     if (!current.lifted) {
       current.lifted = true;
-      const source = typeof ghostSource === 'function' ? ghostSource() : ghostSource;
+      const source = (typeof ghostSource === 'function' ? ghostSource() : ghostSource) || handle;
       const bounds = source.getBoundingClientRect();
       const ghost = source.cloneNode(true);
       // The copy must not duplicate DOM IDs, receive focus or be read as a second item.
@@ -74,10 +79,27 @@ export function bindDrag(handle, { targets, onDrop, onCancel = () => {}, onLift 
       ghost.querySelectorAll('[id]').forEach(element => element.removeAttribute('id'));
       ghost.setAttribute('aria-hidden', 'true');
       ghost.setAttribute('inert', '');
-      ghost.classList.add('q-drag-ghost');
-      Object.assign(ghost.style, { position: 'fixed', left: `${bounds.left}px`, top: `${bounds.top}px`, width: `${bounds.width}px`, height: `${bounds.height}px`, margin: '0', pointerEvents: 'none', zIndex: '9999', transition: 'none' });
+      // Older tablet browsers may not implement inert. Explicitly remove every
+      // copy from keyboard navigation too, even if a future artwork contains a link.
+      for (const element of [ghost, ...ghost.querySelectorAll('*')]) {
+        element.removeAttribute('autofocus');
+        if (element.matches('a[href], button, input, select, textarea, iframe, summary, [tabindex], [contenteditable], audio[controls], video[controls]')) element.setAttribute('tabindex', '-1');
+        if (element.hasAttribute('contenteditable')) element.setAttribute('contenteditable', 'false');
+      }
+      ghost.setAttribute('focusable', 'false');
+      ghost.classList.add('q-drag-ghost', 'q-drag-object-ghost');
+      // A direct picture grab keeps the child's exact grip point. The separate
+      // Move button can sit beside the picture, so lift that picture under the
+      // finger instead of leaving it offset from the highlighted destination.
+      const grabbedArtwork = current.startX >= bounds.left && current.startX <= bounds.left + bounds.width
+        && current.startY >= bounds.top && current.startY <= bounds.top + bounds.height;
+      const left = grabbedArtwork ? bounds.left : current.startX - bounds.width / 2;
+      const top = grabbedArtwork ? bounds.top : current.startY - bounds.height / 2;
+      Object.assign(ghost.style, { position: 'fixed', left: `${left}px`, top: `${top}px`, width: `${bounds.width}px`, height: `${bounds.height}px`, margin: '0', pointerEvents: 'none', zIndex: '9999', transition: 'none' });
       document.body.append(ghost);
       current.ghost = ghost;
+      current.source = source;
+      source.classList.add('q-drag-source');
       handle.classList.add('q-dragging');
       onLift();
     }

@@ -1,0 +1,103 @@
+/* CLUE PLAY: connect the illustration, short evidence and the child's choice.
+   These styles decorate authored content; all answers and rewards stay in engine.js. */
+
+/* Numbered markers sit on the same story scene. The matching selected number
+   continues into the enlarged clue card, making the relationship easy to follow. */
+.q-scene-evidence { position:absolute; inset:0; pointer-events:none; }
+.q-scene-evidence-pin { position:absolute; left:var(--pin-x); top:var(--pin-y); translate:-50% -50%; display:flex; align-items:center; gap:.35rem; min-height:48px; padding:.3rem .6rem .3rem .3rem; background:#fffdf3; border:2px solid #537c70; border-radius:26px; box-shadow:0 4px 0 #44685655; color:#244657; pointer-events:auto; max-width:210px; }
+.q-scene-evidence-pin>span { display:grid; place-items:center; width:35px; height:35px; flex:0 0 35px; border-radius:50%; background:#dbead0; font-weight:900; }
+.q-scene-evidence-pin b { font-size:.82rem; line-height:1.2; }
+.q-scene-evidence-pin.selected { background:#fff0bb; border-color:#986d18; box-shadow:0 4px 0 #ba963e,0 0 0 5px #fff7daaa; }
+.q-scene-evidence-pin.selected>span { background:#f3c653; }
+.q-mission.q-has-picture-help>.q-mission-scene { display:block; max-height:300px; min-height:210px; }
+
+/* The clue is a small illustrated stage with a paper label. It remains a still,
+   readable picture during warnings. Moving accents never change the evidence. */
+.q-picture-help { display:grid; grid-template-columns:minmax(135px,.7fr) minmax(0,1.3fr); gap:1rem; align-items:center; margin:.75rem 0; padding:1rem; border:2px solid #afc6a5; border-radius:25px 25px 25px 8px; background:#f6f5dd; box-shadow:0 5px 0 #bfccb0; }
+.q-picture-help-art { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:200px; padding:1.4rem .7rem .7rem; border:2px solid #fff8eb; border-radius:24px; background:radial-gradient(ellipse at 50% 20%,#fffdf6,#d7e8d3); box-shadow:inset 0 -9px 0 #aec3ac55; }
+.q-picture-help-art>svg { height:148px; width:100%; max-width:205px; filter:drop-shadow(0 9px 3px #42614b22); }
+.q-clue-number { position:absolute; top:-.5rem; left:.6rem; display:grid; place-items:center; width:38px; height:38px; border-radius:50%; border:3px solid #fff8e9; background:#f3c653; color:#294e58; font-weight:900; }
+.q-clue-art-label { font-size:.78rem; font-weight:800; padding:.35rem .55rem; border-radius:9px; color:#304e4b; background:#fff9e9; text-align:center; }
+.q-picture-help-copy h2 { margin:.35rem 0 .6rem; font-size:1.5rem; }
+.q-picture-help-copy>p:not(.q-eyebrow) { margin:.4rem 0 .8rem; font-size:1rem; line-height:1.6; }
+.q-picture-help-copy .q-eyebrow { font-size:.66rem; }
+.q-picture-help-tools { display:flex; gap:.5rem; flex-wrap:wrap; }
+.q-picture-help-tools .q-button { min-height:48px; font-size:.84rem; padding:.6rem .85rem; }
+.q-picture-help-tabs { display:flex; flex-wrap:wrap; gap:.45rem; margin-top:.85rem; }
+.q-picture-help-tabs button { display:flex; align-items:center; gap:.35rem; min-height:44px; padding:.4rem .55rem; border:1px solid #91ac94; border-radius:11px; color:#345445; background:#fffdf1; font-size:.78rem; }
+.q-picture-help-tabs button[aria-pressed=true] { border:2px solid #8d691b; background:#f8e6aa; }
+.q-picture-help-tabs span { font-weight:900; }
+.q-picture-help [tabindex='-1'] { scroll-margin-top:calc(var(--q-chrome-height) + 30px); }
+
+/* Direct touch lives only on the picture and Move button. Text and surrounding
+   page remain scrollable; tapping a destination is always an alternative. */
+.q-sort-picture { padding:.35rem; border:2px solid transparent; border-radius:20px; background:transparent; color:inherit; flex-shrink:0; cursor:grab; }
+.q-sort-picture:not(:disabled):hover,.q-sort-picture[aria-pressed=true] { background:#fff2be; border-color:#aa8438; }
+.q-sort-picture:not(:disabled):active { cursor:grabbing; }
+.q-sort-picture:disabled { cursor:default; opacity:1; }
+.q-sort-picture:focus-visible { outline:3px solid #216ba0; outline-offset:3px; }
+.q-picked-object { outline:3px solid #d5a841; outline-offset:3px; }
+.q-sort-object .q-sort-point-note { margin:.3rem 0 .6rem; color:#64501f; font-weight:750; font-size:.76rem; }
+.q-points-preview { display:grid; gap:.2rem; padding:.6rem .8rem; margin:.6rem 0; border-radius:13px; background:#fff0b9; color:#53451e; font-size:.9rem; }
+.q-points-preview small { font-size:.8rem; }
+.q-earned-note { color:#476329; font-weight:800; }
+.q-choice-tick { width:auto; min-width:50px; border-radius:9px; padding:.2rem .4rem; font-size:.65rem; line-height:1.3; }
+
+/* Checking a two-item plan produces one result per item. Colour is repeated by
+   a word and a tick/cross. On retry, only an unchanged checked choice keeps a tick. */
+.q-plan-feedback>div:last-child { flex:1; min-width:0; }
+.q-plan-results { display:grid; gap:.65rem; margin:.75rem 0; }
+.q-plan-result { display:grid; grid-template-columns:80px minmax(0,1fr); gap:.75rem; align-items:center; padding:.8rem; border:2px solid #b5c3a2; border-radius:18px; background:#f6f7e9; }
+.q-plan-result.correct { background:#e7f1d3; border-color:#8fab80; }
+.q-plan-result.retry { background:#fff2df; border-color:#c99676; }
+.q-plan-result-picture svg { width:80px; height:94px; }
+.q-plan-result h3 { font-size:1rem; margin:.1rem 0 .35rem; }
+.q-plan-result b { font-size:.9rem; }
+.q-plan-result p { margin:.35rem 0; font-size:.86rem; line-height:1.5; }
+.q-plan-result .q-plan-result-choice { font-size:.75rem; color:#52615b; }
+.q-kept-choice .q-plan-slot { border-color:#6e9c70; background:#e0edcf; }
+.q-slot-review { display:block; margin:.4rem 0; font-size:.8rem; color:#65521e; }
+.q-kept-choice .q-slot-review { color:#315e3a; font-weight:800; }
+
+/* The transcript is optional; Pause/Resume/Stop stay visible while the story
+   plays. It also makes the exact recorded words available without hearing. */
+.q-audio-transcript { flex-basis:100%; border-top:1px solid #b9ced8; padding-top:.35rem; font-size:.8rem; }
+.q-audio-transcript summary { min-height:30px; cursor:pointer; }
+.q-audio-transcript p { max-height:130px; overflow:auto; line-height:1.5; margin:.3rem 0; }
+
+/* A wide scene used to squeeze the clue into a tall, narrow column. Share the
+   space evenly on landscape tablets so the picture, explanation and next move
+   remain together. Portrait tablets give the illustrated clue its own row. */
+@media(min-width:901px) {
+  .q-stage-explore { grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:0 1rem; }
+  .q-stage-explore .q-story-heading { margin-bottom:0; }
+  .q-stage-explore .q-guide-dialogue { margin:.35rem 0 .65rem; }
+  .q-stage-explore .q-picture-help { margin-top:0; grid-template-columns:minmax(110px,.6fr) minmax(0,1.4fr); padding:.8rem; gap:.75rem; }
+  .q-stage-explore .q-picture-help-art { min-height:180px; padding-inline:.4rem; }
+  .q-stage-explore .q-picture-help-art>svg { height:130px; }
+  .q-stage-explore .q-picture-help-copy>p:not(.q-eyebrow) { line-height:1.5; }
+  .q-stage-explore .q-step-actions { margin:.65rem 0 .25rem; }
+}
+@media(min-width:601px) and (max-width:900px) {
+  .q-stage-explore:has(.q-picture-help) { display:block; }
+  .q-stage-explore:has(.q-picture-help)>.q-mission-scene { min-height:230px; max-height:260px; aspect-ratio:900/340; }
+  .q-stage-explore .q-picture-help { grid-template-columns:170px minmax(0,1fr); }
+}
+@media(min-width:1000px) { .q-plan-results:has(>article:nth-child(2)) { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:760px) {
+  .q-picture-help { grid-template-columns:125px minmax(0,1fr); padding:.75rem; gap:.75rem; }
+  .q-picture-help-art { min-height:170px; }
+  .q-picture-help-art>svg { height:120px; }
+  .q-picture-help-copy h2 { font-size:1.3rem; }
+  .q-picture-help-copy>p:not(.q-eyebrow) { font-size:.92rem; }
+}
+@media(max-width:450px) {
+  .q-picture-help { grid-template-columns:1fr; }
+  .q-picture-help-art { min-height:145px; padding:.5rem; }
+  .q-picture-help-art>svg { height:110px; }
+  .q-scene-evidence-pin b { font-size:.7rem; }
+  .q-scene-evidence-pin { max-width:145px; min-height:44px; }
+  .q-scene-evidence-pin>span { width:29px; height:29px; flex-basis:29px; }
+  .q-plan-result { grid-template-columns:60px minmax(0,1fr); padding:.55rem; }
+  .q-plan-result-picture svg { width:60px; height:78px; }
+}

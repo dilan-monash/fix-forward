@@ -24,6 +24,19 @@ from flask import (
 ACCESS_SECONDS = 4 * 60 * 60
 access = Blueprint("access", __name__, template_folder="templates")
 
+# The login gate can return only to shipped page entries, never an arbitrary URL
+# or an asset/API endpoint. Exact matching rejects external hosts, backslashes,
+# encoded traversal and control characters without relying on browser URL repair.
+RETURN_PATHS = frozenset({
+    "/", "/index.html", "/quest", "/quest/", "/quest/index.html",
+    "/quest?view=parents", "/quest/?view=parents", "/quest/index.html?view=parents",
+})
+
+
+def _return_path(value):
+    """Return a known local page, falling back to home for any untrusted value."""
+    return value if isinstance(value, str) and value in RETURN_PATHS else "/"
+
 
 # Keep the gate enabled except for an explicitly marked internal test/diagnostic application.
 def _enabled():
@@ -87,10 +100,11 @@ def _valid_csrf():
 
 
 # Render one access-page mode and issue a CSRF token only when its form is usable.
-def _page(mode="login", error=None, status=200):
+def _page(mode="login", error=None, status=200, next_path="/"):
     return render_template(
         "access.html", mode=mode, error=error,
         csrf_token=_csrf_token() if mode != "unavailable" else None,
+        next_path=_return_path(next_path),
     ), status
 
 
@@ -100,16 +114,26 @@ def stylesheet():
     return send_from_directory(Path(__file__).resolve().parent, "access.css")
 
 
+@access.get("/access.js")
+# Expose only this standalone public control script, never arbitrary backend files.
+def script():
+    return send_from_directory(Path(__file__).resolve().parent, "access.js")
+
+
 @access.route("/login", methods=["GET", "POST"])
-# Check CSRF and the exact shared password, then replace the old session and redirect only to home.
+# Check CSRF and the exact shared password, then return to the validated page entry.
 def login():
+    # Keep the destination in this form, not a shared session variable: another
+    # tab or a late asset request must not change where this login will return.
+    candidate = request.form.get("next", request.args.get("next", "/")) if request.method == "POST" else request.args.get("next", "/")
+    next_path = _return_path(candidate)
     if not _enabled():
-        return redirect(url_for("index"), code=303)
+        return redirect(next_path, code=303)
     if _authenticated():
-        return redirect(url_for("index"), code=303)
+        return redirect(next_path, code=303)
     if request.method == "POST":
         if not _valid_csrf():
-            return _page(error="This form has expired. Please enter the website password again.", status=400)
+            return _page(error="This form has expired. Please enter the website password again.", status=400, next_path=next_path)
         supplied = request.form.get("password", "")
         expected = current_app.config["SITE_PASSWORD"]
         # Bounded input avoids unnecessary work; UTF-8 bytes support any exact
@@ -120,10 +144,11 @@ def login():
             session["access_marker"] = _password_marker()
             session["access_issued_at"] = time.time()
             session["access_csrf"] = secrets.token_urlsafe(32)
-            # Always return home. No untrusted next= URL is accepted.
-            return redirect(url_for("index"), code=303)
-        return _page(error="That password did not work. Check it and try again.", status=401)
-    return _page()
+            # Validate again before redirecting, even if a hidden form field was
+            # edited. Session renewal and password comparison are unchanged.
+            return redirect(next_path, code=303)
+        return _page(error="That password did not work. Check it and try again.", status=401, next_path=next_path)
+    return _page(next_path=next_path)
 
 
 @access.route("/logout", methods=["GET", "POST"])
@@ -158,7 +183,7 @@ def configure_access(app):
         if not _enabled():
             return None
         public_asset = request.endpoint == "frontend_asset" and request.path == "/favicon.svg"
-        if request.endpoint in {"api.health", "access.stylesheet"} or public_asset:
+        if request.endpoint in {"api.health", "access.stylesheet", "access.script"} or public_asset:
             return None
         if not _configured():
             if request.path.startswith("/api/"):
@@ -180,7 +205,10 @@ def configure_access(app):
                 "code": "access_required",
                 "message": "Enter the website password to continue.",
             }), 401
-        return redirect(url_for("access.login"), code=303)
+        # Preserve only a known requested page and its supported parent view.
+        # API requests above stay JSON; scripts and unknown paths fall back home.
+        next_path = _return_path(request.full_path.removesuffix("?"))
+        return redirect(url_for("access.login", next=next_path) if next_path != "/" else url_for("access.login"), code=303)
 
     @app.after_request
     # Replace dataset cache headers so an authenticated response is not reusable after access expires.

@@ -1,0 +1,14 @@
+/* Tiny finite touch effects share Quest's gold, teal and mint illustration style.
+   Native Web Animations own timing; this stylesheet performs no continuous work.
+   Input/focus and the real game board always remain underneath and untouched. */
+.q-touch-fx { contain:layout paint; pointer-events:none!important; }
+.q-touch-fx__piece { pointer-events:none!important; transform-origin:center; }
+.q-touch-fx__ring { box-sizing:border-box; border:4px solid #ffd15c; border-radius:50%; background:#fff5c92b; box-shadow:0 0 0 3px #fff9dcbb,0 0 16px #e9b33966; }
+.q-touch-fx__star { fill:#ffcf4c; stroke:#fff9d9; stroke-width:1.5; filter:drop-shadow(0 2px 2px #a3742555); }
+.q-touch-fx__lens { fill:none; stroke:#24796d; stroke-width:3.5; stroke-linecap:round; filter:drop-shadow(0 2px 0 #fff7d4); }
+.q-touch-fx__lens path:last-child { fill:#fff6c88c; stroke:#e6b33f; }
+.q-touch-fx__correct,.q-touch-fx__retry { stroke:#fffaf0; stroke-width:4; stroke-linecap:round; stroke-linejoin:round; filter:drop-shadow(0 3px 0 #244d3d33); }
+.q-touch-fx__correct path:first-child { fill:#328675; stroke:#e9f6d7; stroke-width:3; }
+.q-touch-fx__retry path:first-child { fill:#d38a5a; stroke:#fff1d6; stroke-width:3; }
+.q-touch-fx__correct path:last-child,.q-touch-fx__retry path:last-child { fill:none; }
+.q-touch-fx__item { filter:drop-shadow(0 4px 2px #294d3b33); }

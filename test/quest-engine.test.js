@@ -8,9 +8,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import { MISSIONS, SORT_ITEMS, CONCEPTS } from '../quest/content.js';
-import { createState, transition, sortingRound, sortingSummary, suggestedMission, hydrateState } from '../quest/engine.js';
+import { createState, transition, sortingRound, sortingSummary, suggestedMission, hydrateState, canOpenPlan } from '../quest/engine.js';
 import { STORAGE_KEY, loadProgress, saveProgress, clearProgress } from '../quest/storage.js';
 import { hitTest, bindDrag } from '../quest/drag.js';
+import { progression } from '../quest/progression.js';
 
 // Dispatch a named action through production rules, keeping scenario steps readable.
 function apply(state, type, args = {}) { return transition(state, { type, ...args }); }
@@ -70,9 +71,11 @@ test('clues, retries and help survive a save; a wrong answer can never finish th
   const mission = MISSIONS[0];
   let state = apply(createState(), 'CHOOSE_MISSION', { id: mission.id });
   state = apply(state, 'START_MISSION');
-  assert.equal(apply(state, 'OPEN_PLAN'), state, 'At least one story clue is needed');
+  assert.equal(apply(state, 'OPEN_PLAN'), state, 'Every authored story clue is needed');
   state = apply(state, 'COLLECT_CLUE', { id: mission.clues[0].id });
   assert.equal(apply(state, 'COLLECT_CLUE', { id: mission.clues[0].id }), state);
+  assert.equal(apply(state, 'OPEN_PLAN'), state, 'One clue cannot skip the remaining facts');
+  for (const clue of mission.clues.slice(1)) state = apply(state, 'COLLECT_CLUE', { id: clue.id });
   state = apply(state, 'OPEN_PLAN');
   const slotId = mission.slots[0].id;
   const wrong = mission.allowedActions.find(action => !mission.acceptedPlans.some(plan => plan[slotId] === action.id));
@@ -110,6 +113,26 @@ test('two-part plans accept placements in either order and require both decision
   assert.equal(apply(state, 'CHECK_PLAN'), state);
 });
 
+test('Guided and Challenge both require every exact authored clue before planning', () => {
+  assert.equal(canOpenPlan(createState()), false);
+  for (const mode of ['guided', 'challenge']) for (const mission of MISSIONS) {
+    let state = apply(createState(), 'SET_SETTING', { key: 'mode', value: mode });
+    state = apply(state, 'CHOOSE_MISSION', { id: mission.id });
+    assert.equal(canOpenPlan(state), false, 'introduction is not the facts stage');
+    state = apply(state, 'START_MISSION');
+    for (const clue of mission.clues) {
+      assert.equal(canOpenPlan(state), false);
+      assert.equal(apply(state, 'OPEN_PLAN'), state);
+      state = apply(state, 'COLLECT_CLUE', { id: clue.id });
+    }
+    assert.equal(canOpenPlan(state), true);
+    const repeated = { ...state, activeMission: { ...state.activeMission, clueIds: mission.clues.map(() => mission.clues[0].id) } };
+    assert.equal(canOpenPlan(repeated), false, 'a duplicate count does not replace a missing fact');
+    assert.equal(canOpenPlan({ ...state, view: 'home' }), false, 'a hidden mission cannot advance');
+    assert.equal(apply(state, 'OPEN_PLAN').activeMission.step, 'plan');
+  }
+});
+
 test('a wrong plan can reopen its actual clues without erasing the plan or help history', () => {
   const mission = MISSIONS[0];
   const slotId = mission.slots[0].id;
@@ -142,9 +165,69 @@ test('navigation preserves active work, settings and optional decoration choice'
   for (const view of ['home', 'book', 'grownups', 'mission']) state = apply(state, 'NAVIGATE', { view });
   assert.equal(state.activeMission, active);
   assert.equal(state.settings.mode, 'challenge');
-  assert.equal(state.settings.narration, false);
+  assert.equal(state.settings.narration, true);
   state = apply(state, 'NAVIGATE', { view: 'grownups' });
   assert.equal(apply(state, 'COMPLETE_MISSION'), state, 'Hidden stale callbacks cannot finish a mission');
+});
+
+// The current design keeps its graphics animated. A stale movement control or
+// older browser save must not switch that presentation off or erase progress.
+test('animation is fixed on while stale motion-setting actions remain harmless', () => {
+  const original = deepFreeze(createState());
+  assert.equal(original.settings.motion, 'full');
+  let state = original;
+  const storage = memoryStorage();
+  for (const motion of ['full', 'reduce', 'auto', undefined, null, true, false, 1, 'always', 'FULL', {}, []]) {
+    assert.equal(apply(state, 'SET_SETTING', { key: 'motion', value: motion }), state, 'Removed motion controls cannot change the state');
+    assert.equal(saveProgress(state, storage), true);
+    state = loadProgress(storage).state;
+    assert.equal(state.settings.motion, 'full', 'Reload retains animated graphics');
+    assert.equal(state.settings.narration, true);
+    assert.equal(state.settings.sound, true);
+  }
+  assert.equal(original.settings.motion, 'full', 'Validation does not mutate an earlier save');
+});
+
+test('old motion preferences migrate to animated graphics without losing earned play or sound choices', () => {
+  const mission = MISSIONS[0];
+  let earned = completed(mission);
+  earned = apply(earned, 'DESIGN_POSTCARD', { id: mission.id, theme: 'mint' });
+  earned = apply(earned, 'PLACE_DECORATION', { slotId: 'home', conceptId: mission.conceptIds[0] });
+  earned = apply(earned, 'SET_SETTING', { key: 'mode', value: 'challenge' });
+  earned = apply(earned, 'SET_SETTING', { key: 'sound', value: true });
+  earned = apply(earned, 'SET_SETTING', { key: 'narration', value: true });
+  earned = apply(earned, 'START_SORT');
+  const picture = SORT_ITEMS.find(item => item.id === earned.sorting.itemIds[0]);
+  earned = apply(earned, 'ANSWER_SORT', { destinationId: picture.answer });
+  const expected = deepFreeze(hydrateState(earned));
+  const storage = memoryStorage();
+  for (const value of ['reduce', 'auto', 'full', undefined, null, true, false, 1, 'always', 'FULL', {}, []]) {
+    const oldSave = deepFreeze({ ...earned, settings: { ...earned.settings, motion: value } });
+    assert.equal(saveProgress(oldSave, storage), true);
+    const restored = loadProgress(storage).state;
+    assert.deepEqual(restored, expected, 'Only the obsolete movement choice is normalised');
+    assert.deepEqual(progression(restored), progression(expected), 'Earned Sparks and sorting credit are unchanged');
+  }
+  const missingSettings = { ...earned };
+  delete missingSettings.settings;
+  assert.equal(hydrateState(missingSettings).settings.motion, 'full');
+  assert.deepEqual(hydrateState(missingSettings).sortedItems, expected.sortedItems);
+});
+
+test('new adventures enable sensory feedback while explicit saved off choices remain off', () => {
+  const fresh = deepFreeze(createState());
+  assert.deepEqual(fresh.settings, { mode: 'guided', narration: true, sound: true, haptics: true, motion: 'full' });
+  for (const key of ['narration', 'sound', 'haptics']) {
+    const muted = apply(fresh, 'SET_SETTING', { key, value: false });
+    assert.equal(muted.settings[key], false);
+    assert.equal(hydrateState(muted).settings[key], false, `${key} off survives a reload`);
+    assert.equal(fresh.settings[key], true, 'settings do not mutate the previous save');
+    for (const value of [undefined, null, 'true', 'false', 1, {}]) {
+      assert.equal(hydrateState({ ...fresh, settings: { ...fresh.settings, [key]: value } }).settings[key], true, 'older missing or malformed fields use the new default');
+      assert.equal(apply(fresh, 'SET_SETTING', { key, value }), fresh, 'controls still accept only booleans');
+    }
+  }
+  assert.deepEqual(hydrateState({ version: fresh.version }).settings, fresh.settings);
 });
 
 test('suggestions use reviewed concepts, remain optional and cover unfinished missions', () => {
@@ -206,6 +289,8 @@ test('valid saves from the earlier selector keep their card order while corrupt 
 
 test('sorting retries preserve help; correct placements, repeated clicks and reload never double-count', () => {
   let state = apply(createState(), 'START_SORT');
+  const solved = [];
+  assert.deepEqual(state.sortedItems, []);
   assert.equal(apply(state, 'START_SORT'), state);
   for (let index = 0; index < 5; index += 1) {
     const item = SORT_ITEMS.find(candidate => candidate.id === state.sorting.itemIds[index]);
@@ -215,16 +300,25 @@ test('sorting retries preserve help; correct placements, repeated clicks and rel
       assert.equal(apply(state, 'HINT'), state);
     }
     if (index === 1) {
+      const priorPoints = progression(state).points;
       state = apply(state, 'ANSWER_SORT', { destinationId: ['ewaste', 'paper', 'ask'].find(id => id !== item.answer) });
+      assert.deepEqual(state.sortedItems, solved);
+      assert.equal(progression(state).points, priorPoints, 'A wrong placement changes feedback, not rewards');
       assert.equal(sortingSummary(state.sorting).total, 1);
       assert.equal(apply(state, 'NEXT_SORT'), state);
       state = hydrateState(JSON.parse(JSON.stringify(state)));
       assert.equal(state.sorting.feedback.correct, false);
       state = apply(state, 'RETRY_SORT');
     }
+    const previous = deepFreeze(state);
     state = apply(state, 'ANSWER_SORT', { destinationId: item.answer });
+    assert.deepEqual(previous.sortedItems, solved, 'Recording the next picture cannot mutate the prior state');
+    solved.push(item.id);
+    assert.deepEqual(state.sortedItems, solved);
+    assert.equal(progression(state).breakdown.sorting, solved.length * 5);
     assert.equal(apply(state, 'ANSWER_SORT', { destinationId: item.answer }), state);
     state = hydrateState(JSON.parse(JSON.stringify(state)));
+    assert.deepEqual(state.sortedItems, solved);
     assert.equal(state.sorting.status, 'feedback');
     state = apply(state, 'NEXT_SORT');
     assert.equal(apply(state, 'NEXT_SORT'), state);
@@ -233,11 +327,37 @@ test('sorting retries preserve help; correct placements, repeated clicks and rel
   assert.deepEqual(sortingSummary(state.sorting), { independent: 3, helped: 2, total: 5 });
   const restored = hydrateState(JSON.parse(JSON.stringify(state)));
   assert.deepEqual(restored.sorting, state.sorting);
+  assert.deepEqual(restored.sortedItems, solved);
   assert.equal(apply(state, 'ANSWER_SORT', { destinationId: 'ask' }), state);
   const newRun = apply(state, 'START_SORT');
   assert.equal(newRun.sorting.round, 1);
   assert.deepEqual(sortingSummary(newRun.sorting), { independent: 0, helped: 0, total: 0 });
   assert.notDeepEqual(newRun.sorting.itemIds, state.sorting.itemIds);
+  assert.deepEqual(newRun.sortedItems, solved, 'Starting a fresh board preserves earned picture history');
+});
+
+test('sorting save recovery filters unknown picture IDs and recovers only answers from a valid board', () => {
+  const first = SORT_ITEMS[0].id;
+  const second = SORT_ITEMS[1].id;
+  const raw = { ...createState(), sortedItems: [first, first, second, 'PRIVATE CHILD TEXT', null, 4, { id: first }] };
+  assert.deepEqual(hydrateState(raw).sortedItems, [first, second]);
+  for (const sortedItems of [null, {}, 'PRIVATE CHILD TEXT']) assert.deepEqual(hydrateState({ ...raw, sortedItems }).sortedItems, []);
+  const storage = memoryStorage();
+  assert.equal(saveProgress(raw, storage), true);
+  assert.equal(storage.getItem(STORAGE_KEY).includes('PRIVATE'), false);
+  assert.deepEqual(loadProgress(storage).state.sortedItems, [first, second]);
+
+  // Version-one boards did not save a lifetime picture list. Recover only answers
+  // accepted by the board validator, excluding later cards and arbitrary text.
+  const older = apply(createState(), 'START_SORT');
+  delete older.sortedItems;
+  const [current, future] = older.sorting.itemIds;
+  older.sorting.answers = { [current]: { assisted: false }, [future]: { assisted: false }, 'PRIVATE CHILD TEXT': { assisted: false } };
+  assert.deepEqual(hydrateState(older).sortedItems, [current]);
+  older.sorting.itemIds[4] = 'unreviewed-picture';
+  const discarded = hydrateState(older);
+  assert.equal(discarded.sorting, null);
+  assert.deepEqual(discarded.sortedItems, [], 'A corrupt board cannot create recovered picture rewards');
 });
 
 test('storage rejects obsolete/malformed data and whitelists authored IDs with no arbitrary personal text', () => {
@@ -250,7 +370,7 @@ test('storage rejects obsolete/malformed data and whitelists authored IDs with n
   const raw = {
     ...completed(MISSIONS[0]), name: 'PRIVATE CHILD TEXT', email: 'private@example.test',
     settings: { mode: 'PRIVATE CHILD TEXT', narration: 'yes', motion: 'always' },
-    discoveries: ['PRIVATE CHILD TEXT'], practice: ['PRIVATE CHILD TEXT'],
+    discoveries: ['PRIVATE CHILD TEXT'], practice: ['PRIVATE CHILD TEXT'], sortedItems: ['PRIVATE CHILD TEXT'],
     decorations: { home: 'PRIVATE CHILD TEXT', studio: 'unknown', station: null },
     completed: { [MISSIONS[0].id]: { assisted: false, notes: 'PRIVATE CHILD TEXT' }, 'PRIVATE CHILD TEXT': { assisted: false } }
   };

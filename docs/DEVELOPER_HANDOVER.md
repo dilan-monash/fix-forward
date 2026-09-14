@@ -2,7 +2,7 @@
 
 Prepared on 13 September 2026 for this adult/Quest checkout, now on `iteration-2`. This guide explains the code that exists here. It supports a developer handover and a pre-deployment walkthrough; it does not certify a production release or claim to reproduce a course rubric.
 
-The mentor comparison has two websites: the existing `main` branch and its Render service are Iteration 1; a separate service linked to `iteration-2` provides Iteration 2 when deployed. Preserve the existing service and branch. Confirm the new deployment and its URL separately from local tests or a Git push.
+Iteration 2 is the ongoing development and review website. Main at `fixforward.me` stays at the approved release until the user explicitly approves a reviewed I2 commit for promotion; Iteration 1 remains preserved separately. Follow the canonical [branch roles](../README.md#branches-and-websites), [manual I2 review workflow](../README.md#development-and-review-workflow) and [shared database boundary](../README.md#shared-database-boundary). A local check or Git push does not prove deployment.
 
 ## Start here, even if you do not write code
 
@@ -47,7 +47,7 @@ The browser loads JavaScript directly as native ES modules. There is no React/Vi
 flowchart TD
   A["app.py: application entry"] --> B["backend.create_app: routes, access and headers"]
   B --> C["Adult /: index.html"]
-  B --> D[" China's a presentarrivant to folk bureau shampoo china when you don't know the child about hallmital mechanism barriers plant launch definition of chains such as you actful friendly
+  B --> D["Child /quest: quest/index.html"]
   C --> E["src/app.js: adult screens and events"]
   E --> F["src/logic.js: local decision rules"]
   E --> G["data-service.js and price-catalogue.js"]
@@ -63,6 +63,10 @@ flowchart TD
   L --> P["progression.js: derived Sparks and levels"]
   L --> Q["art.js, postcard.js and CSS: pictures and presentation"]
   L --> R["drag.js: optional pointer input"]
+  L --> S["picture-help.js and feedback.js: explain the current clues and choices"]
+  L --> T["narration.js: recorded voice or device speech"]
+  T --> U["story-audio.js and audio manifest: exact transcript lookup"]
+  U --> V["quest/audio: packaged MP3 recordings"]
 ```
 
 The arrow from `storage.js` to `engine.js` means saved data is reconstructed and checked by the engine. It is not trusted merely because it came from this browser. Quest's rules and interactions make no game-data API requests. Initial access to its page and assets still depends on the server, and browser speech voices may use an online service.
@@ -74,12 +78,13 @@ The diagram describes the Flask application. The Node preview described below is
 Open [app.js](../quest/app.js), [engine.js](../quest/engine.js), [storage.js](../quest/storage.js), [progression.js](../quest/progression.js) and [content.js](../quest/content.js) beside each other.
 
 1. `quest/index.html` loads the screen controller. `loadProgress()` reads the `fixforward.quest.v1` browser-storage key. `hydrateState()` reconstructs allowed fields; missing or invalid saves receive safe defaults.
-2. `render()` chooses the current screen and writes its markup into `#quest-app`. `bind()` attaches handlers to the new buttons. A `data-*` attribute is the link between a button and the action it represents.
+2. `render()` chooses the current screen and writes its markup into `#quest-app`. `bind()` attaches handlers to the new buttons. A `data-*` attribute links a button to its action. The separate `#q-game-hud` container in `quest/index.html` stays inside the sticky `.q-game-chrome`; `updateHud()` refreshes its contents without moving the score into the scrolling game screen.
 3. A story button supplies a mission ID. Its handler calls `dispatch({ type: 'CHOOSE_MISSION', id })`. The engine checks that the authored mission exists before returning a new state.
-4. Tapping a clue calls `clue(id)`, which dispatches `COLLECT_CLUE`. The engine checks the current mission and step and prevents duplicate clue collection. The panel then shows that clue's authored picture and words.
-5. Plan buttons or successful drags dispatch `SET_PLAN`. `CHECK_PLAN` compares the filled spaces with the mission's `acceptedPlans`. Wrong choices produce feedback and allow another try. A render function does not decide which answer is correct.
+4. Tapping a clue calls `clue(id)`, which dispatches `COLLECT_CLUE`. The engine checks the current mission and step and prevents duplicate clue collection. `picture-help.js` links numbered scene markers to a larger drawing and the exact clue text on the same screen. Opening a plan's picture recap changes temporary presentation, not the saved answer or points.
+5. Plan buttons or successful drags dispatch `SET_PLAN`. `CHECK_PLAN` compares the filled spaces with the mission's `acceptedPlans`. `planFeedback()` uses those authored plans to explain each item separately. The engine remains the authority for advancing and completing the story; a green presentation marker does not grant completion. Retry retains both selected actions, and a previously correct item keeps its marker only while its selected action is unchanged.
 6. After a correct checked plan, `COMPLETE_MISSION` records the story and concept discoveries. The optional picture reflection uses `CHECK_REFLECTION`; only a valid correct response to an earned story is saved.
-7. `dispatch()` compares the old and new derived progress, saves the new state and renders it. It restores focus and optionally reads the next task. A celebration merely displays an already-earned change.
+7. `dispatch()` compares the old and new derived progress, saves the new state and renders it. It restores focus and optionally reads the next task. For new Sparks, the HUD briefly shows the previous total while the earned stars travel towards it.
+8. `rewardFx.play()` controls only the decorative flight. Its guarded `onArrive` callback calls `collectSparks()` to show the true total and animate the meter. The effect never changes an answer, writes storage or adds points. Cancelling it on navigation removes the decoration; the next screen reads the latest engine progress. Reduced motion or unavailable/rejected animations show the same earned total immediately.
 
 For a concrete points example, Flo's next-home story on a fresh save earns 20 Sparks for completion and 5 for its new concept. A correct reflection adds 10, making 35. Replaying the same story or animation does not earn those rewards again. Assistance and retries do not reduce the reward.
 
@@ -90,19 +95,57 @@ For a concrete points example, Flo's next-home story on a fresh save earns 20 Sp
 | [content.js](../quest/content.js) | Story text, clues, allowed actions, accepted plans, reflections and source references | Stable IDs are used by the engine, art and saved progress |
 | [engine.js](../quest/engine.js) | Create, update and reconstruct valid game state | `transition` owns allowed changes; `hydrateState` checks saves |
 | [progression.js](../quest/progression.js) | Derive Sparks and level information | Counts valid unique achievements; no independent saved balance |
+| [feedback.js](../quest/feedback.js) | Explain each plan item, preview available rewards and vary celebration copy | Reads authored plans and derived progress; never saves an answer or awards points |
 | [storage.js](../quest/storage.js) | Load, save and clear one Quest storage key | Calls the engine's reconstruction before accepting/saving records |
 | [app.js](../quest/app.js) | Screens, events, dialogs, focus, narration and orchestration | Connects a UI event to the engine and the next render |
+| [navigation.js](../quest/navigation.js) | Browser Back/Forward adapter | Stores validated presentation routes, with no saved scores; explicit replacement repairs obsolete entries |
+| [picture-help.js](../quest/picture-help.js) | Scene markers, enlarged clue pictures and illustrated sorting help | Uses the current authored clue; opening or closing help cannot decide an answer |
+| [narration.js](../quest/narration.js) | Play, pause, resume and stop a matching recording or device speech | Generation checks ignore stale media/voice callbacks; one control contract covers both sources |
+| [story-audio.js](../quest/story-audio.js), [story-manifest.js](../quest/audio/story-manifest.js) | Conversational invitations and exact transcript-to-MP3 lookup | Changed text cannot silently select an outdated safety recording |
+| [generate-story-audio.mjs](../scripts/generate-story-audio.mjs) | Development-only creation of the fixed narration files | Reads reviewed story text; model tools/cache remain outside the public application |
+| [sounds.js](../quest/sounds.js) | Short original Web Audio tones for presses, wins, retries and levels | Sound is opt-in and gesture-guarded; it never changes narration settings or progress |
+| [reward-fx.js](../quest/reward-fx.js) | Finite SVG star burst and flight to the HUD | Calls `onArrive` at most once; it has no access to game scoring or storage |
+| [parent-guide.js](../quest/parent-guide.js) | Family welcome, illustrated learning example, purpose, FAQs and fictional preview | Returns markup; the preview button changes pictures without game rewards |
 | [drag.js](../quest/drag.js) | Pointer movement, hit testing and cleanup | Calls the same logical action used by a tap alternative |
 | [art.js](../quest/art.js) | Original SVG drawing functions | Named groups connect to CSS animation; art does not score |
 | [postcard-options.js](../quest/postcard-options.js) | Allowed theme and sticker IDs | Shared by validation and postcard rendering |
 | [postcard.js](../quest/postcard.js) | Self-contained SVG postcard and safe filename | Uses completed story content and allowed creative choices |
 | [quest.css](../quest/quest.css) | Base child styles, focus and responsive layout | Loaded only on the child entry |
 | [play-effects.css](../quest/play-effects.css) | Finite character, outcome and reward sequences | Trigger classes come from the controller; no scoring callbacks |
-| [tablet-play.css](../quest/tablet-play.css) | Tablet/phone refinements and larger picture controls | Loaded last, so it refines the earlier CSS rules |
+| [tablet-play.css](../quest/tablet-play.css) | Tablet/phone refinements and larger picture controls | Extends the base layout and art styles |
+| [game-feel.css](../quest/game-feel.css) | Persistent score frame, touch feedback, star overlay and restored parent layout | Extends the base styles; visible decoration remains separate from scoring and respects reduced motion |
+| [clue-play.css](../quest/clue-play.css) | Scene-linked clue panels, direct-touch artwork and item-specific feedback | Follows game-feel.css; its picture controls retain tap/keyboard access |
+| [family-guide.css](../quest/family-guide.css) | Dimensional Pip/Flo welcome and the three-step learning example | Loads last and is scoped to the parent guide |
 
-`state` is saved game information. Values such as `picker`, `selectedAction`, `postcardId`, `lastReward`, open dialogs and greeting counters are temporary display information. Keeping them separate avoids saving a celebration banner as if it were a new achievement.
+`state` is saved game information. Values such as `picker`, `selectedAction`, `pictureView`, `checkedPlan`, `sortPicked`, `postcardId`, `lastReward`, open dialogs and character greeting text are temporary display information. Keeping them separate avoids saving an open clue picture, picked-up item or celebration banner as if it were a new achievement.
+
+The current local review separates **Story quests** (solve an authored story), **My creations** (design earned postcards and decorate the map), and **Discovery Book** (read earned learning ideas). Guided exploration puts numbered markers on the current scene and shows one enlarged clue with its exact words. Matching tabs let the child view each clue. Opening a Guided plan records the available facts through the same engine clue action. The plan uses a compact recap; `showFacts()` expands its scene and illustrated clues inline without changing choices or rewards. Challenge hotspots use the same picture panel instead of a text-only modal. Explicit help records assistance, but it does not reduce rewards.
+
+The sorting illustration is itself a semantic `[data-sort-picture]` button bound to `bindDrag()`. A finger can start dragging on the picture without first pressing Move. A simple tap calls `pickSortPicture()`, which only highlights the selected card; the child then taps a destination. The separate Move control remains an alternative. Both drop and destination tap ultimately dispatch `ANSWER_SORT`; a cancelled or off-target drag awards nothing. Wrong results keep the card until the child chooses Try again.
+
+`currentRoute` stores a page and optional story step, never an old score. `restoreRoute` keeps the latest earned records and same-story help/facts, canonicalizes the current history entry, and renders without awarding anything. Each story step is a Back destination; choices within a step replace that entry. Sorting is one activity entry, so Back leaves the activity and a return resumes its latest round. Reset advances a history epoch so old entries cannot restore a cleared attempt. `pageshow` rebinds drag listeners after browser page-cache restoration.
+
+The persistent voice dock is duplicated inside the native dialog because the page behind a modal is not interactive. `readScene()` chooses an authored invitation, story line, selected fact or feedback explanation, rather than reading button labels and scores. `speakText()` keeps the spoken words available in the dock. `narration.js` asks `storyAudioFor()` for an exact transcript match and plays its packaged MP3 when available. Otherwise it uses device speech. Pause/Resume retain the same recording position or speech utterance; Stop and navigation cancel playback and invalidate late callbacks. A blocked playback request offers a visible retry rather than surprising the child with delayed audio. All narration has a visible text equivalent.
+
+### Maintaining the story voice and its assets
+
+The narration was generated during development with **Kokoro 82M v1.0**, the `af_heart` voice and pinned Kokoro.js tools. It is an AI voice, not a live actor or a cloned family member. The parent FAQ explains its origin, while the voice dock distinguishes story recordings from device speech. [The audio notes](../quest/audio/README.md) record generation details and upstream sources; [KOKORO-LICENSE.txt](../quest/audio/KOKORO-LICENSE.txt) preserves the supplied Apache-2.0 licence. The MP3 encoder and development-only dependency information are documented beside the generation code. Keep those notices with a source handover; do not describe externally licensed generation tools as original FixForward code.
+
+[scripts/generate-story-audio.mjs](../scripts/generate-story-audio.mjs) reads `content.js`, `STORY_LINES` and the reviewed feedback combinations, hashes each normalized transcript and creates the MP3 plus manifest metadata. Its opening comments give the pinned tool-install and run commands. Tools and the downloaded model cache live in ignored `tmp/quest-voice-build`, not in the deployed page or runtime requirements. Regeneration can resume completed clips; `--sample` generates a review sample, and `--force` is for a deliberate voice/model-setting change. Review pronunciation and timing before accepting newly generated files.
+
+The browser downloads only the needed recording from the application. There is no microphone capture, model execution or child-data upload for narration. Some fallback device voices may use an online service. Matching normalizes whitespace and quotation marks only: changing the words of a safety fact makes the old recording ineligible. After editing story text, regenerate its recordings and review `story-manifest.js`, source-control additions, asset routing and narration tests together. The manifest stores the transcript, hash, URL, duration and voice; tests verify these links and MP3 integrity, not whether the delivery sounds engaging to a child.
+
+### Presentation, parent guidance and rewards
+
+Game tones use a separate `settings.sound` preference, off by default. The Sound button saves that choice and requests the browser's audio unlock from the user's gesture. A saved preference after reload still needs a real pointer or keyboard activation. `sounds.js` generates short local oscillator tones; it does not fetch music or queue missed sounds. Mute, navigation and narration stop current tones. Reading controls take priority so an explanation is not covered by a win sound. An unavailable audio device leaves the game playable with visible feedback.
+
+The parent page again begins with **For parents and curious families**. Pip the toaster and Flo the fan appear on an original dimensional paper stage, followed by a **Look → Choose → Discover** example that explains how a child uses evidence and sees the result. The fan example includes completed sharing checks and Bea wanting it; a working fan alone is not enough to justify giving it away. The preferred “Throw it away” purpose, four illustrated learning aims, “Let your child lead” invitation, optional preview and FAQs remain. The age-question panel has been removed at the user's request. Ages 7–12 remain the design scope, not a measured learning claim. Pictures and game effects use local SVG/CSS, native Web Animations and Web Audio; packaged MP3s add narration without changing the Flask/native-module stack.
+
+Movement defaults to `settings.motion = 'auto'`: **Follow my device** respects `prefers-reduced-motion`. The top-bar Settings button opens an explicit **Game animations** choice (`full`) that allows finite effects even on a device requesting reduced motion. **Less movement** (`reduce`) always chooses still feedback; switching back to **Follow my device** restores device control. `reduced()` applies this same rule to JavaScript effects and the root `data-motion` attribute used by CSS. Hydration preserves only these reviewed choices; an unknown or missing saved value uses `auto`. This is a presentation preference, not a different scoring mode.
 
 Sparks are **20 per unique completed mission, 5 per unique discovered concept and 10 per unique correct reflection**. Level thresholds are **0, 60, 140 and 240**. The current eight missions, eight concepts and eight reflections permit 280 Sparks. All missions remain available at every level. These are game-progress rules, not an ability assessment or a tamper-proof currency; browser storage remains editable by someone controlling that browser.
+
+`rewardPreview()` derives what is still available from the current save, using the same progression calculation as the HUD. Its label separates finishing the story from the optional reflection. `celebrationCopy()` varies short joy messages by story/activity and receives the actual awarded difference; it never invents an extra prize on replay. The screen can stay encouraging while honestly saying an idea was earned already. Neither helper owns the stored reward rules.
 
 ## Follow an adult decision and data request
 
@@ -192,6 +235,8 @@ For a source-only UI demo, open the correct inner checkout and run:
 
 ```powershell
 npm.cmd ci
+# Current review port; omit this setting to use the helper's default 5502.
+$env:PORT = '5504'
 npm.cmd run dev:quest
 ```
 
@@ -199,12 +244,12 @@ npm.cmd run dev:quest
 
 | View | Preview URL |
 |---|---|
-| Child game | http://127.0.0.1:5502/quest |
-| Parent guide | http://127.0.0.1:5502/quest?view=parents |
-| Adult household guide | http://127.0.0.1:5502/ |
-| Explanation of invented adult data | http://127.0.0.1:5502/test-fixture-info |
+| Child game | http://127.0.0.1:5504/quest |
+| Parent guide | http://127.0.0.1:5504/quest?view=parents |
+| Adult household guide | http://127.0.0.1:5504/ |
+| Explanation of invented adult data | http://127.0.0.1:5504/test-fixture-info |
 
-The [preview helper](../test_helpers/serve-usability.mjs) binds to `127.0.0.1`, serves only allowed files and clearly labels invented adult records. It requires no database or password and must not be used as the production server. Refresh after editing code. Stop the process with Ctrl+C. Changing the port changes the browser-storage origin, so a save at 5502 is separate from a save at 5503.
+The [preview helper](../test_helpers/serve-usability.mjs) binds to `127.0.0.1`, serves only allowed files and clearly labels invented adult records. It requires no database or password and must not be used as the production server. The current review uses port 5504; 5502 remains the default when `PORT` is unset. Refresh after editing code. Stop the process with Ctrl+C. Changing the port changes the browser-storage origin, so saves at 5502, 5503 and 5504 are separate. This game-feedback review is local only: nothing has been pushed or published, and Main and Iteration 1 remain unchanged.
 
 For Flask, use a Python environment with [requirements.txt](../requirements.txt) installed and privately configure the settings described in [WEBSITE_ACCESS.md](WEBSITE_ACCESS.md). Run that environment's interpreter with `-m flask --app app run --host 127.0.0.1 --port 5000`. Adult reference-data functionality additionally needs the intended read-only database and reviewed price snapshot. Do not copy this machine's absolute interpreter path into another developer's setup.
 
@@ -222,12 +267,22 @@ On the current machine the Python executable is the outer workspace's `.venv/bin
 | Evidence | What it establishes | What it does not establish |
 |---|---|---|
 | `test/quest-engine`, `quest-content`, `quest-progression` | Authored plans, allowed transitions, save validation and reward rules | Child comprehension or learning improvement |
-| `test/quest-ui`, `quest-touch`, `quest-postcard` | Simulated screen journeys, pointer edge cases and SVG generation | Every physical tablet, assistive technology or actual downloaded file |
+| `test/quest-ui`, `quest-touch`, `quest-postcard` | Simulated screen journeys, direct-art dragging, per-item retries, inline clue help, pointer edge cases and SVG generation | Every physical tablet, assistive technology or actual downloaded file |
+| `test/quest-narration` | Recording/device fallback, Pause/Resume/Stop races, exact transcripts and MP3 integrity | Natural delivery, clear pronunciation, audible hardware output or child preference |
+| `test/quest-parent-guide`, `quest-feedback` | Family copy boundaries, retained FAQs, per-item explanation and honest reward previews | Parent satisfaction or measured learning improvement |
 | Adult JavaScript tests | Local decision rules, loaders and simulated adult journeys | Current live data coverage or production networking |
 | `test_backend` | Flask access/routes, transformation and mocked/local data behavior | Live Neon permissions, deployment or a penetration test |
-| Source comparison for this comment pass | Comments did not change executable source/parsed Python structure | Correctness of every written explanation or full release readiness |
+| Earlier comment-pass source comparison | Comments in that earlier pass did not change executable source/parsed Python structure | Functional equivalence after subsequent feature work or full release readiness |
 
-Current comment-pass verification is recorded in [HANDOVER_VERIFICATION.md](HANDOVER_VERIFICATION.md). The earlier feature and browser evidence is in [QUEST_TABLET_PLAY.md](QUEST_TABLET_PLAY.md). Keep dated evidence separate from checks performed on a later release.
+Earlier comment-pass verification is recorded in [HANDOVER_VERIFICATION.md](HANDOVER_VERIFICATION.md). The earlier feature and browser evidence is in [QUEST_TABLET_PLAY.md](QUEST_TABLET_PLAY.md). Keep dated evidence separate from checks performed on a later release.
+
+**Review evidence, 13 September 2026:** Earlier game-feedback browser walkthroughs at 1024×768 and 768×1024 verified the reward popup/meter, retry controls fitting the screen, no browser errors, and sound reporting ready after opt-in. DOM inspection also found the expected star particles with full motion selected. Those observations predate the current scene-linked clues, direct artwork dragging, family welcome and packaged story voice; they must not be presented as browser verification of those new features.
+
+**Current local evidence:** `npm.cmd run check` passes 301 JavaScript checks; the 9 Quest Flask route tests pass, including MP3 authentication, byte-range and HEAD behavior. Automated cases exercise exact clue text, inline help without answer loss, direct-art touch events, mixed-plan feedback and retained choices, reward previews, recorded-audio integrity and media-control races.
+
+Chrome review of this update verified the restored parent welcome, the actual empty-report clue picture and matching scene number, portrait/landscape tablet layouts without horizontal overflow, and visible next actions for the reviewed clues. A two-item plan showed separate correct/retry explanations, kept the correct toaster choice, and awarded the advertised 30 Sparks once the box choice was corrected. Directly dragging the jug artwork to the wrong target showed a cross; retrying by tapping the jug and then Pause & ask earned 5 Sparks. A recorded story and the character greetings played through the story-voice route; Pause, Resume, matching visible transcripts and Stop worked, and no browser errors or warnings appeared during these journeys.
+
+Playback status is not an audible quality judgment. Naturalness, pronunciation, physical-tablet sound/feel, parent reactions and children's comprehension remain human-review work. This uncommitted source update is local only; Main and Iteration 1 were not changed, and no deployment or shared database write occurred.
 
 ## Questions a reviewer can ask
 
@@ -236,12 +291,17 @@ Current comment-pass verification is recorded in [HANDOVER_VERIFICATION.md](HAND
 | What happens after I tap a button? | Its handler in `bind()` passes an action to `dispatch`; the engine checks it, storage saves the result and `render` updates the page. Follow `COLLECT_CLUE` as an example. |
 | Where is the correct answer? | In each authored mission's `acceptedPlans` and `reflection` record in `content.js`; `engine.js`/`progression.js` validate it. It is not selected by an AI model. |
 | Can animation award points repeatedly? | No. `progression()` derives points from unique valid records; animation only illustrates the difference after a transition. |
+| Why does the reward preview differ on replay? | `rewardPreview()` calculates only rewards still available in this save. Previously earned story/concept points are not promised again; an unearned reflection can still be available. |
+| Why does one choice get a tick while the other needs another try? | `planFeedback()` compares both items with one coherent authored plan. Retry keeps both selections and marks an unchanged correct one; editing it removes that old marker. The engine still requires a fully correct plan. |
+| What does picture help show? | The current scene’s numbered clue, a larger illustration and the exact authored explanation. `pictureView` is temporary; closing the expansion returns focus without clearing the child’s choices. |
 | Does using a hint reduce the score? | No. Assistance is tracked for feedback/practice while the same unique rewards remain available. |
 | Does a level lock children out? | No. Thresholds change the badge; all authored stories remain available. |
 | What if a saved adventure is broken? | Storage checks format/version/length; `hydrateState` reconstructs permitted records. Invalid or unavailable storage has a fresh/session-play path. |
 | Where does Reset act? | `clearProgress()` removes only `fixforward.quest.v1`, and the controller resets its in-memory Quest state. It does not clear adult answers or website-access cookies. |
 | Why are some internal names still `grownups`? | They identify the optional parent-guide view. Changing a saved-state enum is different from editing child-facing wording; the intended players remain ages 7–12. |
-| Is a drag compulsory? | No. Plan, sorting and decoration buttons provide alternatives. A successful drag invokes the same engine action; cancelled/off-target drags do not record an answer. |
+| Is a drag compulsory? | No. A child can drag the sorting picture directly, use Move, or tap the picture then its destination. Plan and decoration buttons also provide alternatives. Cancelled/off-target drags do not record an answer. |
+| Does the child’s tablet run the voice model? | No. Development generates fixed MP3s with Kokoro. The browser plays the matching file and exposes Pause/Resume/Stop; device speech is the fallback for other words. |
+| What happens when someone edits a spoken clue? | Exact transcript lookup no longer matches the old recording. Device speech reads the new words until a matching recording is generated and reviewed. There is no fuzzy substitution of safety facts. |
 | What prevents a second finger from interfering? | `drag.js` tracks the active pointer ID, handles cancellation and removes listeners on cleanup. The touch suite covers multiple-finger and pointer-ID-zero cases. |
 | How is reduced motion respected? | The app combines its saved movement setting with the device preference. CSS effects require full motion and still have explicit reduced-motion rules. |
 | Can children use this to test a real appliance? | No. Reports and scenarios are fictional teaching content. Real appliance decisions belong to the separate adult guide and appropriate adult/professional help. |
@@ -256,7 +316,7 @@ Current comment-pass verification is recorded in [HANDOVER_VERIFICATION.md](HAND
 
 ## Make a future change without breaking the connections
 
-For story wording, start in `content.js`. Keep stable IDs unless you also plan how old saves are reconstructed. A new mission needs its clues, slots, permitted actions, accepted plans, feedback, reflection, concepts, sources and artwork connections. Review the content and UI tests, passport labels/art and finite reward assumptions together.
+For story wording, start in `content.js`. Keep stable IDs unless you also plan how old saves are reconstructed. A new mission needs its clues, slots, permitted actions, accepted plans, feedback, reflection, concepts, sources and artwork connections. Review the content and UI tests, scene marker/art connections, per-item feedback, passport labels and reward assumptions together. Regenerate changed narration through the commented script, inspect the exact transcript/manifest match, and listen before accepting the replacement recording.
 
 For points or thresholds, start in `progression.js`, then update the rules shown by `levelInfo()` and the parent/documentation explanations. A visual badge change belongs in `art.js`; it should not change the engine's result.
 

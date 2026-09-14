@@ -25,7 +25,8 @@ function finish(mission) {
   const act = (type, fields = {}) => { state = transition(state, { type, ...fields }); };
   act('CHOOSE_MISSION', { id: mission.id });
   act('START_MISSION');
-  act('COLLECT_CLUE', { id: mission.clues[0].id });
+  // Meet the same complete-evidence gate as a child before earning a keepsake.
+  for (const clue of mission.clues) act('COLLECT_CLUE', { id: clue.id });
   act('OPEN_PLAN');
   for (const [slotId, actionId] of Object.entries(mission.acceptedPlans[0])) act('SET_PLAN', { slotId, actionId });
   act('CHECK_PLAN');

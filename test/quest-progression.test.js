@@ -1,6 +1,7 @@
 /**
  * Protect the local reward rules: 20 Sparks per story, 5 per new idea and 10 per
- * earned reflection, with no help penalty or replay farming. Real action paths
+ * earned reflection, plus 5 per distinct solved sorting picture, with no help
+ * penalty or replay farming. Real action paths
  * test earning/reloading; small constructed states isolate level-meter boundaries.
  * No saved score scalar or network service is used to supply an expected result.
  */
@@ -17,7 +18,8 @@ const act = (state, type, fields = {}) => transition(state, { type, ...fields })
 function finish(mission, state = createState(), assisted = false) {
   state = act(state, 'CHOOSE_MISSION', { id: mission.id });
   state = act(state, 'START_MISSION');
-  state = act(state, 'COLLECT_CLUE', { id: mission.clues[0].id });
+  // Earn through every authored clue; the fixture cannot skip the learning gate.
+  for (const clue of mission.clues) state = act(state, 'COLLECT_CLUE', { id: clue.id });
   if (assisted) state = act(state, 'HINT');
   state = act(state, 'OPEN_PLAN');
   for (const [slotId, actionId] of Object.entries(mission.acceptedPlans[0])) state = act(state, 'SET_PLAN', { slotId, actionId });
@@ -33,17 +35,18 @@ function memoryStorage() {
 }
 
 test('Sparks start at zero and a finished story, new idea and reflection have their stated values', () => {
-  assert.deepEqual(SPARK_VALUES, { mission: 20, discovery: 5, reflection: 10 });
+  assert.deepEqual(SPARK_VALUES, { mission: 20, discovery: 5, reflection: 10, sorting: 5 });
   assert.deepEqual(createState().reflections, {});
+  assert.deepEqual(createState().sortedItems, []);
   assert.deepEqual(progression(createState()), {
     points: 0, level: 1, title: 'Clue Scout', nextThreshold: 60, pointsRemaining: 60,
-    percent: 0, withinLevelPercent: 0, breakdown: { missions: 0, discoveries: 0, reflections: 0 }
+    percent: 0, withinLevelPercent: 0, breakdown: { missions: 0, discoveries: 0, reflections: 0, sorting: 0 }
   });
   const mission = MISSIONS[0];
   const state = finish(mission);
   const expectedDiscoveries = new Set(mission.conceptIds).size * 5;
   assert.equal(progression(state).points, 20 + expectedDiscoveries);
-  assert.deepEqual(progression(reflect(state, mission)).breakdown, { missions: 20, discoveries: expectedDiscoveries, reflections: 10 });
+  assert.deepEqual(progression(reflect(state, mission)).breakdown, { missions: 20, discoveries: expectedDiscoveries, reflections: 10, sorting: 0 });
 });
 
 test('reflections require an earned mission and an authored option; a wrong answer allows a later retry', () => {
@@ -84,6 +87,18 @@ test('all eight authored reflection answers work and the full reviewed bank has 
   assert.equal(progression(state).nextThreshold, null);
   assert.equal(progression(state).pointsRemaining, 0);
   assert.equal(progression(state).percent, 100);
+  // Solve actual rounds after the stories: picture practice adds a bounded reward
+  // without changing the already-earned story, idea or reflection values.
+  for (let round = 0; round < 20; round += 1) {
+    state = act(state, 'START_SORT');
+    for (const id of state.sorting.itemIds) {
+      state = act(state, 'ANSWER_SORT', { destinationId: SORT_ITEMS.find(item => item.id === id).answer });
+      state = act(state, 'NEXT_SORT');
+    }
+  }
+  assert.equal(state.sortedItems.length, SORT_ITEMS.length);
+  assert.equal(progression(state).points, 280 + SORT_ITEMS.length * 5);
+  assert.equal(progression(state).points, 340, 'All authored progress has a finite total, even after extra rounds');
 });
 
 test('help and repeated stories never reduce points or create replay farming', () => {
@@ -99,21 +114,74 @@ test('help and repeated stories never reduce points or create replay farming', (
   assert.deepEqual(replayed.reflections, assisted.reflections);
 });
 
-test('repeated sorting can discover an idea once but cannot farm points through repeated rounds', () => {
+test('each new sorting picture earns five Sparks even when its idea is already known', () => {
+  let state = act(createState(), 'START_SORT');
+  const known = new Set();
+  let repeatedIdeaPictures = 0;
+  for (const id of state.sorting.itemIds) {
+    const item = SORT_ITEMS.find(card => card.id === id);
+    const before = progression(state);
+    state = act(state, 'ANSWER_SORT', { destinationId: item.answer });
+    const after = progression(state);
+    assert.equal(after.breakdown.sorting - before.breakdown.sorting, 5, item.id);
+    if (known.has(item.conceptId)) {
+      repeatedIdeaPictures += 1;
+      assert.equal(after.points - before.points, 5, 'A second picture of the same idea is rewarded as new practice');
+    } else assert.equal(after.points - before.points, 10, 'A new picture and a new idea each earn five Sparks');
+    known.add(item.conceptId);
+    assert.equal(act(state, 'ANSWER_SORT', { destinationId: item.answer }), state, 'A repeated click cannot earn the picture twice');
+    state = act(state, 'NEXT_SORT');
+  }
+  assert.ok(repeatedIdeaPictures >= 1, 'This actual five-picture round exercises at least two pictures of the same idea');
+});
+
+test('wrong sorting answers earn nothing; help and a correct retry still earn the full picture reward once', () => {
+  let state = act(createState(), 'START_SORT');
+  const item = SORT_ITEMS.find(card => card.id === state.sorting.itemIds[0]);
+  const wrong = ['ewaste', 'paper', 'ask'].find(id => id !== item.answer);
+  state = act(state, 'ANSWER_SORT', { destinationId: wrong });
+  assert.equal(progression(state).points, 0);
+  assert.deepEqual(state.sortedItems, []);
+  state = hydrateState(structuredClone(state));
+  assert.equal(progression(state).points, 0, 'Reloading retry feedback cannot turn it into a reward');
+  state = act(state, 'RETRY_SORT');
+  state = act(state, 'HINT');
+  state = act(state, 'ANSWER_SORT', { destinationId: item.answer });
+  assert.equal(state.sorting.answers[item.id].assisted, true);
+  assert.equal(progression(state).points, 10, 'Using help costs no Sparks');
+  assert.deepEqual(state.sortedItems, [item.id]);
+  assert.equal(act(state, 'ANSWER_SORT', { destinationId: item.answer }), state);
+  const restored = hydrateState(structuredClone(state));
+  assert.equal(progression(restored).points, 10);
+  assert.deepEqual(restored.sortedItems, [item.id]);
+});
+
+test('repeated sorting earns each picture and idea once and cannot farm points through repeated rounds', () => {
   let state = createState();
   const known = new Set();
-  for (let round = 0; round < 12; round += 1) {
+  const pictures = new Set();
+  let replayed = 0;
+  for (let round = 0; round < 20; round += 1) {
     state = act(state, 'START_SORT');
     for (let index = 0; index < 5; index += 1) {
       const item = SORT_ITEMS.find(card => card.id === state.sorting.itemIds[index]);
+      const before = progression(state).points;
       state = act(state, 'ANSWER_SORT', { destinationId: item.answer });
+      if (pictures.has(item.id)) {
+        replayed += 1;
+        assert.equal(progression(state).points, before, 'A previously solved picture can be replayed without duplicating its reward');
+      }
       known.add(item.conceptId);
-      assert.equal(progression(state).points, known.size * 5);
+      pictures.add(item.id);
+      assert.equal(progression(state).points, known.size * 5 + pictures.size * 5);
       state = act(state, 'NEXT_SORT');
     }
   }
-  assert.deepEqual(progression(state).breakdown, { missions: 0, discoveries: known.size * 5, reflections: 0 });
-  assert.ok(progression(state).points <= CONCEPTS.length * 5);
+  assert.ok(replayed > 0);
+  assert.equal(pictures.size, SORT_ITEMS.length);
+  assert.deepEqual(new Set(state.sortedItems), pictures);
+  assert.deepEqual(progression(state).breakdown, { missions: 0, discoveries: known.size * 5, reflections: 0, sorting: pictures.size * 5 });
+  assert.ok(progression(state).points <= (CONCEPTS.length + SORT_ITEMS.length) * 5);
 });
 
 // Find a combination of known IDs worth the requested boundary total, or fail clearly
@@ -176,6 +244,36 @@ test('reflection reload is idempotent and version-one saves without reflections 
   assert.equal(progression(restoredLegacy).points, progression(state).points - 10);
 });
 
+test('a version-one save without picture history preserves old progress and recovers only its valid last-board answers', () => {
+  let state = reflect(finish(MISSIONS[0]), MISSIONS[0]);
+  state = act(state, 'START_SORT');
+  for (let index = 0; index < 2; index += 1) {
+    const item = SORT_ITEMS.find(card => card.id === state.sorting.itemIds[index]);
+    state = act(state, 'ANSWER_SORT', { destinationId: item.answer });
+    if (index === 0) state = act(state, 'NEXT_SORT');
+  }
+  const legacy = structuredClone(state);
+  delete legacy.sortedItems;
+  const oldPoints = progression(legacy).points;
+  const oldBreakdown = progression(legacy).breakdown;
+  const storage = memoryStorage();
+  storage.setItem(STORAGE_KEY, JSON.stringify(legacy));
+  const loaded = loadProgress(storage);
+  assert.equal(loaded.status, 'restored');
+  assert.equal(loaded.state.version, 1);
+  assert.deepEqual(loaded.state.completed, state.completed);
+  assert.deepEqual(loaded.state.reflections, state.reflections);
+  assert.deepEqual(loaded.state.discoveries, state.discoveries);
+  assert.deepEqual(loaded.state.sortedItems, state.sorting.itemIds.slice(0, 2));
+  assert.deepEqual(progression(loaded.state).breakdown, { ...oldBreakdown, sorting: 10 });
+  assert.equal(progression(loaded.state).points, oldPoints + 10);
+  assert.equal(saveProgress(loaded.state, storage), true);
+  assert.deepEqual(progression(loadProgress(storage).state), progression(loaded.state), 'Migrating and reloading credit is idempotent');
+  const withoutBoard = hydrateState({ ...legacy, sorting: null });
+  assert.deepEqual(withoutBoard.sortedItems, [], 'Known ideas alone do not claim solved pictures from missing rounds');
+  assert.equal(progression(withoutBoard).points, oldPoints);
+});
+
 test('storage whitelists completed reflection IDs and never retains arbitrary answers or a score scalar', () => {
   const mission = MISSIONS[0];
   const locked = MISSIONS[1];
@@ -210,11 +308,14 @@ test('point derivation ignores duplicate/unknown IDs and malformed counters with
     ...state, points: Infinity, level: 99,
     completed: { ...state.completed, 'unreviewed-mission': { assisted: false } },
     discoveries: [...state.discoveries, ...state.discoveries, 'unknown-concept'],
-    reflections: { ...state.reflections, 'unreviewed-mission': 'claimed-answer' }
+    reflections: { ...state.reflections, 'unreviewed-mission': 'claimed-answer' },
+    sortedItems: ['unknown-picture', null, {}, 100]
   };
   const before = structuredClone(malformed);
   assert.deepEqual(progression(malformed), original);
   assert.deepEqual(malformed, before);
+  const solved = { ...state, sortedItems: [SORT_ITEMS[0].id, SORT_ITEMS[0].id, 'unknown-picture'] };
+  assert.equal(progression(solved).points, original.points + 5, 'A known picture counts once, regardless of repeated IDs');
   assert.equal(progression(null).points, 0);
-  assert.equal(progression({ completed: [], discoveries: 'PRIVATE CHILD NAME', reflections: [], points: 10000 }).points, 0);
+  assert.equal(progression({ completed: [], discoveries: 'PRIVATE CHILD NAME', reflections: [], sortedItems: 'PRIVATE CHILD NAME', points: 10000 }).points, 0);
 });

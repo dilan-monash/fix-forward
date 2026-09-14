@@ -1,0 +1,37 @@
+/* GAME SCENE RESPONSE: small local SVG/CSS effects, with no video or frame loop.
+ * Only guide characters and destination drawings react; story warnings stay still.
+ * Fixed-size art and transforms preserve the carefully fitted sorting layout. */
+.q-story-trail { gap:0; padding:.3rem .2rem; }
+.q-story-trail li { position:relative; flex-direction:row; align-items:center; gap:.5rem; border:0; padding:0 .5rem 0 0; }
+.q-story-trail li:not(:last-child)::after { content:""; height:0; border-top:2px dashed #b0ccbc; flex:1; min-width:6px; }
+.q-story-trail .q-stage-picture { position:relative; width:44px; height:44px; border:2px solid #ced9cc; background:#fffaf0; }
+.q-story-trail .q-stage-picture>svg { display:block; width:40px; height:40px; padding:2px; }
+.q-stage-picture em { position:absolute; right:-5px; bottom:-3px; display:grid; place-items:center; width:18px; height:18px; border-radius:50%; background:#dceadd; color:#17385c; font:800 12px/1 sans-serif; }
+.q-story-trail li[aria-current] .q-stage-picture { border-color:#22796b; box-shadow:0 0 0 4px #f4c45d80; }
+.q-story-trail li[aria-current] .q-stage-picture>svg { animation:q-stage-arrive .45s ease-out both; }
+.q-story-trail .is-finished .q-stage-picture { background:#dceadd; border-color:#22796b; }
+.q-story-trail .is-finished em { background:#22796b; color:#fff; }
+.q-story-trail b { font:inherit; font-weight:750; }
+
+/* A place leans forward when a finger carries an item over it. All three places
+ * react identically: hover is a possible landing spot, never a hint to the answer. */
+.q-destination-drawing { transition:transform .16s ease-out; transform-origin:center bottom; }
+.q-drag-over .q-destination-drawing { transform:translateY(-5px) scale(1.12); }
+.q-destination:active:not(:disabled) .q-destination-drawing { transform:scale(.92); }
+.q-accepted .q-destination-drawing { animation:q-place-welcome .5s ease-out both; }
+.q-picked-object .q-sort-picture>svg:not(:has(.q-warning-object)) { filter:drop-shadow(0 7px 3px #11285825); }
+
+/* Guide portraits acknowledge the new scene with a nod; readable dialogue never
+ * shakes. Continuous Flo/Pip motion remains in play-effects.css. */
+.q-play-enter .q-guide-portrait>svg { animation:q-guide-nod .55s ease-out both; transform-origin:center bottom; }
+.q-greeting-friends button:active>svg { transform:translateY(-5px) rotate(-4deg); }
+.q-greeting-friends button>svg { transition:transform .16s ease-out; }
+@keyframes q-guide-nod { 0% { transform:translateY(5px) rotate(-5deg); } 55% { transform:translateY(-3px) rotate(3deg); } 100% { transform:none; } }
+@keyframes q-stage-arrive { 0% { transform:scale(.6) rotate(-12deg); } 65% { transform:scale(1.1) rotate(4deg); } 100% { transform:none; } }
+@keyframes q-place-welcome { 0%,100% { transform:none; } 45% { transform:translateY(-6px) scale(1.12); } }
+@media (max-width:600px) {
+  .q-story-trail li { flex-direction:column; align-items:center; gap:.25rem; padding:0; }
+  .q-story-trail li:not(:last-child)::after { position:absolute; left:calc(50% + 22px); right:calc(-50% + 22px); top:20px; }
+  .q-story-trail .q-stage-picture { width:38px; height:38px; }
+  .q-story-trail .q-stage-picture>svg { width:34px; height:34px; }
+}

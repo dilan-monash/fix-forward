@@ -98,12 +98,13 @@ const datasets = new Map([
 ]);
 
 // Return one labelled, non-cached fixture response. HEAD returns headers without a body.
-function send(request, response, status, body, type = "text/plain; charset=utf-8") {
+function send(request, response, status, body, type = "text/plain; charset=utf-8", headers = {}) {
   response.writeHead(status, {
     "Content-Type": type,
     "Cache-Control": "no-store",
     "X-Content-Type-Options": "nosniff",
-    "X-FixForward-Data-Mode": "SYNTHETIC-TEST-ONLY"
+    "X-FixForward-Data-Mode": "SYNTHETIC-TEST-ONLY",
+    ...headers
   });
   response.end(request.method === "HEAD" ? undefined : body);
 }
@@ -133,15 +134,32 @@ const server = http.createServer(async (request, response) => {
 
   // An explicit frontend allowlist prevents accidentally exposing credentials,
   // backend files, local reports, fixtures or any file outside this workspace.
-  const permitted = route === "/" || ["/index.html", "/styles.css", "/404.html", "/500.html", "/favicon.svg", "/quest", "/quest/", "/quest/index.html", "/quest/quest.css", "/quest/play-effects.css", "/quest/tablet-play.css"].includes(route)
+  const permitted = route === "/" || ["/index.html", "/styles.css", "/404.html", "/500.html", "/favicon.svg", "/quest", "/quest/", "/quest/index.html", "/quest/quest.css", "/quest/play-effects.css", "/quest/tablet-play.css", "/quest/game-feel.css", "/quest/clue-play.css", "/quest/family-guide.css", "/quest/visual-play.css", "/quest/word-help.css", "/quest/touch-fx.css", "/quest/scene-play.css", "/quest/adventure-world.css", "/quest/audio/story-manifest.js", "/quest/audio/KOKORO-LICENSE.txt"].includes(route)
+    || /^\/quest\/audio\/[a-f0-9]{16}\.mp3$/.test(route)
     || /^\/(src|quest)\/[a-zA-Z0-9_-]+\.js$/.test(route);
   if (!permitted) { send(request, response, 404, "Not found."); return; }
   const relative = route === "/" ? "index.html" : ["/quest", "/quest/"].includes(route) ? "quest/index.html" : route.slice(1);
   try {
-    let content = await readFile(path.join(workspace, relative), "utf8");
     const extension = path.extname(relative);
-    const type = extension === ".js" ? "text/javascript; charset=utf-8"
+    // MP3 is binary. UTF-8 decoding would corrupt a generated story recording.
+    let content = await readFile(path.join(workspace, relative), extension === ".mp3" ? undefined : "utf8");
+    const type = extension === ".mp3" ? "audio/mpeg" : extension === ".txt" ? "text/plain; charset=utf-8" : extension === ".js" ? "text/javascript; charset=utf-8"
       : extension === ".css" ? "text/css; charset=utf-8" : extension === ".svg" ? "image/svg+xml" : "text/html; charset=utf-8";
+    // Tablet audio may ask for a byte range when resuming. Return binary bytes,
+    // just as Flask's send_from_directory does in the real application.
+    if (extension === '.mp3') {
+      const range = request.headers.range;
+      if (range) {
+        const match = /^bytes=(\d+)-(\d*)$/.exec(range);
+        const start = match ? Number(match[1]) : -1;
+        const end = match?.[2] ? Math.min(Number(match[2]), content.length - 1) : content.length - 1;
+        if (start < 0 || start >= content.length || end < start) {
+          send(request, response, 416, '', type, { 'Content-Range': `bytes */${content.length}` }); return;
+        }
+        send(request, response, 206, content.subarray(start, end + 1), type, { 'Accept-Ranges': 'bytes', 'Content-Range': `bytes ${start}-${end}/${content.length}`, 'Content-Length': end - start + 1 }); return;
+      }
+      send(request, response, 200, content, type, { 'Accept-Ranges': 'bytes', 'Content-Length': content.length }); return;
+    }
     if (relative === "index.html") {
       content = content.replace("<title>", "<title>[SYNTHETIC TEST] ");
       content = content.replace("<body>", `<body><aside aria-label="Synthetic test environment" style="padding:12px 20px;background:#fff1d9;color:#071c49;border-bottom:2px solid #071c49;font:700 14px/1.5 sans-serif;">${marker} · Invented records · No database connected · Do not contact or visit test locations.</aside>`);

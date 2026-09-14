@@ -25,8 +25,11 @@ const face = (expression = 'happy', x = 120, y = 126, scale = 1) => group(motion
 // Draw Pip/the toaster; damaged and guide flags select warning marks or a greeting arm.
 function toaster(expression, damaged = false, guide = false) {
   const greeting = guide && !damaged ? motionGroup('q-pip-arm', `<path d="M41 139q-22 2-24-20" stroke-width="5"/><path d="M17 120q-12 0-13-9-1-4 4-3l5 4-1-13q0-5 4-4l3 15 4-11q3-5 5-1l-1 17q-2 8-10 5z" fill="${C.cream}" stroke-width="2"/>`) : '';
+  // Two bread slots, a side lever and a loose plug make Pip a recognisable toaster.
+  // A toast-shaped guide badge is decoration; warning-story appliances never pop or move.
+  const guideBadge = guide ? `<path d="M58 157v-9q-5-1-5-6 0-9 13-9t13 9q0 5-5 6v9z" fill="${C.gold}" stroke-width="2"/><path d="m61 146 4 4 7-8" stroke="${C.teal}" stroke-width="2"/>` : '';
   return `${shadow()}${greeting}<path d="M51 179v15h17v-15m91 0v15h17v-15" fill="${C.ink}"/><path d="M174 160h21q18 0 18 18v4"/><path d="M210 184v6h12v-9h-12m3-5v-6m6 6v-6" fill="${C.cream}"/>
-    <rect x="39" y="63" width="151" height="121" rx="30" fill="${C.pale}"/><path d="M51 73q3-12 21-12h83q16 0 23 12" fill="${C.blue}"/><rect x="67" y="49" width="96" height="15" rx="7" fill="${C.cream}"/><path d="M78 55h74"/><path d="M41 153h148v9q-4 22-27 22H69q-23 0-28-22z" fill="${C.blue}"/><path d="M183 92h15v31h-15" fill="${C.teal}"/><circle cx="169" cy="136" r="6" fill="${C.gold}"/>${face(expression, 111, 112, .9)}<path d="M57 88v34" stroke="${C.paper}" stroke-width="6"/>
+    <rect x="39" y="59" width="151" height="125" rx="29" fill="${C.pale}"/><path d="M40 84q0-25 29-25h94q25 0 26 25z" fill="${C.blue}"/><rect x="66" y="64" width="95" height="5" rx="2.5" fill="${C.ink}" stroke-width="1"/><rect x="64" y="74" width="99" height="5" rx="2.5" fill="${C.ink}" stroke-width="1"/><path d="M41 158h148v4q-4 22-27 22H69q-23 0-28-22z" fill="${C.blue}"/><path d="M182 94h11v40h-11" fill="${C.cream}"/><rect x="184" y="104" width="17" height="10" rx="4" fill="${C.teal}"/><circle cx="167" cy="143" r="8" fill="${C.gold}"/><path d="m167 139 3 4m-13 11h21M83 170h62" stroke-width="2"/>${face(expression, 111, 117, .85)}<path d="M54 99v26" stroke="${C.paper}" stroke-width="5"/>${guideBadge}
     ${damaged ? `<path d="m208 163 9 4m-9 5 9 4" stroke="${C.coral}" stroke-width="6"/><path d="m196 157-3-6m25 6 5-5" stroke="${C.coral}"/>` : ''}`;
 }
 
@@ -35,7 +38,10 @@ function fan(expression, guide = false) {
   // Only Flo the guide can greet with a blade turn. The quiet/unassessed fan
   // object stays still, so motion cannot accidentally suggest it now works.
   const blades = motionGroup(guide ? 'q-flo-blades' : 'q-fan-blades', `<path d="M120 85q-40-8-30-36t32-5q14 13-2 41m0 0q8-40 36-30t5 32q-13 14-41-2m0 0q40 8 30 36t-32 5q-14-13 2-41m0 0q-8 40-36 30t-5-32q13-14 41 2" fill="${C.mint}" stroke-width="2"/>`);
-  return `${shadow(120, 201, 64)}<path d="M111 149v35h-20q-14 0-16 16h90q-2-16-16-16h-20v-35" fill="${C.mint}"/><path d="M116 171h8"/><circle cx="120" cy="85" r="69" fill="${C.teal}"/><circle cx="120" cy="85" r="60" fill="${C.cream}"/>${blades}<circle cx="120" cy="85" r="28" fill="${C.gold}"/>${face(expression, 120, 83, .54)}<path d="M67 68q4-18 18-28" stroke="${C.paper}" stroke-width="4"/><circle cx="120" cy="192" r="3" fill="${C.ink}"/>`;
+  // A fixed guard grille sits in front of the blades. Flo greets behind that guard;
+  // the pedestal, control buttons and unplugged cord distinguish a desk fan from a flower.
+  const guard = `<g class="q-fan-guard" stroke="${C.teal}" stroke-width="1.4" opacity=".65"><circle cx="120" cy="85" r="46"/><path d="M120 26v118M61 85h118M78 43l84 84M78 127l84-84"/></g>`;
+  return `${shadow(120, 201, 64)}<path d="M111 149v33h-20q-17 0-20 18h98q-3-18-20-18h-20v-33" fill="${C.mint}"/><path d="M111 163h18m-45 30h71" stroke-width="2"/><path d="M160 192h28q17 0 17-17v-9"/><rect x="199" y="153" width="13" height="14" rx="4" fill="${C.cream}"/><path d="M202 153v-6m7 6v-6" stroke-width="2"/><circle cx="120" cy="85" r="69" fill="${C.teal}"/><circle cx="120" cy="85" r="60" fill="${C.cream}"/>${blades}${guard}<circle cx="120" cy="85" r="27" fill="${C.gold}"/>${face(expression, 120, 83, .51)}<path d="M67 68q4-18 18-28" stroke="${C.paper}" stroke-width="4"/><circle cx="108" cy="191" r="3" fill="${C.ink}"/><circle cx="120" cy="191" r="3" fill="${C.cream}"/><circle cx="132" cy="191" r="3" fill="${C.coral}"/>`;
 }
 
 // Draw the kettle with the requested fictional character expression.
@@ -60,6 +66,25 @@ function box(open = true) {
 function paper(newspaper = false) {
   return `${shadow()}<path d="m60 43 129 9-12 145-133-9z" fill="${C.blue}"/><path d="m47 35 128-6 15 147-129 7z" fill="${C.paper}"/><path d="m60 52 94-5m-92 16 65-4" stroke-width="5"/>
     ${newspaper ? `<path d="m64 83 40-2 3 43-39 2z" fill="${C.mint}"/><path d="m78 111 8-14 13 17"/><path d="m120 82 39-2m-38 13 39-2m-38 13 39-2m-38 13 39-2m-93 26 97-5m-95 17 97-5" stroke-width="3"/>` : `<path d="m68 89 37-2m-35 19 88-4m-86 20 88-5m-86 21 61-3" stroke="${C.blue}" stroke-width="5"/><path d="m143 77 8 8 15-18" stroke="${C.teal}" stroke-width="4"/>`}`;
+}
+
+// An empty folder is deliberately different from paper()'s completed check.
+// Its blank, dashed space and question mark mean the story has no report yet.
+// There are no report lines, ticks, or motion that could imply a check occurred.
+function emptyReport() {
+  return `${shadow(120, 202, 80)}<g class="q-empty-report"><path d="M39 69V45q0-9 9-9h59l16 19h67q10 0 10 10v113H39Z" fill="${C.gold}"/><path d="M48 74h143v105H48Z" fill="${C.pale}"/><rect class="q-empty-report-space" x="80" y="65" width="80" height="97" rx="7" fill="${C.paper}" stroke-dasharray="6 7"/><text x="120" y="133" text-anchor="middle" fill="${C.ink}" stroke="none" font-size="57" font-family="sans-serif" font-weight="800">?</text><path d="M28 132q-2-10 9-10h52l13 12h104q10 0 7 11l-11 40q-2 9-12 9H46q-8 0-10-9Z" fill="${C.coral}"/><path d="M45 183h146" stroke="${C.gold}" stroke-width="4"/><text x="120" y="170" text-anchor="middle" fill="${C.ink}" stroke="none" font-size="16" font-family="sans-serif" font-weight="800">EMPTY</text></g>`;
+}
+
+// A question in an unfilled reply bubble means the collection place has not
+// answered. Reusing a ticked report here would wrongly suggest confirmation.
+function missingAnswer() {
+  return `${shadow(120, 202, 70)}<g class="q-missing-answer"><path d="M44 46h152q13 0 13 13v95q0 13-13 13h-63l-35 25v-25H44q-13 0-13-13V59q0-13 13-13Z" fill="${C.pale}"/><path d="M48 65h144v84H48Z" fill="${C.paper}" stroke-dasharray="6 7"/><text x="120" y="131" text-anchor="middle" fill="${C.ink}" stroke="none" font-size="66" font-family="sans-serif" font-weight="800">?</text></g>`;
+}
+
+// This local list contains bottle and jar pictures only. The separate appliance
+// jug keeps its question mark outside the list: its destination is unresolved.
+function glassList() {
+  return `${shadow(119, 202, 83)}<g class="q-glass-list"><path d="M37 27h120l18 18v143H37Z" fill="${C.paper}"/><path d="M157 27v18h18" fill="${C.blue}"/><path d="M53 49h78" stroke-width="5"/><g class="q-listed-bottle"><path d="M64 73h20v22l8 11v47H56v-47l8-11Z" fill="${C.mint}"/><path d="M63 73h22v-8H63Z" fill="${C.teal}"/><path d="M59 112h30v25H59Z" fill="${C.cream}"/></g><g class="q-listed-jar"><rect x="109" y="106" width="38" height="47" rx="7" fill="${C.pale}"/><path d="M110 99h36v9h-36Z" fill="${C.coral}"/><path d="M114 119h28v19h-28Z" fill="${C.cream}"/></g><text x="101" y="176" text-anchor="middle" fill="${C.ink}" stroke="none" font-size="11" font-family="sans-serif" font-weight="800">Bottles + jars</text></g><g class="q-list-unknown">${group(jug(),151,133,.31)}</g>`;
 }
 
 // Draw the glass-jug silhouette without assigning it a real household-bin destination.
@@ -112,6 +137,9 @@ function object(id, expression = 'happy') {
     case 'battery-shaver': return shaver(expression, true);
     case 'cardboard': case 'box': return box();
     case 'paper': return paper();
+    case 'empty-report': return emptyReport();
+    case 'missing-answer': return missingAnswer();
+    case 'glass-list': return glassList();
     case 'newspaper': return paper(true);
     case 'glass-jug': return jug();
     case 'boxed-toaster': return `${group(box(),-20,25,.85)}${group(toaster(expression),90,-7,.64)}`;
@@ -177,6 +205,7 @@ export function passportStamp(id, label) {
 
 // Choose the central clue, Sparks or level illustration; scoring is outside this file.
 function rewardPicture(kind) {
+  if (kind === 'win') return `<path d="m160 24 13 28 31 4-23 22 6 31-27-15-27 15 6-31-23-22 31-4z" fill="${C.gold}"/><path d="m142 72 12 12 23-26" stroke="${C.teal}" stroke-width="6"/><path d="m151 43-4 9" stroke="${C.cream}" stroke-width="4"/>`;
   if (kind === 'points') return `<circle cx="160" cy="68" r="42" fill="${C.gold}"/><circle cx="160" cy="68" r="33" stroke="${C.coral}" stroke-width="3"/>${star(160,67,2.15,C.cream)}<path d="m134 44 5-4m-8 12 2-3" stroke="${C.cream}" stroke-width="4"/>`;
   if (kind === 'level') return `<path d="M110 44q27-12 50 2 24-14 50-2v59q-25-10-50 3-25-13-50-3z" fill="${C.blue}"/><path d="M116 34q26-9 44 5 19-14 44-5v59q-23-8-44 5-20-13-44-5z" fill="${C.cream}"/><path d="M160 39v59m-32-43 20 5m-20 10 20 5m-20 10 20 5" stroke="${C.teal}" stroke-width="2"/>${star(182,63,1.75,C.gold)}<path d="M186 84v24l8-5 6 7V88" fill="${C.coral}"/>`;
   return `<path d="m127 29 52-4 20 20 5 61-72 5z" fill="${C.cream}"/><path d="m179 25 2 23 18-3" fill="${C.gold}"/><path d="m141 45 20-2m-19 14 23-2m-21 32 33-3" stroke="${C.blue}" stroke-width="3"/><circle cx="168" cy="69" r="17" fill="${C.mint}"/><path d="m160 69 5 5 11-12m16 22 13 13" stroke-width="4"/>`;
@@ -187,18 +216,28 @@ function rewardPicture(kind) {
  */
 // Assemble a decorative reward token and escape any optional short label.
 export function rewardBurst({ kind = 'clue', label = '' } = {}) {
-  const event = ['clue','points','level'].includes(kind) ? kind : 'clue';
-  const color = event === 'clue' ? C.mint : event === 'points' ? C.gold : C.blue;
+  const event = ['clue','points','level','win'].includes(kind) ? kind : 'clue';
+  const color = event === 'clue' ? C.mint : ['points','win'].includes(event) ? C.gold : C.blue;
   const shortLabel = String(label).slice(0, 34);
   const caption = escapeAttribute(shortLabel);
   const ribbonWidth = Math.min(256, Math.max(132, shortLabel.length * 6.3 + 24));
   const ribbonLeft = 160 - ribbonWidth / 2;
   const ribbonRight = 160 + ribbonWidth / 2;
   const trail = `<path class="q-reward-path" pathLength="1" d="M54 103q-12-43 28-58 24-9 30-1M212 41q46-1 51 30 4 18-15 27" stroke="${color}" stroke-width="4"/>`;
+  // A win has a purpose-built sunburst. Each ray stays in place after its one-shot
+  // reveal, so reduced motion still communicates the same successful decision.
+  const burst = event === 'win' ? motionGroup('q-win-rays', Array.from({ length: 12 }, (_, index) => {
+    const angle = index * Math.PI / 6;
+    const innerX = (160 + Math.cos(angle) * 58).toFixed(2);
+    const innerY = (68 + Math.sin(angle) * 58).toFixed(2);
+    const outerX = (160 + Math.cos(angle) * 71).toFixed(2);
+    const outerY = (68 + Math.sin(angle) * 64).toFixed(2);
+    return `<path d="M${innerX} ${innerY} ${outerX} ${outerY}" stroke="${index % 2 ? C.coral : C.gold}" stroke-width="5"/>`;
+  }).join('')) : '';
   const accents = motionGroup('q-reward-accents', `${star(70,85,.85,C.coral)}${star(247,53,.85,color)}<circle cx="232" cy="106" r="5" fill="${C.teal}" stroke="none"/>`);
   const token = motionGroup('q-reward-token', `<circle cx="160" cy="68" r="51" fill="${color}" opacity=".3" stroke="none"/>${rewardPicture(event)}`);
   const ribbon = `<path d="M${ribbonLeft} 127l-10 10 10 10H${ribbonRight}l10-10-10-10z" fill="${C.cream}" stroke="${color}" stroke-width="2"/>${caption ? `<text x="160" y="141" text-anchor="middle" fill="${C.ink}" stroke="none" font-family="inherit" font-size="12" font-weight="800">${caption}</text>` : `<path d="M132 137h56" stroke="${color}" stroke-width="3"/>`}`;
-  return svg(`${trail}${accents}${token}${ribbon}`, '0 0 320 160', `q-reward-art q-reward-${event}`);
+  return svg(`${trail}${burst}${accents}${token}${ribbon}`, '0 0 320 160', `q-reward-art q-reward-${event}`);
 }
 
 // Choose the level's sprout, compass, workshop or map drawing.
