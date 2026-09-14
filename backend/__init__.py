@@ -38,6 +38,7 @@ def create_app(test_config=None):
         SECRET_KEY=settings.secret_key,
         SITE_ACCESS_ENABLED=True,
         SESSION_COOKIE_SECURE=settings.session_cookie_secure,
+        PRICE_CATALOGUE_STORAGE=settings.price_catalogue_storage,
     )
     if test_config:
         app.config.update(test_config)

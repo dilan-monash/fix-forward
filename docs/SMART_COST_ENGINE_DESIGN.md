@@ -4,7 +4,9 @@ Updated 11 September 2026. This document describes the implemented catalogue and
 
 ## Purpose and scope
 
-Help a household compare a repair quote with a replacement price, identify relevant retail examples, and prepare useful questions for a repairer.
+Help a household see sourced repair-service starting fees beside a relevant
+replacement-price example without typing prices, compare a real repair quote
+when available, and prepare useful questions for a repairer.
 
 The user reported that their mentor allowed the project to create its own database. This update implements that permission through a reviewed public price catalogue. It does not require a new scope-confirmation step to build the catalogue.
 
@@ -33,7 +35,11 @@ Optional problem description -> summary + questions for a repairer
 
 Uncertain safety answers can retain cautious cost exploration. Serious warnings and possible recalls continue to restrict ordinary cost routes; a delayed price response cannot override those restrictions.
 
-The comparison form is followed by recorded retail examples and an optional expandable section containing inspection-fee examples. Describing a problem is optional.
+The page first presents an automatic evidence panel using the strongest current
+replacement match and the reviewed service-fee range. The scopes remain separate,
+so it does not announce a cheaper choice. A manual real-quote comparison, retail
+examples and an optional inspection-fee section remain available. Describing a
+problem is optional.
 
 ## Product matching
 
@@ -129,7 +135,13 @@ Build from the project root:
 python data/scripts/build_price_catalogue.py
 ```
 
-The builder uses Python's standard library, validates each observation, checks duplicates, dates, currency and retailer URLs, stores amounts as integer cents and reads the built database back for verification. The SQLite schema includes `replacement_price_observations`, indexes for category/brand/model and date, and `replacement_price_catalogue_meta`. Snapshot metadata includes the schema version, record count, date bounds, content hash and `livePrices: false`.
+The builder uses Python's standard library, validates each observation, checks
+duplicates, dates, currency and source URLs, stores amounts as integer cents and
+reads the built database back for verification. SQLite schema version 2 includes
+`replacement_price_observations`, `repair_service_fee_observations`, replacement
+indexes and `replacement_price_catalogue_meta`. The built snapshot contains 28
+replacement records and four service-fee records. Snapshot metadata includes the
+schema version, both record counts, date bounds, content hash and `livePrices: false`.
 
 Flask opens `data/catalogue/replacement-prices.sqlite` in read-only mode and verifies its metadata. A missing or invalid file yields an unavailable response; web requests do not create an empty database. Generate the public snapshot during deployment as well as local setup.
 
@@ -151,6 +163,8 @@ Before publishing a combined GitHub update, rebuild the catalogue and rerun the 
 
 Current supported description:
 
-> FixForward offers recorded retail-price examples, general inspection-fee context and a comparison using amounts the user chooses.
+> FixForward automatically presents matched replacement evidence beside general
+> repair-service fee context, and separately compares a real quote when the user
+> has one.
 
 Broader claims such as automatic repair-cost prediction, market-wide replacement pricing, price-history trends or brand reliability would require additional evidence and implementation. Neither a source link nor a larger row count establishes those capabilities by itself.

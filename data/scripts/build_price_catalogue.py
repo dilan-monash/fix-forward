@@ -21,9 +21,11 @@ if str(PROJECT_ROOT) not in sys.path:
 from backend.price_catalogue import (  # noqa: E402
     CatalogueValidationError,
     DEFAULT_DATABASE_PATH,
+    DEFAULT_SERVICE_FEE_PATH,
     DEFAULT_SOURCE_DIR,
     build_database,
     load_reviewed_observations,
+    load_reviewed_service_fees,
     read_catalogue,
 )
 
@@ -37,7 +39,11 @@ def main():
     parser.add_argument("--module", type=Path, default=PROJECT_ROOT / "src" / "price-snapshot.js", help="Public ESM snapshot used by the explicit static preview")
     args = parser.parse_args()
     try:
-        payload = build_database(load_reviewed_observations(args.source_dir), args.database)
+        payload = build_database(
+            load_reviewed_observations(args.source_dir),
+            args.database,
+            load_reviewed_service_fees(args.source_dir / DEFAULT_SERVICE_FEE_PATH.name),
+        )
         if read_catalogue(args.database) != payload:
             raise CatalogueValidationError("Saved public snapshot did not match the reviewed input")
         args.module.parent.mkdir(parents=True, exist_ok=True)
@@ -56,6 +62,7 @@ def main():
         print(f"Price catalogue build failed: {error}", file=sys.stderr)
         return 1
     print(f"Built and read-verified {payload['meta']['recordCount']} reviewed AUD price observations.")
+    print(f"Included {payload['meta']['repairFeeRecordCount']} reviewed repair service-fee observations.")
     print(f"Observation dates: {payload['meta']['firstObservedAt']} to {payload['meta']['lastObservedAt']}")
     print(f"Public snapshot database: {args.database}")
     print(f"Public static-preview module: {args.module}")

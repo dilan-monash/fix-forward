@@ -21,6 +21,7 @@ class Settings:
     site_password: str
     secret_key: str
     session_cookie_secure: bool
+    price_catalogue_storage: str
 
     @classmethod
     # Prefer existing environment values, bound the connection timeout and retain the exact shared password.
@@ -47,4 +48,7 @@ class Settings:
             site_password=os.getenv("SITE_PASSWORD", ""),
             secret_key=os.getenv("SECRET_KEY", ""),
             session_cookie_secure=os.getenv("SESSION_COOKIE_SECURE", "true").lower() != "false",
+            price_catalogue_storage=(
+                "postgres" if os.getenv("PRICE_CATALOGUE_STORAGE", "local").strip().lower() == "postgres" else "local"
+            ),
         )

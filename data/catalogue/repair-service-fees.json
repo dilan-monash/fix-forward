@@ -1,0 +1,38 @@
+[
+  {
+    "id": "national-small-workshop",
+    "provider": "National Appliance Repairs",
+    "label": "Workshop drop-off inspection",
+    "amount": 99,
+    "note": "Small-appliance inspection and diagnosis. Parts, extra labour and return delivery are quoted separately.",
+    "url": "https://www.nationalappliancerepairs.com.au/pricing/",
+    "retrieved": "2026-09-11"
+  },
+  {
+    "id": "national-small-pickup",
+    "provider": "National Appliance Repairs",
+    "label": "Workshop pick-up inspection",
+    "amount": 198,
+    "note": "Small-appliance pick-up inspection and diagnosis. Parts, extra labour and return delivery are quoted separately.",
+    "url": "https://www.nationalappliancerepairs.com.au/pricing/",
+    "retrieved": "2026-09-11"
+  },
+  {
+    "id": "onetouch-callout",
+    "provider": "One Touch Appliance Repairs",
+    "label": "Melbourne mobile call-out",
+    "amount": 129,
+    "note": "Published call-out/service fee. Parts and further work may cost extra.",
+    "url": "https://1touchappliancerepairs.com.au/services/",
+    "retrieved": "2026-09-11"
+  },
+  {
+    "id": "onetouch-labour-cap",
+    "provider": "One Touch Appliance Repairs",
+    "label": "Published labour cap including call-out",
+    "amount": 229,
+    "note": "Published labour cap including the call-out when a repair proceeds. Parts are separate.",
+    "url": "https://1touchappliancerepairs.com.au/services/",
+    "retrieved": "2026-09-11"
+  }
+]

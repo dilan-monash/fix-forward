@@ -6,6 +6,7 @@
 from copy import deepcopy
 from contextlib import closing
 from datetime import date
+from decimal import Decimal
 import importlib.util
 import json
 from pathlib import Path
@@ -19,10 +20,14 @@ from backend.price_catalogue import (
     PriceCatalogueUnavailable,
     build_database,
     load_reviewed_observations,
+    load_reviewed_service_fees,
     read_catalogue,
+    read_postgres_catalogue,
     snapshot_payload,
     validate_observation,
     validate_observations,
+    validate_service_fee,
+    CATEGORY_CODES,
 )
 
 
@@ -36,6 +41,18 @@ def example(**overrides):
         "sourceUrl": "https://www.jbhifi.com.au/products/synthetic-test-kettle",
         "observedAt": "2020-01-01", "priceKind": "advertised",
         "availability": "not-verified", "notes": "Synthetic fixture only.",
+    }
+    record.update(overrides)
+    return record
+
+
+def service_fee(**overrides):
+    record = {
+        "id": "test-inspection", "provider": "National Appliance Repairs",
+        "label": "Synthetic inspection fixture", "amount": 99,
+        "note": "Synthetic fixture only; parts are separate.",
+        "url": "https://www.nationalappliancerepairs.com.au/pricing/",
+        "retrieved": "2020-01-01",
     }
     record.update(overrides)
     return record
@@ -55,13 +72,30 @@ class PriceCatalogueTests(unittest.TestCase):
 
     def test_build_roundtrip_keeps_provenance_and_exact_aud_cents(self):
         record = example()
-        result = build_database([record], self.database)
+        fee = service_fee()
+        result = build_database([record], self.database, [fee])
         self.assertEqual(read_catalogue(self.database), result)
         self.assertEqual(result["prices"], [record])
         self.assertEqual(result["meta"]["source"], "reviewed-price-snapshot")
         self.assertFalse(result["meta"]["livePrices"])
         with closing(sqlite3.connect(self.database)) as connection:
             self.assertEqual(connection.execute("SELECT price_cents FROM replacement_price_observations").fetchone()[0], 2995)
+            self.assertEqual(connection.execute("SELECT amount_cents FROM repair_service_fee_observations").fetchone()[0], 9900)
+
+    def test_service_fees_keep_provider_source_and_reject_untrusted_values(self):
+        self.assertEqual(validate_service_fee(service_fee())["amount"], 99.0)
+        for changes in (
+            {"amount": 0}, {"amount": "99"}, {"provider": "Unknown provider"},
+            {"url": "https://example.com/pricing"}, {"retrieved": "2999-01-01"},
+        ):
+            with self.subTest(changes=changes):
+                with self.assertRaises(CatalogueValidationError):
+                    validate_service_fee(service_fee(**changes), today=date(2026, 9, 11))
+
+    def test_service_fee_file_is_loaded_separately_from_retail_observations(self):
+        path = self.root / "repair-service-fees.json"
+        path.write_text(json.dumps([service_fee()]), encoding="utf-8")
+        self.assertEqual(load_reviewed_service_fees(path), [service_fee()])
 
     def test_repeated_read_never_changes_file_and_missing_file_is_not_created(self):
         with self.assertRaises(PriceCatalogueUnavailable):
@@ -161,6 +195,38 @@ class PriceCatalogueTests(unittest.TestCase):
         second = snapshot_payload([example(priceAud=30)])
         self.assertNotEqual(first["meta"]["snapshotVersion"], second["meta"]["snapshotVersion"])
 
+    def test_project_catalogue_covers_every_supported_category_three_times(self):
+        records = load_reviewed_observations()
+        counts = {code: sum(row["categoryCode"] == code for row in records) for code in CATEGORY_CODES}
+        self.assertEqual(set(counts), set(CATEGORY_CODES))
+        self.assertGreaterEqual(min(counts.values()), 3)
+        self.assertEqual(sum(counts.values()), 57)
+
+    @patch("backend.db.fetch_all")
+    def test_postgres_reader_revalidates_rows_and_hosted_metadata(self, fetch_all):
+        price = example(offerEndsAt="2026-09-30")
+        repair_fee = service_fee()
+        expected = snapshot_payload([price], [repair_fee])
+        expected["meta"]["storage"] = "neon-postgresql"
+        db_price = {
+            "id": price["id"], "categoryCode": price["categoryCode"],
+            "brand": price["brand"], "model": price["model"],
+            "productName": price["productName"], "retailer": price["retailer"],
+            "price_cents": Decimal("2995"), "currency": "AUD",
+            "sourceUrl": price["sourceUrl"], "observedAt": date(2020, 1, 1),
+            "priceKind": "advertised", "availability": "not-verified",
+            "offerEndsAt": date(2026, 9, 30), "notes": price["notes"],
+        }
+        db_fee = {
+            "id": repair_fee["id"], "provider": repair_fee["provider"],
+            "label": repair_fee["label"], "amount_cents": Decimal("9900"),
+            "note": repair_fee["note"], "url": repair_fee["url"],
+            "retrieved": date(2020, 1, 1),
+        }
+        meta_rows = [{"key": key, "value": json.dumps(value)} for key, value in expected["meta"].items()]
+        fetch_all.side_effect = [[db_price], [db_fee], meta_rows]
+        self.assertEqual(read_postgres_catalogue(), expected)
+
 
 HAS_WEB_DEPENDENCIES = bool(importlib.util.find_spec("flask") and importlib.util.find_spec("dotenv"))
 
@@ -173,7 +239,13 @@ class PriceCatalogueApiTests(unittest.TestCase):
         from backend import create_app
         self.temp = tempfile.TemporaryDirectory()
         self.database = Path(self.temp.name) / "catalogue.sqlite"
-        self.app = create_app({"TESTING": True, "SITE_ACCESS_ENABLED": False, "DATABASE_URL": "", "PRICE_CATALOGUE_PATH": self.database})
+        self.app = create_app({
+            "TESTING": True,
+            "SITE_ACCESS_ENABLED": False,
+            "DATABASE_URL": "",
+            "PRICE_CATALOGUE_STORAGE": "local",
+            "PRICE_CATALOGUE_PATH": self.database,
+        })
         self.client = self.app.test_client()
 
     # Remove the temporary directory created by the test so its local database does not persist.
@@ -181,11 +253,12 @@ class PriceCatalogueApiTests(unittest.TestCase):
         self.temp.cleanup()
 
     def test_price_snapshot_is_available_without_claiming_neon_readiness(self):
-        build_database([example()], self.database)
+        build_database([example()], self.database, [service_fee()])
         response = self.client.get("/api/replacement-prices")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json["meta"]["storage"], "local-public-snapshot")
         self.assertEqual(response.json["prices"][0]["priceAud"], 29.95)
+        self.assertEqual(response.json["repairFees"][0]["amount"], 99.0)
         self.assertEqual(self.client.get("/api/ready").status_code, 503)
 
     def test_missing_snapshot_returns_503_without_path_or_details(self):

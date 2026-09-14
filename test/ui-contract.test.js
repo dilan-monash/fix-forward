@@ -110,6 +110,9 @@ test("UX13 map is in-app, lazy-loaded and the list remains usable if map loading
 
 test("UX14 cost examples describe their limits and avoid promising a personalised estimate", () => {
   assert.match(app, /Start with what you know/);
+  assert.match(app, /Automatic database comparison/);
+  assert.match(app, /Starting figures found/);
+  assert.match(app, /does not label either choice cheaper/);
   assert.match(app, /Repair fees explained/);
   assert.match(app, /What is the appliance doing\?/);
   assert.match(app, /Inspection-fee examples — not your repair quote/);

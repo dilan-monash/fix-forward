@@ -20,6 +20,10 @@ services:
     envVars:
       - key: DATABASE_URL
         sync: false
+      # DATABASE_URL must target the Neon branch where migrations 003/004 and
+      # the reviewed catalogue import 005 have been applied.
+      - key: PRICE_CATALOGUE_STORAGE
+        value: postgres
       - key: RELEASE_VERSION
         value: iteration-2-v2.0.0-quest
       - key: SITE_PASSWORD
