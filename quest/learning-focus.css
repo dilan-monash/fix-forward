@@ -1,0 +1,107 @@
+/* LEARNING FOCUS: load after the other Quest styles. Warm, labelled surfaces
+ * identify something a child can use; the existing cool world stays scenery.
+ * These rules change paint only, retaining the tested phone/tablet dimensions.
+ * The parent guide and all adult pages are outside this component's scope. */
+body.quest:not([data-quest-view=grownups]):not([data-quest-view=parents]) {
+  --q-touch-surface:#fff0d3;
+  --q-touch-gold:#f4c45d;
+  --q-touch-edge:#af7839;
+}
+
+/* A filled button and a readable label repeat the colour cue. Gold is not a
+ * correctness hint: every available destination uses exactly the same paint. */
+body.quest:not([data-quest-view=grownups]):not([data-quest-view=parents]) .q-button.primary {
+  color:#112858;
+  background:var(--q-touch-gold);
+  border-color:var(--q-touch-edge);
+  box-shadow:0 4px 0 #bd8a42;
+}
+body.quest:not([data-quest-view=grownups]):not([data-quest-view=parents]) .q-button.primary:hover:not(:disabled) { background:#f8d685; }
+body.quest:not([data-quest-view=grownups]):not([data-quest-view=parents]) .q-button.primary:active:not(:disabled) { box-shadow:0 2px 0 #bd8a42; }
+
+/* Only the movable illustration receives this warm rim. Its surrounding clue
+ * paragraph remains ordinary readable paper and keeps its scrolling behavior. */
+body.quest:not([data-quest-view=grownups]):not([data-quest-view=parents]) .q-sort-picture:not(:disabled) {
+  background:var(--q-touch-surface);
+  border-color:var(--q-touch-edge);
+  box-shadow:inset 0 0 0 3px #f4c45d73;
+}
+body.quest:not([data-quest-view=grownups]):not([data-quest-view=parents]) [data-action-select] .q-action-art {
+  background:var(--q-touch-surface);
+  border-radius:16px;
+  outline:2px solid var(--q-touch-edge);
+  outline-offset:0;
+  box-shadow:inset 0 0 0 4px #f4c45d73;
+}
+body.quest:not([data-quest-view=grownups]):not([data-quest-view=parents]) .q-destination:not(:disabled),
+body.quest:not([data-quest-view=grownups]):not([data-quest-view=parents]) .q-plan-slot:not(:disabled) {
+  background:var(--q-touch-surface);
+  border-color:var(--q-touch-edge);
+  color:#112858;
+}
+body.quest:not([data-quest-view=grownups]):not([data-quest-view=parents]) .q-destination:not(:disabled) small { color:#38405a; }
+
+/* The same hover/rim response applies to all candidate places. A chosen or
+ * checked answer still has its existing word/tick/cross as well as colour. */
+body.quest:not([data-quest-view=grownups]):not([data-quest-view=parents]) .q-destination:hover:not(:disabled),
+body.quest:not([data-quest-view=grownups]):not([data-quest-view=parents]) .q-destination.q-drag-over:not(:disabled),
+body.quest:not([data-quest-view=grownups]):not([data-quest-view=parents]) .q-plan-slot.q-drag-over:not(:disabled),
+body.quest:not([data-quest-view=grownups]):not([data-quest-view=parents]) .q-sort-picture[aria-pressed=true]:not(:disabled) {
+  background:#f8d685;
+  box-shadow:0 0 0 3px #af783957;
+}
+body.quest:not([data-quest-view=grownups]):not([data-quest-view=parents]) :is(.q-button.primary,.q-sort-picture,[data-action-select],.q-destination,.q-plan-slot):focus-visible {
+  outline:3px solid #125e96;
+  outline-offset:3px;
+}
+
+/* No perpetual clouds/flags compete with choosing a story. The drawings stay
+ * visible. Greetings, a press, a carried item and an earned reward still have
+ * their finite responses when a child chooses to interact. */
+body.quest:not([data-quest-view=grownups]):not([data-quest-view=parents]) :is(.q-world-cloud,.q-adventure-cloud,.q-island-pennant) { animation:none!important; }
+
+/* Reading, listening, reviewing a clue and deciding are intentionally still.
+ * A body-level drag ghost follows the child's finger and is not a descendant
+ * of #quest-app; reward flights and finite manipulation overlays live outside
+ * it too. app.js separately cancels decorative Web Animations on entry because
+ * CSS animation:none cannot cancel an animation created with element.animate.
+ * We never hide evidence, animate text or delay access to the next action. */
+body.quest[data-learning-quiet=true]:not([data-quest-view=grownups]):not([data-quest-view=parents]) #quest-app,
+body.quest[data-learning-quiet=true]:not([data-quest-view=grownups]):not([data-quest-view=parents]) #quest-app *,
+body.quest[data-learning-quiet=true]:not([data-quest-view=grownups]):not([data-quest-view=parents]) #quest-app *::before,
+body.quest[data-learning-quiet=true]:not([data-quest-view=grownups]):not([data-quest-view=parents]) #quest-app *::after {
+  animation:none!important;
+  transition:none!important;
+}
+/* Retry words live outside the game container. They must be just as still as
+ * the explanation underneath; positive reward feedback keeps its own context. */
+body.quest[data-learning-quiet=true]>.q-game-feedback { animation:none!important; transition:none!important; }
+
+/* The HUD badge is a small SVG whose internal 53-unit number rendered at only
+ * about 12 pixels. app.js adds this real 26px numeral above the medallion; the
+ * button remains at least 44px and the full reward-page badges are unchanged. */
+body.quest:not([data-quest-view=grownups]):not([data-quest-view=parents]) .q-level-chip>span:first-child { position:relative; }
+body.quest:not([data-quest-view=grownups]):not([data-quest-view=parents]) .q-level-chip:has(.q-hud-level-number) svg text { visibility:hidden; }
+body.quest:not([data-quest-view=grownups]):not([data-quest-view=parents]) .q-hud-level-number {
+  position:absolute;
+  inset:0 0 12%;
+  display:grid;
+  place-items:center;
+  color:#112858;
+  font-size:26px;
+  font-weight:900;
+  line-height:1;
+  pointer-events:none;
+  text-shadow:0 1px 0 #fffaf0;
+}
+
+/* Home keeps one story trail. The separate sorting/earned-making activities
+ * use the available width without leaving empty spaces for removed routes. */
+.q-home .q-focused-doors { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.q-home .q-focused-doors:has(>button:only-child) { grid-template-columns:minmax(0,1fr); }
+.q-challenge-invite { margin-block:24px; padding:20px; border:2px solid #789f9c; border-radius:22px; background:#e7f0e8; }
+.q-challenge-invite h2 { margin:0; }
+.q-challenge-invite p { max-width:48em; }
+.q-projector-compare summary { padding:12px; min-height:44px; cursor:pointer; font-weight:700; }
+.q-projector-compare>div { display:flex; flex-wrap:wrap; gap:8px; }
+@media(max-width:650px) { .q-home .q-focused-doors { grid-template-columns:minmax(0,1fr); } }

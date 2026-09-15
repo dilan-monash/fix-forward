@@ -41,8 +41,19 @@ export function createState() {
   return {
     version: STATE_VERSION, view: 'home', activeMission: null, completed: {}, discoveries: [],
     settings: { mode: 'guided', narration: true, sound: true, haptics: true, motion: 'full' },
-    decorations: { home: null, studio: null, station: null }, postcards: {}, reflections: {}, sorting: null, sortRound: 0, practice: [], sortedItems: []
+    decorations: { home: null, studio: null, station: null }, postcards: {}, reflections: {}, sorting: null, sortRound: 0, practice: [], sortedItems: [],
+    // Presentation help is separate from answers: seeing a demo never earns a
+    // Spark, and declining an invitation never changes the child's play style.
+    onboarding: { challengeChoice: null, sortingDemoSeen: false }
   };
+}
+
+/** Offer a choice only after two different stories were solved without help.
+ * Count reviewed story IDs rather than arbitrary saved keys, and remember either
+ * response so a reload cannot keep asking a child who already made a choice. */
+export function canOfferChallenge(state) {
+  return Boolean(state?.settings?.mode === 'guided' && !state?.onboarding?.challengeChoice
+    && MISSIONS.filter(mission => state?.completed?.[mission.id]?.assisted === false).length >= 2);
 }
 
 /** Both play styles need every authored fact before planning. Guided reveals
@@ -210,8 +221,23 @@ export function transition(state, action) {
       // longer a switchable setting; stale controls cannot change that policy.
       const allowed = { mode: ['guided', 'challenge'], narration: [true, false], sound: [true, false], haptics: [true, false] };
       if (!Object.hasOwn(allowed, action.key) || !allowed[action.key].includes(action.value) || state.settings[action.key] === action.value) return state;
-      return { ...state, settings: { ...state.settings, [action.key]: action.value } };
+      // Choosing Challenge in Settings is already an informed choice. Do not
+      // advertise it again if the child later returns to the guided play style.
+      const onboarding = action.key === 'mode' && action.value === 'challenge'
+        ? { ...state.onboarding, challengeChoice: 'accepted' } : state.onboarding;
+      return { ...state, onboarding, settings: { ...state.settings, [action.key]: action.value } };
     }
+    case 'ACCEPT_CHALLENGE':
+      // Only a deliberate response to an eligible invitation changes the mode.
+      return canOfferChallenge(state) ? { ...state, settings: { ...state.settings, mode: 'challenge' }, onboarding: { ...state.onboarding, challengeChoice: 'accepted' } } : state;
+    case 'CHALLENGE_OFFER_DISMISSED':
+      // Keeping guided play is a complete answer, never a temporary dismissal.
+      return canOfferChallenge(state) ? { ...state, onboarding: { ...state.onboarding, challengeChoice: 'dismissed' } } : state;
+    case 'SORT_DEMO_SEEN':
+      // The tutorial belongs to the real sorting screen but cannot submit a
+      // sorting answer. Marking it twice leaves the exact same state object.
+      return state.view === 'sorting' && sorting && !state.onboarding?.sortingDemoSeen
+        ? { ...state, onboarding: { ...state.onboarding, sortingDemoSeen: true } } : state;
     case 'PLACE_DECORATION': {
       // Allow an earned decoration or null to clear a slot; no arbitrary asset IDs.
       if (!DECORATION_SLOTS.includes(action.slotId)) return state;
@@ -350,6 +376,12 @@ function hydrateSorting(raw) {
 export function hydrateState(raw) {
   const state = createState();
   if (!isRecord(raw) || raw.version !== STATE_VERSION) return state;
+  // These optional version-1 fields are deliberately narrow. Older adventures
+  // retain all their progress and receive first-visit help without a reset.
+  if (isRecord(raw.onboarding)) {
+    if (['accepted', 'dismissed'].includes(raw.onboarding.challengeChoice)) state.onboarding.challengeChoice = raw.onboarding.challengeChoice;
+    state.onboarding.sortingDemoSeen = raw.onboarding.sortingDemoSeen === true;
+  }
   // Completion records anchor earned reflections, postcards and mission outcomes.
   if (isRecord(raw.completed)) {
     for (const mission of MISSIONS) {
@@ -383,6 +415,8 @@ export function hydrateState(raw) {
   state.practice = validIds(raw.practice, conceptIds);
   if (isRecord(raw.settings)) {
     state.settings.mode = raw.settings.mode === 'challenge' ? 'challenge' : 'guided';
+    // A legacy save already using Challenge needs no invitation to try it.
+    if (state.settings.mode === 'challenge') state.onboarding.challengeChoice = 'accepted';
     // Keep a child's explicit off choices. Missing or malformed older fields
     // inherit the new first-run defaults, still subject to browser gesture rules.
     for (const key of ['narration', 'sound', 'haptics']) {

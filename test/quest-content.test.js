@@ -10,8 +10,8 @@ import { JSDOM } from "jsdom";
 import { MISSIONS, SORT_ITEMS, CONCEPTS, LOCATIONS, SOURCES, validateQuestContent } from "../quest/content.js";
 import { artwork } from "../quest/art.js";
 
-test("all eight authored missions and twelve sorting cards have reviewable complete paths", () => {
-  assert.equal(MISSIONS.length, 8);
+test("all nine authored missions and twelve sorting cards have reviewable complete paths", () => {
+  assert.equal(MISSIONS.length, 9);
   assert.equal(SORT_ITEMS.length, 12);
   assert.equal(LOCATIONS.length, 3);
   assert.equal(CONCEPTS.length, 8);
@@ -122,6 +122,7 @@ test("two-picture reflections revisit the evidence that changed each story's pla
     "moving-day-box": /toaster and clean cardboard/i,
     "bulging-gadget": /battery was bulging/i,
     "mystery-glass-jug": /list named bottles and jars/i,
+    "fan-no-takers": /nobody wanted it.*checks weren't done/i,
   };
   const pictureIds = new Set(["paper", "empty-report", "missing-answer", "glass-list", "fan", "person", "toaster-damaged", "kettle", "boxed-toaster", "cardboard", "shaver", "battery-shaver", "glass-jug"]);
   for (const mission of MISSIONS) {

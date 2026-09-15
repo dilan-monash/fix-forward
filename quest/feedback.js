@@ -35,7 +35,7 @@ function slotMessage(mission, slot, action, correct, compatibleElsewhere) {
 }
 
 /**
- * Explain an attempt (or a plain slot-to-action plan) one item at a time.
+ * Explain an attempt (or a plain slot-to-action plan) one item or step at a time.
  * Match one complete accepted plan. For a retry, use the variant with the most
  * matching slots; a tie uses authored order. This makes feedback deterministic
  * and preserves the largest useful part of the child's current plan.
@@ -70,11 +70,14 @@ export function planFeedback(mission, attemptOrPlan = {}) {
   const matchedCount = rows.filter(row => row.chosenCorrect).length;
   const correct = complete && Boolean(best) && matchedCount === slots.length;
   const mixed = matchedCount > 0 && matchedCount < slots.length;
+  // A sequence plans what happens first and next to one item. Calling its
+  // missing step "the other item" would invent a second object in the story.
+  const slotWord = mission?.planKind === 'sequence' ? 'step' : 'item';
   let summary = 'Look at the clues. Try another choice.';
   if (!slots.length) summary = 'Choose a story to make a plan.';
   else if (correct) summary = slots.length === 1 ? 'Your choice fits the clues!' : 'Both choices fit the clues!';
-  else if (mixed) summary = complete ? 'One choice fits! Keep it. Try the other choice.' : 'One choice fits! Choose a plan for the other item.';
-  else if (!complete) summary = 'Choose a picture for each item.';
+  else if (mixed) summary = complete ? 'One choice fits! Keep it. Try the other choice.' : `One choice fits! Choose a plan for the other ${slotWord}.`;
+  else if (!complete) summary = `Choose a picture for each ${slotWord}.`;
   return {
     correct, complete, mixed, matchedCount, total: slots.length, summary,
     matchedVariantIndex: best?.index ?? null,

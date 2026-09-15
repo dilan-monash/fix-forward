@@ -13,6 +13,13 @@ In the Neon SQL Editor, run these files in order:
 1. `001_i1_recall_matching.sql`
 2. `002_seed_verified_mistral_vacuum.sql`
 
+Migrations `003_replacement_price_catalogue.sql` and
+`004_repair_service_fee_catalogue.sql`, followed by generated import `005`, are
+used only on the isolated `iteration-2-cost-comparison` branch. They must not be
+applied to shared Neon. The runtime stays on local SQLite unless the server-side
+setting `PRICE_CATALOGUE_STORAGE=postgres` is deliberately enabled with that
+branch's SELECT-only connection. See `docs/ITERATION2_COST_CATALOGUE.md`.
+
 Both scripts use transactions and conflict handling, so they can be run again without creating duplicate seed rows.
 
 Verify:

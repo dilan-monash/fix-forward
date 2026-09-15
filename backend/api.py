@@ -12,6 +12,7 @@ from .price_catalogue import (
     DEFAULT_DATABASE_PATH,
     PriceCatalogueUnavailable,
     read_catalogue,
+    read_postgres_catalogue,
 )
 from .transform import (
     build_location,
@@ -149,15 +150,21 @@ def repair_evidence():
 
 
 @api.get("/replacement-prices")
-# Read reviewed local price observations without treating them as evidence of Neon availability.
+# Read reviewed price observations from the explicitly configured storage target.
 def replacement_prices():
     # This is an explicit, independent public price snapshot. It never replaces
     # Neon recalls, repair evidence or locations, and does not prove Neon health.
     # Filtering by the user's brand/model happens locally in their browser.
-    payload = read_catalogue(
-        current_app.config.get("PRICE_CATALOGUE_PATH", DEFAULT_DATABASE_PATH)
+    payload = (
+        read_postgres_catalogue()
+        if current_app.config.get("PRICE_CATALOGUE_STORAGE") == "postgres"
+        else read_catalogue(current_app.config.get("PRICE_CATALOGUE_PATH", DEFAULT_DATABASE_PATH))
     )
-    return jsonify(meta=release_meta(payload["meta"]), prices=payload["prices"])
+    return jsonify(
+        meta=release_meta(payload["meta"]),
+        prices=payload["prices"],
+        repairFees=payload["repairFees"],
+    )
 
 
 @api.get("/locations")

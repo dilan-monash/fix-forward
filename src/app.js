@@ -30,7 +30,7 @@ import {
 import { SUBURB_POSTCODES } from "./suburb-index.js";
 import { icons } from "./icons.js";
 import { PRICE_SNAPSHOT } from "./price-snapshot.js";
-import { loadPriceCatalogue, matchPriceExamples, problemQuestions } from "./price-catalogue.js";
+import { automaticCostContext, loadPriceCatalogue, matchPriceExamples, problemQuestions } from "./price-catalogue.js";
 import { productSuggestions } from "./product-suggestions.js";
 import { createLearningState, transitionLearning, renderLearning } from "./learning.js";
 
@@ -1389,6 +1389,16 @@ function productMatchLevel() {
   return { label: "Appliance-type request", copy: state.appliance.category };
 }
 
+// Prefer validated fee rows loaded from the local catalogue database.
+// The authored copy keeps older static previews usable without inventing new values.
+function repairFeeRecords() {
+  return Array.isArray(priceCatalogue.repairFees) && priceCatalogue.repairFees.length
+    ? priceCatalogue.repairFees
+    : COST_CONTEXT_SOURCES.flatMap((item) => item.secondaryAmount
+      ? [item, { ...item, id: `${item.id}-labour-cap`, label: "Published labour cap including call-out", amount: item.secondaryAmount }]
+      : [item]);
+}
+
 // Keep unresolved safety or recall limits visible while the person explores cost information.
 function costSafetyBanner() {
   if (state.safetyResult?.status === "uncertain") {
@@ -1409,7 +1419,7 @@ function costContextResultHtml() {
     : state.appliance.brand
       ? `<strong>Brand supplied:</strong> ${escapeHtml(state.appliance.brand)}. The figures below are not brand-specific quotes.`
       : `<strong>Appliance type only:</strong> ${escapeHtml(state.appliance.category)}. The figures below are not product-specific quotes.`;
-  const cards = COST_CONTEXT_SOURCES.map((item) => `<article class="price-source-card"><p class="mini-label">Published service-fee example</p><h3>${escapeHtml(item.provider)}</h3><p class="price-context-amount">${money(item.amount)}${item.secondaryAmount ? `<small> · labour cap ${money(item.secondaryAmount)}</small>` : ""}</p><strong>${escapeHtml(item.label)}</strong><p>${escapeHtml(item.note)}</p><small>Checked ${escapeHtml(item.retrieved)} · confirm before booking</small>${externalLink(item.url, "See provider pricing", "text-link")}</article>`).join("");
+  const cards = repairFeeRecords().map((item) => `<article class="price-source-card"><p class="mini-label">Published service-fee example</p><h3>${escapeHtml(item.provider)}</h3><p class="price-context-amount">${money(item.amount)}</p><strong>${escapeHtml(item.label)}</strong><p>${escapeHtml(item.note)}</p><small>Checked ${escapeHtml(item.retrieved)} · confirm before booking</small>${externalLink(item.url, "See provider pricing", "text-link")}</article>`).join("");
   return `<section class="cost-context-result" tabindex="-1" aria-live="polite">
     <div class="context-summary"><p class="eyebrow">About these examples</p><h2>Inspection-fee examples — not your repair quote</h2><p>${identityNote}</p>${state.problemContext ? `<div id="problem-summary"><p>Your description: <strong>${escapeHtml(state.problemContext.label)}</strong>. This is a summary, not a diagnosis or a personalised price.</p><p><strong>Useful details for a repairer:</strong> ${escapeHtml(problemQuestions(state.problemContext.code))}</p><p>Describe only what you have already noticed. Do not switch it on or open it to investigate.</p></div>` : ""}<p>These general examples may not apply to your appliance. Confirm the current fee and appliance coverage with the provider.</p></div>
     <div class="price-source-grid">${cards}</div>
@@ -1431,7 +1441,27 @@ function recordedPricesHtml() {
   return `<div class="retail-catalogue-heading"><p class="eyebrow">Replacement price ideas · AUD</p><h2>Recorded retail examples</h2><p>${escapeHtml(matchNote)}</p></div>
     <p class="catalogue-status" role="status">${status}</p>
     <p class="small-copy">A small reference sample, not a market-wide comparison or a recommendation to replace your appliance. Prices can change; delivery and installation may cost extra. Stock is not confirmed.</p>
-    ${rows.length ? `<div class="retail-price-grid">${rows.map((row) => `<article class="retail-price-card"><span class="price-match-label">${row.match === "exact" ? "Same brand and model" : row.match === "brand" ? "Same brand · different model" : "Same appliance type"}</span><h3>${escapeHtml(row.productName)}</h3><p class="retail-model">${escapeHtml(row.brand)} · Model ${escapeHtml(row.model)}</p><p class="price-context-amount">${money(row.priceAud)} <small>AUD</small></p><p>${escapeHtml(row.retailer)}<br><small>Source reviewed ${escapeHtml(row.observedAt)}${row.stale ? " · older than 90 days" : ""}</small></p>${row.notes ? `<details class="plain-details price-record-details"><summary>Price details and limitations</summary><p class="small-copy">${escapeHtml(row.notes)}</p></details>` : ""}${row.availability === "out-of-stock" ? `<p class="field-error">Recorded as out of stock.</p>` : ""}<div class="retail-card-actions">${externalLink(row.sourceUrl, "Check retailer price", "text-link")}${!row.stale && row.availability !== "out-of-stock" ? `<button class="button secondary" type="button" data-use-price="${escapeAttr(row.id)}">Use ${money(row.priceAud)} in comparison<span class="sr-only"> for ${escapeHtml(row.productName)}</span></button>` : `<p class="small-copy">Check a current price before comparing.</p>`}</div></article>`).join("")}</div>` : `<div class="notice"><strong>No recorded examples for this appliance type yet.</strong><p>Enter a price from a retailer for a similar size and type. We will not substitute an unrelated appliance.</p></div>`}`;
+      ${rows.length ? `<div class="retail-price-grid">${rows.map((row) => `<article class="retail-price-card"><span class="price-match-label">${row.match === "exact" ? "Same brand and model" : row.match === "brand" ? "Same brand · different model" : "Same appliance type"}</span><h3>${escapeHtml(row.productName)}</h3><p class="retail-model">${escapeHtml(row.brand)} · Model ${escapeHtml(row.model)}</p><p class="price-context-amount">${money(row.priceAud)} <small>AUD</small></p><p>${escapeHtml(row.retailer)}<br><small>Source reviewed ${escapeHtml(row.observedAt)}${row.stale ? " · older than 90 days" : ""}${row.offerExpired ? " · offer ended" : ""}</small></p>${row.notes ? `<details class="plain-details price-record-details"><summary>Price details and limitations</summary><p class="small-copy">${escapeHtml(row.notes)}</p></details>` : ""}${row.availability === "out-of-stock" ? `<p class="field-error">Recorded as out of stock.</p>` : ""}<div class="retail-card-actions">${externalLink(row.sourceUrl, "Check retailer price", "text-link")}${!row.stale && !row.offerExpired && row.availability !== "out-of-stock" ? `<button class="button secondary" type="button" data-use-price="${escapeAttr(row.id)}">Use ${money(row.priceAud)} in comparison<span class="sr-only"> for ${escapeHtml(row.productName)}</span></button>` : `<p class="small-copy">Check a current price before comparing.</p>`}</div></article>`).join("")}</div>` : `<div class="notice"><strong>No recorded examples for this appliance type yet.</strong><p>Enter a price from a retailer for a similar size and type. We will not substitute an unrelated appliance.</p></div>`}`;
+}
+
+// Show a no-entry-needed comparison of sourced starting fees and recorded replacement prices.
+// Different scopes stay visibly separate, so this never becomes an invented repair quote.
+function automaticCostHtml() {
+  const result = automaticCostContext(priceCatalogue.prices, priceCatalogue.repairFees, state.appliance);
+  if (!result.available) {
+    return `<section class="automatic-cost-card" aria-live="polite"><p class="eyebrow">Automatic database comparison</p><h2>More evidence is needed for this appliance.</h2><p>We could not find both a current replacement example and a reviewed service-fee example. You can still use a real quote below.</p></section>`;
+  }
+  const replacementRange = result.replacementMin === result.replacementMax ? money(result.replacementMin) : `${money(result.replacementMin)}–${money(result.replacementMax)}`;
+  const repairRange = result.repairMin === result.repairMax ? money(result.repairMin) : `${money(result.repairMin)}–${money(result.repairMax)}`;
+  const matchLabel = result.match === "exact" ? "same brand and model" : result.match === "brand" ? "same brand" : "same appliance type";
+  return `<section class="automatic-cost-card" aria-labelledby="automatic-cost-title" aria-live="polite">
+    <div><p class="eyebrow">Automatic database comparison</p><h2 id="automatic-cost-title">Starting figures found — no price entry needed</h2><p>FixForward matched ${result.replacementRows.length} current ${matchLabel} replacement ${result.replacementRows.length === 1 ? "record" : "records"} with ${result.repairFees.length} published repair-service fee records.</p></div>
+    <div class="automatic-cost-grid">
+      <article><span>Repair service context</span><strong>${repairRange}</strong><p>Published inspection, call-out or labour-limit examples. Parts and further work may cost extra.</p></article>
+      <article><span>Replacement evidence</span><strong>${replacementRange}</strong><p>Recorded advertised prices before delivery or installation. Check the current retailer price.</p></article>
+    </div>
+    <div class="notice"><strong>This is an automatic evidence comparison, not a personalised quote.</strong><p>The two ranges cover different things, so FixForward does not label either choice cheaper. Enter an itemised repair quote below only if you have one.</p></div>
+  </section>`;
 }
 
 // Start one price-catalogue request and refresh only the visible price section on completion.
@@ -1440,6 +1470,8 @@ function refreshRecordedPrices() {
   if (priceRequest) return;
   priceRequest = loadPriceCatalogue(PRICE_SNAPSHOT).then((catalogue) => {
     priceCatalogue = catalogue;
+    const automatic = app.querySelector("#automatic-cost");
+    if (state.screen === "cost" && automatic) automatic.innerHTML = automaticCostHtml();
     const section = app.querySelector("#recorded-prices");
     if (state.screen === "cost" && section) section.innerHTML = recordedPricesHtml();
   });
@@ -1460,6 +1492,8 @@ function renderCost() {
     <div class="step-heading friendly-heading"><p class="eyebrow">Compare costs</p><h1>Start with what you know.</h1><p>Compare your repair quote with a replacement price. If you need a starting point, explore recorded retail prices and inspection-fee examples below.</p></div>
     ${costSafetyBanner()}
     ${subtleRecallStatus()}
+
+    <div id="automatic-cost">${automaticCostHtml()}</div>
 
     <details class="smart-cost-card" ${state.feeExamplesOpen ? "open" : ""}><summary>See inspection-fee examples (optional)</summary>
       <div class="smart-cost-head"><span class="beta-pill">Repair fees explained</span><h2>${escapeHtml(match.copy)}</h2><p>Optional: describe the problem to prepare useful details for a repairer. The fee examples are general and do not change with your description.</p></div>
@@ -1494,7 +1528,7 @@ function renderCost() {
     const button = event.target.closest("[data-use-price]");
     if (!button) return;
     const row = matchPriceExamples(priceCatalogue.prices, state.appliance).find((item) => item.id === button.dataset.usePrice);
-    if (!row || row.stale || row.availability === "out-of-stock") return;
+    if (!row || row.stale || row.offerExpired || row.availability === "out-of-stock") return;
     state.costs.replacement = String(row.priceAud);
     state.selectedPrice = row;
     state.comparison = null;
@@ -1641,7 +1675,7 @@ function renderAbout() {
     limitations: `${money(row.priceAud)} AUD. ${row.notes || "Recorded price; confirm current pricing and stock."}`,
     retrievalDate: row.observedAt, url: row.sourceUrl
   }));
-  groups["Inspection-fee examples"] = COST_CONTEXT_SOURCES.map((row) => ({
+  groups["Inspection-fee examples"] = repairFeeRecords().map((row) => ({
     name: row.provider, limitations: `${row.label}: ${money(row.amount)}. ${row.note}`,
     retrievalDate: row.retrieved, url: row.url
   }));

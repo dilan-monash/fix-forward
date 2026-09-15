@@ -120,7 +120,9 @@ test('sorting pickup and result controls bypass generic tap audio', async t => {
   assert.equal(q.notes.length, before, 'A direct picture press waits for its own pickup sound');
   picture.click();
   assert.equal(q.notes.length, before + 2, 'The accepted tap-to-pick action schedules one two-note pickup');
-  q.press(q.required('[data-sort-drag]'));
+  // The picture is now the only drag handle. Its follow-up press still must
+  // not add the generic tap sound over its own pickup/drop/result feedback.
+  q.press(q.required('[data-sort-picture]'));
   q.press(q.required('[data-destination]'));
   assert.equal(q.notes.length, before + 2, 'A drag follow-up or answer control adds no competing generic cue');
 });

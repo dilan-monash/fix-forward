@@ -652,6 +652,15 @@ dialog::backdrop { background: rgba(6,39,34,.7); backdrop-filter: blur(3px); }
 .auto-price-status h2 { margin: .35rem 0 .3rem; font-size: 1.25rem; }
 .auto-price-status p { margin: 0; color: var(--muted); line-height: 1.55; }
 .manual-cost-card { margin-top: 1rem; padding: 1.1rem; border: 1px solid var(--line); border-radius: 20px; background: white; box-shadow: var(--shadow-card); }
+.automatic-cost-card { display: grid; gap: 1rem; margin: 1rem 0; padding: 1.2rem; border: 1px solid #b9d6ce; border-radius: 20px; background: linear-gradient(135deg, #f4fbf8, #fffdf4); box-shadow: var(--shadow-card); }
+.automatic-cost-card h2 { margin: .2rem 0 .35rem; }
+.automatic-cost-card > div > p:not(.eyebrow) { margin: 0; color: var(--muted); }
+.automatic-cost-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; }
+.automatic-cost-grid article { padding: 1rem; border: 1px solid var(--line); border-radius: 14px; background: #fff; }
+.automatic-cost-grid span { display: block; color: var(--muted); font-weight: 700; }
+.automatic-cost-grid strong { display: block; margin: .3rem 0; color: var(--ink); font-size: clamp(1.45rem, 4vw, 2rem); }
+.automatic-cost-grid p { margin: 0; color: var(--muted); }
+@media (max-width: 620px) { .automatic-cost-grid { grid-template-columns: minmax(0, 1fr); } }
 .manual-cost-head h2 { margin: .2rem 0 .35rem; }
 .manual-cost-head p:not(.eyebrow) { margin: 0; color: var(--muted); }
 .comparison-result { display: grid; gap: .8rem; margin-top: 1rem; }

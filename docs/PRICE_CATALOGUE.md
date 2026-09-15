@@ -8,17 +8,20 @@ price; they are not a diagnosis, a repair quote or a recommendation to replace.
 
 ## Where this database lives
 
-- Reviewed source records: `data/catalogue/*-observations.json`.
+- Reviewed replacement records: `data/catalogue/*-observations.json`.
+- Reviewed service-fee records: `data/catalogue/repair-service-fees.json`.
 - Public SQLite database: `data/catalogue/replacement-prices.sqlite`.
 - Static-preview copy of the same reviewed records: `src/price-snapshot.js`.
 - Flask endpoint: `GET /api/replacement-prices`.
 - Source-review notes: `data/catalogue/SOURCES.md` and
   `data/catalogue/ADDITIONAL_SOURCES.md`.
 
-The initial snapshot reviewed on 11 September 2026 contains 28 observations
-across all 19 supported appliance categories: 22 from The Good Guys and 6 from
-Harvey Norman. JB Hi-Fi is a supported future source but no JB Hi-Fi price was
-included because seller evidence for the candidate listing was incomplete.
+The initial snapshot reviewed on 11 September 2026 contains 28 replacement-price
+observations across all 19 supported appliance categories and four sourced
+repair-service fee observations. The replacement set contains 22 records from
+The Good Guys and 6 from Harvey Norman. JB Hi-Fi is a supported future source
+but no JB Hi-Fi price was included because seller evidence for the candidate
+listing was incomplete.
 
 The price database is an **explicit local public snapshot**, created without a
 Neon credential. Runtime reads use SQLite `mode=ro` and `query_only`; a web request
@@ -90,28 +93,34 @@ adding a record. Amazon rows additionally require explicit reviewed
 
 ## API contract and failure behavior
 
-The endpoint returns `{meta, prices}`. Each price retains the source JSON fields.
+The endpoint returns `{meta, prices, repairFees}`. Each row retains its source
+JSON fields. Repair fees are published inspection, call-out or labour-limit
+examples, not model-specific quotes.
 `meta.source` is `reviewed-price-snapshot`, `meta.storage` is
 `local-public-snapshot`, and `meta.livePrices` is `false`. Metadata also includes
 the schema version, record count, first/last observation dates, a content-derived
 snapshot version and a plain-English limitation. Flask adds `releaseVersion`.
 
 The endpoint does not receive the user's brand/model or fault answers; matching
-and comparison happen in the browser. A missing, corrupt, empty, incompatible
+and comparison happen in the browser. The automatic panel chooses the strongest
+current replacement evidence (exact model, then brand, then category), displays
+it beside the reviewed service-fee range, and does not declare either option
+cheaper because the amounts cover different scopes. A missing, corrupt, empty, incompatible
 or modified snapshot returns HTTP 503 with `price_catalogue_unavailable` and
 `Cache-Control: no-store`. It never invents replacement prices or contacts Neon
 as an implicit fallback. Manual price entry remains available in the UI.
 
 ## Optional later move to PostgreSQL
 
-`database/003_replacement_price_catalogue.sql` supplies equivalent PostgreSQL
-tables and indexes for a future move. **It has not been applied to Neon and does
-not change current storage.** The local catalogue requires no database URL.
+`database/003_replacement_price_catalogue.sql` and
+`database/004_repair_service_fee_catalogue.sql` supply equivalent PostgreSQL
+tables and indexes for a future move. **They have not been applied to Neon and
+do not change current storage.** The local catalogue requires no database URL.
 
 To move the catalogue later:
 
 1. Verify the target development database and take the team's usual backup.
-2. Apply migration 003 using a separate migration credential.
+2. Apply migrations 003 and 004 using a separate migration credential.
 3. Validate the reviewed JSON with the same Python validator. Import the exact
    records with parameterised SQL, converting `priceAud` to integer `price_cents`
    using `Decimal`, and preserve the source URL and observation date. The

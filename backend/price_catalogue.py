@@ -24,7 +24,8 @@ from urllib.parse import urlsplit
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_SOURCE_DIR = PROJECT_ROOT / "data" / "catalogue"
 DEFAULT_DATABASE_PATH = DEFAULT_SOURCE_DIR / "replacement-prices.sqlite"
-SCHEMA_VERSION = 1
+DEFAULT_SERVICE_FEE_PATH = DEFAULT_SOURCE_DIR / "repair-service-fees.json"
+SCHEMA_VERSION = 2
 CATEGORY_CODES = frozenset({
     "kettle", "toaster", "sandwich-press", "rice-cooker", "blender", "mixer",
     "food-processor", "coffee-machine", "air-fryer", "microwave",
@@ -47,6 +48,14 @@ FIELDS = (
     "priceAud", "currency", "sourceUrl", "observedAt", "priceKind",
     "availability", "notes",
 )
+OPTIONAL_FIELDS = ("offerEndsAt",)
+SERVICE_FEE_FIELDS = (
+    "id", "provider", "label", "amount", "note", "url", "retrieved",
+)
+SERVICE_PROVIDER_HOSTS = {
+    "National Appliance Repairs": "nationalappliancerepairs.com.au",
+    "One Touch Appliance Repairs": "1touchappliancerepairs.com.au",
+}
 LIMITATION = (
     "Small reviewed sample of advertised Australian retailer prices, not a live "
     "price feed or a complete market survey. Prices and stock may change. "
@@ -122,7 +131,18 @@ def validate_observation(record, today=None):
         raise CatalogueValidationError("sourceUrl is invalid") from error
     if result["retailer"] == "Amazon AU" and "sold by amazon au" not in result["notes"].lower():
         raise CatalogueValidationError("Amazon observations need reviewed 'Sold by Amazon AU' evidence in notes")
-    return {key: result[key] for key in FIELDS}
+    offer_ends_at = record.get("offerEndsAt")
+    if offer_ends_at is not None:
+        if not isinstance(offer_ends_at, str):
+            raise CatalogueValidationError("offerEndsAt must be an ISO calendar date")
+        try:
+            offer_end = date.fromisoformat(offer_ends_at)
+        except ValueError as error:
+            raise CatalogueValidationError("offerEndsAt must be an ISO calendar date") from error
+        if offer_end.isoformat() != offer_ends_at or offer_end < observed:
+            raise CatalogueValidationError("offerEndsAt must be YYYY-MM-DD and not precede observedAt")
+        result["offerEndsAt"] = offer_ends_at
+    return {key: result[key] for key in (*FIELDS, *OPTIONAL_FIELDS) if key in result}
 
 
 # Validate the whole nonempty input, reject duplicate offers and return a stable ID ordering.
@@ -167,11 +187,63 @@ def load_reviewed_observations(source_dir=DEFAULT_SOURCE_DIR):
 
 
 # Create the shared response payload and deterministic content hash from validated observations.
-def snapshot_payload(records):
+def validate_service_fee(record, today=None):
+    """Return one sourced public fee record; it remains context, not a quote."""
+    if not isinstance(record, dict):
+        raise CatalogueValidationError("Each service fee must be an object")
+    missing = set(SERVICE_FEE_FIELDS) - set(record)
+    if missing:
+        raise CatalogueValidationError("Missing service-fee fields: " + ", ".join(sorted(missing)))
+    result = {}
+    for key in SERVICE_FEE_FIELDS:
+        if key == "amount":
+            continue
+        value = record[key]
+        if not isinstance(value, str) or not value.strip():
+            raise CatalogueValidationError(f"Service fee {key} must be non-empty text")
+        result[key] = value.strip()
+    value = record["amount"]
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise CatalogueValidationError("Service fee amount must be a number")
+    amount = Decimal(str(value))
+    if not amount.is_finite() or amount <= 0 or amount > Decimal("100000") or amount != amount.quantize(Decimal("0.01")):
+        raise CatalogueValidationError("Service fee amount must be valid positive AUD")
+    result["amount"] = float(amount)
+    try:
+        observed = date.fromisoformat(result["retrieved"])
+        url = urlsplit(result["url"])
+    except (ValueError, TypeError) as error:
+        raise CatalogueValidationError("Service fee date or URL is invalid") from error
+    if observed.isoformat() != result["retrieved"] or observed > (today or date.today()):
+        raise CatalogueValidationError("Service fee retrieved must be a past ISO date")
+    host = SERVICE_PROVIDER_HOSTS.get(result["provider"])
+    if (not host or url.scheme != "https" or url.hostname not in {host, "www." + host}
+            or url.username or url.password or url.port not in {None, 443} or not url.path.strip("/")):
+        raise CatalogueValidationError("Service fee URL must match the named provider")
+    return {key: result[key] for key in SERVICE_FEE_FIELDS}
+
+
+def load_reviewed_service_fees(path=DEFAULT_SERVICE_FEE_PATH):
+    """Load the separately reviewed service-fee context without contacting a provider."""
+    try:
+        records = json.loads(Path(path).read_text(encoding="utf-8-sig"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as error:
+        raise CatalogueValidationError("Cannot read reviewed repair-service-fees.json") from error
+    if not isinstance(records, list) or not records:
+        raise CatalogueValidationError("At least one reviewed service fee is required")
+    clean = [validate_service_fee(record) for record in records]
+    ids = [record["id"] for record in clean]
+    if len(ids) != len(set(ids)):
+        raise CatalogueValidationError("Duplicate service fee id")
+    return sorted(clean, key=lambda row: row["id"])
+
+
+def snapshot_payload(records, service_fees=None):
     """Shared contract for the SQLite API and explicit static-preview bundle."""
     clean = validate_observations(records)
     # Stable keys and row ordering make the content hash repeatable across the SQLite and browser exports.
-    canonical = json.dumps(clean, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    fees = sorted([validate_service_fee(row) for row in (service_fees or [])], key=lambda row: row["id"])
+    canonical = json.dumps({"prices": clean, "repairFees": fees}, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     observed_dates = [row["observedAt"] for row in clean]
     meta = {
         "source": "reviewed-price-snapshot",
@@ -180,12 +252,13 @@ def snapshot_payload(records):
         "schemaVersion": SCHEMA_VERSION,
         "snapshotVersion": hashlib.sha256(canonical.encode("utf-8")).hexdigest(),
         "recordCount": len(clean),
+        "repairFeeRecordCount": len(fees),
         "firstObservedAt": min(observed_dates),
         "lastObservedAt": max(observed_dates),
         "livePrices": False,
         "limitation": LIMITATION,
     }
-    return {"meta": meta, "prices": clean}
+    return {"meta": meta, "prices": clean, "repairFees": fees}
 
 
 SQLITE_SCHEMA = """
@@ -202,6 +275,7 @@ CREATE TABLE replacement_price_observations (
     observed_at TEXT NOT NULL,
     price_kind TEXT NOT NULL CHECK (price_kind = 'advertised'),
     availability TEXT NOT NULL CHECK (availability IN ('not-verified', 'in-stock', 'out-of-stock')),
+    offer_ends_at TEXT,
     notes TEXT NOT NULL,
     UNIQUE (source_url, observed_at, model)
 );
@@ -213,13 +287,22 @@ CREATE TABLE replacement_price_catalogue_meta (
     key TEXT PRIMARY KEY,
     value TEXT NOT NULL
 );
+CREATE TABLE repair_service_fee_observations (
+    id TEXT PRIMARY KEY,
+    provider TEXT NOT NULL,
+    label TEXT NOT NULL,
+    amount_cents INTEGER NOT NULL CHECK (amount_cents > 0 AND amount_cents <= 10000000),
+    note TEXT NOT NULL,
+    source_url TEXT NOT NULL,
+    retrieved_at TEXT NOT NULL
+);
 """
 
 
 # Build and check a temporary SQLite file before atomically replacing the previous public snapshot.
-def build_database(records, destination=DEFAULT_DATABASE_PATH):
+def build_database(records, destination=DEFAULT_DATABASE_PATH, service_fees=None):
     """Validate everything before atomically replacing a public snapshot file."""
-    payload = snapshot_payload(records)
+    payload = snapshot_payload(records, service_fees)
     destination = Path(destination).resolve()
     destination.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile(prefix=".replacement-prices-", suffix=".tmp", dir=destination.parent, delete=False) as temporary:
@@ -230,18 +313,30 @@ def build_database(records, destination=DEFAULT_DATABASE_PATH):
             connection.executescript(SQLITE_SCHEMA)
             connection.execute(f"PRAGMA user_version = {SCHEMA_VERSION}")
             connection.executemany(
-                "INSERT INTO replacement_price_observations VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                """INSERT INTO replacement_price_observations (
+                    id, category_code, brand, model, product_name, retailer,
+                    price_cents, currency, source_url, observed_at, price_kind,
+                    availability, offer_ends_at, notes
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                 [(
                     row["id"], row["categoryCode"], row["brand"], row["model"],
                     row["productName"], row["retailer"],
                     int(Decimal(str(row["priceAud"])) * 100), row["currency"],
                     row["sourceUrl"], row["observedAt"], row["priceKind"],
-                    row["availability"], row["notes"],
+                    row["availability"], row.get("offerEndsAt"), row["notes"],
                 ) for row in payload["prices"]],
             )
             connection.executemany(
                 "INSERT INTO replacement_price_catalogue_meta (key, value) VALUES (?, ?)",
                 [(key, json.dumps(value, ensure_ascii=False)) for key, value in payload["meta"].items()],
+            )
+            connection.executemany(
+                "INSERT INTO repair_service_fee_observations VALUES (?, ?, ?, ?, ?, ?, ?)",
+                [(
+                    row["id"], row["provider"], row["label"],
+                    int(Decimal(str(row["amount"])) * 100), row["note"],
+                    row["url"], row["retrieved"],
+                ) for row in payload["repairFees"]],
             )
             connection.commit()
             if connection.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
@@ -270,13 +365,19 @@ def read_catalogue(database_path=DEFAULT_DATABASE_PATH):
                 SELECT id, category_code AS categoryCode, brand, model,
                     product_name AS productName, retailer, price_cents,
                     currency, source_url AS sourceUrl, observed_at AS observedAt,
-                    price_kind AS priceKind, availability, notes
+                    price_kind AS priceKind, availability,
+                    offer_ends_at AS offerEndsAt, notes
                 FROM replacement_price_observations ORDER BY id
             """).fetchall()
             stored_meta = {
                 row["key"]: json.loads(row["value"])
                 for row in connection.execute("SELECT key, value FROM replacement_price_catalogue_meta")
             }
+            fee_rows = connection.execute("""
+                SELECT id, provider, label, amount_cents, note,
+                    source_url AS url, retrieved_at AS retrieved
+                FROM repair_service_fee_observations ORDER BY id
+            """).fetchall()
         finally:
             connection.close()
         records = []
@@ -286,11 +387,70 @@ def read_catalogue(database_path=DEFAULT_DATABASE_PATH):
             if isinstance(cents, bool) or not isinstance(cents, int):
                 raise CatalogueValidationError("Invalid stored currency amount")
             item["priceAud"] = cents / 100
+            if item.get("offerEndsAt") is None:
+                item.pop("offerEndsAt", None)
             records.append(item)
-        payload = snapshot_payload(records)
+        service_fees = []
+        for row in fee_rows:
+            item = dict(row)
+            cents = item.pop("amount_cents")
+            if isinstance(cents, bool) or not isinstance(cents, int):
+                raise CatalogueValidationError("Invalid stored service-fee amount")
+            item["amount"] = cents / 100
+            service_fees.append(item)
+        payload = snapshot_payload(records, service_fees)
         # Recompute rather than trust stored labels: edited rows must not retain an older reviewed snapshot identity.
         if stored_meta != payload["meta"]:
             raise CatalogueValidationError("Price catalogue content does not match its reviewed snapshot metadata")
         return payload
     except (OSError, sqlite3.Error, ValueError, TypeError, KeyError) as error:
         raise PriceCatalogueUnavailable("The reviewed replacement-price snapshot is unavailable") from error
+
+
+def read_postgres_catalogue():
+    """Read and revalidate the hosted catalogue through the app's read-only DB boundary."""
+    try:
+        from .db import fetch_all
+
+        rows = fetch_all("""
+            SELECT id, category_code AS "categoryCode", brand, model,
+                product_name AS "productName", retailer, price_cents,
+                currency, source_url AS "sourceUrl", observed_at AS "observedAt",
+                price_kind AS "priceKind", availability,
+                offer_ends_at AS "offerEndsAt", notes
+            FROM replacement_price_observations ORDER BY id
+        """)
+        fee_rows = fetch_all("""
+            SELECT id, provider, label, amount_cents, note,
+                source_url AS url, retrieved_at AS retrieved
+            FROM repair_service_fee_observations ORDER BY id
+        """)
+        stored_meta = {
+            row["key"]: json.loads(row["value"])
+            for row in fetch_all("SELECT key, value FROM replacement_price_catalogue_meta")
+        }
+        records = []
+        for source in rows:
+            item = dict(source)
+            item["priceAud"] = float(Decimal(item.pop("price_cents")) / 100)
+            item["observedAt"] = item["observedAt"].isoformat()
+            if item.get("offerEndsAt") is None:
+                item.pop("offerEndsAt", None)
+            else:
+                item["offerEndsAt"] = item["offerEndsAt"].isoformat()
+            records.append(item)
+        fees = []
+        for source in fee_rows:
+            item = dict(source)
+            item["amount"] = float(Decimal(item.pop("amount_cents")) / 100)
+            item["retrieved"] = item["retrieved"].isoformat()
+            fees.append(item)
+        payload = snapshot_payload(records, fees)
+        payload["meta"]["storage"] = "neon-postgresql"
+        if stored_meta != payload["meta"]:
+            raise CatalogueValidationError("Hosted catalogue content does not match its reviewed metadata")
+        return payload
+    except PriceCatalogueUnavailable:
+        raise
+    except Exception as error:
+        raise PriceCatalogueUnavailable("The reviewed hosted price catalogue is unavailable") from error

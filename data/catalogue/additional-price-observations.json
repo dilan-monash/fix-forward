@@ -11,6 +11,7 @@
     "notes": "Mini multicooker with a 1.5-cup rice capacity. Price Attack offer displayed with an end date of 30 September 2026. Product and brand listings agreed. Product-page snapshot was labelled crawled 1 day earlier. Price before delivery and optional extras. Recorded example, not a live quote or recommendation. Stock was not checked.",
     "currency": "AUD",
     "observedAt": "2026-09-11",
+    "offerEndsAt": "2026-09-30",
     "priceKind": "advertised",
     "availability": "not-verified"
   },
@@ -101,6 +102,7 @@
     "notes": "Advertised promotion ends 13 September 2026. Convector heater example; compare heater type and output. Official indexed product page and category listings agreed. Product-page snapshot was labelled crawled 1 day earlier. Price before delivery and optional extras. Recorded example, not a live quote or recommendation. Stock was not checked.",
     "currency": "AUD",
     "observedAt": "2026-09-11",
+    "offerEndsAt": "2026-09-13",
     "priceKind": "advertised",
     "availability": "not-verified"
   },

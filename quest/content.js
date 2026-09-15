@@ -440,6 +440,51 @@ export const MISSIONS = [
     discussionPrompt: "What should Sam ask about this exact jug?", artworkId: "glass-jug",
     sourceIds: ["merri-glass"],
   }),
+  // Optional ninth story: harder reasoning uses familiar words and existing facts.
+  // The two slots describe a conditional plan, not permission to move a real fan.
+  // Keep this appended so the original eight IDs, saved progress and audio stay intact.
+  authored({
+    id: "fan-no-takers", title: "A fan nobody wants", character: "flo", locationId: "studio",
+    applianceCategory: "fan", conceptIds: ["reuse","uncertainty"], variantGroup: "fan-conditions", difficulty: "trickier",
+    optional: true, planKind: "sequence",
+    learningGoal: "Weigh a working condition against the lack of a willing recipient; plan checks without promising reuse.",
+    childSummary: "It works. Nobody wants it yet. What can Sam do?",
+    fictionalContext: "In this made-up story, Sam has a spare fan that works. Bea and Lee both have fans. Neither wants this one. Can a working fan always find a new home?",
+    guideLines: {
+      intro: "It works, but a new home isn't ready. This one's trickier!",
+      explore: "One clue sounds hopeful. The others make us pause.",
+      plan: "First, who could want it? Then, what must happen before a move?",
+      success: "You made a careful plan. We don't have to promise a happy ending.",
+      retry: "A working fan still needs someone who wants it and finished checks.",
+      outcome: "Sam can ask. A new home is possible, but we don't know yet.",
+    },
+    postcardLine: "No easy ending. A thoughtful next step.",
+    reflection: {
+      prompt: "Why couldn't Sam promise a new home?",
+      options: [
+        { id: "fan-works", label: "The fan still worked.", artworkId: "fan" },
+        { id: "no-ready-home", label: "Nobody wanted it. Checks weren't done.", artworkId: "missing-answer" },
+      ],
+      correctId: "no-ready-home",
+      explanation: "Working is one clue. Sam still needs someone who wants the fan. The checks must be finished before any move. A new home is not certain.",
+    },
+    clues: [
+      clue("still-works", "It works", "Sam, the adult owner, says the fan works. It might help someone who needs a fan.", "fan", 68, 46),
+      clue("no-takers", "Both said no", "Bea and Lee already have fans. Both said no. Sam has not found anyone who wants this one yet.", "person", 26, 65),
+      clue("checks-pending", "Checks not done", "The checks for sharing this fan are not finished. Before any move, Sam needs those checks, including a qualified repairer's check.", "empty-report", 48, 31),
+    ],
+    slots: [{ id: "first", label: "First" }, { id: "then", label: "Then, if someone says yes" }],
+    allowedActions: [
+      action("find-recipient", "Sam asks who wants a fan", "Flo: Put this first: Sam asks who wants the fan. A new home is not ready just because the fan works.", "person"),
+      action("finish-checks", "Sam arranges checks before a move", "Flo: Put this next, if someone says yes. Sam must finish the sharing checks before any move.", "evidence"),
+      action("leave-at-bea", "Leave it at Bea's anyway", "Flo: Bea said no. A working fan is not a gift someone must take. Sam needs a willing new owner and finished checks.", "fan"),
+    ],
+    acceptedPlans: [{ first: "find-recipient", then: "finish-checks" }],
+    outcome: { title: "A plan without a promise", text: "Sam starts asking who wants the fan. No new home is ready yet. If someone says yes, Sam must finish the sharing checks. Those checks must happen before any move. If nobody wants it, Sam needs to ask about another plan.", scene: "help" },
+    helpText: "Flo: First find someone who wants the fan. Then Sam finishes checks before a move. No one has said yes yet.",
+    discussionPrompt: "What could Sam ask if nobody wants this working fan?", artworkId: "fan",
+    sourceIds: ["esv-secondhand","merri-ewaste","sv-reuse"],
+  }),
 ];
 
 // These fixed story conditions are reviewed. No random conditions are combined.

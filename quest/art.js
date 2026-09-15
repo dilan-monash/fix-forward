@@ -175,6 +175,8 @@ const STAMPS = Object.freeze({
   'moving-day-box': { art: 'boxed-toaster', label: 'TWO STORIES', color: C.blue, symbol: 'paths' },
   'bulging-gadget': { art: 'battery-shaver', label: 'PAUSE & ASK', color: C.coral, symbol: 'conversation' },
   'mystery-glass-jug': { art: 'glass-jug', label: 'KEEP ASKING', color: C.gold, symbol: 'question' },
+  // The harder story earns a question stamp, not a claim that reuse happened.
+  'fan-no-takers': { art: 'fan', label: 'THINK IT THROUGH', color: C.mint, symbol: 'question' },
 });
 
 // Return a small visual summary such as a house, question or conversation bubble.

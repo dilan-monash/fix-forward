@@ -38,6 +38,7 @@ def create_app(test_config=None):
         SECRET_KEY=settings.secret_key,
         SITE_ACCESS_ENABLED=True,
         SESSION_COOKIE_SECURE=settings.session_cookie_secure,
+        PRICE_CATALOGUE_STORAGE=settings.price_catalogue_storage,
     )
     if test_config:
         app.config.update(test_config)
@@ -72,6 +73,8 @@ def create_app(test_config=None):
                            "quest/art.js", "quest/content.js", "quest/engine.js",
                            "quest/touch-fx.js", "quest/touch-fx.css", "quest/scene-play.css",
                            "quest/adventure-world.js", "quest/adventure-world.css",
+                           # Local gesture help and still-learning policy stay behind the same access gate.
+                           "quest/sort-demo.js", "quest/sort-demo.css", "quest/motion-context.js", "quest/learning-focus.css",
                            "quest/storage.js", "quest/drag.js", "quest/play-effects.css",
                            "quest/postcard.js", "quest/postcard-options.js",
                            "quest/progression.js", "quest/tablet-play.css",

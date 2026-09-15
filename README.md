@@ -252,23 +252,26 @@ See `docs/SECURE_ARCHITECTURE_I1.md`.
 
 ## Local setup
 
-Requirements: Python 3.11+ and Node.js 20+. The main reference-data routes additionally need a PostgreSQL/Neon connection string for the application's read-only role. The public price catalogue needs no database URL.
+Requirements: Python 3.11+ and Node.js 20+. The browser frontend calls the Flask API on the same origin, so it needs no separate connection secret. PostgreSQL/Neon credentials belong only in the backend environment.
 
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
 python data/scripts/build_price_catalogue.py
+Copy-Item .env.example .env
 ```
 
-This workspace has a private, Git-ignored `.env` with `DATABASE_URL=` left blank and local website-access settings configured. Put the real database URL immediately after `DATABASE_URL=`, save, and restart Flask. In a fresh checkout, copy `.env.example` to `.env`, set `SITE_PASSWORD` privately, and generate a random `SECRET_KEY` of at least 32 characters. Set `SESSION_COOKIE_SECURE=false` only for local HTTP testing at `127.0.0.1:5000`; keep it true on HTTPS hosting. Existing shell/hosting environment variables take precedence. Never put real credentials in frontend code, Git, documentation, screenshots or chat. See [website access setup](docs/WEBSITE_ACCESS.md).
+Open the new private, Git-ignored `.env`. Put the team member's own SELECT-only Neon URL after `DATABASE_URL=`, set `PRICE_CATALOGUE_STORAGE=postgres`, set `SITE_PASSWORD`, generate a random `SECRET_KEY` of at least 32 characters, and set `SESSION_COOKIE_SECURE=false` only for local HTTP. The URL must target the branch where migrations `003`/`004` and import `005` were applied. Existing shell or hosting variables take precedence. Never put real credentials in frontend code, Git, documentation, screenshots or chat. See [website access setup](docs/WEBSITE_ACCESS.md) and [Iteration 2 catalogue handover](docs/ITERATION2_COST_CATALOGUE.md).
 
 ```powershell
 $env:RELEASE_VERSION = "iteration-2-v2.0.0-quest"
-python -m flask --app app run --debug
+python -m flask --app app run --port 5000
 ```
 
 Open `http://127.0.0.1:5000` and enter the shared website password. Without valid `SITE_PASSWORD` and `SECRET_KEY` settings, the server returns an access-unavailable page instead of exposing the application.
+
+Before demonstrating the cost comparison, open `/api/replacement-prices` after signing in and confirm that `meta.storage` is `neon-postgresql`. If it reports `local-public-snapshot`, that server is using the offline fallback rather than Neon.
 
 Run `python -m backend.check_database` to test the main PostgreSQL connection and dataset routes without printing credentials. See the [database guide](docs/DATABASE_CONNECTION_CHECK.md) for this machine's interpreter path and diagnostic outcomes. The in-process diagnostic bypasses the visitor gate only for its internal test application. A static `:5500` preview or GitHub Pages deployment cannot protect application files with this server-side password and cannot prove that Flask or Neon is running.
 

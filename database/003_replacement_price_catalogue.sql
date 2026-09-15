@@ -1,5 +1,5 @@
 -- OPTIONAL DATABASE-WRITING schema for future PostgreSQL price storage.
--- The current runtime reads local SQLite via backend/price_catalogue.py; this table is not used by that reader.
+-- The runtime uses this table only when PRICE_CATALOGUE_STORAGE=postgres.
 -- This file is not part of the Render build command or automatic Flask startup.
 
 -- OPTIONAL future PostgreSQL storage for the public replacement-price catalogue.
@@ -26,9 +26,13 @@ CREATE TABLE IF NOT EXISTS replacement_price_observations (
     price_kind text NOT NULL DEFAULT 'advertised' CHECK (price_kind = 'advertised'),
     availability text NOT NULL DEFAULT 'not-verified'
         CHECK (availability IN ('not-verified', 'in-stock', 'out-of-stock')),
+    offer_ends_at date,
     notes text NOT NULL DEFAULT '',
     UNIQUE (source_url, observed_at, model)
 );
+
+ALTER TABLE replacement_price_observations
+    ADD COLUMN IF NOT EXISTS offer_ends_at date;
 
 CREATE INDEX IF NOT EXISTS replacement_prices_category_brand_model
     ON replacement_price_observations (category_code, brand, model);
@@ -47,6 +51,10 @@ BEGIN
     IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'fixforward_runtime') THEN
         GRANT SELECT ON replacement_price_observations, replacement_price_catalogue_meta
             TO fixforward_runtime;
+    END IF;
+    IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'fixforward_app') THEN
+        GRANT SELECT ON replacement_price_observations, replacement_price_catalogue_meta
+            TO fixforward_app;
     END IF;
 END
 $$;
