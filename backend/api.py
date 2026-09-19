@@ -5,7 +5,6 @@
 """Read-only JSON endpoints consumed by the browser application."""
 
 from flask import Blueprint, current_app, jsonify, request
-
 from .db import DatabaseUnavailable
 from . import repository
 from .price_catalogue import (

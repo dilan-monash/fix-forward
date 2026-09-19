@@ -460,3 +460,11 @@ data/raw/**
 
 # Regenerable 10 MB ORA mapping output
 data/clean/ora_clean_mapped.csv
+
+# Trained appliance model artifacts are supplied through private deployment storage.
+model/*.keras
+model/*.h5
+model/*.json
+!model/appliance-classifier/
+!model/appliance-classifier/*.json
+!model/appliance-classifier/*.bin

@@ -10,6 +10,7 @@ const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
 const css = await readFile(new URL("../styles.css", import.meta.url), "utf8");
 const backendInit = await readFile(new URL("../backend/__init__.py", import.meta.url), "utf8");
 const backendApi = await readFile(new URL("../backend/api.py", import.meta.url), "utf8");
+const classifier = await readFile(new URL("../src/appliance-classifier.js", import.meta.url), "utf8");
 
 // v1.6 usability-lab contracts: goal-first journeys, complete short safety checks,
 // postcode/suburb autocomplete, repair-hub choice, evidence-led smart cost context,
@@ -28,6 +29,26 @@ test("UX02 repair, compare, recycle and help-me-decide actions are available in 
   assert.match(data, /I want to recycle it/);
   assert.match(data, /I’m not sure/);
   assert.doesNotMatch(app, /Start a 3–5 minute assessment/);
+});
+
+test("UX02b adult photo detection routes through the existing safety check", () => {
+  assert.match(app, /id="appliance-photo"/);
+  assert.match(app, /photo-dropzone/);
+  assert.match(app, /dataTransfer\.files/);
+  assert.match(app, /classifyAppliancePhoto/);
+  assert.doesNotMatch(app, /fetch\("\/api\/appliance-detect"/);
+  assert.match(app, /Your photo looks like a/);
+  assert.match(app, /Other possible matches/);
+  assert.match(app, /confirm-photo-appliance/);
+  assert.match(app, /Yes, continue to safety questions/);
+  assert.match(app, /navigate\("check"\)/);
+  assert.doesNotMatch(backendApi, /appliance-detect/);
+  assert.match(classifier, /tf\.loadLayersModel/);
+  assert.match(classifier, /min_margin/);
+  assert.match(classifier, /The selected image could not be read/);
+  assert.match(classifier, /friendlyRecognitionError/);
+  assert.match(classifier, /current model yet/);
+  assert.match(html, /tensorflow\/tfjs@4\.22\.0/);
 });
 
 test("UX03 recall language teaches the term instead of assuming users know it", () => {
