@@ -1003,9 +1003,15 @@ function renderResults() {
   }
 
   const featuredIntent = state.intent === "guide" ? "repair" : state.intent;
+  const summaryAction = featuredIntent === "repair" ? "Explore repair options" : featuredIntent === "compare" ? "Compare repair and replacement costs" : featuredIntent === "recycle" ? "Find recycling options" : "Choose a next step below";
   app.innerHTML = `<section class="screen result-screen options-screen">
     ${renderBack("Back to safety questions")}
     <div class="result-hero"><div><p class="eyebrow">Your options</p><h1>Here are the next steps for your ${escapeHtml(state.appliance.category.toLowerCase())}.</h1><p>You did not report one of the serious warning signs in our quick check. <strong>This is not a guarantee that the appliance is safe.</strong> Choose what you want to do next.</p></div><div class="appliance-pill"><span>↻</span><div><small>Your appliance</small><strong>${escapeHtml([state.appliance.brand, state.appliance.model].filter(Boolean).join(" ") || state.appliance.category)}</strong><em>${escapeHtml(state.appliance.category)}</em></div></div></div>
+    <section class="decision-summary" aria-labelledby="decision-summary-title">
+      <div class="decision-summary-heading"><span class="decision-summary-icon" aria-hidden="true">✓</span><div><p class="eyebrow">Your check-in summary</p><h2 id="decision-summary-title">No immediate warning reported</h2></div></div>
+      <p>Based on what you told us, the best next step is to <strong>${escapeHtml(summaryAction.toLowerCase())}</strong>.</p>
+      <div class="decision-summary-facts"><span><strong>Checked</strong>${escapeHtml(state.appliance.category)}</span><span><strong>Result</strong>No serious warning signs reported</span><span><strong>Important</strong>Not a safety certification</span></div>
+    </section>
     ${subtleRecallStatus()}
     <div class="result-grid">
       ${resultActionCard("repair", "🔧", "Repair it", "See repair history for similar appliances and find repair options near you.", "Explore repair", featuredIntent === "repair")}

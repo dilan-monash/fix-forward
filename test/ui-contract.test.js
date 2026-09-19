@@ -42,6 +42,9 @@ test("UX02b adult photo detection routes through the existing safety check", () 
   assert.match(app, /confirm-photo-appliance/);
   assert.match(app, /Yes, continue to safety questions/);
   assert.match(app, /navigate\("check"\)/);
+  assert.match(app, /Your check-in summary/);
+  assert.match(app, /No immediate warning reported/);
+  assert.match(app, /Not a safety certification/);
   assert.doesNotMatch(backendApi, /appliance-detect/);
   assert.match(classifier, /tf\.loadLayersModel/);
   assert.match(classifier, /min_margin/);

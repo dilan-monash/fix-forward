@@ -280,6 +280,14 @@ input:focus, select:focus { border-color: var(--green-700); outline: 3px solid v
 .result-hero > div:first-child { max-width: 780px; }
 .result-hero h1 { margin: .35rem 0 .65rem; font-size: clamp(2.6rem, 5.5vw, 5.3rem); line-height: .97; letter-spacing: -.066em; }
 .result-hero p:not(.eyebrow) { color: var(--muted); line-height: 1.6; }
+.decision-summary { margin: 1rem 0 1.25rem; padding: 1.25rem 1.4rem; border: 1px solid #a9d8c1; border-radius: 22px; background: linear-gradient(135deg, #f0fbf5, #fff); box-shadow: var(--shadow-card); }
+.decision-summary-heading { display: flex; align-items: center; gap: .75rem; }
+.decision-summary-heading h2 { margin: .18rem 0 0; font-size: clamp(1.35rem, 3vw, 1.8rem); letter-spacing: -.035em; }
+.decision-summary-icon { display: grid; place-items: center; width: 2.45rem; height: 2.45rem; flex: 0 0 auto; border-radius: 50%; background: var(--green-700); color: white; font-weight: 800; }
+.decision-summary > p { margin: .85rem 0 0; color: #38534a; line-height: 1.55; }
+.decision-summary-facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem; margin-top: 1rem; }
+.decision-summary-facts span { display: grid; gap: .2rem; padding: .7rem .8rem; border-radius: 13px; background: rgba(255,255,255,.8); color: var(--muted); font-size: .82rem; line-height: 1.35; }
+.decision-summary-facts strong { color: var(--ink); font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; }
 .appliance-pill { flex: 0 0 260px; display: flex; gap: .75rem; align-items: center; padding: .85rem 1rem; border: 1px solid var(--line); border-radius: 18px; background: white; box-shadow: var(--shadow-card); }
 .appliance-pill > span { display: grid; place-items: center; width: 2.6rem; height: 2.6rem; border-radius: 50%; background: var(--green-900); color: white; font-size: 1.2rem; }
 .appliance-pill small, .appliance-pill strong, .appliance-pill em { display: block; }
@@ -479,6 +487,7 @@ dialog::backdrop { background: rgba(6,39,34,.7); backdrop-filter: blur(3px); }
   .hero-copy-simple h1 { font-size: clamp(2rem, 8vw, 2.75rem); }
   .floating-chip { min-width: 100px; font-size: .74rem; }
   .goal-grid, .family-grid, .category-grid, .form-grid, .result-grid, .mini-check-grid, .comparison-card { grid-template-columns: 1fr; }
+  .decision-summary-facts { grid-template-columns: 1fr; }
   .result-grid .result-action:last-child { grid-column: auto; }
   .goal-card { min-height: 245px; }
   .goal-card h2 { margin-top: 1.8rem; }
