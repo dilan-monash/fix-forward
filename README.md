@@ -262,6 +262,14 @@ python data/scripts/build_price_catalogue.py
 Copy-Item .env.example .env
 ```
 
+Adult photo detection uses the browser-only TensorFlow.js model in
+`model/appliance-classifier/`. The browser validates and resizes the image,
+loads the allowlisted model assets, and keeps the photo out of Flask entirely.
+The model is optional at runtime: if it cannot load, the adult site keeps the
+manual appliance picker available. To replace it, run the v2 training notebook,
+copy its `web_model/` files into that directory, and run the model verification
+script from the supplied photo-feature package before publishing.
+
 Open the new private, Git-ignored `.env`. Put the team member's own SELECT-only Neon URL after `DATABASE_URL=`, set `PRICE_CATALOGUE_STORAGE=postgres`, set `SITE_PASSWORD`, generate a random `SECRET_KEY` of at least 32 characters, and set `SESSION_COOKIE_SECURE=false` only for local HTTP. The URL must target the branch where migrations `003`/`004` and import `005` were applied. Existing shell or hosting variables take precedence. Never put real credentials in frontend code, Git, documentation, screenshots or chat. See [website access setup](docs/WEBSITE_ACCESS.md) and [Iteration 2 catalogue handover](docs/ITERATION2_COST_CATALOGUE.md).
 
 ```powershell

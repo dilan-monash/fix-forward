@@ -33,6 +33,11 @@ import { PRICE_SNAPSHOT } from "./price-snapshot.js";
 import { automaticCostContext, loadPriceCatalogue, matchPriceExamples, problemQuestions } from "./price-catalogue.js";
 import { productSuggestions } from "./product-suggestions.js";
 import { createLearningState, transitionLearning, renderLearning } from "./learning.js";
+import {
+  classifyAppliancePhoto,
+  friendlyRecognitionError,
+  validatePhotoFile,
+} from "./appliance-classifier.js?v=browser-model-1";
 
 const app = document.querySelector("#app");
 const main = document.querySelector("#main");
@@ -87,7 +92,8 @@ const emptyState = () => ({
   problemContext: null,
   feeExamplesOpen: false,
   fromRepairHub: false,
-  touched: false
+  touched: false,
+  photoDetection: null
 });
 let state = emptyState();
 
@@ -392,6 +398,18 @@ function renderIdentify() {
     ${renderBack("Back to choices")}
     <div class="step-heading friendly-heading"><p class="eyebrow">${heading.eyebrow}</p><h1>${heading.title}</h1><p>${heading.copy}</p></div>
 
+    <section class="photo-detect-card" aria-labelledby="photo-detect-title">
+      <div><p class="eyebrow">Photo helper</p><h2 id="photo-detect-title">Identify it from a photo</h2><p>Upload a clear photo and we will suggest a match. You will always get a chance to confirm it before the safety questions.</p><details class="photo-scope"><summary>What can it recognise?</summary><p>It currently recognises six groups: <strong>everyday cooking</strong> (kettles, toasters, sandwich presses, rice cookers), <strong>blending and mixing</strong> (blenders, mixers, food processors), <strong>coffee, air fryers and microwaves</strong>, <strong>cleaning</strong> (vacuum and steam cleaners), <strong>personal care</strong> (hair dryers, shavers, straighteners), and <strong>heating and cooling</strong> (fans, portable heaters, dehumidifiers, portable air conditioners).</p></details></div>
+      <div class="photo-detect-actions"><label class="photo-dropzone" for="appliance-photo" tabindex="0"><span class="button secondary">Choose photo</span><span>or drag a photo here</span></label><input id="appliance-photo" type="file" accept="image/jpeg,image/png,image/webp" hidden><span id="photo-detect-status" role="status" aria-live="polite">JPG, PNG or WEBP · max 10 MB</span></div>
+    </section>
+    ${state.photoDetection ? `<section class="photo-confirm-card" aria-labelledby="photo-confirm-title">
+      <p class="eyebrow">Please confirm</p>
+      <h2 id="photo-confirm-title">${state.photoDetection.accepted ? "Your photo looks like" : "We think this may be"} ${/^air fryer/i.test(state.photoDetection.category) ? "an" : "a"} ${escapeHtml(state.photoDetection.category)}.</h2>
+      <p>We are ${Math.round(state.photoDetection.confidence * 100)}% confident. ${state.photoDetection.accepted ? "Please check the suggestion before continuing." : "The leading match is not clear enough for us to choose automatically, so compare these suggestions carefully."} A photo can be unclear or show more than one appliance.</p>
+      ${state.photoDetection.alternatives?.length > 1 ? `<div class="photo-alternatives"><strong>Other possible matches:</strong> ${state.photoDetection.alternatives.slice(1).map((item) => `<button class="link-button" type="button" data-photo-choice="${escapeAttr(item.category)}">${escapeHtml(item.category)} (${Math.round(item.score * 100)}%)</button>`).join(" ")}</div>` : ""}
+      <div class="photo-confirm-actions"><button class="button primary" id="confirm-photo-appliance" type="button">Yes, continue to safety questions ${icon("arrow")}</button><button class="button secondary" id="reject-photo-appliance" type="button">No, choose manually</button></div>
+    </section>` : ""}
+
     <div class="identify-layout">
       <section>
         <h2 class="form-section-title">1. Choose a group</h2>
@@ -416,6 +434,85 @@ function renderIdentify() {
   </section>`;
 
   bindBack();
+  const photoInput = app.querySelector("#appliance-photo");
+  const photoDropzone = app.querySelector(".photo-dropzone");
+  const processPhoto = async (file) => {
+    const status = app.querySelector("#photo-detect-status");
+    if (!file) return;
+    const validation = validatePhotoFile(file);
+    if (!validation.ok) {
+      status.textContent = validation.error;
+      return;
+    }
+    status.textContent = "Preparing your photo on this device…";
+    photoDropzone?.classList.add("is-processing");
+    await new Promise((resolve) => setTimeout(resolve, 250));
+    status.textContent = "Looking for the appliance on this device…";
+    try {
+      const payload = await classifyAppliancePhoto(file);
+      const confidence = Number(payload.confidence);
+      const suggestions = payload.alternatives || [];
+      const match = families().flatMap((family) => family.categories.map((category) => ({ family, category })))
+        .find((item) => item.category === suggestions[0]?.category);
+      if (!match) throw new Error("Choose the appliance manually.");
+      state.photoDetection = {
+        ...payload,
+        category: suggestions[0].category,
+        family: match.family.id,
+      };
+      status.textContent = payload.accepted
+        ? "Suggestion ready — please confirm it below."
+        : "We found possible matches — please choose the right one below.";
+      renderIdentify();
+      focusElement("#confirm-photo-appliance");
+    } catch (error) {
+      status.textContent = friendlyRecognitionError(error);
+    } finally {
+      if (photoInput) photoInput.value = "";
+      photoDropzone?.classList.remove("is-processing");
+    }
+  };
+  photoInput?.addEventListener("change", (event) => processPhoto(event.target.files?.[0]));
+  photoDropzone?.addEventListener("dragover", (event) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "copy";
+    photoDropzone.classList.add("drag-over");
+  });
+  app.querySelector("#confirm-photo-appliance")?.addEventListener("click", () => {
+    const detection = state.photoDetection;
+    if (!detection) return;
+    state.appliance = { family: detection.family, category: detection.category, categoryCode: CATEGORY_CODE_BY_NAME[detection.category] || "", brand: "", model: "" };
+    state.photoDetection = null;
+    state.safety = {};
+    state.safetyOptOut = false;
+    navigate("check");
+  });
+  app.querySelector("#reject-photo-appliance")?.addEventListener("click", () => {
+    state.photoDetection = null;
+    renderIdentify();
+    focusElement("[data-family]");
+  });
+  app.querySelectorAll("[data-photo-choice]").forEach((button) => button.addEventListener("click", () => {
+    const category = button.dataset.photoChoice;
+    const match = families().flatMap((family) => family.categories.map((item) => ({ family, category: item })))
+      .find((item) => item.category === category);
+    if (!match) return;
+    state.photoDetection = { ...state.photoDetection, category, family: match.family.id, accepted: false };
+    renderIdentify();
+    focusElement("#confirm-photo-appliance");
+  }));
+  photoDropzone?.addEventListener("dragleave", () => photoDropzone.classList.remove("drag-over"));
+  photoDropzone?.addEventListener("drop", (event) => {
+    event.preventDefault();
+    photoDropzone.classList.remove("drag-over");
+    processPhoto(event.dataTransfer.files?.[0]);
+  });
+  photoDropzone?.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      photoInput?.click();
+    }
+  });
   app.querySelectorAll('[name="brand"], [name="model"]').forEach((input) => input.addEventListener("input", (event) => {
     state.appliance[event.target.name] = event.target.value;
     if (state.selectedPrice) { state.costs.replacement = ""; state.selectedPrice = null; }
@@ -429,6 +526,7 @@ function renderIdentify() {
   app.querySelectorAll("[data-family]").forEach((button) => button.addEventListener("click", () => {
     // A different appliance cannot inherit a previous appliance's warnings, quote or search centre.
     state.appliance = { family: button.dataset.family, category: "", categoryCode: "", brand: "", model: "" };
+    state.photoDetection = null;
     state.safety = {};
     state.recall = null;
     state.safetyResult = null;
@@ -454,6 +552,7 @@ function renderIdentify() {
     // Clear dependent results even within one family: questions and product evidence may differ.
     state.appliance.category = button.dataset.category;
     state.appliance.categoryCode = CATEGORY_CODE_BY_NAME[button.dataset.category] || "";
+    state.photoDetection = null;
     state.safety = {};
     state.recall = null;
     state.safetyResult = null;
@@ -904,9 +1003,15 @@ function renderResults() {
   }
 
   const featuredIntent = state.intent === "guide" ? "repair" : state.intent;
+  const summaryAction = featuredIntent === "repair" ? "Explore repair options" : featuredIntent === "compare" ? "Compare repair and replacement costs" : featuredIntent === "recycle" ? "Find recycling options" : "Choose a next step below";
   app.innerHTML = `<section class="screen result-screen options-screen">
     ${renderBack("Back to safety questions")}
     <div class="result-hero"><div><p class="eyebrow">Your options</p><h1>Here are the next steps for your ${escapeHtml(state.appliance.category.toLowerCase())}.</h1><p>You did not report one of the serious warning signs in our quick check. <strong>This is not a guarantee that the appliance is safe.</strong> Choose what you want to do next.</p></div><div class="appliance-pill"><span>↻</span><div><small>Your appliance</small><strong>${escapeHtml([state.appliance.brand, state.appliance.model].filter(Boolean).join(" ") || state.appliance.category)}</strong><em>${escapeHtml(state.appliance.category)}</em></div></div></div>
+    <section class="decision-summary" aria-labelledby="decision-summary-title">
+      <div class="decision-summary-heading"><span class="decision-summary-icon" aria-hidden="true">✓</span><div><p class="eyebrow">Your check-in summary</p><h2 id="decision-summary-title">No immediate warning reported</h2></div></div>
+      <p>Based on what you told us, the best next step is to <strong>${escapeHtml(summaryAction.toLowerCase())}</strong>.</p>
+      <div class="decision-summary-facts"><span><strong>Checked</strong>${escapeHtml(state.appliance.category)}</span><span><strong>Result</strong>No serious warning signs reported</span><span><strong>Important</strong>Not a safety certification</span></div>
+    </section>
     ${subtleRecallStatus()}
     <div class="result-grid">
       ${resultActionCard("repair", "🔧", "Repair it", "See repair history for similar appliances and find repair options near you.", "Explore repair", featuredIntent === "repair")}

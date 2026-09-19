@@ -1,0 +1,38 @@
+{
+  "model_name": "fixforward-appliance-efficientnet-b0",
+  "input_shape": [
+    224,
+    224,
+    3
+  ],
+  "class_order": [
+    "air_fryer",
+    "blender",
+    "coffee_machine",
+    "dehumidifier",
+    "fan",
+    "food_processor",
+    "hair_dryer",
+    "kettle",
+    "microwave",
+    "mixer",
+    "portable_ac",
+    "portable_heater",
+    "rice_cooker",
+    "sandwich_press",
+    "shaver",
+    "steam_cleaner",
+    "straightener",
+    "toaster",
+    "vaccum_cleaner"
+  ],
+  "metrics": {
+    "test_top1_accuracy": 0.8632,
+    "test_top3_accuracy": 0.9895,
+    "calibration": {
+      "min_confidence": 0.72,
+      "min_margin": 0.12
+    }
+  },
+  "photo_processing": "browser-local"
+}

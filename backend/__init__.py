@@ -84,6 +84,13 @@ def create_app(test_config=None):
                            "quest/family-guide.css", "quest/story-audio.js", "quest/audio/story-manifest.js",
                            "quest/audio/KOKORO-LICENSE.txt"}
         ) or (
+            # Browser inference assets are explicitly allowlisted; arbitrary model
+            # files must never become downloadable through the frontend route.
+            re.fullmatch(
+                r"model/appliance-classifier/(?:model\.json|labels\.json|model_manifest\.json|group\d+-shard\d+of\d+\.bin)",
+                asset_path,
+            ) is not None
+        ) or (
             # Only generated, content-addressed story audio is public, not arbitrary files.
             re.fullmatch(r"quest/audio/[a-f0-9]{16}\.mp3", asset_path) is not None
         )
@@ -98,7 +105,10 @@ def create_app(test_config=None):
         # Leaflet 1.9.4 is loaded only on the map screen and pinned with Subresource Integrity; all other scripts are local.
         response.headers["Content-Security-Policy"] = (
             "default-src 'self'; "
-            "script-src 'self' https://unpkg.com; "
+            # TensorFlow.js uses a generated kernel function for its CPU backend.
+            # Keep eval permission scoped to scripts; image bytes still have no
+            # network path because connect-src remains same-origin.
+            "script-src 'self' https://unpkg.com 'unsafe-eval'; "
             "style-src 'self' 'unsafe-inline' https://unpkg.com; "
             "img-src 'self' data: https://tile.openstreetmap.org https://unpkg.com; "
             "connect-src 'self'; object-src 'none'; "
