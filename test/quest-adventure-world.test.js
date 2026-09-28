@@ -34,7 +34,6 @@ test('earned chapters replay their story and count guided and independent comple
   assert.equal(dom.querySelectorAll('.is-earned').length, 2);
   assert.equal(dom.querySelector('.is-suggested'), null);
   assert.equal(dom.querySelector('meter').value, 2);
-  assert.match(dom.querySelector('.is-earned [data-mission]').textContent, /Replay story/);
   assert.match(dom.querySelector('.is-earned [data-mission]').getAttribute('aria-label'), /Replay/);
   assert.deepEqual(completed, before, 'rendering never changes progress');
 });
@@ -45,7 +44,7 @@ test('all collected stamps celebrate completion and still replay every story', (
   assert.equal(dom.querySelectorAll('[data-postcard]').length, 0);
   assert.equal(dom.querySelectorAll('[data-mission]').length, MISSIONS.length);
   assert.equal(dom.querySelector('meter').value, MISSIONS.length);
-  assert.match(dom.querySelector('h2').textContent, /Look how far/);
+  assert.match(dom.querySelector('.q-adventure-progress').textContent, new RegExp(`${MISSIONS.length} / ${MISSIONS.length}`));
   assert.equal(dom.querySelectorAll('.q-island-earned-star').length, MISSIONS.length);
 });
 

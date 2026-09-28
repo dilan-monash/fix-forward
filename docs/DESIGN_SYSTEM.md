@@ -42,3 +42,14 @@ These were deliberate choices for accessibility, safety or existing research fin
 ## Migration notes
 
 A first pass shifted Quest's warm paper, teal and navy colours, and the adult guide's hard-coded navy colours, into the green-neutral family. Each replacement kept the original colour's WCAG luminance, so existing text and background contrast ratios were preserved. Warning, retry, recall and danger rules kept their original warm and red colours. Component rules were then rewritten by hand to use tokens.
+
+## Quest child screens carry only what is needed to play
+
+Each child screen shows the task and the controls for it, nothing else:
+
+- **Home:** "Pick a story", the story map (islands with titles and a stamp count), a Sorting game button, and Continue when a story is in progress.
+- **Story:** back link, title, the story sentence, the character's line, the picture, and one next action. The plan step shows one question and one status line that says what to tap.
+- **Ending:** the stamp with what was learned, the picture question, and Next story / Play again. Postcards and decorations stay in My creations, reached from the Discovery Book.
+- **Sorting:** back link, one question, the round dots, the picture with its clues, and the three places.
+
+Slogans, repeated instructions, points previews, step trackers, scene captions and duplicate buttons were removed. Read to me, Sound and Settings live only in the top bar. Explanations for adults belong in the parent guide, not on child screens.

@@ -2,7 +2,7 @@
  * styling is scoped to this component; the approved hero and parent guide keep
  * their layout. SVGs are shared with the stories, without extra image requests. */
 .q-adventure-trail { grid-column:1/-1; min-width:0; margin:1.5rem 0 .5rem; padding:1.5rem clamp(.75rem,2vw,1.5rem); border:1px solid #c7dcd0; border-radius:30px; background:linear-gradient(160deg,#e6f2eb,#e8f5ed 67%,#e5edf5); }
-.q-adventure-heading { display:flex; align-items:center; justify-content:space-between; gap:1rem; position:relative; z-index:1; }
+.q-adventure-heading { display:flex; align-items:center; justify-content:flex-end; gap:1rem; position:relative; z-index:1; }
 .q-adventure-heading h2 { max-width:680px; margin:.3rem 0 .5rem; font-size:clamp(1.5rem,2.5vw,2.2rem); line-height:1.15; }
 .q-adventure-heading p { margin:0; }
 .q-adventure-kicker { color:#247b4d; font-weight:800; }

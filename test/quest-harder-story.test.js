@@ -59,8 +59,7 @@ test('the trickier chapter is optional and immediately playable without a score 
   const button = dom.querySelector(`[data-mission="${story.id}"]`);
   assert.ok(button);
   assert.equal(button.disabled, false);
-  assert.match(button.textContent, /Trickier story/);
-  assert.match(dom.querySelector('h2').textContent, /9 big stories/);
+  assert.match(button.textContent, /Trickier/);
   assert.match(passportStamp(story.id), /THINK IT THROUGH/);
 });
 
