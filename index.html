@@ -12,12 +12,14 @@
   <!-- Page summary for tools that read metadata; the visible introduction is rendered by app.js. -->
   <meta name="description" content="FixForward helps Melbourne households decide what to do with a faulty household appliance: check important safety concerns, explore repair, compare costs and find recycling options.">
   <!-- Suggest a browser-interface colour on browsers that support theme-color. -->
-  <meta name="theme-color" content="#061f57">
+  <meta name="theme-color" content="#ffffff">
   <!-- Initial tab title; app.js updates it when the visitor changes screens. -->
   <title>Home | FixForward</title>
   <!-- The small icon shown beside the browser tab title comes from this local SVG file. -->
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" sizes="any">
   <!-- CSS controls colours, spacing and responsive layouts; it does not make appliance decisions. -->
+  <!-- brand.css holds the design system shared with Quest, so it loads before the adult styles. -->
+  <link rel="stylesheet" href="/brand.css">
   <link rel="stylesheet" href="styles.css">
   <!-- TensorFlow.js runs the adult photo classifier locally; the photo is not uploaded. -->
   <script defer src="https://unpkg.com/@tensorflow/tfjs@4.22.0/dist/tf.min.js" crossorigin="anonymous"></script>
@@ -32,10 +34,11 @@
   <div class="site-chrome">
   <header class="site-header">
     <!-- id connects this button to the home handler; aria-label supplies its accessible name. -->
-    <button class="brand" id="home-button" type="button" aria-label="Go to FixForward home">
+    <!-- ff-brand is the shared FixForward identity from brand.css; Quest's header uses the same mark and wordmark. -->
+    <button class="brand ff-brand" id="home-button" type="button" aria-label="Go to FixForward home">
       <!-- Decorative artwork is hidden from screen readers because the button already has a name. -->
-      <span class="brand-mark" aria-hidden="true"></span>
-      <span><strong>FixForward</strong><small>Know your options</small></span>
+      <img class="ff-brand-mark" src="/favicon.svg" alt="" width="42" height="42">
+      <span class="ff-brand-name"><strong>FixForward</strong><small>Know your options</small></span>
     </button>
     <nav class="header-actions" aria-label="Main navigation">
       <!-- Open Quest in another tab so this tab's in-memory adult answers remain available. -->

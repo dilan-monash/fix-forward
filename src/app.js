@@ -1216,11 +1216,11 @@ async function renderMap(result) {
   if (state.userLocation) {
     const point = [state.userLocation.latitude, state.userLocation.longitude];
     bounds.push(point);
-    globalThis.L.circleMarker(point, { radius: 9, weight: 3, color: "#061f57", fillColor: "#ffffff", fillOpacity: 1 }).addTo(mapInstance).bindPopup("Your approximate location");
+    globalThis.L.circleMarker(point, { radius: 9, weight: 3, color: "#17352d", fillColor: "#ffffff", fillOpacity: 1 }).addTo(mapInstance).bindPopup("Your approximate location");
   } else if (state.areaSelection) {
     const point = [state.areaSelection.latitude, state.areaSelection.longitude];
     bounds.push(point);
-    globalThis.L.circleMarker(point, { radius: 8, weight: 3, color: "#061f57", fillColor: "#ffffff", fillOpacity: 1 }).addTo(mapInstance).bindPopup(`Selected area: ${escapeHtml(state.areaSelection.label)}`);
+    globalThis.L.circleMarker(point, { radius: 8, weight: 3, color: "#17352d", fillColor: "#ffffff", fillOpacity: 1 }).addTo(mapInstance).bindPopup(`Selected area: ${escapeHtml(state.areaSelection.label)}`);
   }
 
   mappable.forEach(({ item, resultIndex }) => {

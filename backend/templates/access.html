@@ -6,17 +6,19 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
-  <meta name="theme-color" content="#061f57">
+  <meta name="theme-color" content="#ffffff">
   <title>{% if mode == 'logout' %}Lock website{% elif mode == 'unavailable' %}Website unavailable{% else %}Enter website{% endif %} | FixForward</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" sizes="any">
+  <!-- brand.css and its fonts are public presentation files, so the gate matches both applications before sign-in. -->
+  <link rel="stylesheet" href="/brand.css">
   <link rel="stylesheet" href="{{ url_for('access.stylesheet') }}">
   {% if mode == 'login' %}<script src="{{ url_for('access.script') }}" defer></script>{% endif %}
 </head>
 <body>
   <main aria-labelledby="access-title">
-    <div class="brand">
-      <img src="/favicon.svg" alt="" width="52" height="52">
-      <span><strong>FixForward</strong><small>Know your options</small></span>
+    <div class="brand ff-brand">
+      <img class="ff-brand-mark" src="/favicon.svg" alt="" width="52" height="52">
+      <span class="ff-brand-name"><strong>FixForward</strong><small>Know your options</small></span>
     </div>
     <!-- An unavailable gate has no login form: configuration failure must not open the protected site. -->
     {% if mode == 'unavailable' %}

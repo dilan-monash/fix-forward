@@ -1,7 +1,7 @@
 /* A compact, optional practice strip. It cannot receive a drag or cover a real
    answer. Warm paper/box art demonstrates the gesture; the words stay still. */
 .q-sort-demo { width: 100%; max-width: 28rem; margin-inline: auto; pointer-events: none; }
-.q-sort-demo__words { margin: 0; color: #112858; font-size: 1rem; line-height: 1.4; text-align: center; }
+.q-sort-demo__words { margin: 0; color: #113024; font-size: 1rem; line-height: 1.4; text-align: center; }
 .q-sort-demo__stage { display: block; width: 100%; max-height: 110px; overflow: visible; }
 .q-sort-demo__paper, .q-sort-demo__touch, .q-sort-demo__check { transform-box: fill-box; transform-origin: center; }
 /* WAAPI reveals these only during the actual example. Without animation APIs
@@ -18,7 +18,7 @@
 .q-sort-practice:not([hidden]) {
   position:absolute; inset:0; z-index:3; display:flex;
   flex-direction:column; justify-content:center; align-items:center;
-  gap:6px; padding:8px; border-radius:inherit; background:#fffaf0;
+  gap:6px; padding:8px; border-radius:inherit; background:#f3fcf7;
   pointer-events:none; overflow:auto;
 }
 .q-sort-practice [data-sort-demo-stage] { width:100%; min-width:0; }

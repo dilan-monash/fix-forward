@@ -2,40 +2,42 @@
    progress; this file supplies the game frame, response and reward presentation. */
 :root { --q-chrome-height:145px; }
 html { scroll-padding-top:calc(var(--q-chrome-height) + 16px); }
-body.quest { background:radial-gradient(ellipse at 10% 0,#d7ece9 0,transparent 52%),radial-gradient(ellipse at 100% 40%,#f9e5b9 0,transparent 55%),#fff9ed; }
-body.quest[data-quest-view=grownups] { background:radial-gradient(ellipse at 85% 0,#f7efd9,transparent 60%),#fffaf0; }
+/* White pages with the shared meadow glow; the adult guide uses the same background. */
+body.quest { background:radial-gradient(ellipse at 92% 0,rgba(168,235,91,.16),transparent 45%),radial-gradient(ellipse at 0 60%,rgba(143,200,255,.1),transparent 50%),#fff; }
+body.quest[data-quest-view=grownups] { background:radial-gradient(ellipse at 92% 0,rgba(168,235,91,.16),transparent 50%),#fff; }
 
 /* The whole chrome stays at the top. Scores never scroll out of the game. */
-.q-game-chrome { position:sticky; top:0; z-index:80; padding-bottom:.4rem; background:#fffaf0f5; backdrop-filter:blur(12px); box-shadow:0 3px 16px #193b4f12; }
+.q-game-chrome { position:sticky; top:0; z-index:80; padding-bottom:.4rem; background:rgba(255,255,255,.95); backdrop-filter:blur(12px); border-bottom:1px solid var(--ff-border-header); }
 .q-game-chrome .q-header { max-width:1280px; min-height:58px; padding:.3rem 1.3rem; }
-.q-game-chrome .q-brand-symbol { width:35px; height:35px; border-radius:12px 12px 12px 4px; font-size:1.7rem; }
+.q-game-chrome .ff-brand-mark { width:2.3rem; height:2.3rem; border-radius:12px; }
 .q-game-chrome .q-header nav button { min-height:44px; }
-.q-game-chrome .q-player-strip { width:min(1220px,calc(100% - 2rem)); min-height:77px; margin:0 auto; padding:.35rem .75rem .35rem .35rem; border:2px solid #315e70; border-radius:23px; gap:.9rem; background:linear-gradient(115deg,#20485e,#163d4b); color:#fff7da; box-shadow:0 4px 0 #102f40, inset 0 1px 0 #ffffff36; }
-.q-game-chrome .q-level-chip { min-height:58px; color:#fff7da; }
-.q-game-chrome .q-level-chip small { color:#bcdedb; }
-.q-game-chrome .q-level-chip strong { color:#fff7da; }
+/* The score card is a light, rounded panel in the shared system; rewards stay gold. */
+.q-game-chrome .q-player-strip { width:min(1220px,calc(100% - 2rem)); min-height:77px; margin:0 auto; padding:.35rem .75rem .35rem .35rem; border:1.5px solid var(--ff-mint-border); border-radius:var(--ff-radius-feature); gap:.9rem; background:linear-gradient(180deg,#fff,var(--ff-mint-bg)); color:var(--ink); box-shadow:var(--ff-shadow-card); }
+.q-game-chrome .q-level-chip { min-height:58px; color:var(--ink); }
+.q-game-chrome .q-level-chip small { color:var(--ff-accent); }
+.q-game-chrome .q-level-chip strong { color:var(--ink); }
 .q-game-chrome .q-level-chip>span:first-child { width:58px; flex-basis:58px; }
 .q-game-chrome .q-level-chip svg { height:60px; }
 .q-game-chrome .q-spark-meter { max-width:none; min-width:100px; flex:1; }
-.q-game-chrome .q-spark-meter small { color:#c8e2df; }
-.q-game-chrome .q-spark-meter b { display:inline-flex; align-items:center; gap:.3rem; font-size:1.16rem; font-variant-numeric:tabular-nums; color:#fff7da; transform-origin:center; }
-.q-game-chrome .q-spark-meter b>span:first-child { color:#ffd568; font-size:1.6rem; text-shadow:0 0 12px #ffcc6a70; }
+.q-game-chrome .q-spark-meter small { color:var(--ff-body); }
+.q-game-chrome .q-spark-meter b { display:inline-flex; align-items:center; gap:.3rem; font-size:1.16rem; font-variant-numeric:tabular-nums; color:var(--ink); transform-origin:center; }
+.q-game-chrome .q-spark-meter b>span:first-child { color:#f5a623; font-size:1.6rem; text-shadow:0 0 10px rgba(245,166,35,.35); }
 .q-game-chrome [data-spark-value] { min-width:1.7ch; text-align:right; }
-.q-game-chrome .q-spark-track { height:13px; border:1px solid #638591; border-radius:9px; background:#0b2938; box-shadow:inset 0 2px 3px #0003; }
-.q-game-chrome .q-spark-track>span { background:linear-gradient(180deg,#fff4b0,#f4b82f); border:1px solid #ffdc74; box-shadow:0 0 10px #ffc75d80; }
+.q-game-chrome .q-spark-track { height:13px; border:1px solid var(--ff-border-strong); border-radius:var(--ff-radius-pill); background:var(--ff-neutral-fill); box-shadow:inset 0 2px 3px rgba(23,53,45,.08); }
+.q-game-chrome .q-spark-track>span { border-radius:var(--ff-radius-pill); background:linear-gradient(180deg,#ffd873,#f5a623); border:1px solid #f5c65a; box-shadow:0 0 8px rgba(245,166,35,.4); }
 .q-hud-tools { display:flex; align-items:center; gap:.45rem; }
 /* Sound, reading and play settings stay in reach while the child is playing. */
-.q-game-settings { display:grid; place-items:center; min-width:44px; min-height:48px; border:1px solid #7dadaf; border-radius:13px; background:#284f60; color:#fff7da; font-size:1.6rem; }
-.q-game-sound { display:flex; align-items:center; justify-content:center; gap:.35rem; min-height:48px; padding:.4rem .7rem; border:1px solid #7dadaf; border-radius:13px; background:#284f60; color:#fff7da; font-size:.78rem; font-weight:800; }
+.q-game-settings { display:grid; place-items:center; min-width:48px; min-height:48px; border:1.5px solid var(--ff-ghost-border); border-radius:var(--ff-radius-pill); background:#fff; color:var(--ff-ghost-text); font-size:1.5rem; }
+.q-game-sound { display:flex; align-items:center; justify-content:center; gap:.35rem; min-height:48px; padding:.4rem .85rem; border:1.5px solid var(--ff-ghost-border); border-radius:var(--ff-radius-pill); background:#fff; color:var(--ff-ghost-text); font-size:.8rem; font-weight:800; }
 .q-game-sound>span:first-child { font-size:1.45rem; }
-.q-game-sound[aria-pressed=true] { background:#c6e8d1; color:#174f43; border-color:#ddf4df; }
+.q-game-sound[aria-pressed=true] { background:var(--ff-mint-bg); color:var(--ff-mint-text); border-color:var(--ff-accent-bright); }
 /* Show the current round beside the score, including replay progress when a
    picture has already earned Sparks. Counts remain visible while the board scrolls. */
-.q-round-hud { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.15rem .7rem; width:min(1200px,calc(100% - 3rem)); min-height:27px; margin:.35rem auto 0; color:#254e50; font-size:.78rem; }
-.q-round-hud strong { color:#173f4b; }
-.q-game-chrome .q-hud-listen { min-height:48px; padding:.4rem .7rem; border-color:#f4dfa3; background:#fff5d6; color:#23445a; }
-.q-game-chrome button:focus-visible { outline-color:#e7a434; outline-offset:3px; }
-.q-sound-invite { display:inline-flex; align-items:center; flex-wrap:wrap; gap:.4rem .6rem; margin:.9rem 0 0; min-height:48px; padding:.55rem .85rem; border:1.5px solid #ad9871; border-radius:14px; background:#ffefbb; font-weight:800; color:#4a442e; box-shadow:0 3px 0 #d9c795; }
+.q-round-hud { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.15rem .7rem; width:min(1200px,calc(100% - 3rem)); min-height:27px; margin:.35rem auto 0; color:#255039; font-size:.78rem; }
+.q-round-hud strong { color:var(--ink); }
+.q-game-chrome .q-hud-listen { min-height:48px; padding:.4rem .85rem; border:1.5px solid var(--ff-sky-border); border-radius:var(--ff-radius-pill); background:var(--ff-sky-bg); color:var(--ink); }
+.q-game-chrome button:focus-visible { outline-color:var(--ff-focus); outline-offset:3px; }
+.q-sound-invite { display:inline-flex; align-items:center; flex-wrap:wrap; gap:.4rem .6rem; margin:.9rem 0 0; min-height:48px; padding:.55rem 1rem; border:1.5px solid var(--ff-caution-border); border-radius:var(--ff-radius-pill); background:var(--ff-caution-bg); font-weight:800; color:var(--ink); box-shadow:0 2px 6px rgba(23,53,45,.06); }
 .q-sound-invite>span { font-size:1.4rem; }
 .q-sound-invite small { font-size:.74rem; font-weight:400; }
 /* Play screens use compact stages and large touch choices, with details available
@@ -48,36 +50,36 @@ body.quest:not([data-quest-view=grownups]) #quest-main { min-height:calc(100dvh 
 .q-story-heading h1,.q-sort-heading h1 { margin:.35rem 0 .6rem; font-size:clamp(1.6rem,3vw,2.25rem); letter-spacing:-.025em; }
 .q-story-heading p:empty { display:none; }
 .q-story-heading>p:not(.q-eyebrow) { max-width:880px; margin:.4rem 0 .7rem; font-size:.97rem; }
-.q-guide-dialogue { margin:.7rem 0; padding:.55rem .75rem; border-radius:18px; min-height:0; box-shadow:0 3px 0 #bdcdb84d; }
+.q-guide-dialogue { margin:.7rem 0; padding:.55rem .75rem; border-radius:18px; min-height:0; box-shadow:0 3px 0 #bdccc34d; }
 .q-guide-portrait { width:62px; flex-basis:62px; }
 .q-guide-dialogue p { margin:.2rem 0; font-size:.98rem; }
-.q-mission-scene { border:3px solid #fffdf4; box-shadow:0 5px 0 #b7c9b9; }
+.q-mission-scene { border:3px solid #f8fefb; box-shadow:0 5px 0 #b7c9be; }
 .q-stage-plan>.q-mission-scene,.q-stage-feedback>.q-mission-scene { max-height:115px; min-height:0; }
-.q-fact-recap { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.5rem; margin:.7rem 0; padding:.45rem .65rem; background:#e6eee0; border-radius:13px; }
+.q-fact-recap { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.5rem; margin:.7rem 0; padding:.45rem .65rem; background:#e1efe6; border-radius:13px; }
 .q-fact-recap>div { display:flex; flex-wrap:wrap; gap:.4rem; }
-.q-fact-recap>div>span { padding:.3rem .5rem; border-radius:9px; color:#2c5c4e; background:#fffaf0; font-size:.78rem; }
+.q-fact-recap>div>span { padding:.3rem .5rem; border-radius:9px; color:#2c5c43; background:#f3fcf7; font-size:.78rem; }
 .q-fact-recap .q-button { min-height:44px; padding:.35rem .5rem; font-size:.82rem; }
 .q-plan-section .q-plan-instruction>h2 { margin:.35rem 0; font-size:1.45rem; }
 .q-plan-instruction .q-selection { margin:.3rem 0; }
-.q-action-tile { border-width:2px; border-radius:18px; box-shadow:0 5px 0 #bec6ba; }
-.q-action-tile.selected { background:#d1edc8; box-shadow:0 5px 0 #90b788,0 0 0 3px #eaf5c5; }
+.q-action-tile { border-width:2px; border-radius:18px; box-shadow:0 5px 0 #bcc5c0; }
+.q-action-tile.selected { background:#c8edd8; box-shadow:0 5px 0 #95b3a2,0 0 0 3px #e4f4eb; }
 .q-step-actions { margin:.75rem 0 .25rem; gap:.65rem; }
 .q-step-actions>.q-button.primary { min-height:52px; padding:.8rem 1.3rem; border-radius:17px; }
-.q-feedback { margin:.8rem 0; border-width:2px; box-shadow:0 5px 0 #d6cbb5; }
+.q-feedback { margin:.8rem 0; border-width:2px; box-shadow:0 5px 0 #b9d1c3; }
 .q-feedback h2 { font-size:1.35rem; }
-.q-feedback.correct { background:#e2f0cc; border-color:#9db987; box-shadow:0 5px 0 #b4c69e; }
+.q-feedback.correct { background:#d0f4df; border-color:#99b7a6; box-shadow:0 5px 0 #a9c7b5; }
 .q-feedback .q-button { min-height:52px; }
 .q-sort-heading>p { margin:.4rem 0 .65rem; }
-.q-sort-board { padding:.9rem; border:2px solid #aec5a7; border-radius:28px; box-shadow:0 7px 0 #bdcdae; }
+.q-sort-board { padding:.9rem; border:2px solid #adc3b6; border-radius:28px; box-shadow:0 7px 0 #b6cdc0; }
 .q-sort-object { margin:.7rem auto; min-height:128px; }
 .q-sort-art { flex-basis:110px; }
 .q-sort-object-copy h2 { font-size:1.2rem; }
 .q-sort-object-copy p { font-size:.94rem; }
 .q-destinations { gap:.8rem; }
-.q-destination { min-height:145px; border-width:2px; box-shadow:0 5px 0 #adbda2; border-radius:20px; }
+.q-destination { min-height:145px; border-width:2px; box-shadow:0 5px 0 #a8bdb1; border-radius:20px; }
 .q-destination-drawing { width:80px; margin:.2rem auto; }
 .q-destination strong { font-size:1rem; }
-.q-destination.q-accepted { box-shadow:0 5px 0 #88ad8a,0 0 0 4px #cae8a5; }
+.q-destination.q-accepted { box-shadow:0 5px 0 #8fab9a,0 0 0 4px #bfe8d0; }
 .q-drag-over { outline:4px solid #ffcb54!important; outline-offset:3px; box-shadow:0 0 0 8px #fff1b277!important; }
 .q-picture-facts { margin:.5rem 0!important; }
 .q-picture-fact { padding:.65rem!important; }
@@ -86,18 +88,18 @@ body.quest:not([data-quest-view=grownups]) #quest-main { min-height:calc(100dvh 
 /* Viewport rewards are decoration, not dialogs. They cannot block a touch,
    capture focus, trigger a scroll, or turn an animation into game progress. */
 .q-reward-fx { contain:layout paint; }
-.q-reward-fx__popup { display:grid; place-items:center; min-width:230px; max-width:calc(100vw - 3rem); padding:1rem 2rem .75rem; border:4px solid #fffdf3; border-radius:34px 34px 34px 11px; color:#1c4255; background:radial-gradient(ellipse at 50% 15%,#fff9d9,#ffd877); box-shadow:0 8px 0 #b58939,0 22px 65px #244b5d4d; text-align:center; }
+.q-reward-fx__popup { display:grid; place-items:center; min-width:230px; max-width:calc(100vw - 3rem); padding:1rem 2rem .75rem; border:4px solid #f7fffa; border-radius:34px 34px 34px 11px; color:#254438; background:radial-gradient(ellipse at 50% 15%,#ecfcf3,#ffd877); box-shadow:0 8px 0 #b58939,0 22px 65px #2e4d414d; text-align:center; }
 .q-reward-fx__label { font-size:1.03rem; font-weight:900; letter-spacing:.03em; }
 .q-reward-fx__amount { font-size:clamp(3.8rem,8vw,5.5rem); line-height:1.12; font-weight:900; text-shadow:0 3px 0 #fff4c9; }
-.q-reward-fx__popup::before,.q-reward-fx__popup::after { content:'✦'; position:absolute; font-size:2.8rem; color:#fff8ce; text-shadow:0 2px 0 #a87a36; }
+.q-reward-fx__popup::before,.q-reward-fx__popup::after { content:'✦'; position:absolute; font-size:2.8rem; color:#ebfbf2; text-shadow:0 2px 0 #a87a36; }
 .q-reward-fx__popup::before { left:-1.1rem; top:.35rem; rotate:-14deg; }
 .q-reward-fx__popup::after { right:-1rem; bottom:.1rem; rotate:18deg; }
 .q-reward-fx[data-level-up=true] .q-reward-fx__popup { background:radial-gradient(ellipse at 50% 10%,#f2f0ff,#c6b9f5); box-shadow:0 8px 0 #8a79b1,0 22px 65px #5143834d; }
-.q-reward-fx svg.q-reward-fx__star { width:32px; height:32px; color:#ffd14c; filter:drop-shadow(0 0 3px #fff9d9) drop-shadow(0 2px 1px #9f671f); }
+.q-reward-fx svg.q-reward-fx__star { width:32px; height:32px; color:#ffd14c; filter:drop-shadow(0 0 3px #ecfcf3) drop-shadow(0 2px 1px #9f671f); }
 .q-reward-fx svg.q-reward-fx__star:nth-of-type(3n) { width:37px; height:37px; color:#ffeaa1; }
-.q-reward-fx svg.q-reward-fx__glint { width:10px; height:10px; color:#fff8ce; filter:drop-shadow(0 0 4px #efa62e); }
+.q-reward-fx svg.q-reward-fx__glint { width:10px; height:10px; color:#ebfbf2; filter:drop-shadow(0 0 4px #efa62e); }
 .q-reward-fx__ring { border:5px solid #ffc954; border-radius:50%; box-shadow:0 0 0 7px #fff7ba88; }
-.q-game-feedback { position:fixed; left:50%; top:calc(var(--q-chrome-height) + 20px); z-index:120; display:flex; align-items:center; gap:.7rem; width:max-content; max-width:calc(100vw - 2rem); padding:.75rem 1.3rem; border:3px solid white; border-radius:22px; color:#214735; background:#d4edba; box-shadow:0 5px 0 #93b97c,0 14px 35px #224b5133; transform:translateX(-50%); pointer-events:none; }
+.q-game-feedback { position:fixed; left:50%; top:calc(var(--q-chrome-height) + 20px); z-index:120; display:flex; align-items:center; gap:.7rem; width:max-content; max-width:calc(100vw - 2rem); padding:.75rem 1.3rem; border:3px solid white; border-radius:22px; color:#27463a; background:#cdecda; box-shadow:0 5px 0 #97b5a4,0 14px 35px #1f4e3433; transform:translateX(-50%); pointer-events:none; }
 .q-game-feedback b { font-size:1.8rem; }
 .q-game-feedback strong { font-size:1.15rem; }
 .q-game-feedback--retry { color:#774633; background:#ffe8d0; box-shadow:0 5px 0 #d5a080,0 14px 35px #224b5133; }
@@ -112,7 +114,7 @@ body.quest:not([data-quest-view=grownups]) #quest-main { min-height:calc(100dvh 
 .q-parent-restored-goals svg { width:125px; height:125px; margin:0 0 1rem; }
 .q-parent-restored-goals h3 { font-size:1.25rem; line-height:1.4; }
 .q-parent-restored-goals p { font-size:1rem; line-height:1.8; }
-.q-parent-restored-join { display:grid; grid-template-columns:210px minmax(0,1fr); gap:3rem; align-items:center; padding:2rem 3rem; margin:2rem 0; background:#dcece1; border-radius:28px; }
+.q-parent-restored-join { display:grid; grid-template-columns:210px minmax(0,1fr); gap:3rem; align-items:center; padding:2rem 3rem; margin:2rem 0; background:#dcece2; border-radius:28px; }
 .q-parent-restored-companion svg { width:210px; height:230px; }
 .q-parent-restored-join-copy h2 { font-size:1.8rem; margin:.5rem 0 1rem; }
 .q-parent-restored-join-copy blockquote { margin:1rem 0; border-left:3px solid #d9b96d; padding:.3rem 0 .3rem 1rem; font-size:1.2rem; }

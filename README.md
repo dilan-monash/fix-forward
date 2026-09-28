@@ -2,6 +2,8 @@
 
 **Current code location:** Work on the adult website and animated Quest experience in this `iteration-2` checkout. In the existing workspace, that is `tmp/child-quest-prototype`; the outer folder is a separate older copy, and `tmp/github-update` is the Main checkout. In another clone, select the `iteration-2` branch and check the working tree before editing. Both `index.html` files and every authored JavaScript module contain comments directly beside the code. See the [agent working agreement](AGENTS.md) and [verified technology stack and source links](docs/TECH_STACK.md).
 
+**Shared design system:** The adult guide, Quest, the parent guide, the error pages and the password page share one visual system in `brand.css` (Baloo 2 and Nunito fonts, green-neutral ink, pill buttons, tinted status panels). See the [design system notes](docs/DESIGN_SYSTEM.md) before changing colours, fonts or button styles.
+
 ## Branches and websites
 
 | Website | GitHub branch | Website address | Role |

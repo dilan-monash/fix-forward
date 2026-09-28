@@ -3,14 +3,14 @@
  * Fixed-size art and transforms preserve the carefully fitted sorting layout. */
 .q-story-trail { gap:0; padding:.3rem .2rem; }
 .q-story-trail li { position:relative; flex-direction:row; align-items:center; gap:.5rem; border:0; padding:0 .5rem 0 0; }
-.q-story-trail li:not(:last-child)::after { content:""; height:0; border-top:2px dashed #b0ccbc; flex:1; min-width:6px; }
-.q-story-trail .q-stage-picture { position:relative; width:44px; height:44px; border:2px solid #ced9cc; background:#fffaf0; }
+.q-story-trail li:not(:last-child)::after { content:""; height:0; border-top:2px dashed #b0ccbb; flex:1; min-width:6px; }
+.q-story-trail .q-stage-picture { position:relative; width:44px; height:44px; border:2px solid #cfd9d3; background:#f3fcf7; }
 .q-story-trail .q-stage-picture>svg { display:block; width:40px; height:40px; padding:2px; }
-.q-stage-picture em { position:absolute; right:-5px; bottom:-3px; display:grid; place-items:center; width:18px; height:18px; border-radius:50%; background:#dceadd; color:#17385c; font:800 12px/1 sans-serif; }
-.q-story-trail li[aria-current] .q-stage-picture { border-color:#22796b; box-shadow:0 0 0 4px #f4c45d80; }
+.q-stage-picture em { position:absolute; right:-5px; bottom:-3px; display:grid; place-items:center; width:18px; height:18px; border-radius:50%; background:#dceae1; color:#1e3d31; font:800 12px/1 var(--ff-font-body); }
+.q-story-trail li[aria-current] .q-stage-picture { border-color:#247b4d; box-shadow:0 0 0 4px #f4c45d80; }
 .q-story-trail li[aria-current] .q-stage-picture>svg { animation:q-stage-arrive .45s ease-out both; }
-.q-story-trail .is-finished .q-stage-picture { background:#dceadd; border-color:#22796b; }
-.q-story-trail .is-finished em { background:#22796b; color:#fff; }
+.q-story-trail .is-finished .q-stage-picture { background:#dceae1; border-color:#247b4d; }
+.q-story-trail .is-finished em { background:#247b4d; color:#fff; }
 .q-story-trail b { font:inherit; font-weight:750; }
 
 /* A place leans forward when a finger carries an item over it. All three places

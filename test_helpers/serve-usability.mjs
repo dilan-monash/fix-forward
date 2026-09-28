@@ -127,7 +127,7 @@ const server = http.createServer(async (request, response) => {
   }
   if (route === "/test-fixture-info") {
     send(request, response, 200,
-      `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${marker}</title><link rel="stylesheet" href="/styles.css"><body class="error-page"><main><p class="eyebrow">TEST ONLY</p><h1>${marker}</h1><p>These locations, repair counts and recall are invented solely to test the interface. No database is connected. No records are saved.</p><p>Recall test: select Kettle, brand Test Brand, model FF-TEST-42. Search Richmond or 3121 to display synthetic service results.</p><a class="button primary" href="/">Return to test app</a></main></body></html>`,
+      `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${marker}</title><link rel="stylesheet" href="/brand.css"><link rel="stylesheet" href="/styles.css"><body class="error-page"><main><p class="eyebrow">TEST ONLY</p><h1>${marker}</h1><p>These locations, repair counts and recall are invented solely to test the interface. No database is connected. No records are saved.</p><p>Recall test: select Kettle, brand Test Brand, model FF-TEST-42. Search Richmond or 3121 to display synthetic service results.</p><a class="button primary" href="/">Return to test app</a></main></body></html>`,
       "text/html; charset=utf-8");
     return;
   }
@@ -135,16 +135,17 @@ const server = http.createServer(async (request, response) => {
   // An explicit frontend allowlist prevents accidentally exposing credentials,
   // backend files, local reports, fixtures or any file outside this workspace.
   // Keep browser review aligned with Flask's explicitly served local styles.
-  const permitted = route === "/" || ["/index.html", "/styles.css", "/404.html", "/500.html", "/favicon.svg", "/quest", "/quest/", "/quest/index.html", "/quest/quest.css", "/quest/play-effects.css", "/quest/tablet-play.css", "/quest/game-feel.css", "/quest/clue-play.css", "/quest/family-guide.css", "/quest/visual-play.css", "/quest/word-help.css", "/quest/touch-fx.css", "/quest/scene-play.css", "/quest/adventure-world.css", "/quest/sort-demo.css", "/quest/learning-focus.css", "/quest/audio/story-manifest.js", "/quest/audio/KOKORO-LICENSE.txt"].includes(route)
+  const permitted = route === "/" || ["/index.html", "/styles.css", "/brand.css", "/fonts/baloo-2-latin.woff2", "/fonts/nunito-latin.woff2", "/404.html", "/500.html", "/favicon.svg", "/quest", "/quest/", "/quest/index.html", "/quest/quest.css", "/quest/play-effects.css", "/quest/tablet-play.css", "/quest/game-feel.css", "/quest/clue-play.css", "/quest/family-guide.css", "/quest/visual-play.css", "/quest/word-help.css", "/quest/touch-fx.css", "/quest/scene-play.css", "/quest/adventure-world.css", "/quest/sort-demo.css", "/quest/learning-focus.css", "/quest/audio/story-manifest.js", "/quest/audio/KOKORO-LICENSE.txt"].includes(route)
     || /^\/quest\/audio\/[a-f0-9]{16}\.mp3$/.test(route)
     || /^\/(src|quest)\/[a-zA-Z0-9_-]+\.js$/.test(route);
   if (!permitted) { send(request, response, 404, "Not found."); return; }
   const relative = route === "/" ? "index.html" : ["/quest", "/quest/"].includes(route) ? "quest/index.html" : route.slice(1);
   try {
     const extension = path.extname(relative);
-    // MP3 is binary. UTF-8 decoding would corrupt a generated story recording.
-    let content = await readFile(path.join(workspace, relative), extension === ".mp3" ? undefined : "utf8");
-    const type = extension === ".mp3" ? "audio/mpeg" : extension === ".txt" ? "text/plain; charset=utf-8" : extension === ".js" ? "text/javascript; charset=utf-8"
+    // MP3 and WOFF2 are binary. UTF-8 decoding would corrupt a recording or font.
+    const binary = extension === ".mp3" || extension === ".woff2";
+    let content = await readFile(path.join(workspace, relative), binary ? undefined : "utf8");
+    const type = extension === ".mp3" ? "audio/mpeg" : extension === ".woff2" ? "font/woff2" : extension === ".txt" ? "text/plain; charset=utf-8" : extension === ".js" ? "text/javascript; charset=utf-8"
       : extension === ".css" ? "text/css; charset=utf-8" : extension === ".svg" ? "image/svg+xml" : "text/html; charset=utf-8";
     // Tablet audio may ask for a byte range when resuming. Return binary bytes,
     // just as Flask's send_from_directory does in the real application.
@@ -163,7 +164,7 @@ const server = http.createServer(async (request, response) => {
     }
     if (relative === "index.html") {
       content = content.replace("<title>", "<title>[SYNTHETIC TEST] ");
-      content = content.replace("<body>", `<body><aside aria-label="Synthetic test environment" style="padding:12px 20px;background:#fff1d9;color:#071c49;border-bottom:2px solid #071c49;font:700 14px/1.5 sans-serif;">${marker} · Invented records · No database connected · Do not contact or visit test locations.</aside>`);
+      content = content.replace("<body>", `<body><aside aria-label="Synthetic test environment" style="padding:12px 20px;background:#fff8e3;color:#17352d;border-bottom:2px solid #17352d;font:700 14px/1.5 sans-serif;">${marker} · Invented records · No database connected · Do not contact or visit test locations.</aside>`);
     }
     if (relative === "quest/index.html") {
       content = content.replace('</head>', '<meta name="quest-review-fixture" content="synthetic-adult-data"></head>');

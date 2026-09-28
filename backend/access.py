@@ -33,6 +33,14 @@ RETURN_PATHS = frozenset({
 })
 
 
+# Content-free presentation files the access page needs before sign-in. Exact
+# paths only: nothing else from the frontend becomes public.
+PUBLIC_BRAND_PATHS = frozenset({
+    "/favicon.svg", "/brand.css",
+    "/fonts/baloo-2-latin.woff2", "/fonts/nunito-latin.woff2",
+})
+
+
 def _return_path(value):
     """Return a known local page, falling back to home for any untrusted value."""
     return value if isinstance(value, str) and value in RETURN_PATHS else "/"
@@ -182,7 +190,8 @@ def configure_access(app):
     def require_website_access():
         if not _enabled():
             return None
-        public_asset = request.endpoint == "frontend_asset" and request.path == "/favicon.svg"
+        # The icon, shared brand stylesheet and bundled fonts style the access page itself.
+        public_asset = request.endpoint == "frontend_asset" and request.path in PUBLIC_BRAND_PATHS
         if request.endpoint in {"api.health", "access.stylesheet", "access.script"} or public_asset:
             return None
         if not _configured():

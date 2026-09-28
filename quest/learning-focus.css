@@ -3,21 +3,22 @@
  * These rules change paint only, retaining the tested phone/tablet dimensions.
  * The parent guide and all adult pages are outside this component's scope. */
 body.quest:not([data-quest-view=grownups]):not([data-quest-view=parents]) {
-  --q-touch-surface:#fff0d3;
+  --q-touch-surface:#fff3d6; /* the design system's warm citrus tint: touchable, not scenery */
   --q-touch-gold:#f4c45d;
   --q-touch-edge:#af7839;
 }
 
 /* A filled button and a readable label repeat the colour cue. Gold is not a
- * correctness hint: every available destination uses exactly the same paint. */
+ * correctness hint: every available destination uses exactly the same paint.
+ * The gold uses the design system's citrus bubble (gloss, inner rim, coloured
+ * glow), so child actions keep their warm "touch me" cue in the shared finish. */
 body.quest:not([data-quest-view=grownups]):not([data-quest-view=parents]) .q-button.primary {
-  color:#112858;
-  background:var(--q-touch-gold);
-  border-color:var(--q-touch-edge);
-  box-shadow:0 4px 0 #bd8a42;
+  color:var(--ff-ink);
+  background:var(--ff-gloss),linear-gradient(180deg,#ffd873,#f5a623);
+  border:0;
+  box-shadow:var(--ff-bubble-rim),0 6px 14px -4px rgba(245,166,35,.45),0 1px 2px rgba(0,0,0,.06);
 }
-body.quest:not([data-quest-view=grownups]):not([data-quest-view=parents]) .q-button.primary:hover:not(:disabled) { background:#f8d685; }
-body.quest:not([data-quest-view=grownups]):not([data-quest-view=parents]) .q-button.primary:active:not(:disabled) { box-shadow:0 2px 0 #bd8a42; }
+body.quest:not([data-quest-view=grownups]):not([data-quest-view=parents]) .q-button.primary:hover:not(:disabled) { filter:brightness(1.04); }
 
 /* Only the movable illustration receives this warm rim. Its surrounding clue
  * paragraph remains ordinary readable paper and keeps its scrolling behavior. */
@@ -37,9 +38,9 @@ body.quest:not([data-quest-view=grownups]):not([data-quest-view=parents]) .q-des
 body.quest:not([data-quest-view=grownups]):not([data-quest-view=parents]) .q-plan-slot:not(:disabled) {
   background:var(--q-touch-surface);
   border-color:var(--q-touch-edge);
-  color:#112858;
+  color:#113024;
 }
-body.quest:not([data-quest-view=grownups]):not([data-quest-view=parents]) .q-destination:not(:disabled) small { color:#38405a; }
+body.quest:not([data-quest-view=grownups]):not([data-quest-view=parents]) .q-destination:not(:disabled) small { color:#28473b; }
 
 /* The same hover/rim response applies to all candidate places. A chosen or
  * checked answer still has its existing word/tick/cross as well as colour. */
@@ -87,19 +88,19 @@ body.quest:not([data-quest-view=grownups]):not([data-quest-view=parents]) .q-hud
   inset:0 0 12%;
   display:grid;
   place-items:center;
-  color:#112858;
+  color:#113024;
   font-size:26px;
   font-weight:900;
   line-height:1;
   pointer-events:none;
-  text-shadow:0 1px 0 #fffaf0;
+  text-shadow:0 1px 0 #f3fcf7;
 }
 
 /* Home keeps one story trail. The separate sorting/earned-making activities
  * use the available width without leaving empty spaces for removed routes. */
 .q-home .q-focused-doors { grid-template-columns:repeat(2,minmax(0,1fr)); }
 .q-home .q-focused-doors:has(>button:only-child) { grid-template-columns:minmax(0,1fr); }
-.q-challenge-invite { margin-block:24px; padding:20px; border:2px solid #789f9c; border-radius:22px; background:#e7f0e8; }
+.q-challenge-invite { margin-block:24px; padding:20px; border:2px solid #79a08c; border-radius:22px; background:#e6efea; }
 .q-challenge-invite h2 { margin:0; }
 .q-challenge-invite p { max-width:48em; }
 .q-projector-compare summary { padding:12px; min-height:44px; cursor:pointer; font-weight:700; }
