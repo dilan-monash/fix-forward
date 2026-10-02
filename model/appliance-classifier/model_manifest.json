@@ -1,5 +1,5 @@
 {
-  "model_name": "fixforward-appliance-efficientnet-b0",
+  "model_name": "fixforward-appliance-mobilenetv3-small",
   "input_shape": [
     224,
     224,
@@ -27,11 +27,9 @@
     "vaccum_cleaner"
   ],
   "metrics": {
-    "test_top1_accuracy": 0.8632,
-    "test_top3_accuracy": 0.9895,
     "calibration": {
-      "min_confidence": 0.72,
-      "min_margin": 0.12
+      "min_confidence": 0.68,
+       "blur_threshold": 57.233463287353516
     }
   },
   "photo_processing": "browser-local"

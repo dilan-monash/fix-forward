@@ -40,7 +40,7 @@ function applianceForSlug(slug) {
 }
 
 function requireTensorFlow() {
-  if (!globalThis.tf?.loadGraphModel && !globalThis.tf?.loadLayersModel) {
+  if (!globalThis.tf?.loadLayersModel) {
     throw new Error("Photo recognition is unavailable right now. Choose the appliance manually.");
   }
   return globalThis.tf;
@@ -48,13 +48,14 @@ function requireTensorFlow() {
 
 function loadModel() {
   const tf = requireTensorFlow();
+
   if (!modelPromise) {
-    const load = tf.loadGraphModel || tf.loadLayersModel;
-    modelPromise = load.call(tf, MODEL_URL).catch((error) => {
+    modelPromise = tf.loadGraphModel(MODEL_URL).catch((error) => {
       modelPromise = null;
       throw error;
     });
   }
+
   return modelPromise;
 }
 
@@ -81,6 +82,77 @@ function readImage(file) {
   });
 }
 
+function calculateBlurScore(image) {
+  const size = 512;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+
+  const context = canvas.getContext("2d", {
+    willReadFrequently: true
+  });
+
+  if (!context) return null;
+
+  context.drawImage(
+    image,
+    0,
+    0,
+    size,
+    size
+  );
+
+  const imageData = context.getImageData(
+    0,
+    0,
+    size,
+    size
+  );
+
+  const pixels = imageData.data;
+  const gray = new Float32Array(size * size);
+
+  for (let i = 0; i < size * size; i += 1) {
+    const offset = i * 4;
+
+    gray[i] =
+      0.299 * pixels[offset] +
+      0.587 * pixels[offset + 1] +
+      0.114 * pixels[offset + 2];
+  }
+
+  const values = [];
+
+  for (let y = 1; y < size - 1; y += 1) {
+    for (let x = 1; x < size - 1; x += 1) {
+      const index = y * size + x;
+
+      const value =
+        gray[index - size] +
+        gray[index + size] +
+        gray[index - 1] +
+        gray[index + 1] -
+        4 * gray[index];
+
+      values.push(value);
+    }
+  }
+
+  const mean =
+    values.reduce((sum, value) => sum + value, 0) /
+    values.length;
+
+  const variance =
+    values.reduce(
+      (sum, value) =>
+        sum + Math.pow(value - mean, 2),
+      0
+    ) / values.length;
+
+  return variance;
+}
+
 export async function classifyAppliancePhoto(file) {
   const validation = validatePhotoFile(file);
   if (!validation.ok) throw new Error(validation.error);
@@ -89,31 +161,85 @@ export async function classifyAppliancePhoto(file) {
   // browsers and keeps this safety-oriented suggestion deterministic.
   if (tf.findBackend?.("cpu")) await tf.setBackend("cpu");
   await tf.ready();
-  const [model, image, manifest] = await Promise.all([loadModel(), readImage(file), loadManifest()]);
+  let model;
+let image;
+let manifest;
+
+try {
+  model = await loadModel();
+} catch (error) {
+  console.error("RAW MODEL LOAD ERROR:", error);
+  console.error("ERROR NAME:", error?.name);
+  console.error("ERROR MESSAGE:", error?.message);
+  console.error("ERROR STACK:", error?.stack);
+  console.error("ERROR CAUSE:", error?.cause);
+
+  const details = error && typeof error === "object"
+    ? Object.getOwnPropertyNames(error)
+        .map((key) => `${key}=${String(error[key])}`)
+        .join(" | ")
+    : String(error);
+
+  throw new Error(`MODEL LOAD FAILED: ${details}`);
+}
+
+try {
+  image = await readImage(file);
+} catch (error) {
+  throw new Error(`IMAGE READ FAILED: ${error?.message || String(error)}`);
+}
+
+manifest = await loadManifest();
   const expected = APPLIANCE_CLASSES.map(({ slug }) => slug);
   if (manifest?.class_order && JSON.stringify(manifest.class_order) !== JSON.stringify(expected)) {
     throw new Error("The appliance model does not match this website.");
   }
   const calibration = manifest?.metrics?.calibration || {};
-  const minConfidence = Number(calibration.min_confidence) || 0.72;
-  const minMargin = Number(calibration.min_margin) || 0.12;
-  const input = tf.browser.fromPixels(image, 3).resizeBilinear([224, 224], true).toFloat().expandDims(0);
+
+const minConfidence =
+  Number(calibration.min_confidence) || 0.68;
+
+const blurThreshold =
+  Number(calibration.blur_threshold) || 57.233463287353516;
+
+const blurScore = calculateBlurScore(image);
+
+if (
+  blurScore !== null &&
+  blurThreshold > 0 &&
+  blurScore < blurThreshold
+) {
+  return {
+    accepted: false,
+    confidence: 0,
+    alternatives: [],
+    reason: "blurry_or_unclear",
+  };
+}
+  const input = tf.browser.fromPixels(image, 3).resizeBilinear([224, 224], false).toFloat().expandDims(0);
   let output;
   try {
-    output = model.predict(input);
+     try {
+      output = model.predict(input);
+     } catch (error) {
+     throw new Error(`PREDICTION FAILED: ${error?.message || String(error)}`);
+  }
     if (Array.isArray(output)) [output] = output;
     const scores = Array.from(await output.data());
     if (scores.length !== APPLIANCE_CLASSES.length) throw new Error("The appliance model returned an invalid result.");
     const top = scores.map((score, index) => ({ ...APPLIANCE_CLASSES[index], score: Number(score) }))
       .sort((left, right) => right.score - left.score).slice(0, 3);
-    const margin = top[0].score - top[1].score;
     return {
-      accepted: top[0].score >= minConfidence && margin >= minMargin,
+      accepted:
+       top[0].score >= minConfidence &&
+       blurScore >= blurThreshold,
       confidence: top[0].score,
-      margin,
       alternatives: top,
-      thresholds: { minConfidence, minMargin },
-    };
+      thresholds: {
+      minConfidence,
+      blurThreshold,
+    },
+  };
   } finally {
     input.dispose();
     if (output && typeof output.dispose === "function") output.dispose();
