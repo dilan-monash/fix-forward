@@ -1,0 +1,129 @@
+/* Local design review layer based on the supplied FixForward Quest PDF.
+   Sunny's game state, questions and storage keys remain in the original JS. */
+:root {
+  --sunny-forest: #174f38;
+  --sunny-green: #207c50;
+  --sunny-green-soft: #eff8f1;
+  --sunny-green-line: #cee4d6;
+  --sunny-cream: #fffdf8;
+  --sunny-gold: #f8b83e;
+  --sunny-gold-shadow: #d98b18;
+  --sunny-radius: 26px;
+}
+
+body { background: var(--sunny-cream); color: var(--sunny-forest); }
+
+.safety-strip {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: .7rem;
+  min-height: 46px;
+  padding: .65rem 1rem;
+  background: var(--sunny-green);
+  color: #fff;
+  font-weight: 800;
+  text-align: center;
+}
+
+.prototype { background: #f3f7ef; border-color: var(--sunny-green-line); color: #496557; }
+.site-head, .sunny-discovery .header { background: var(--sunny-cream); border-color: #e9e3d6; }
+.brand-mark, .sunny-discovery .brand > span {
+  background: var(--sunny-green);
+  border-radius: 15px 15px 15px 7px;
+  box-shadow: 0 4px 0 #0d5d39;
+}
+h1, h2, h3, .brand, .sunny-discovery .brand { color: var(--sunny-forest); }
+.main-shell, .sunny-discovery main { width: min(1240px, 100%); }
+
+.home-top, .quest-head, .sunny-discovery .page-heading {
+  padding: 1.8rem 2rem;
+  border: 1px solid var(--sunny-green-line);
+  border-radius: var(--sunny-radius);
+  background-color: #f5fbf6;
+  background-image: radial-gradient(circle, #d9eedf 2px, transparent 2px);
+  background-size: 34px 34px;
+}
+
+.home-top h1, .quest-head h1, .sunny-discovery .page-heading h1 {
+  font-size: clamp(2.35rem, 5vw, 4.35rem);
+  line-height: 1.02;
+  letter-spacing: -.04em;
+}
+
+.home-paths { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 1.5rem; }
+.path-card, .panel, .item, .stamp, .selection-bar,
+.sunny-discovery .start-controls, .sunny-discovery .station-art,
+.sunny-discovery .catalogue-card, .sunny-discovery .book-card,
+.sunny-discovery .episode-item, .sunny-discovery .item-ticket {
+  border: 1px solid var(--sunny-green-line);
+  border-radius: var(--sunny-radius);
+  background: var(--sunny-green-soft);
+  color: var(--sunny-forest);
+  box-shadow: 0 7px 0 #dcece1;
+}
+
+.path-card.adult-path { background: #e9f6ed; color: var(--sunny-forest); }
+.adult-path p, .adult-path .eyebrow { color: #456455; }
+.adult-path .path-item { background: #fff; }
+.kid-path { background: #fff5d8; border-color: #ecd99d; }
+
+button, .primary, .gold, .path-start,
+.sunny-discovery .primary, .sunny-discovery .secondary { border-radius: 999px; }
+
+.primary, .gold, .path-start, .adult-path .path-start, .kid-path .path-start,
+.sunny-discovery .primary {
+  border-color: var(--sunny-gold);
+  background: var(--sunny-gold);
+  color: var(--sunny-forest);
+  box-shadow: 0 5px 0 var(--sunny-gold-shadow);
+  font-weight: 850;
+}
+
+.primary:hover, .gold:hover, .path-start:hover, .adult-path .path-start:hover,
+.kid-path .path-start:hover, .sunny-discovery .primary:hover:not(:disabled) {
+  border-color: #ffc95c;
+  background: #ffc95c;
+  color: var(--sunny-forest);
+  transform: translateY(-1px);
+}
+
+.primary:active, .gold:active, .path-start:active, .sunny-discovery .primary:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 var(--sunny-gold-shadow);
+}
+
+.notice, .discovery-invite, .sunny-discovery .resume-note,
+.sunny-discovery .new-clue, .sunny-discovery .finish-note {
+  border: 1px solid var(--sunny-green-line);
+  border-radius: 18px;
+  background: #f4fbf5;
+}
+
+.sunny-discovery .quest-nav { background: #f4f8f1; border-color: var(--sunny-green-line); }
+.sunny-discovery .quest-nav > nav a[aria-current="page"] {
+  background: var(--sunny-green);
+  color: #fff;
+  border-radius: 999px;
+}
+.sunny-discovery .mode.selected, .sunny-discovery .selected {
+  border-color: var(--sunny-green);
+  background: #e4f4e9 !important;
+}
+.sunny-discovery .station-art img { filter: saturate(.78) contrast(.96); }
+.footer, .sunny-discovery .footer { border-color: var(--sunny-green-line); }
+
+@media (max-width: 700px) {
+  .safety-strip { font-size: .84rem; }
+  .home-top, .quest-head, .sunny-discovery .page-heading { padding: 1.35rem; }
+  .home-paths { grid-template-columns: 1fr; }
+  .path-card { min-height: 320px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation: none !important;
+    transition: none !important;
+  }
+}
