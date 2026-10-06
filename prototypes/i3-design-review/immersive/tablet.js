@@ -1,5 +1,5 @@
 // Screen-sized activity layouts; no user-agent sniffing or hardware-test claims.
-const sheet=document.createElement('link');sheet.rel='stylesheet';sheet.href=new URL('./tablet.css',import.meta.url).href;document.head.append(sheet);
+// Discovery's existing responsive stylesheet styles this build; the absent optional tablet.css is not requested.
 const kind=location.pathname.includes('/home/')?'home':location.pathname.includes('/lab/')?'lab':'discovery';document.body.classList.add(kind+'-tablet');
 const typeSize=()=>document.body.classList.toggle('large-type',parseFloat(window.getComputedStyle(document.documentElement).fontSize)>22);typeSize();new MutationObserver(typeSize).observe(document.documentElement,{attributes:true,attributeFilter:['style','class']});
 const size=()=>{document.documentElement.style.setProperty('--play-height',(window.visualViewport?.height||window.innerHeight)+'px');};size();window.addEventListener('resize',size);window.visualViewport?.addEventListener('resize',size);

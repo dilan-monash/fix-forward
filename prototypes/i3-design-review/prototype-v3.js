@@ -240,15 +240,15 @@
   }
 
   function lensScan() {
-    return `<section class="screen-head compact"><h1>Scan your device</h1><p>Hold the device inside the box.</p></section>
+    return `<section class="screen-head compact"><h1>Try a sample scan</h1><p>Camera demo only. No camera opens and no photo is analysed.</p></section>
       <div class="scan-box"><div class="camera-frame"><strong>Camera preview</strong></div></div>
       <p class="center small">Keep faces and personal details out of the photo.</p>
       <div class="actions end">${button('Choose instead', 'lens', 'secondary')}${button('Use photo', 'lens/confirm', 'primary blue')}</div>`;
   }
 
   function lensConfirm() {
-    return `<section class="screen-head compact"><h1>Is this your device?</h1><p>Hold the device inside the box.</p></section>
-      <div class="device-card"><span class="device-icon" aria-hidden="true"></span><div><h2>We found: Tablet</h2><p>Choose the right device before we show its information.</p><div class="actions">${button('Yes, it’s a tablet', 'lens/impact', 'primary green')}${button('Choose another', 'lens', 'primary')}</div></div></div>`;
+    return `<section class="screen-head compact"><h1>Explore a sample device</h1><p>This is a fixed example, not a recognition result.</p></section>
+      <div class="device-card"><span class="device-icon" aria-hidden="true"></span><div><h2>Example: Tablet</h2><p>Open the sample information to explore this design.</p><div class="actions">${button('Explore the tablet', 'lens/impact', 'primary green')}${button('Back', 'lens', 'primary')}</div></div></div>`;
   }
 
   function lensTabs(active) {
@@ -306,7 +306,8 @@
   ];
 
   function safety() {
-    return `<section class="screen-head compact"><h1>No matching recall found</h1><p>Now let’s check for obvious warning signs.</p>${steps(1)}</section>
+    // No recall service runs in this static build; never present its example as a real search result.
+    return `<section class="screen-head compact"><h1>Try the safety questions</h1><p>Demo only: no recall search has been performed. A real item's recall status is unknown.</p>${steps(1)}</section>
       <div class="safety-list">${safetyQuestions.map((question, index) => `<div class="safety-row"><span class="safety-number">${index + 1}</span><strong>${question}</strong><span class="segmented">${['Yes', 'No', 'Not sure'].map(answer => `<button class="${state.safety[index] === answer ? 'active' : ''}" data-safety-index="${index}" data-safety-answer="${answer}">${answer}</button>`).join('')}</span></div>`).join('')}</div>
       <div class="actions end"><button class="primary green" data-safety-continue>Continue</button></div>`;
   }
@@ -323,8 +324,8 @@
   }
 
   function recall() {
-    return `<section class="screen-head compact"><h1>A recall was found</h1><p>This means the product has an official safety notice.</p>${steps(1)}</section>
-      <div class="big-result red-card"><p>Russell Hobbs · Model RHK510</p><h2 class="blue-text">Official recall notice</h2><p>A recall means the manufacturer or safety regulator has warned that this product may have a safety problem.</p><strong>Stop using it and ask an adult to follow the official recall instructions.</strong><div class="actions">${button('View official recall', 'privacy', 'danger')}${button('Back', 'pathway', 'primary')}</div></div>`;
+    return `<section class="screen-head compact"><h1>Sample recall screen</h1><p>Design example only. No official recall has been checked or matched.</p>${steps(1)}</section>
+      <div class="big-result red-card"><p>Example appliance · Sample model</p><h2 class="blue-text">How a recall could appear</h2><p>In a real service, this screen would link to a verified official notice. This demonstration cannot tell you whether an item is recalled.</p><strong>For a real item, check the official Product Safety Australia recall information.</strong><div class="actions"><a class="danger" href="https://www.productsafety.gov.au/recalls" target="_blank" rel="noopener">Open official recall search</a>${button('Back', 'pathway', 'primary')}</div></div>`;
   }
 
   function finder() {
@@ -351,6 +352,7 @@
 
   function finderPlace() {
     return `<section class="screen-head compact"><h1>Repair Café Brunswick</h1></section>
+      <div class="alert warning"><strong>Fictional place for design review.</strong> Address, distance and opening hours are examples. No live provider search was performed.</div>
       <div class="finder-layout"><div class="map"><span class="pin one"></span></div><article class="panel"><h2>Repair Café Brunswick</h2><p class="blue-text"><b>1.2 km away</b></p><p>Open Saturday 10am–2pm</p><p>Repairs small electronics.<br>Check the provider site before you go.</p><div class="actions"><button class="primary blue" data-demo>Directions</button><button class="primary" data-demo>Provider site</button></div></article></div>`;
   }
 

@@ -1,6 +1,6 @@
 # I3 design implementation prototype
 
-This local package implements the 30 screen states supplied in
+This design-review package implements the 30 screen states supplied in
 `FixForward I3 Prototype.zip`. It is an interactive review build rather than a
 production release.
 
@@ -56,8 +56,30 @@ the I2 cost-comparison API, Flask and Neon are deliberately not connected in
 this static design review. Those integrations require separate implementation
 and validation before release.
 
-The implementation is local only. It has not been committed, pushed, merged
-into `main` or deployed.
+## Publish a separate design preview
+
+Use a **new Render Static Site**, connected to `dilan-monash/fix-forward`:
+
+- Branch: `feature/i3-design-review`
+- Root directory: `prototypes/i3-design-review`
+- Build command: `echo "Static prototype: no build required"`
+- Publish directory: `.`
+- Environment variables: none
+
+The hash routes work without a rewrite. The `/discover/` folder contains its
+own entry page and relative assets. Do not use the repository-root
+`render.yaml`: it configures the separate Iteration 2 Flask application.
+Do not copy database URLs, passwords or API keys into this static site.
+
+This is a public design preview, not a verified household decision service.
+The persistent notice and sample-result labels explain its simulated camera,
+recall and provider screens. The extended Sorting Station retains its games
+and 3D item pictures; links to the absent discovery home and parts lab have
+been removed. Existing Iteration 1, Iteration 2 and Main services remain separate.
+
+After deployment, verify Render's branch and deployed commit, then check the
+home page, safety and recall demo labels, Quest routes, and `/discover/` assets.
+Configuration instructions alone do not establish that a deployment succeeded.
 
 ## Third-party code
 
