@@ -1,6 +1,30 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Explore FixForward Iteration 3: practical household appliance help, children's e-waste missions and teacher-led lessons."><meta name="theme-color" content="#207c50"><title>FixForward · Iteration 3 local design review</title><link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23146c5d'/%3E%3Ctext x='8' y='24' fill='white' font-family='Arial' font-weight='bold' font-size='23'%3Ef%3C/text%3E%3C/svg%3E"><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="design-system.css"><script src="app.js" defer></script></head><body>
-<a class="skip" href="#main">Skip to content</a><div class="safety-strip"><span aria-hidden="true">●</span> Real appliances need adult help. Never open, unplug or take apart a gadget on your own.</div><div class="prototype"><strong>Local design review</strong> Sunny's game logic is unchanged.<span class="secondary"> Progress stays in this browser.</span></div>
-<div class="site-head"><header><button class="brand" data-go="home" aria-label="FixForward home"><span class="brand-mark" aria-hidden="true">ff</span>FixForward</button><nav class="nav" aria-label="Main navigation"><button class="quiet" data-go="adult">Help with an item</button><a class="quiet discover-nav" href="discover/">Quest for kids</a><button class="quiet" data-go="schools">For schools</button><a class="quiet lab-nav" href="explore/">My 3D world</a><a class="quiet book-link" href="discover/#/book">Discovery Book <span class="book-counter" id="book-count">0</span></a></nav></header></div>
-<main class="main-shell" id="main" tabindex="-1"></main><div id="announce" class="sr" role="status" aria-live="polite"></div><footer class="footer"><span>FixForward · Care for our things. Learn as we go.</span><div><button class="quiet small" id="sound">Sound off</button><button class="quiet small" id="read">Read this screen</button><button class="quiet small" id="clear">Reset prototype</button></div></footer>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a45a1249ea383d32',t:'MTc5MTE3ODYxNQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="FixForward Iteration 3 interactive design prototype.">
+  <meta name="theme-color" content="#ffffff">
+  <title>FixForward · Iteration 3 prototype</title>
+  <link rel="stylesheet" href="prototype-v3.css">
+  <script src="prototype-v3.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#app">Skip to content</a>
+  <header class="site-header">
+    <a class="brand" href="#/home" aria-label="FixForward home">FixForward</a>
+    <nav aria-label="Main navigation">
+      <a href="#/home" data-nav="home">Home</a>
+      <a href="#/about" data-nav="about">About</a>
+      <span class="progress-pill" aria-label="Your progress">
+        <span aria-hidden="true">⚡</span><b id="energy-count">0</b>
+        <span>Lv <b id="level-count">1</b></span>
+        <span aria-hidden="true">★</span><b id="star-count">0</b>
+      </span>
+    </nav>
+  </header>
+
+  <main id="app" tabindex="-1"></main>
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>
