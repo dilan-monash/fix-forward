@@ -66,6 +66,10 @@ let spokenWords = '';
 let navigation = null;
 let historyEpoch = Number.isSafeInteger(window.history?.state?.[NAVIGATION_KEY]?.route?.epoch) ? window.history.state[NAVIGATION_KEY].route.epoch : 0;
 let demoTimer = null;
+// The story-card coach plays once per page visit. It is presentation only and
+// never enters saved progress, so reopening Quest can demonstrate the gesture again.
+let homeCoachShown = false;
+let homeCoachTimer = null;
 // Visual timers never own progress. A navigation settles the display immediately.
 let hudFrame = null;
 let feedbackTimer = null;
@@ -128,6 +132,32 @@ function clearGameEffects() {
   hudFrame = null; feedbackTimer = null; pendingHudProgress = null;
   hudAnimations.forEach(animation => { try { animation.cancel(); } catch { /* An old WebView may already have removed the effect. */ } }); hudAnimations = [];
   document.querySelector('[data-game-feedback]')?.remove();
+  if (homeCoachTimer !== null) window.clearTimeout(homeCoachTimer);
+  homeCoachTimer = null;
+  document.querySelector('.q-adventure-trail')?.classList.remove('is-coaching', 'is-coaching-static');
+}
+
+// Briefly demonstrate progressive disclosure without looping or moving content.
+// Reduced-motion users see the same hint and example bubble without a moving pointer.
+function startHomeCoach() {
+  if (homeCoachShown || state.view !== 'home' || picker || postcardId) return;
+  const trail = app.querySelector('.q-adventure-trail');
+  if (!trail) return;
+  homeCoachShown = true;
+  const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  trail.classList.add(reducedMotion ? 'is-coaching-static' : 'is-coaching');
+  homeCoachTimer = window.setTimeout(() => {
+    trail.classList.remove('is-coaching', 'is-coaching-static');
+    homeCoachTimer = null;
+  }, reducedMotion ? 5000 : 4600);
+}
+
+// A touch screen has no hover. Its first tap opens the story bubble and a
+// second tap enters the story; mouse and keyboard activation continue directly.
+function closeStoryBubbles(except = null) {
+  app.querySelectorAll('.q-adventure-island[aria-expanded="true"]').forEach(control => {
+    if (control !== except) control.setAttribute('aria-expanded', 'false');
+  });
 }
 // Give an immediate, brief response in the visible play area. Detailed learning
 // feedback remains on the page; this toast adds no score and takes no focus.
@@ -744,6 +774,7 @@ function render(effect = '', { fromProgress = null } = {}) {
   addWordHelp(app, { read: speakText });
   bind();
   updateAudio();
+  startHomeCoach();
 }
 // Open the designer only for a completed mission; preserve the chosen story in a temporary ID.
 function openPostcard(id) {
@@ -920,7 +951,19 @@ function bind() {
   app.querySelectorAll('[data-nav]').forEach(el => el.onclick = () => navigate(el.dataset.nav));
   app.querySelectorAll('[data-picker]').forEach(el => el.onclick = () => openPicker());
   app.querySelectorAll('[data-place]').forEach(el => el.onclick = () => openPicker(el.dataset.place));
-  app.querySelectorAll('[data-mission]').forEach(el => el.onclick = () => { picker = null; postcardId = null; selectedAction = null; openClueList = false; dispatch({ type: 'CHOOSE_MISSION', id: el.dataset.mission }); window.scrollTo({ top: 0, behavior: 'auto' }); });
+  app.querySelectorAll('[data-mission]').forEach(el => el.onclick = event => {
+    if (el.classList.contains('q-adventure-island') && lastPointerType === 'touch' && el.getAttribute('aria-expanded') !== 'true') {
+      event.preventDefault();
+      closeStoryBubbles(el);
+      el.setAttribute('aria-expanded', 'true');
+      const words = el.querySelector('.q-story-bubble')?.textContent?.trim();
+      announce(`${words || 'Story details.'} Tap the picture again to open it.`);
+      return;
+    }
+    picker = null; postcardId = null; selectedAction = null; openClueList = false;
+    dispatch({ type: 'CHOOSE_MISSION', id: el.dataset.mission });
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  });
   app.querySelectorAll('[data-continue]').forEach(el => el.onclick = () => navigate('mission'));
   app.querySelectorAll('[data-mode]').forEach(el => el.onclick = () => dispatch({ type: 'SET_SETTING', key: 'mode', value: el.dataset.mode }, { focusTarget: `[data-mode="${el.dataset.mode}"]`, speak: false }));
   app.querySelector('[data-start-mission]')?.addEventListener('click', () => dispatch({ type: 'START_MISSION' }));
@@ -972,6 +1015,7 @@ function showTouch(event) {
 }
 document.addEventListener('pointerdown', event => {
   lastPointerType = event.pointerType || 'mouse';
+  if (lastPointerType === 'touch' && !event.target.closest?.('.q-adventure-island')) closeStoryBubbles();
   // A held finger takes priority immediately, before the drag threshold or
   // click. The tutorial must not finish and start audio under that gesture.
   if (event.isTrusted && event.target.closest?.('.q-sort-board') && !event.target.closest?.('[data-sort-demo-skip]')) finishSortDemo();

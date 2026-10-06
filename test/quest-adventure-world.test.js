@@ -16,6 +16,9 @@ test('all nine illustrated chapters stay available in authored order without loc
   assert.equal(buttons.length, MISSIONS.length);
   assert.deepEqual(buttons.map(button => button.dataset.mission), MISSIONS.map(item => item.id));
   assert.equal(dom.querySelectorAll('.q-island-story-art>svg').length, MISSIONS.length);
+  assert.equal(dom.querySelectorAll('.q-story-bubble').length, MISSIONS.length);
+  assert.equal(dom.querySelectorAll('[aria-describedby][aria-expanded="false"]').length, MISSIONS.length);
+  assert.ok(dom.querySelector('.q-story-bubble').textContent.includes(MISSIONS[0].childSummary));
   assert.equal(dom.querySelector('[disabled], [aria-disabled="true"], input, a'), null);
   assert.equal(dom.querySelectorAll('.is-suggested').length, 1);
   assert.equal(dom.querySelector('.is-suggested [data-mission]').dataset.mission, MISSIONS[0].id);
@@ -74,16 +77,17 @@ test('duplicate and unknown input missions cannot inflate the trail or insert ma
   assert.equal(renderAdventureTrail({ missions: 'bad' }), '');
 });
 
-test('decorations stay inaccessible and warning art keeps its static marker', () => {
+test('simplified cards remove repeated scenery while warning art keeps its static marker', () => {
   const dom = render();
   for (const svg of dom.querySelectorAll('svg')) {
     assert.equal(svg.getAttribute('aria-hidden'), 'true');
     assert.equal(svg.getAttribute('focusable'), 'false');
   }
-  assert.equal(dom.querySelectorAll('.q-adventure-route').length, 2);
-  assert.equal(dom.querySelectorAll('.q-adventure-cloud').length, 2);
+  assert.equal(dom.querySelector('.q-island-ground, .q-adventure-route, .q-adventure-cloud'), null);
+  assert.equal(dom.querySelectorAll('.q-story-coach').length, 1);
   assert.equal(dom.querySelector('[data-mission="pip-damaged-cable"]').querySelectorAll('.q-warning-object').length, 1);
   assert.equal(dom.querySelector('[data-mission="bulging-gadget"]').querySelectorAll('.q-warning-object').length, 1);
   assert.equal(dom.querySelectorAll('.q-guide-character').length, 0, 'story objects are never substituted with animated working guides');
-  assert.equal(dom.querySelector('[id], image, iframe, audio, video, canvas'), null);
+  assert.equal(dom.querySelector('image, iframe, audio, video, canvas'), null);
+  assert.ok([...dom.querySelectorAll('[id]')].every(node => node.classList.contains('q-story-bubble')), 'Only the local tooltip relationships need IDs');
 });

@@ -1,7 +1,7 @@
 /* ADVENTURE TRAIL: a local illustrated world below the existing home map. All
  * styling is scoped to this component; the approved hero and parent guide keep
  * their layout. SVGs are shared with the stories, without extra image requests. */
-.q-adventure-trail { grid-column:1/-1; min-width:0; margin:1.5rem 0 .5rem; padding:1.5rem clamp(.75rem,2vw,1.5rem); border:1px solid #c7dcd0; border-radius:30px; background:linear-gradient(160deg,#e6f2eb,#e8f5ed 67%,#e5edf5); }
+.q-adventure-trail { position:relative; grid-column:1/-1; min-width:0; margin:1.5rem 0 .5rem; padding:1.5rem clamp(.75rem,2vw,1.5rem); border:1px solid #c7dcd0; border-radius:30px; background:#eef6f1; }
 .q-adventure-heading { display:flex; align-items:center; justify-content:flex-end; gap:1rem; position:relative; z-index:1; }
 .q-adventure-heading h2 { max-width:680px; margin:.3rem 0 .5rem; font-size:clamp(1.5rem,2.5vw,2.2rem); line-height:1.15; }
 .q-adventure-heading p { margin:0; }
@@ -15,13 +15,13 @@
 .q-adventure-progress meter::-webkit-meter-optimum-value { background:#247b4d; border-radius:12px; }
 .q-adventure-progress meter::-moz-meter-bar { background:#247b4d; border-radius:12px; }
 
-/* The route is painted behind stable, native buttons. No labels or touch
+/* Stable native cards replace the repeated island scenery. No labels or touch
  * targets bob around: children can tap a picture without chasing animation. */
 .q-adventure-map { position:relative; isolation:isolate; margin-top:1.25rem; min-width:0; }
-.q-adventure-islands { position:relative; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:1.4rem .5rem; margin:0; padding:.5rem 0; list-style:none; }
+.q-adventure-islands { position:relative; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; margin:0; padding:.5rem 0; list-style:none; }
 .q-adventure-stop { min-width:0; position:relative; }
-.q-adventure-island { position:relative; display:flex; flex-direction:column; align-items:center; width:100%; height:100%; min-height:248px; min-width:44px; padding:.45rem .35rem .7rem; border:2px solid transparent; border-radius:22px; background:transparent; color:#113024; text-align:center; line-height:1.3; transition:background-color 150ms,border-color 150ms,box-shadow 150ms; }
-.q-adventure-island:hover { background:#fafefc98; border-color:#a4c5b2; }
+.q-adventure-island { position:relative; display:flex; flex-direction:column; align-items:center; width:100%; height:100%; min-height:220px; min-width:44px; padding:.8rem .65rem .9rem; border:1px solid #c4d8cc; border-radius:22px; background:#f9fcfa; color:#113024; text-align:center; line-height:1.3; box-shadow:0 3px 0 #dbe8e0; transition:background-color 150ms,border-color 150ms,box-shadow 150ms; }
+.q-adventure-island:hover { background:#fff; border-color:#7ea58f; }
 .q-adventure-island:focus-visible { outline:3px solid #125e96; outline-offset:3px; background:#fafefc; }
 .q-adventure-island:active { background:#f7e5b7; }
 .q-adventure-title { display:block; max-width:100%; font-size:var(--q-reading-size,1.125rem); line-height:1.3; margin:.2rem 0 .4rem; }
@@ -31,29 +31,28 @@
 .is-earned .q-adventure-action { color:#245f3f; }
 .is-suggested .q-adventure-island { border-color:#b78625; background:#eefcf482; box-shadow:0 4px 0 #deb86c38; }
 .q-adventure-next { position:absolute; top:.45rem; right:.45rem; z-index:2; padding:.25rem .45rem; border:1px solid #d4a947; border-radius:9px; background:#f9d980; font-size:1rem; font-weight:800; }
-.q-island-stage { position:relative; display:block; width:100%; max-width:220px; height:168px; flex:0 0 168px; margin-top:1.3rem; }
-.q-island-stage>.q-island-ground { position:absolute; inset:auto 0 0; width:100%; height:auto; overflow:visible; }
-.q-island-story-art { position:absolute; z-index:1; width:138px; max-width:70%; bottom:28px; left:50%; translate:-50% 0; }
+.q-island-stage { position:relative; display:grid; place-items:center; width:100%; max-width:190px; height:142px; flex:0 0 142px; margin-top:1rem; border-radius:18px; background:#edf5f0; }
+.q-island-story-art { width:120px; max-width:68%; }
 .q-island-story-art>.quest-art { display:block; width:100%; height:auto; }
-.q-island-earned-star { position:absolute; z-index:2; right:8%; bottom:33px; color:#9b570b; font-size:2.5rem; line-height:1; text-shadow:0 2px #eefcf4; }
-.q-adventure-map>.q-adventure-route { position:absolute; z-index:-1; inset:0; width:100%; height:100%; overflow:visible; pointer-events:none; }
-.q-adventure-route path { fill:none; stroke:#99b9a6; stroke-width:5; stroke-dasharray:2 13; stroke-linecap:round; vector-effect:non-scaling-stroke; }
-.q-adventure-map>.q-adventure-route--narrow { display:none; }
+.q-island-earned-star { position:absolute; z-index:2; right:9%; bottom:9px; color:#9b570b; font-size:2.2rem; line-height:1; text-shadow:0 2px #eefcf4; }
 
-/* Two clouds, a flag on each island and earned stars carry the motion. Only
- * transforms/opacity animate; product pictures (including warnings) stay still.
- * Brief star twinkles finish by themselves, avoiding perpetual flashing. */
-.q-adventure-cloud { position:absolute; z-index:-1; width:62px; height:17px; border-radius:24px; background:#fafefc; opacity:.75; pointer-events:none; animation:q-trail-cloud 14s ease-in-out infinite alternate; }
-.q-adventure-cloud::before,.q-adventure-cloud::after { content:""; position:absolute; bottom:3px; width:27px; height:27px; border-radius:50%; background:inherit; }
-.q-adventure-cloud::before { left:8px; }
-.q-adventure-cloud::after { left:28px; width:22px; height:22px; }
-.q-adventure-cloud--one { left:28%; top:7px; }
-.q-adventure-cloud--two { right:17%; top:52%; animation-delay:-7s; }
-.q-island-pennant { transform-box:fill-box; transform-origin:left center; animation:q-trail-flag 5s ease-in-out infinite; }
-.q-adventure-stop:nth-child(even) .q-island-pennant { animation-delay:-2.5s; }
+/* Supporting words stay out of the resting layout. Mouse hover, keyboard focus
+ * and a first touch reveal the same calm speech bubble without moving the card. */
+.q-story-bubble { position:absolute; z-index:4; left:7%; right:7%; bottom:3.15rem; padding:.75rem .85rem; border:1px solid #8aa99a; border-radius:16px 16px 16px 4px; background:#fffdf6; color:#17392d; box-shadow:0 6px 16px #15382d24; font-size:.88rem; font-weight:700; line-height:1.35; opacity:0; visibility:hidden; translate:0 6px; pointer-events:none; transition:opacity 150ms ease,translate 150ms ease,visibility 0s linear 150ms; }
+.q-story-bubble::after { content:""; position:absolute; left:20px; bottom:-8px; width:14px; height:14px; border-right:1px solid #8aa99a; border-bottom:1px solid #8aa99a; background:#fffdf6; rotate:45deg; }
+.q-story-bubble small { display:block; margin-top:.35rem; color:#386252; font-size:.72rem; }
+.q-adventure-island:hover .q-story-bubble,.q-adventure-island:focus-visible .q-story-bubble,.q-adventure-island[aria-expanded=true] .q-story-bubble,.is-coaching .q-adventure-stop:first-child .q-story-bubble,.is-coaching-static .q-adventure-stop:first-child .q-story-bubble { opacity:1; visibility:visible; translate:0 0; transition-delay:0s; }
+
+/* This finite coach demonstrates the hidden explanation once per page visit.
+ * It neither blocks the cards nor loops after the child begins exploring. */
+.q-story-coach { position:absolute; z-index:6; left:50%; top:6.4rem; display:flex; align-items:center; gap:.55rem; max-width:310px; padding:.65rem .8rem; border:1px solid #8aa99a; border-radius:16px; background:#fffdf6; color:#17392d; box-shadow:0 6px 16px #15382d24; font-size:.82rem; font-weight:800; opacity:0; visibility:hidden; pointer-events:none; translate:-50% 0; }
+.is-coaching .q-story-coach,.is-coaching-static .q-story-coach { opacity:1; visibility:visible; }
+.q-story-coach-pointer { color:#a25b0d; font-size:1.5rem; }
+.is-coaching .q-story-coach-pointer { animation:q-story-coach-pointer 1.35s ease-in-out 2; }
+@keyframes q-story-coach-pointer { 0%,100% { transform:translate(-12px,-8px); } 55% { transform:translate(7px,7px); } }
+
+/* Earned stars use one brief acknowledgement; the resting pictures stay still. */
 .q-island-earned-star { animation:q-trail-stamp 650ms ease-out 2; }
-@keyframes q-trail-cloud { from { transform:translateX(-8px); } to { transform:translateX(8px); } }
-@keyframes q-trail-flag { 0%,100% { transform:skewY(-3deg) scaleX(.97); } 50% { transform:skewY(3deg) scaleX(1); } }
 @keyframes q-trail-stamp { 0%,100% { scale:1; } 50% { scale:1.14; } }
 
 /* Two roomy columns on phones keep titles readable and each entire island
@@ -64,24 +63,26 @@
   .q-adventure-heading h2 { font-size:1.6rem; }
   .q-adventure-progress { grid-template-columns:28px auto 90px; gap:.45rem; padding:.5rem .7rem; }
   .q-adventure-progress-star { grid-row:auto; font-size:2rem; }
-  .q-adventure-islands { grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem .3rem; }
+  .q-adventure-islands { grid-template-columns:repeat(2,minmax(0,1fr)); gap:.75rem; }
   .q-adventure-island { min-height:228px; padding:.4rem .2rem .65rem; border-radius:17px; }
-  .q-island-stage { height:146px; flex-basis:146px; margin-top:1.45rem; }
-  .q-island-story-art { width:125px; max-width:77%; bottom:20px; }
+  .q-island-stage { height:132px; flex-basis:132px; margin-top:1.2rem; }
+  .q-island-story-art { width:110px; max-width:72%; }
   .q-adventure-chapter { left:.3rem; top:.3rem; width:30px; height:30px; font-size:1rem; }
   .q-adventure-next { top:.3rem; right:.2rem; padding:.2rem .3rem; }
-  .q-adventure-map>.q-adventure-route--wide { display:none; }
-  .q-adventure-map>.q-adventure-route--narrow { display:block; }
-  .q-adventure-cloud--one { left:35%; top:3px; }
-  .q-adventure-cloud--two { right:10%; top:49%; }
+  .q-story-coach { top:5.7rem; max-width:270px; font-size:.76rem; }
 }
 
 /* Narrow phones need the artwork's proportions to shrink, not the reading
  * size. This also leaves the chapter number and suggestion label separate. */
 @media(max-width:375px) {
   .q-adventure-island { min-height:216px; }
-  .q-island-stage { height:126px; flex-basis:126px; margin-top:1.55rem; }
-  .q-island-story-art { max-width:82%; bottom:17px; }
+  .q-island-stage { height:118px; flex-basis:118px; margin-top:1.35rem; }
+  .q-island-story-art { max-width:76%; }
   .q-adventure-progress { grid-template-columns:25px auto; }
   .q-adventure-progress meter { grid-column:2; }
+}
+
+@media(prefers-reduced-motion:reduce) {
+  .q-story-bubble { transition:none; }
+  .is-coaching .q-story-coach-pointer { animation:none; }
 }

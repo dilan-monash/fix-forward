@@ -237,6 +237,23 @@ test('rendered mission supports wrong choice, retry, tap planning, saved discove
   assert.equal(q.actualStorage.getItem('adult-session-fixture'), 'Adult journey remains separate');
 });
 
+test('story cards reveal calm help before a touch opens the selected mission', async t => {
+  const q = await createQuest(t);
+  const card = q.required(`[data-mission="${MISSIONS[0].id}"]`);
+  const firstTouch = new q.window.Event('pointerdown', { bubbles: true });
+  Object.defineProperty(firstTouch, 'pointerType', { value: 'touch' });
+  card.dispatchEvent(firstTouch);
+  card.click();
+  assert.ok(q.query('.q-home'), 'The first touch keeps the child on the calm story menu');
+  assert.equal(card.getAttribute('aria-expanded'), 'true');
+  assert.ok(card.querySelector('.q-story-bubble').textContent.includes(MISSIONS[0].childSummary));
+  const secondTouch = new q.window.Event('pointerdown', { bubbles: true });
+  Object.defineProperty(secondTouch, 'pointerType', { value: 'touch' });
+  card.dispatchEvent(secondTouch);
+  card.click();
+  assert.equal(q.required('.q-story-heading h1').textContent, MISSIONS[0].title);
+});
+
 test('semantic keyboard alternatives complete a two-slot story and preserve optional cooperative evidence', async t => {
   const q = await createQuest(t, { reducedMotion: true });
   const item = MISSIONS.find(mission => mission.slots.length === 2);
