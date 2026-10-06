@@ -120,6 +120,27 @@ p { color: var(--muted); font-size: 1.08rem; line-height: 1.5; }
 .muted { color: var(--muted); }
 .small { font-size: .9rem; }
 .center { text-align: center; }
+.page-back {
+  margin: -18px 0 30px;
+}
+.page-back button {
+  width: fit-content;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 800;
+  transition: transform .16s ease, box-shadow .16s ease;
+}
+.page-back button:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.page-back button:focus-visible { outline: 4px solid rgba(22,116,239,.25); outline-offset: 3px; }
 .screen-head { margin-bottom: 46px; }
 .screen-head.compact { margin-bottom: 28px; }
 

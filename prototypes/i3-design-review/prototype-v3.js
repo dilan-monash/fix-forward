@@ -15,13 +15,18 @@
     model: '',
     safety: {},
     finderType: 'repair',
+    finderPlace: 0,
     suburb: 'Brunswick VIC 3056',
     cityScore: 25,
     landfill: 75,
+    cityUpgrade: 'recovery',
   };
 
   let state = loadState();
   let promptTimers = [];
+  let lastRenderedPath = null;
+  let suppressTrailUpdate = false;
+  const routeTrail = [];
 
   function loadState() {
     try {
@@ -84,6 +89,24 @@
 
   const button = (label, path, className = 'primary') =>
     `<a class="${className}" href="#/${path}">${label}</a>`;
+
+  // These parent routes are safe fallbacks when a screen is opened directly without in-app history.
+  const backTargets = {
+    tour: 'home', quest: 'home', fixit: 'quest', 'fixit/right': 'fixit', 'fixit/retry': 'fixit',
+    loop: 'quest', 'loop/right': 'loop', 'loop/retry': 'loop', city: 'quest', 'city/play': 'city',
+    'city/upgrade': 'city/play', 'city/win': 'city', lens: 'home', 'lens/scan': 'lens',
+    'lens/confirm': 'lens', 'lens/impact': 'lens/confirm', 'lens/facts': 'lens/confirm',
+    'lens/care': 'lens/confirm', pathway: 'home', 'pathway/not-found': 'pathway',
+    'pathway/safety': 'pathway', 'pathway/options': 'pathway/safety', 'pathway/recall': 'pathway',
+    finder: 'home', 'finder/location': 'finder', 'finder/results': 'finder/location',
+    'finder/place': 'finder/results', about: 'home', privacy: 'about',
+  };
+
+  function backNavigation(path) {
+    const destination = backTargets[path];
+    if (!destination) return '';
+    return '<nav class="page-back" aria-label="Page navigation"><button type="button" data-go-back><span aria-hidden="true">←</span> Back</button></nav>';
+  }
 
   function steps(active) {
     return `<div class="steps" aria-label="Your pathway">
@@ -181,11 +204,11 @@
         <h2>${correct ? 'Repair' : 'Try again'}</h2>
         <p>${correct ? 'Fix the screen. Keep the phone. Keep its materials in use.' : 'Hint: the screen is cracked, but the phone still turns on.'}</p>
         ${correct ? '<strong>+10 Sparks</strong>' : ''}
-      </div><div class="actions end">${button(correct ? 'Next item' : 'Back to choices', correct ? 'quest' : 'fixit', correct ? 'primary green' : 'primary')}</div>`;
+      </div><div class="actions end">${button(correct ? 'Back to games' : 'Back to choices', correct ? 'quest' : 'fixit', correct ? 'primary green' : 'primary')}</div>`;
   }
 
   function loop() {
-    return `<section class="screen-head compact"><h1>Circular Choices</h1><p>Question 2 of 5</p></section>
+    return `<section class="screen-head compact"><h1>Circular Choices</h1></section>
       <div class="prompt-banner center"><strong>Your family has an old laptop that still works.<br>Nobody uses it anymore.<br><br>What keeps the most value in the loop?</strong></div>
       <div class="three-grid">
         <button class="choice green-card" data-loop="right"><strong>Give it to someone who can use it</strong></button>
@@ -200,7 +223,7 @@
         <h2>${correct ? 'Reuse keeps the whole product working.' : 'It still works.'}</h2>
         <p>${correct ? 'That saves more value than throwing it away or breaking it down too soon.' : 'Who could use it next?'}</p>
         ${correct ? '<strong>+15 Sparks &nbsp; 🔥 Streak: 2</strong>' : ''}
-      </div><div class="actions end">${button(correct ? 'Next question' : 'Try again', correct ? 'quest' : 'loop', correct ? 'primary green' : 'primary')}</div>`;
+      </div><div class="actions end">${button(correct ? 'Back to games' : 'Try again', correct ? 'quest' : 'loop', correct ? 'primary green' : 'primary')}</div>`;
   }
 
   function cityIntro() {
@@ -212,15 +235,21 @@
   function cityPlay() {
     return `<section class="screen-head compact"><h1>Circular City</h1><p>Pick one upgrade. Each choice changes your city.</p></section>
       <div class="upgrade-grid">
-        <article class="upgrade orange-card"><h2>Old dump</h2><p>Turn it into a Resource Recovery Hub.</p><b>100 coins · +15 circular · −10 landfill</b><div class="actions"><button class="primary orange" data-city-upgrade>Upgrade</button></div></article>
-        <article class="upgrade blue-card"><h2>Old factory</h2><p>Upgrade it to build easier-to-repair tech.</p><b>120 coins · +20 circular</b><div class="actions"><button class="primary blue" data-city-upgrade>Upgrade</button></div></article>
-        <article class="upgrade green-card"><h2>Empty lot</h2><p>Build a Tool Library for sharing.</p><b>80 coins · +10 circular</b><div class="actions"><button class="primary green" data-city-upgrade>Upgrade</button></div></article>
+        <article class="upgrade orange-card"><h2>Old dump</h2><p>Turn it into a Resource Recovery Hub.</p><b>100 coins · +15 circular · −15 landfill</b><div class="actions"><button class="primary orange" data-city-upgrade="recovery">Upgrade</button></div></article>
+        <article class="upgrade blue-card"><h2>Old factory</h2><p>Upgrade it to build easier-to-repair tech.</p><b>120 coins · +20 circular · −20 landfill</b><div class="actions"><button class="primary blue" data-city-upgrade="repairable">Upgrade</button></div></article>
+        <article class="upgrade green-card"><h2>Empty lot</h2><p>Build a Tool Library for sharing.</p><b>80 coins · +10 circular · −10 landfill</b><div class="actions"><button class="primary green" data-city-upgrade="sharing">Upgrade</button></div></article>
       </div><div class="score-bar">Circular score ${state.cityScore}% → Landfill ${state.landfill}%</div>`;
   }
 
   function cityUpgrade() {
-    return `<section class="screen-head compact"><h1>Nice upgrade!</h1><p>The Resource Recovery Hub keeps useful materials out of landfill.</p></section>
-      <div class="feedback-box green-card"><h2>Old dump → Resource Recovery Hub</h2><p>Metals, plastics and parts can be recovered instead of buried.</p></div>
+    const upgrades = {
+      recovery: ['The Resource Recovery Hub keeps useful materials out of landfill.', 'Old dump → Resource Recovery Hub', 'Metals, plastics and parts can be recovered instead of buried.'],
+      repairable: ['Repairable products can stay useful for longer.', 'Old factory → Repairable technology workshop', 'Products designed for repair are easier to maintain instead of replace.'],
+      sharing: ['Sharing helps more people use fewer new products.', 'Empty lot → Tool Library', 'Borrowing useful equipment reduces unnecessary purchases and waste.'],
+    };
+    const [summary, title, detail] = upgrades[state.cityUpgrade] || upgrades.recovery;
+    return `<section class="screen-head compact"><h1>Nice upgrade!</h1><p>${summary}</p></section>
+      <div class="feedback-box green-card"><h2>${title}</h2><p>${detail}</p></div>
       <div class="score-bar">Circular score ${state.cityScore}% &nbsp; • &nbsp; Landfill ${state.landfill}%</div>
       <div class="actions end">${state.cityScore >= 100 ? button('See result', 'city/win', 'primary green') : button('Choose another upgrade', 'city/play', 'primary green')}</div>`;
   }
@@ -228,7 +257,7 @@
   function cityWin() {
     return `<section class="screen-head compact"><h1>You did it! 🎉</h1><p>Your city keeps products and materials moving instead of wasting them.</p></section>
       <div class="big-result green-card"><strong>100% CIRCULAR</strong><strong>0% LANDFILL</strong><p>🏆 Circular City Builder</p></div>
-      <div class="actions end">${button('Play again', 'city', 'primary')}</div>`;
+      <div class="actions end"><button class="primary" data-city-reset>Play again</button></div>`;
   }
 
   function lensStart() {
@@ -248,7 +277,7 @@
 
   function lensConfirm() {
     return `<section class="screen-head compact"><h1>Explore a sample device</h1><p>This is a fixed example, not a recognition result.</p></section>
-      <div class="device-card"><span class="device-icon" aria-hidden="true"></span><div><h2>Example: Tablet</h2><p>Open the sample information to explore this design.</p><div class="actions">${button('Explore the tablet', 'lens/impact', 'primary green')}${button('Back', 'lens', 'primary')}</div></div></div>`;
+      <div class="device-card"><span class="device-icon" aria-hidden="true"></span><div><h2>Example: Tablet</h2><p>Open the sample information to explore this design.</p><div class="actions">${button('Explore the tablet', 'lens/impact', 'primary green')}</div></div></div>`;
   }
 
   function lensTabs(active) {
@@ -314,10 +343,13 @@
 
   function options() {
     const uncertain = Object.values(state.safety).some(answer => answer === 'Yes' || answer === 'Not sure');
-    return `<section class="screen-head compact"><h1>Here’s what we know</h1><p>One or more answers were “Not sure”, so get advice before using the item again.</p>${steps(2)}</section>
+    const summary = uncertain
+      ? 'One or more answers need caution, so get advice before using the item again.'
+      : 'Your answers did not show an obvious warning, but this short check cannot guarantee safety.';
+    return `<section class="screen-head compact"><h1>Here’s what we know</h1><p>${summary}</p>${steps(2)}</section>
       <div class="alert ${uncertain ? 'warning' : 'success'}"><strong>Safety is ${uncertain ? 'unclear' : 'not currently showing an obvious warning'}.</strong><p>${uncertain ? 'That does not mean something is definitely wrong, but it also does not mean the item is safe.' : 'This check is not a guarantee of safety.'}</p></div>
       <h2>You can still explore your options</h2><div class="three-grid">
-        <article class="option-card blue-card"><h2>Ask about repair</h2><p>Find a repair business to contact.</p>${button('Explore', 'finder/results', 'primary blue')}</article>
+        <article class="option-card blue-card"><h2>Ask about repair</h2><p>Find a repair business to contact.</p><button class="primary blue" data-finder-start="repair">Explore</button></article>
         <article class="option-card green-card"><h2>Repair or replace?</h2><p>Compare the cost and what makes sense.</p><button class="primary green" data-demo>Explore</button></article>
         <article class="option-card yellow-card"><h2>Consider recycling</h2><p>Find a place that can handle the item safely.</p>${button('Explore', 'finder', 'primary orange')}</article>
       </div>`;
@@ -325,13 +357,13 @@
 
   function recall() {
     return `<section class="screen-head compact"><h1>Sample recall screen</h1><p>Design example only. No official recall has been checked or matched.</p>${steps(1)}</section>
-      <div class="big-result red-card"><p>Example appliance · Sample model</p><h2 class="blue-text">How a recall could appear</h2><p>In a real service, this screen would link to a verified official notice. This demonstration cannot tell you whether an item is recalled.</p><strong>For a real item, check the official Product Safety Australia recall information.</strong><div class="actions"><a class="danger" href="https://www.productsafety.gov.au/recalls" target="_blank" rel="noopener">Open official recall search</a>${button('Back', 'pathway', 'primary')}</div></div>`;
+      <div class="big-result red-card"><p>Example appliance · Sample model</p><h2 class="blue-text">How a recall could appear</h2><p>In a real service, this screen would link to a verified official notice. This demonstration cannot tell you whether an item is recalled.</p><strong>For a real item, check the official Product Safety Australia recall information.</strong><div class="actions"><a class="danger" href="https://www.productsafety.gov.au/recalls" target="_blank" rel="noopener">Open official recall search</a></div></div>`;
   }
 
   function finder() {
     return `<section class="screen-head compact"><h1>What do you want to find?</h1><p>Choose one, then tell us where to look.</p></section>
       <div class="finder-kinds">${[['repair', 'Repair', 'orange-card'], ['donate', 'Donate or reuse', 'green-card'], ['recycle', 'Recycle', 'blue-card']].map(([value, label, colour]) => `<button class="finder-kind ${colour} ${state.finderType === value ? 'selected' : ''}" data-finder-type="${value}">${label}</button>`).join('')}</div>
-      <label for="finder-location">Location</label><div class="search-row"><input id="finder-location" value="${escapeHtml(state.suburb)}"><button class="primary green" data-finder-next>Show nearby places</button></div>`;
+      <div class="actions end"><button class="primary green" data-finder-next>Continue</button></div>`;
   }
 
   function finderLocation() {
@@ -340,27 +372,47 @@
       <div class="actions center"><button class="primary blue" data-current-location>Use current location</button></div><p class="center small">You can change this anytime.</p>`;
   }
 
+  // Provider examples follow the selected service type so results never imply the wrong kind of help.
+  const finderProviders = {
+    repair: [
+      ['Repair Café Brunswick', 'Repairs small electronics.'],
+      ['TechFix Community Hub', 'Offers community repair support.'],
+      ['Northside Repair Centre', 'Assesses household electronic repairs.'],
+    ],
+    donate: [
+      ['Community Tech Reuse', 'Accepts working devices for reuse.'],
+      ['Neighbourhood Donation Hub', 'Collects usable household electronics.'],
+      ['Device Reuse Centre', 'Prepares donated devices for another user.'],
+    ],
+    recycle: [
+      ['Council E-waste Drop-off', 'Accepts selected electronics for recycling.'],
+      ['Electronics Recycling Hub', 'Collects devices for material recovery.'],
+      ['Resource Recovery Centre', 'Handles approved local e-waste items.'],
+    ],
+  };
+
   function finderResults() {
-    return `<section class="screen-head compact"><h1>${state.finderType === 'repair' ? 'Repair' : state.finderType === 'donate' ? 'Donation' : 'Recycling'} near Brunswick</h1></section>
-      <div class="popular"><button class="chip-button active">Repair</button><button class="chip-button">Donate</button><button class="chip-button">Recycle</button></div>
+    const providers = finderProviders[state.finderType] || finderProviders.repair;
+    return `<section class="screen-head compact"><h1>${state.finderType === 'repair' ? 'Repair' : state.finderType === 'donate' ? 'Donation' : 'Recycling'} near ${escapeHtml(state.suburb)}</h1></section>
+      <div class="popular"><button class="chip-button ${state.finderType === 'repair' ? 'active' : ''}" data-finder-type="repair">Repair</button><button class="chip-button ${state.finderType === 'donate' ? 'active' : ''}" data-finder-type="donate">Donate</button><button class="chip-button ${state.finderType === 'recycle' ? 'active' : ''}" data-finder-type="recycle">Recycle</button></div>
       <div class="finder-layout"><div class="map" aria-label="Illustrative map"><span class="pin one"></span><span class="pin two"></span><span class="pin three"></span></div><aside><h2>Nearby</h2><div class="places">
-        <button class="place-card active" data-place><h3>Repair Café Brunswick</h3><p>1.2 km · Details</p></button>
-        <button class="place-card" data-place><h3>TechFix Community Hub</h3><p>1.8 km · Details</p></button>
-        <button class="place-card" data-place><h3>Northside Repair Centre</h3><p>2.4 km · Details</p></button>
+        ${providers.map(([name], index) => `<button class="place-card ${index === state.finderPlace ? 'active' : ''}" data-place="${index}"><h3>${name}</h3><p>${[1.2, 1.8, 2.4][index]} km · Details</p></button>`).join('')}
       </div></aside></div><p class="small">Prototype locations are fictional and must be replaced with verified provider data.</p>`;
   }
 
   function finderPlace() {
-    return `<section class="screen-head compact"><h1>Repair Café Brunswick</h1></section>
+    const providers = finderProviders[state.finderType] || finderProviders.repair;
+    const [name, service] = providers[state.finderPlace] || providers[0];
+    return `<section class="screen-head compact"><h1>${name}</h1></section>
       <div class="alert warning"><strong>Fictional place for design review.</strong> Address, distance and opening hours are examples. No live provider search was performed.</div>
-      <div class="finder-layout"><div class="map"><span class="pin one"></span></div><article class="panel"><h2>Repair Café Brunswick</h2><p class="blue-text"><b>1.2 km away</b></p><p>Open Saturday 10am–2pm</p><p>Repairs small electronics.<br>Check the provider site before you go.</p><div class="actions"><button class="primary blue" data-demo>Directions</button><button class="primary" data-demo>Provider site</button></div></article></div>`;
+      <div class="finder-layout"><div class="map"><span class="pin one"></span></div><article class="panel"><h2>${name}</h2><p class="blue-text"><b>${[1.2, 1.8, 2.4][state.finderPlace] || 1.2} km away</b></p><p>Open Saturday 10am–2pm</p><p>${service}<br>Check the provider site before you go.</p><div class="actions"><button class="primary blue" data-demo>Directions</button><button class="primary" data-demo>Provider site</button></div></article></div>`;
   }
 
   function about() {
     return `<section class="screen-head"><h1>Why FixForward exists</h1><p>Helping families make better choices with electronics.</p></section>
       <div class="two-grid"><article class="panel blue-card"><h2>The problem</h2><p>Electronics use valuable materials and energy. When we throw them away too soon, those resources are lost.</p></article><article class="panel green-card"><h2>What we’re here to do</h2><p>FixForward helps children and families understand e-waste, think in a circular way, and make safer household decisions together.</p></article></div>
       <div class="alert warning"><strong>Not-for-profit. Made for learning.</strong><p>FixForward is designed to make trustworthy e-waste information easier to understand, not to sell products or push a brand.</p></div>
-      <div class="actions"><a class="text-button" href="#/privacy">Privacy & data</a><a class="text-button" href="#/privacy">Our sources</a></div>`;
+      <div class="actions"><a class="text-button" href="#/privacy">Privacy & data</a></div>`;
   }
 
   function privacy() {
@@ -386,11 +438,16 @@
   function render() {
     promptTimers.forEach(clearTimeout);
     promptTimers = [];
-    const path = currentRoute();
-    const view = views[path] || home;
-    app.innerHTML = view();
+    const requestedPath = currentRoute();
+    const path = views[requestedPath] ? requestedPath : 'home';
+    const view = views[path];
+    if (lastRenderedPath && lastRenderedPath !== path && !suppressTrailUpdate) routeTrail.push(lastRenderedPath);
+    suppressTrailUpdate = false;
+    lastRenderedPath = path;
+    app.innerHTML = `${backNavigation(path)}${view()}`;
     document.querySelectorAll('[data-nav]').forEach(link => {
-      const selected = path === link.dataset.nav || (link.dataset.nav === 'home' && path !== 'about' && path !== 'privacy');
+      const selected = (link.dataset.nav === 'home' && (path === 'home' || path === 'tour'))
+        || (link.dataset.nav === 'about' && (path === 'about' || path === 'privacy'));
       if (selected) link.setAttribute('aria-current', 'page');
       else link.removeAttribute('aria-current');
     });
@@ -404,17 +461,30 @@
     const target = event.target.closest('button');
     if (!target) return;
 
-    if (target.dataset.fixit) {
+    if (target.hasAttribute('data-go-back')) {
+      const fallback = backTargets[currentRoute()] || 'home';
+      const destination = routeTrail.pop() || fallback;
+      suppressTrailUpdate = true;
+      route(destination);
+    } else if (target.dataset.fixit) {
       if (target.dataset.fixit === 'right') award({ energy: 10, stars: 1 });
       route(`fixit/${target.dataset.fixit}`);
     } else if (target.dataset.loop) {
       if (target.dataset.loop === 'right') award({ energy: 15, stars: 1 });
       route(`loop/${target.dataset.loop}`);
     } else if (target.hasAttribute('data-city-upgrade')) {
-      state.cityScore = Math.min(100, state.cityScore + 25);
-      state.landfill = Math.max(0, state.landfill - 25);
+      state.cityUpgrade = target.dataset.cityUpgrade;
+      const improvement = { recovery: 15, repairable: 20, sharing: 10 }[state.cityUpgrade] || 10;
+      state.cityScore = Math.min(100, state.cityScore + improvement);
+      state.landfill = Math.max(0, state.landfill - improvement);
       award({ energy: 10 });
       route('city/upgrade');
+    } else if (target.hasAttribute('data-city-reset')) {
+      state.cityScore = 25;
+      state.landfill = 75;
+      state.cityUpgrade = 'recovery';
+      saveState();
+      route('city');
     } else if (target.dataset.appliance) {
       state.appliance = target.dataset.appliance;
       saveState();
@@ -440,12 +510,15 @@
       else route('pathway/options');
     } else if (target.dataset.finderType) {
       state.finderType = target.dataset.finderType;
+      state.finderPlace = 0;
       saveState();
       render();
-    } else if (target.hasAttribute('data-finder-next')) {
-      state.suburb = document.querySelector('#finder-location').value.trim() || state.suburb;
+    } else if (target.dataset.finderStart) {
+      state.finderType = target.dataset.finderStart;
       saveState();
-      route('finder/results');
+      route('finder/location');
+    } else if (target.hasAttribute('data-finder-next')) {
+      route('finder/location');
     } else if (target.hasAttribute('data-finder-search')) {
       state.suburb = document.querySelector('#finder-location').value.trim() || state.suburb;
       saveState();
@@ -454,6 +527,8 @@
       showToast('Location is simulated in this local prototype.');
       route('finder/results');
     } else if (target.hasAttribute('data-place')) {
+      state.finderPlace = Number(target.dataset.place) || 0;
+      saveState();
       route('finder/place');
     } else if (target.hasAttribute('data-demo')) {
       showToast('This external action is disabled in the local prototype.');
