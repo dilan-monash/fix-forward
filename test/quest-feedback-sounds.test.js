@@ -90,9 +90,8 @@ async function feedbackPage(t, saved = createState()) {
 
 test('ordinary press sounds return after natural narration completion and while paused', async t => {
   const q = await feedbackPage(t);
-  q.click('[data-picker]');
   q.click('[data-hear]');
-  const control = q.required('[data-character]');
+  const control = q.required('[data-level-info]');
   const reading = q.utterances.at(-1);
   const before = q.notes.length;
   q.press(control);
@@ -137,7 +136,7 @@ test('an incorrect picture reflection still sounds after its reading finishes', 
   saved = transition(saved, { type: 'CHECK_PLAN' });
   saved = transition(saved, { type: 'COMPLETE_MISSION' });
   const q = await feedbackPage(t, saved);
-  q.click('.q-reflection [data-hear]');
+  q.click('.q-hud-listen');
   q.utterances.at(-1).onend();
   const before = q.notes.length;
   const wrong = item.reflection.options.find(option => option.id !== item.reflection.correctId);

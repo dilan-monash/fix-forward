@@ -67,13 +67,18 @@ class AccessTests(unittest.TestCase):
         health_check.assert_not_called()
 
     def test_only_minimal_access_assets_and_liveness_are_public(self):
-        for path in ("/api/health", "/favicon.svg", "/access.css", "/access.js", "/login"):
+        for path in ("/api/health", "/favicon.svg", "/access.css", "/access.js", "/login",
+                     "/brand.css", "/fonts/baloo-2-latin.woff2", "/fonts/nunito-latin.woff2"):
             with self.subTest(path=path):
                 response = self.client.get(path)
                 self.assertEqual(response.status_code, 200)
                 response.close()
         self.assertEqual(self.client.get("/api/health/").status_code, 401)
         self.assertEqual(self.client.get("/backend/access.css").status_code, 303)
+        # Only the named brand files are public: other fonts, styles and app pages stay gated.
+        for path in ("/fonts/README.md", "/fonts/NUNITO-OFL.txt", "/styles.css", "/quest/quest.css", "/"):
+            with self.subTest(gated=path):
+                self.assertNotEqual(self.client.get(path).status_code, 200)
 
     def test_login_has_semantic_form_and_no_password_value_or_app_script(self):
         response = self.client.get("/login")

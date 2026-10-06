@@ -1,9 +1,9 @@
 /* Touch-led game surfaces. Scrolling works everywhere outside a move handle. */
-body.quest { --play-yellow:#f8d777; --play-mint:#d8ebdd; --play-blue:#dbe7f3; }
+body.quest { --play-yellow:#f8d777; --play-mint:#d7eadf; --play-blue:#dbe7f3; }
 .q-header { padding-block:.8rem; }
 .q-header nav { gap:1rem; }
 /* Level badge, Sparks meter and read-aloud control. Display values come from progression.js through app.js. */
-.q-player-strip { display:flex; align-items:center; gap:1.3rem; width:min(1280px,calc(100% - 3rem)); margin:.1rem auto .5rem; padding:.4rem 1rem .5rem .3rem; border:1px solid #d6d9c6; border-radius:21px; background:#fffdf5; }
+.q-player-strip { display:flex; align-items:center; gap:1.3rem; width:min(1280px,calc(100% - 3rem)); margin:.1rem auto .5rem; padding:.4rem 1rem .5rem .3rem; border:1px solid #ccdbd2; border-radius:21px; background:#f9fffb; }
 .q-level-chip { display:flex; align-items:center; gap:.3rem; border:0; background:none; text-align:left; min-height:62px; padding:0 .5rem 0 0; border-radius:14px; }
 .q-level-chip>span:first-child { width:56px; flex:0 0 56px; }
 .q-level-chip svg { height:60px; }
@@ -15,9 +15,9 @@ body.quest { --play-yellow:#f8d777; --play-mint:#d8ebdd; --play-blue:#dbe7f3; }
 .q-spark-meter b>span:first-child { color:#916519; }
 .q-spark-meter b>span:last-child { font-size:.8rem; }
 .q-spark-meter small { font-size:.7rem; color:var(--muted); }
-.q-spark-track { background:#e9e8d5; height:9px; overflow:hidden; border-radius:8px; }
+.q-spark-track { background:#deeae3; height:9px; overflow:hidden; border-radius:8px; }
 .q-spark-track>span { display:block; height:100%; background:linear-gradient(90deg,#e4b341,#f4d778); border-radius:inherit; }
-.q-hud-listen,.q-listen { display:inline-flex; align-items:center; justify-content:center; gap:.5rem; padding:.55rem .85rem; min-height:48px; border:1px solid #b8cbb8; border-radius:13px; background:#eaf1e4; font-size:.8rem; font-weight:800; }
+.q-hud-listen,.q-listen { display:inline-flex; align-items:center; justify-content:center; gap:.5rem; padding:.55rem .85rem; min-height:48px; border:1px solid #bbcac1; border-radius:13px; background:#e4f1ea; font-size:.8rem; font-weight:800; }
 .q-hud-listen>span:first-child,.q-listen>span { font-size:1.05rem; white-space:nowrap; }
 .q-hud-listen>span:first-child,.q-listen>span { display:block; width:23px; height:23px; flex:0 0 23px; }
 .q-hud-listen { margin-left:auto; }
@@ -25,18 +25,18 @@ body.quest { --play-yellow:#f8d777; --play-mint:#d8ebdd; --play-blue:#dbe7f3; }
 .q-adventure-cover h1 { font-size:clamp(2.4rem,3.7vw,3.9rem); }
 /* Three large entry buttons lead directly to stories, sorting and creations. */
 .q-play-doors { grid-column:1/-1; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; margin-top:1.25rem; }
-.q-play-doors>button { position:relative; display:flex; align-items:center; gap:.9rem; padding:1rem .9rem; min-height:134px; min-width:0; text-align:left; border:1.5px solid #a9beaa; border-radius:22px 22px 22px 6px; background:var(--play-mint); box-shadow:0 5px 0 #c0cdb4; }
+.q-play-doors>button { position:relative; display:flex; align-items:center; gap:.9rem; padding:1rem .9rem; min-height:134px; min-width:0; text-align:left; border:1.5px solid #adbdb3; border-radius:22px 22px 22px 6px; background:var(--play-mint); box-shadow:0 5px 0 #bbcdc2; }
 .q-play-doors>button:nth-child(2) { background:#f5e3aa; border-color:#cfb977; box-shadow:0 5px 0 #dfd0a0; }
 .q-play-doors>button:nth-child(3) { background:#dde8f5; border-color:#afbdd1; box-shadow:0 5px 0 #c4d1dd; }
 .q-play-doors>button>span { flex:0 0 77px; }
 .q-play-doors>button svg { height:85px; }
 .q-play-doors small { display:block; font-size:.58rem; letter-spacing:.07em; color:#445d53; font-weight:800; }
 .q-play-doors strong { display:block; font-size:1.2rem; margin:.4rem 0; }
-.q-play-doors p { font-size:.78rem; margin:0; line-height:1.45; color:#40595a; }
+.q-play-doors p { font-size:.78rem; margin:0; line-height:1.45; color:#405a4d; }
 .q-play-doors b { margin-left:auto; font-size:1.5rem; color:var(--teal); }
 .q-play-doors button:hover { outline:2px solid var(--teal); outline-offset:3px; }
-.q-play-doors button:active { box-shadow:0 2px 0 #bdc4b3; transform:translateY(3px); }
-.q-guide-dialogue { max-width:none; border:1px solid #c7d8be; gap:.6rem; padding:.5rem .8rem .5rem .3rem; }
+.q-play-doors button:active { box-shadow:0 2px 0 #b8c4bd; transform:translateY(3px); }
+.q-guide-dialogue { max-width:none; border:1px solid #c4d7cc; gap:.6rem; padding:.5rem .8rem .5rem .3rem; }
 .q-guide-dialogue>div:nth-child(2) { flex:1; }
 .q-guide-dialogue p { font-size:1rem; }
 .q-guide-tools { display:flex; gap:.35rem; align-items:center; }
@@ -49,7 +49,7 @@ body.quest { --play-yellow:#f8d777; --play-mint:#d8ebdd; --play-blue:#dbe7f3; }
 .q-story-heading h1 { font-size:clamp(1.9rem,3vw,2.65rem); }
 .q-story-heading>p:last-child { font-size:1rem; line-height:1.55; }
 .q-step-track { max-width:820px; margin-bottom:1rem; }
-.q-hotspot { min-width:56px; min-height:56px; font-size:.87rem; border-radius:16px; box-shadow:0 4px 0 #b5a779; }
+.q-hotspot { min-width:56px; min-height:56px; font-size:.87rem; border-radius:16px; box-shadow:0 4px 0 #90ae9d; }
 .q-hotspot b { width:30px; height:30px; }
 .q-hotspot:active { background:#f6d46b; }
 .q-pocket-pieces button { min-height:48px; font-size:.82rem; }
@@ -77,7 +77,7 @@ body.quest { --play-yellow:#f8d777; --play-mint:#d8ebdd; --play-blue:#dbe7f3; }
 .q-action-tile>.q-drag-handle { flex-direction:column; gap:.15rem; }
 .q-drag-handle small { font-size:.65rem; font-weight:800; }
 .q-choice-tick { position:absolute; top:.5rem; right:.5rem; display:grid; place-items:center; width:23px; height:23px; border-radius:50%; background:var(--teal); color:white; }
-.q-action-tile.selected { border:2px solid var(--teal); background:#e0efdb; box-shadow:0 4px 0 #a3c6a7; }
+.q-action-tile.selected { border:2px solid var(--teal); background:#dcf0e4; box-shadow:0 4px 0 #a2c5b1; }
 .q-plan-slot { min-height:100px; font-size:1rem; }
 .q-single-plan .q-plan-layout { display:block; }
 .q-single-plan .q-action-bank { grid-template-columns:repeat(3,minmax(0,1fr)); align-items:stretch; }
@@ -85,7 +85,7 @@ body.quest { --play-yellow:#f8d777; --play-mint:#d8ebdd; --play-blue:#dbe7f3; }
 .q-single-plan .q-action-tile>button:first-child { flex-direction:column; text-align:center; min-height:155px; padding:1rem .7rem; gap:.65rem; }
 .q-single-plan .q-action-art { flex-basis:auto; width:95px; }
 .q-single-plan .q-action-art svg { height:85px; }
-.q-single-plan .q-drag-handle { flex-direction:row; border-left:0; border-top:1px dashed #acbd9e; min-height:46px; }
+.q-single-plan .q-drag-handle { flex-direction:row; border-left:0; border-top:1px dashed #a6bdb0; min-height:46px; }
 .q-single-plan .q-plan-slots { margin-top:1rem; }
 .q-single-plan .q-slot-wrap>span { font-size:.72rem; }
 .q-single-plan .q-plan-slot { min-height:62px; }
@@ -100,22 +100,22 @@ body.quest { --play-yellow:#f8d777; --play-mint:#d8ebdd; --play-blue:#dbe7f3; }
 .q-reflection-heading { display:flex; align-items:center; justify-content:space-between; gap:.7rem; }
 .q-reflection h2 { margin:.25rem 0 .7rem; font-size:1.35rem; }
 .q-reflection-options { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:.8rem; }
-.q-reflection-options button { display:flex; align-items:center; gap:.85rem; padding:.9rem; min-height:105px; border:2px solid #a5bbc8; border-radius:17px; background:#fffdf4; text-align:left; font-size:1rem; }
-.q-reflection-options button:hover { border-color:var(--teal); background:#f9edc8; }
+.q-reflection-options button { display:flex; align-items:center; gap:.85rem; padding:.9rem; min-height:105px; border:2px solid #a5bbc8; border-radius:17px; background:#f8fefb; text-align:left; font-size:1rem; }
+.q-reflection-options button:hover { border-color:var(--teal); background:#e1f1e8; }
 .q-reflection-options button>span { width:80px; flex:0 0 80px; }
 .q-reflection-options svg { height:80px; }
-.q-reflection-hint { border-left:4px solid var(--teal); padding:.6rem .8rem; background:#f8faf0; font-size:.95rem; }
-.q-reflection.answered { background:#e5efdd; border-color:#a6bd9e; }
+.q-reflection-hint { border-left:4px solid var(--teal); padding:.6rem .8rem; background:#f5fbf7; font-size:.95rem; }
+.q-reflection.answered { background:#dff1e6; border-color:#a4bcae; }
 .q-projector-controls [role=group] { gap:.4rem; }
 .q-projector-controls button { min-height:48px; }
 .q-sort { max-width:970px; }
 .q-sort-heading h1 { font-size:clamp(1.75rem,3vw,2.45rem); }
 .q-sort-rule { font-size:.88rem; }
 .q-sort-round-track { display:flex; justify-content:center; gap:.65rem; grid-column:1/-1; margin:0 0 1rem; }
-.q-sort-round-track span { display:grid; place-items:center; border:1px solid #b1bda5; border-radius:50%; width:31px; height:31px; background:#fffbee; font-size:.8rem; font-weight:800; }
+.q-sort-round-track span { display:grid; place-items:center; border:1px solid #acbeb3; border-radius:50%; width:31px; height:31px; background:#f3fdf8; font-size:.8rem; font-weight:800; }
 .q-sort-round-track .current { border:2px solid var(--teal); background:#f5d46c; }
 .q-sort-round-track .done { background:var(--teal); color:white; }
-.q-sort-board { position:relative; background:linear-gradient(150deg,#e5eddc,#f5eccb); border:2px solid #b3c3a7; }
+.q-sort-board { position:relative; background:linear-gradient(150deg,#ddeee5,#e0f0e7); border:2px solid #adc2b6; }
 .q-sort-object h2 { font-size:1.2rem; }
 .q-sort-object p { font-size:.94rem; }
 .q-lift { min-width:100px; min-height:52px; }
@@ -126,8 +126,8 @@ body.quest { --play-yellow:#f8d777; --play-mint:#d8ebdd; --play-blue:#dbe7f3; }
 .q-destination:active:not(:disabled) { background:#f8db86; }
 .q-destination-drawing svg path:not([fill]) { fill:none; }
 .q-level-trail { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.6rem; margin:1.5rem 0; }
-.q-level-trail>div { display:grid; justify-items:center; align-content:start; gap:.25rem; padding:.5rem .2rem; text-align:center; border:1px dashed #aebba2; border-radius:14px; background:#f1ecdb; }
-.q-level-trail .earned { background:#e2edda; border-style:solid; }
+.q-level-trail>div { display:grid; justify-items:center; align-content:start; gap:.25rem; padding:.5rem .2rem; text-align:center; border:1px dashed #a9bbb0; border-radius:14px; background:#e2f0e8; }
+.q-level-trail .earned { background:#dbeee3; border-style:solid; }
 .q-level-trail svg { height:90px; }
 .q-level-trail strong { font-size:.8rem; }
 .q-level-trail span { font-size:.75rem; line-height:1.4; }
@@ -136,52 +136,52 @@ body.quest { --play-yellow:#f8d777; --play-mint:#d8ebdd; --play-blue:#dbe7f3; }
  * The same local sans-serif face connects it to the game without making adults
  * scan a large illustrated cover before they understand the activity. */
 body.quest .q-parent-guide { max-width:1080px; }
-body.quest .q-parent-hero { display:block; padding:1.7rem 2rem; margin-bottom:2rem; border:1px solid #b4cbd4; border-radius:28px 28px 28px 8px; background:linear-gradient(120deg,#e3eef6,#f3f7ef); }
+body.quest .q-parent-hero { display:block; padding:1.7rem 2rem; margin-bottom:2rem; border:1px solid #b4cbd4; border-radius:28px 28px 28px 8px; background:linear-gradient(120deg,#e3eef6,#f0f8f3); }
 body.quest .q-parent-hero h1 { max-width:780px; font-size:clamp(1.9rem,3.7vw,2.8rem); line-height:1.12; margin:.5rem 0 1rem; letter-spacing:-.025em; }
 body.quest .q-parent-hero>p { max-width:760px; }
-body.quest .q-parent-hero .q-parent-lead { font-size:1.12rem; line-height:1.6; color:#263f55; }
+body.quest .q-parent-hero .q-parent-lead { font-size:1.12rem; line-height:1.6; color:#244337; }
 body.quest .q-parent-guide p { line-height:1.65; }
 body.quest .q-parent-guide h2 { font-size:clamp(1.4rem,2.5vw,1.8rem); line-height:1.25; letter-spacing:-.015em; }
 body.quest .q-parent-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.9rem; margin:1.3rem 0 2rem; }
 body.quest .q-parent-card { min-width:0; padding:1.2rem; border:1px solid #b7ccd8; border-radius:18px; background:#e7eff6; }
-body.quest .q-parent-card[data-tone=mint] { background:#e5efdf; border-color:#b9cdb0; }
-body.quest .q-parent-card[data-tone=sun] { background:#faf0cf; border-color:#d9c58a; }
-body.quest .q-parent-card[data-tone=peach] { background:#f7e6dc; border-color:#d9bba9; }
-body.quest .q-parent-card>.q-eyebrow { display:inline-block; margin:0 0 .55rem; font-size:.72rem; letter-spacing:.06em; color:#37516a; }
+body.quest .q-parent-card[data-tone=mint] { background:#e0f0e6; border-color:#b7cdc0; }
+body.quest .q-parent-card[data-tone=sun] { background:#e4f4eb; border-color:#d9c58a; }
+body.quest .q-parent-card[data-tone=peach] { background:#ddede4; border-color:#a9c8b6; }
+body.quest .q-parent-card>.q-eyebrow { display:inline-block; margin:0 0 .55rem; font-size:.72rem; letter-spacing:.06em; color:#365549; }
 body.quest .q-parent-card h3 { margin:0 0 .65rem; font-size:1.13rem; line-height:1.25; }
-body.quest .q-parent-card p { margin:0; font-size:.95rem; color:#384d5e; }
-body.quest .q-parent-current { padding:1.6rem 1.8rem; margin:1.4rem 0; border-left:5px solid #9ab4b5; border-radius:0 20px 20px 0; background:#f0f3e9; }
+body.quest .q-parent-card p { margin:0; font-size:.95rem; color:#325145; }
+body.quest .q-parent-current { padding:1.6rem 1.8rem; margin:1.4rem 0; border-left:5px solid #9ab4b5; border-radius:0 20px 20px 0; background:#eef4f0; }
 body.quest .q-parent-current>p { max-width:850px; }
 body.quest .q-parent-current h2 { margin:.4rem 0 .9rem; }
-body.quest .q-parent-current>div { padding:1rem 1.2rem; border:1px solid #c5cdbb; border-radius:14px; background:#fffdf4; }
+body.quest .q-parent-current>div { padding:1rem 1.2rem; border:1px solid #c0cdc6; border-radius:14px; background:#f8fefb; }
 body.quest .q-parent-current h3 { margin:0; font-size:1.12rem; }
-body.quest .q-parent-current .q-small-note { font-size:.86rem; color:#526477; }
-body.quest .q-parent-details { border-bottom:1px solid #c9d1c7; }
-body.quest .q-parent-details>summary { cursor:pointer; padding:1.1rem .3rem; min-height:52px; color:#203f53; font-size:1.02rem; font-weight:800; line-height:1.4; }
-body.quest .q-parent-details[open]>summary { color:#226a60; }
+body.quest .q-parent-current .q-small-note { font-size:.86rem; color:#4a695d; }
+body.quest .q-parent-details { border-bottom:1px solid #c9d0cc; }
+body.quest .q-parent-details>summary { cursor:pointer; padding:1.1rem .3rem; min-height:52px; color:#234236; font-size:1.02rem; font-weight:800; line-height:1.4; }
+body.quest .q-parent-details[open]>summary { color:#236b45; }
 body.quest .q-parent-details>p,body.quest .q-parent-details>ul { max-width:850px; margin:.3rem .3rem 1rem; font-size:.95rem; }
 body.quest .q-parent-details a { overflow-wrap:anywhere; }
 body.quest .q-parent-actions { display:flex; flex-wrap:wrap; gap:.75rem; margin:1.3rem 0 .2rem; }
 /* The parent preview reuses real game scenes. Its explicit stage attribute
  * selects one still frame; a button-driven reveal can animate the after frame. */
 body.quest .q-parent-intro { min-width:0; }
-body.quest .q-parent-demo { min-width:0; padding:1rem; margin-top:1.5rem; border:1px solid #b5c7bd; border-radius:22px 22px 7px 22px; background:#fffaf0; box-shadow:0 5px 0 #cddbcf; }
+body.quest .q-parent-demo { min-width:0; padding:1rem; margin-top:1.5rem; border:1px solid #b5c7bc; border-radius:22px 22px 7px 22px; background:#f3fcf7; box-shadow:0 5px 0 #cddbd2; }
 body.quest .q-parent-demo>.q-eyebrow { margin:0 0 .35rem; font-size:.68rem; }
 body.quest .q-parent-demo>h2 { margin:0 0 .85rem; font-size:1.35rem; }
-body.quest .q-parent-demo-pictures { overflow:hidden; border:1px solid #d1ccb6; border-radius:13px; background:#f2ecd7; }
+body.quest .q-parent-demo-pictures { overflow:hidden; border:1px solid #bcd1c5; border-radius:13px; background:#e0f0e7; }
 body.quest .q-parent-demo-frame { display:none; }
 body.quest .q-parent-demo[data-parent-demo-stage=before] [data-parent-demo-frame=before],
 body.quest .q-parent-demo[data-parent-demo-stage=after] [data-parent-demo-frame=after] { display:block; }
 body.quest .q-parent-demo-frame>.quest-art { display:block; width:100%; height:auto; aspect-ratio:900/460; }
-body.quest .q-parent-demo-frame>p { display:flex; flex-wrap:wrap; align-items:center; gap:.35rem .55rem; min-height:46px; margin:0; padding:.5rem .7rem; background:#e5ebdd; color:#2d4b40; font-size:.83rem; line-height:1.4; }
-body.quest .q-parent-demo-frame b { padding:.15rem .4rem; border-radius:5px; background:#fffdf4; font-size:.75rem; }
-body.quest .q-parent-demo>.q-parent-demo-caption { margin:.85rem 0; font-size:.9rem; line-height:1.55; color:#425751; }
-body.quest .q-parent-demo>.q-button { width:100%; text-align:center; background:#e0ecda; border-color:#7b9f82; }
+body.quest .q-parent-demo-frame>p { display:flex; flex-wrap:wrap; align-items:center; gap:.35rem .55rem; min-height:46px; margin:0; padding:.5rem .7rem; background:#dfede4; color:#2c4a3f; font-size:.83rem; line-height:1.4; }
+body.quest .q-parent-demo-frame b { padding:.15rem .4rem; border-radius:5px; background:#f8fefb; font-size:.75rem; }
+body.quest .q-parent-demo>.q-parent-demo-caption { margin:.85rem 0; font-size:.9rem; line-height:1.55; color:#435850; }
+body.quest .q-parent-demo>.q-button { width:100%; text-align:center; background:#dbede2; border-color:#7b9f8a; }
 /* Retain older optional artwork hooks for callers that supply a cover picture. */
-.q-parent-picture { border-radius:28px; overflow:hidden; background:#eee6ce; }
+.q-parent-picture { border-radius:28px; overflow:hidden; background:#daeae1; }
 .q-parent-why { max-width:870px; margin:1.5rem auto 2.5rem; text-align:center; }
 .q-parent-why h2 { font-size:clamp(1.5rem,2.5vw,2rem); }
-.q-parent-why p:not(.q-eyebrow) { color:#415763; }
+.q-parent-why p:not(.q-eyebrow) { color:#3c5b4f; }
 .q-parent-learning>h2 { font-size:1.7rem; }
 .q-parent-goals { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:1.5rem; margin:1.6rem 0 2.5rem; }
 .q-parent-goals article { padding:0 .5rem; }
@@ -270,7 +270,7 @@ body.quest .q-parent-demo>.q-button { width:100%; text-align:center; background:
   .q-single-plan .q-action-tile>button:first-child { flex-direction:row; min-height:86px; text-align:left; padding:.6rem; font-size:.95rem; }
   .q-single-plan .q-action-art { flex:0 0 62px; width:62px; }
   .q-single-plan .q-action-art svg { height:64px; }
-  .q-single-plan .q-drag-handle { flex-direction:column; border-top:0; border-left:1px dashed #acbd9e; }
+  .q-single-plan .q-drag-handle { flex-direction:column; border-top:0; border-left:1px dashed #a6bdb0; }
   .q-action-tile>button:first-child { font-size:.95rem; }
   .q-choice-tick { top:.2rem; right:.25rem; width:19px; height:19px; font-size:.68rem; }
   .q-plan-instruction>p { font-size:.9rem; }
@@ -336,44 +336,44 @@ body.quest .q-parent-demo>.q-button { width:100%; text-align:center; background:
 @keyframes q-chosen-picture { 0% { transform:scale(.94); } 65% { transform:scale(1.04); } 100% { transform:scale(1); } }
 @keyframes q-sort-deal { from { opacity:.5; transform:translateX(-18px) rotate(-2deg); } to { opacity:1; transform:none; } }
 @keyframes q-sort-arrive { from { opacity:.5; transform:translateY(-14px) scale(.85); } to { opacity:1; transform:none; } }
-@keyframes q-answer-reveal { from { background:#f4e4a8; } to { background:#e5efdd; } }
+@keyframes q-answer-reveal { from { background:#f4e4a8; } to { background:#dff1e6; } }
 
 /* Discovered picture facts stay beside the scene. Each short note has its own
  * illustration and heading; learning does not depend on opening a pop-up. */
 body.quest .q-picture-facts { display:grid; gap:.75rem; margin:1rem 0; }
 body.quest .q-picture-facts>h2 { margin:0; font-size:1.18rem; line-height:1.3; }
-body.quest .q-picture-facts>p { margin:0; color:#4b605f; font-size:.88rem; line-height:1.45; }
+body.quest .q-picture-facts>p { margin:0; color:#4c6159; font-size:.88rem; line-height:1.45; }
 body.quest .q-picture-fact-grid { display:grid; gap:.75rem; }
-body.quest .q-picture-fact { display:grid; grid-template-columns:72px minmax(0,1fr); gap:.85rem; align-items:center; padding:.85rem; border:1px solid #b7cbb7; border-radius:17px 17px 17px 5px; background:#f6faed; box-shadow:0 3px 0 #d6e0cc; }
+body.quest .q-picture-fact { display:grid; grid-template-columns:72px minmax(0,1fr); gap:.85rem; align-items:center; padding:.85rem; border:1px solid #bac9c1; border-radius:17px 17px 17px 5px; background:#f2faf6; box-shadow:0 3px 0 #d1e0d8; }
 body.quest .q-picture-fact>span:first-child,body.quest .q-picture-fact-art { display:block; width:72px; }
 body.quest .q-picture-fact-art>svg { height:72px; }
 body.quest .q-picture-fact h3 { margin:0 0 .3rem; font-size:1rem; line-height:1.35; }
-body.quest .q-picture-fact p { margin:.2rem 0; color:#354f52; font-size:.94rem; line-height:1.55; }
-body.quest .q-picture-fact .q-eyebrow { font-size:.64rem; margin:0 0 .3rem; color:#365e57; }
+body.quest .q-picture-fact p { margin:.2rem 0; color:#345141; font-size:.94rem; line-height:1.55; }
+body.quest .q-picture-fact .q-eyebrow { font-size:.64rem; margin:0 0 .3rem; color:#375f4a; }
 body.quest .q-picture-fact .q-listen { min-height:44px; margin-top:.45rem; }
 body.quest .q-picture-fact:focus { outline:3px solid #125e96; outline-offset:3px; }
 
 /* Speech controls remain reachable during a long page. The body-level toolbar
  * sits at the viewport bottom with reserved page space; the dialog copy stays
  * inline inside its native focus boundary. The app owns every button state. */
-body.quest .q-audio-dock { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:.7rem 1rem; padding:.7rem .9rem; margin:.9rem 0; border:1px solid #aac2d1; border-radius:16px; background:#e8f0f6; color:#244357; }
-body.quest>.q-audio-dock { position:fixed; z-index:30; bottom:max(1rem,env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%); width:min(640px,calc(100% - 2rem)); margin:0; box-shadow:0 5px 24px #1f3d4f25; }
+body.quest .q-audio-dock { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:.7rem 1rem; padding:.7rem .9rem; margin:.9rem 0; border:1px solid #aac2d1; border-radius:16px; background:#e8f0f6; color:#27463a; }
+body.quest>.q-audio-dock { position:fixed; z-index:30; bottom:max(1rem,env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%); width:min(640px,calc(100% - 2rem)); margin:0; box-shadow:0 5px 24px #21403425; }
 body.quest:has(>.q-audio-dock:not([hidden])) { padding-bottom:100px; }
 body.quest .q-audio-dock>p { flex:1 1 180px; margin:0; font-size:.84rem; line-height:1.5; }
 body.quest .q-audio-dock>[data-audio-status] { flex:1 1 135px; font-size:.9rem; font-weight:800; line-height:1.4; }
-body.quest .q-audio-dock strong { color:#183e56; }
+body.quest .q-audio-dock strong { color:#224135; }
 body.quest .q-audio-actions { display:flex; flex-wrap:wrap; align-items:center; gap:.45rem; }
-body.quest .q-audio-actions button { display:inline-flex; align-items:center; justify-content:center; gap:.4rem; min-height:46px; padding:.55rem .8rem; border:1px solid #819eb2; border-radius:10px; background:#fffdf7; color:#203f53; font-size:.85rem; font-weight:800; }
-body.quest .q-audio-actions button:hover:not(:disabled) { background:#f9e9b8; border-color:#55798c; }
-body.quest .q-audio-actions button[aria-pressed=true] { background:#244d63; border-color:#244d63; color:white; }
-body.quest .q-audio-actions button:disabled { color:#637583; border-color:#b9c8d0; background:#edf1f2; cursor:default; }
+body.quest .q-audio-actions button { display:inline-flex; align-items:center; justify-content:center; gap:.4rem; min-height:46px; padding:.55rem .8rem; border:1px solid #819eb2; border-radius:10px; background:#fafefc; color:#234236; font-size:.85rem; font-weight:800; }
+body.quest .q-audio-actions button:hover:not(:disabled) { background:#f9e9b8; border-color:#5c7b6f; }
+body.quest .q-audio-actions button[aria-pressed=true] { background:#304f43; border-color:#304f43; color:white; }
+body.quest .q-audio-actions button:disabled { color:#5b796e; border-color:#b9c8d0; background:#edf1f2; cursor:default; }
 body.quest .q-audio-actions svg { width:19px; height:19px; flex:0 0 19px; }
 
 /* A wrong destination has a visible cross as well as coral colour. It stays
  * steady while the child reads the clue and chooses again; there is no shake. */
 body.quest .q-destination.q-sort-retry { background:#fae9e1; border-color:#a95844; box-shadow:0 3px 0 #ddb39d; }
 body.quest .q-destination.q-sort-retry:hover:not(:disabled) { background:#f9dfd0; }
-body.quest .q-destination-cross { position:absolute; top:.5rem; right:.5rem; display:grid; place-items:center; width:31px; height:31px; border-radius:50%; border:2px solid #fff8ef; background:#a44d39; color:white; font-size:1.5rem; font-weight:900; line-height:1; }
+body.quest .q-destination-cross { position:absolute; top:.5rem; right:.5rem; display:grid; place-items:center; width:31px; height:31px; border-radius:50%; border:2px solid #f2fcf6; background:#a44d39; color:white; font-size:1.5rem; font-weight:900; line-height:1; }
 body.quest .q-feedback.retry { background:#fae9df; border-color:#c9957e; }
 body.quest .q-feedback.retry .q-feedback-mark { background:#a44d39; color:white; font-size:1.7rem; }
 body.quest .q-feedback.retry h2 { color:#783e32; }
@@ -381,7 +381,7 @@ body.quest .q-feedback.retry .q-button.primary { background:#245e55; color:white
 
 /* The win picture is in normal document flow. Its static star remains when
  * animations are reduced, and the next button is available immediately. */
-body.quest .q-win-celebration { display:flex; align-items:center; justify-content:center; gap:.6rem; width:100%; max-width:740px; padding:.4rem .8rem; margin:.6rem auto; border:1px solid #d5bd78; border-radius:22px; background:linear-gradient(120deg,#fcf1cc,#fff9e8); }
+body.quest .q-win-celebration { display:flex; align-items:center; justify-content:center; gap:.6rem; width:100%; max-width:740px; padding:.4rem .8rem; margin:.6rem auto; border:1px solid #d5bd78; border-radius:22px; background:linear-gradient(120deg,#e5f5ec,#effcf4); }
 body.quest .q-win-celebration>.quest-art,body.quest .q-win-celebration>span:first-child { display:block; width:230px; flex:0 0 230px; max-width:60%; }
 body.quest .q-win-celebration .quest-art { max-height:120px; }
 body.quest .q-win-celebration h2,body.quest .q-win-celebration strong { font-size:1.2rem; line-height:1.25; }
@@ -393,23 +393,23 @@ body.quest .q-win-celebration>.quest-art:only-child { max-width:100%; }
 
 /* Creations is a workbench, visually separate from the green story map. The
  * lavender paper, project shelves and postcard tools belong to creative play. */
-body.quest .q-creations-studio { max-width:1180px; padding:1.5rem 1.7rem 2rem; margin-top:1rem; border:1px solid #c7bfd4; border-radius:30px 30px 8px 30px; background:linear-gradient(150deg,#eeebf7,#fff8e9 62%); }
+body.quest .q-creations-studio { max-width:1180px; padding:1.5rem 1.7rem 2rem; margin-top:1rem; border:1px solid #c7bfd4; border-radius:30px 30px 8px 30px; background:linear-gradient(150deg,#eeebf7,#eefcf4 62%); }
 body.quest .q-creations-studio>h1 { font-size:clamp(2rem,4vw,2.8rem); max-width:750px; }
 body.quest .q-creations-studio>.q-eyebrow { color:#5b527c; }
-body.quest .q-creations-studio>p { max-width:720px; color:#4c5369; }
+body.quest .q-creations-studio>p { max-width:720px; color:#3d5a4f; }
 body.quest .q-creations-studio .q-creative-invite { border-color:#beb3d1; background:#faf6ff; box-shadow:0 5px 0 #d9d1e7; }
 body.quest .q-creations-studio .q-decorating { margin-top:1.8rem; border-top-color:#b2a6c3; }
 body.quest .q-creations-studio .q-decoration-picks { padding:1rem; border:1px solid #c8bdd6; border-radius:18px; background:#e7e0f0; }
-body.quest .q-creations-studio .q-decoration-tile { background:#fffdf6; border-color:#b9acc8; }
+body.quest .q-creations-studio .q-decoration-tile { background:#f9fefb; border-color:#b9acc8; }
 body.quest .q-creations-studio .q-decoration-tile>button:first-child { min-height:105px; }
 body.quest .q-creations-studio .q-decoration-slots button { border-color:#ada0bb; background:#f5f0fa; }
-body.quest .q-creations-studio .q-decor-world { border:8px solid #fffaf1; border-radius:20px; overflow:hidden; box-shadow:0 5px 0 #cbbfda; }
+body.quest .q-creations-studio .q-decor-world { border:8px solid #f4fdf8; border-radius:20px; overflow:hidden; box-shadow:0 5px 0 #cbbfda; }
 body.quest .q-creations-studio .q-postcard-preview { background:#dcd3e9; box-shadow:0 7px 0 #c6bad6,0 12px 22px #3c2e5814; }
 /* Finished stories form a postcard shelf; the thumbnail previews the child's
  * real saved design instead of repeating the adventure-map illustration. */
 body.quest .q-created-postcards { margin-top:1.8rem; }
 body.quest .q-creation-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1.2rem; margin:1.4rem 0; }
-body.quest .q-creation-card { display:flex; flex-direction:column; gap:.7rem; min-width:0; padding:.7rem .7rem .9rem; border:1px solid #b9afc9; border-radius:16px 16px 16px 5px; background:#fffdf7; text-align:left; box-shadow:0 5px 0 #d1c5df; }
+body.quest .q-creation-card { display:flex; flex-direction:column; gap:.7rem; min-width:0; padding:.7rem .7rem .9rem; border:1px solid #b9afc9; border-radius:16px 16px 16px 5px; background:#fafefc; text-align:left; box-shadow:0 5px 0 #d1c5df; }
 body.quest .q-creation-card>span { display:block; width:100%; overflow:hidden; border:1px solid #ded4e5; border-radius:10px; }
 body.quest .q-creation-card svg { width:100%; height:auto; }
 body.quest .q-creation-card strong { margin:0 .25rem; font-size:1.04rem; line-height:1.35; }

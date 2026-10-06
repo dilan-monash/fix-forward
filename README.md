@@ -4,6 +4,8 @@
 
 **Where to work:** Ordinary changes continue on `iteration-2` in `tmp/child-quest-prototype`. This checkout, `tmp/github-update`, is for explicitly approved Main promotions; the outer workspace is a separate older copy. In another clone, choose the intended branch and check the working tree before editing. Authored source files contain nearby explanations of functions and important rules. See the [agent working agreement](AGENTS.md) and [technology stack and source links](docs/TECH_STACK.md).
 
+**Shared design system:** The adult guide, Quest, the parent guide, the error pages and the password page share one visual system in `brand.css` (Baloo 2 and Nunito fonts, green-neutral ink, pill buttons, tinted status panels). See the [design system notes](docs/DESIGN_SYSTEM.md) before changing colours, fonts or button styles.
+
 ## Branches and websites
 
 | Website | GitHub branch | Website address | Role |

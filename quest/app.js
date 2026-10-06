@@ -20,9 +20,9 @@ import { createGameSounds } from './sounds.js';
 import { createHaptics } from './haptics.js';
 import { addWordHelp } from './word-help.js';
 import { sceneClues, pictureHelp as renderPictureHelp, sortingPictureHelp } from './picture-help.js';
-import { planFeedback, celebrationCopy, rewardPreview } from './feedback.js';
+import { planFeedback, celebrationCopy } from './feedback.js';
 import { STORY_LINES } from './story-audio.js';
-import { sortingVisualClues, playTrail, storyTrail } from './visual-play.js';
+import { sortingVisualClues } from './visual-play.js';
 import { getMotionContext } from './motion-context.js';
 import { createSortDemo } from './sort-demo.js';
 
@@ -50,7 +50,6 @@ let openClueList = false;
 let dialogReturn = null;
 let dialogReturnSelector = null;
 let postcardId = null;
-let storyBefore = false;
 let downloadUrl = null;
 let lastReward = null;
 let reflectionHint = null;
@@ -91,7 +90,6 @@ const soundIcon = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"
 // Small read-only lookups translate saved IDs into authored records and readable labels.
 const mission = () => MISSIONS.find(item => item.id === state.activeMission?.id);
 const concept = id => CONCEPTS.find(item => item.id === id);
-const locationTitle = id => LOCATIONS.find(item => item.id === id)?.title || 'Adventure map';
 // Shared markup helper: text and data are trusted templates assembled by callers.
 const button = (text, data, style = 'primary') => `<button class="q-button ${style}" ${data}>${text}</button>`;
 // Put a short update in the polite live region so a screen reader hears feedback.
@@ -273,7 +271,7 @@ function updateAudio(status = narration.getState()) {
   });
   // Natural completion can hide the currently focused Pause/Stop button. Return
   // focus to a visible reading control instead of leaving keyboard users stranded.
-  if (focusedDock?.hidden) (dialog.open ? dialog.querySelector('#q-dialog-close') : document.querySelector('#read-aloud')).focus();
+  if (focusedDock?.hidden) (dialog.open ? dialog.querySelector('#q-dialog-close') : document.querySelector('.q-hud-listen')).focus();
   if (audioRequested && (status.status === 'error' || status.status === 'unavailable')) announce(status.message);
   measureChrome();
 }
@@ -284,11 +282,11 @@ function bindAudio() {
   const focusAudio = (control, next) => {
     const target = control.parentElement.querySelector(next);
     if (!target.hidden && !target.closest('[data-audio-dock]').hidden) target.focus();
-    else (dialog.open ? dialog.querySelector('#q-dialog-close') : document.querySelector('#read-aloud')).focus();
+    else (dialog.open ? dialog.querySelector('#q-dialog-close') : document.querySelector('.q-hud-listen')).focus();
   };
   document.querySelectorAll('[data-audio-pause]').forEach(control => { control.onclick = () => { narration.pause(); focusAudio(control, '[data-audio-resume]'); }; });
   document.querySelectorAll('[data-audio-resume]').forEach(control => { control.onclick = () => { narration.resume(); focusAudio(control, '[data-audio-pause]'); }; });
-  document.querySelectorAll('[data-audio-stop]').forEach(control => { control.onclick = () => { narration.stop(); (dialog.open ? dialog.querySelector('#q-dialog-close') : document.querySelector('#read-aloud')).focus(); }; });
+  document.querySelectorAll('[data-audio-stop]').forEach(control => { control.onclick = () => { narration.stop(); (dialog.open ? dialog.querySelector('#q-dialog-close') : document.querySelector('.q-hud-listen')).focus(); }; });
 }
 // Release pointer listeners and temporary drag pictures before their screen disappears.
 function cleanDrag() { dragCleanups.forEach(clean => clean()); dragCleanups = []; }
@@ -333,7 +331,7 @@ function restoreRoute(route, { moveFocus = true } = {}) {
   closeDialog(); cleanDownload();
   picker = target.picker; postcardId = target.postcardId;
   selectedAction = null; selectedDecoration = null; openClueList = false;
-  reflectionHint = null; lastReward = null; celebration = false; storyBefore = false; pictureView = null; sortPicked = false; checkedPlan = null;
+  reflectionHint = null; lastReward = null; celebration = false; pictureView = null; sortPicked = false; checkedPlan = null;
   state = hydrateState({ ...state, view: target.view, activeMission: target.activeMission || state.activeMission, sorting: target.sorting || state.sorting });
   render('q-play-enter');
   // Canonicalize this same entry after reset or validation. Otherwise reloading
@@ -365,7 +363,6 @@ function dispatch(action, { focusTarget = '[data-focus]', speak = true } = {}) {
   if (action.type === 'ANSWER_SORT' || action.type === 'RETRY_SORT') sortPicked = false;
   if (action.type === 'CHECK_PLAN') checkedPlan = planFeedback(mission(), next.activeMission);
   else if (action.type !== 'RETRY_PLAN' && action.type !== 'SET_PLAN' && action.type !== 'REMOVE_PLAN' && action.type !== 'HINT' && action.type !== 'COLLECT_CLUE' && action.type !== 'SET_SETTING') checkedPlan = null;
-  if (action.type === 'CHOOSE_MISSION' || action.type === 'COMPLETE_MISSION' || action.type === 'REPLAY_MISSION') storyBefore = false;
   const nextProgress = progression(next);
   lastReward = nextProgress.points > previousProgress.points ? { amount: nextProgress.points - previousProgress.points, levelUp: nextProgress.level > previousProgress.level, level: nextProgress.level, title: nextProgress.title } : null;
   if (newScene) reflectionHint = null;
@@ -493,16 +490,7 @@ function listenButton(text = 'Hear it', extra = '') {
 }
 // Build the level badge and progress meter from derived rewards, not a stored score.
 function renderHud(progress = progression(state)) {
-  return `<div class="q-player-strip" aria-label="Your Quest progress"><button class="q-level-chip" data-level-info aria-label="Level ${progress.level}: ${escape(progress.title)}. ${progress.points} Sparks. See rewards."><span>${levelBadge(progress.level)}<b class="q-hud-level-number" aria-hidden="true">${progress.level}</b></span><span><small>LEVEL ${progress.level}</small><strong>${escape(progress.title)}</strong></span></button><div class="q-spark-meter"><div><b data-spark-target><span aria-hidden="true">✦</span> <span data-spark-value>${progress.points}</span> <span>Sparks</span></b><small>${progress.nextThreshold ? `${progress.pointsRemaining} to Level ${progress.level+1}` : 'All four level badges earned'}</small></div><div class="q-spark-track" role="progressbar" aria-label="Progress to your next level" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(progress.percent)}"><span data-spark-bar style="width:${progress.percent}%"></span></div></div><div class="q-hud-tools"><button class="q-game-sound" data-game-sound aria-pressed="${state.settings.sound}"><span aria-hidden="true">♫</span><span data-sound-label>${state.settings.sound ? 'Sound on' : 'Sound off'}</span></button><button class="q-hud-listen" data-hear aria-label="Read this screen aloud"><span aria-hidden="true">${soundIcon}</span><span>Read to me</span></button><button class="q-game-settings" data-game-settings aria-label="Game settings" title="Game settings"><span aria-hidden="true">⚙</span></button></div></div>${renderActivityProgress()}`;
-}
-// Keep the current goal next to the score, even when a child scrolls to a picture.
-// Replaying always advances this round, while each different picture earns Sparks once.
-function renderActivityProgress() {
-  const stamps = `${Object.keys(state.completed).length} / ${MISSIONS.length} story stamps`;
-  if (state.view === 'sorting' && state.sorting) return `<div class="q-round-hud" role="status"><strong>${Object.keys(state.sorting.answers).length} / 5 sorted</strong><span>${state.sortedItems.length} / ${SORT_ITEMS.length} different pictures</span></div>`;
-  const item = mission();
-  if (state.view === 'mission' && item && !picker && state.activeMission.step === 'explore') return `<div class="q-round-hud" role="status"><strong>${state.activeMission.clueIds.length} / ${item.clues.length} clues found</strong><span>${stamps}</span></div>`;
-  return `<div class="q-round-hud" role="status"><strong>${stamps}</strong><span>Every story is open. Pick your next adventure!</span></div>`;
+  return `<div class="q-player-strip" aria-label="Your Quest progress"><button class="q-level-chip" data-level-info aria-label="Level ${progress.level}: ${escape(progress.title)}. ${progress.points} Sparks. See rewards."><span>${levelBadge(progress.level)}<b class="q-hud-level-number" aria-hidden="true">${progress.level}</b></span><span><small>LEVEL ${progress.level}</small><strong>${escape(progress.title)}</strong></span></button><div class="q-spark-meter"><div><b data-spark-target><span aria-hidden="true">✦</span> <span data-spark-value>${progress.points}</span> <span>Sparks</span></b></div><div class="q-spark-track" role="progressbar" aria-label="Progress to your next level" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(progress.percent)}"><span data-spark-bar style="width:${progress.percent}%"></span></div></div><div class="q-hud-tools"><button class="q-game-sound" data-game-sound aria-pressed="${state.settings.sound}"><span aria-hidden="true">♫</span><span data-sound-label>${state.settings.sound ? 'Sound on' : 'Sound off'}</span></button><button class="q-hud-listen" data-hear aria-label="Read this screen aloud"><span aria-hidden="true">${soundIcon}</span><span>Read to me</span></button><button class="q-game-settings" data-game-settings aria-label="Game settings" title="Game settings"><span aria-hidden="true">⚙</span></button></div></div>`;
 }
 // Show only the most recent increase in Sparks; no increase means no reward banner.
 function renderCelebration() {
@@ -519,46 +507,29 @@ function levelInfo() {
   modal('Your Spark adventure', `<p>Collect Sparks as you learn. Every level brings a new badge.</p><div class="q-level-trail">${LEVELS.map(level => `<div class="${progress.level >= level.level ? 'earned' : ''}">${levelBadge(level.level)}<strong>Level ${level.level}</strong><span>${escape(level.title)}</span></div>`).join('')}</div><ul class="q-spark-rules"><li>Finish a new story: <strong>20 Sparks</strong></li><li>Sort a different picture: <strong>5 Sparks</strong></li><li>Find a new idea: <strong>5 Sparks</strong></li><li>Answer a story’s picture question: <strong>10 Sparks</strong></li></ul><p>Hints are free. Trying again is free. You keep your Sparks.</p><p class="q-small-note">Each picture and discovery earns Sparks once. Repeat pictures still fill your round. You can play every story at any level.</p>${button('Let’s play', 'data-close-clue')}`);
   dialogBody.querySelector('[data-close-clue]').onclick = closeDialog;
 }
-// Provide a small vocabulary panel with its own read-aloud and close controls.
-function wordHelp() {
-  modal('Little words, big ideas', `<dl class="q-word-list"><div><dt>A clue</dt><dd>A fact that helps you choose, like a note saying a fan works.</dd></div><div><dt>A report</dt><dd>A note about a check. It tells us what the trained repairer found.</dd></div><div><dt>Reuse</dt><dd>Use something again. It may go to a new home.</dd></div><div><dt>Repair</dt><dd>Fix something that is broken. A repairer does this.</dd></div><div><dt>Recycle</dt><dd>Turn old materials into materials we can use again.</dd></div><div><dt>E-waste</dt><dd>Old electrical things that need a special collection service.</dd></div><div><dt>A qualified repairer</dt><dd>A person trained to check and repair these appliances.</dd></div></dl>${listenButton('Read these words')}${button('Got it', 'data-close-clue')}`);
-  dialogBody.querySelector('[data-hear]').onclick = readScene;
-  dialogBody.querySelector('[data-close-clue]').onclick = closeDialog;
-}
-
 // Show each authored story as an available mission or an earned postcard entry.
 function renderPassport() {
   return renderAdventureTrail({ missions: MISSIONS, completed: state.completed, suggestedId: suggestedMission(state) });
 }
-// Home offers two clear story routes: start/resume, or choose a trail chapter.
-// Sorting is a different activity. Creations appear only when something earned
-// can actually be made; scenery no longer duplicates the chapter navigation.
+// Home is the minimum needed to play: pick a story on the map, continue one in
+// progress, or play the sorting game. Explanations live in the parent guide.
 function renderHome() {
-  const done = Object.keys(state.completed).length;
-  const canCreate = done > 0 || state.discoveries.length > 0;
+  const continuing = state.activeMission && state.activeMission.step !== 'outcome';
+  const sorting = state.sorting && state.sorting.status !== 'complete';
   return `<section class="q-home q-adventure-cover">
-    <div class="q-home-intro" data-read><p class="q-eyebrow"><span aria-hidden="true">✦</span> Small choices. Big adventures.</p><h1 tabindex="-1" data-focus>You choose <em>what happens next.</em></h1><p class="q-hero-invitation">Meet Pip the toaster and Flo the fan.</p>${playTrail({step:'look'})}
-      <div class="q-start-actions">${state.activeMission && state.activeMission.step !== 'outcome' ? button('Continue your adventure <span aria-hidden="true">→</span>', 'data-continue') : button(`${done ? 'Continue your adventure' : 'Start a mission'} <span aria-hidden="true">→</span>`, 'data-picker')}</div>
-      <p class="q-boundary">Your adventure stays on screen. Real appliances need adult help.</p>
+    <div class="q-home-intro" data-read><h1 tabindex="-1" data-focus>Pick a story</h1>
+      <div class="q-start-actions">${continuing ? button('Continue my story <span aria-hidden="true">→</span>', 'data-continue') : ''}${button(`${sorting ? 'Continue sorting' : 'Sorting game'} <span aria-hidden="true">→</span>`, 'data-sort-start', continuing ? 'secondary' : 'primary')}</div>
     </div>
-    <div class="q-play-doors q-focused-doors" aria-label="More to play and make"><button data-sort-start><span>${artwork('cardboard')}</span><div><small>TAP · MOVE · MATCH</small><strong>${state.sorting && state.sorting.status !== 'complete' ? 'Continue sorting' : 'Sorting game'}</strong><p>Find a home for each picture.</p></div><b aria-hidden="true">→</b></button>${canCreate ? `<button data-nav="creations"><span>${artwork('flowers')}</span><div><small>COLLECT · MAKE · KEEP</small><strong>My creations</strong><p>Make your world look like you.</p></div><b aria-hidden="true">→</b></button>` : ''}</div>
     ${renderPassport()}
-    ${canOfferChallenge(state) ? `<aside class="q-challenge-invite"><div><p class="q-eyebrow">Two stories solved on your own!</p><h2>Want to hunt for clues?</h2><p>In Challenge, you find the numbered clues yourself. Help is always there.</p></div><div class="q-step-actions">${button('Try Challenge', 'data-challenge-accept')}${button('Keep playing my way', 'data-challenge-dismiss', 'quiet')}</div></aside>` : ''}
-    <div class="q-world-wrap"><div class="q-world" aria-label="The places in our picture stories">${neighborhood({ unlocked: state.discoveries, decorations: state.decorations })}<span class="q-world-caption">A little world of second chances.</span></div><div class="q-world-greetings"><div class="q-greeting-friends">${['pip','flo'].map(id => `<button data-greet="${id}" aria-label="Say hello to ${id === 'pip' ? 'Pip' : 'Flo'}">${artwork(id)}<span>${id === 'pip' ? 'Pip' : 'Flo'}</span></button>`).join('')}</div><p class="q-world-dialogue" role="status">Pip the toaster. Flo the fan.<br>Tap a friend to say hello!</p></div></div>
+    ${canOfferChallenge(state) ? `<aside class="q-challenge-invite"><h2>Find the clues yourself?</h2><div class="q-step-actions">${button('Try Challenge', 'data-challenge-accept')}${button('No thanks', 'data-challenge-dismiss', 'quiet')}</div></aside>` : ''}
   </section>`;
 }
-// Filter authored missions by the temporary character/place selection and return their buttons.
+// List the authored stories (optionally for one place) as picture-and-title buttons.
 function renderPicker() {
-  const options = MISSIONS.filter(item => (!picker.character || item.character === picker.character) && (!picker.place || item.locationId === picker.place));
-  return `<section class="q-page q-picker"><button class="q-back" data-nav="home">← Back to the adventure map</button><p class="q-eyebrow">Every clue starts a story</p><h1 data-focus tabindex="-1">Who shall we help?</h1><p>Choose a friend, then a mission.</p><div class="q-character-choices">${['pip', 'flo'].map(id => `<button data-character="${id}" aria-pressed="${picker.character === id}">${artwork(id)}<strong>${id === 'pip' ? 'Pip' : 'Flo'}</strong><span>${id === 'pip' ? 'Pip the toaster' : 'Flo the fan'}</span></button>`).join('')}</div>
-      <div class="q-picker-tools"><span>${picker.place ? escape(locationTitle(picker.place)) : 'All around the adventure map'}</span><button class="q-back" data-all-missions>Show all stories</button></div>
-      <div class="q-mission-list">${options.map((item, index) => `<button class="q-mission-row" data-mission="${attr(item.id)}"><span class="q-mission-thumb">${artwork(item.artworkId)}</span><span><small>${escape(locationTitle(item.locationId))} · ${item.difficulty === 'trickier' ? 'Trickier story' : item.difficulty === 'challenge' || item.slots.length > 1 ? 'Connect the clues' : 'A next-step story'}</small><strong>${escape(item.title)}</strong><span>${escape(item.childSummary || item.fictionalContext)}</span></span><b aria-label="${state.completed[item.id] ? 'Explored' : 'Open story'}">${state.completed[item.id] ? '✓' : '→'}</b></button>`).join('') || '<p>Try another friend, or show all stories.</p>'}</div>
-      ${picker.place === 'station' || !picker.place ? `<div class="q-collection-invite"><span>${artwork('cardboard')}</span><div><p class="q-eyebrow">A hands-on picture activity</p><h2>Sort at Sorting Station</h2><p>Five picture cards. Three places to choose.</p>${button('Play sorting →', 'data-sort-start')}</div></div>` : ''}
+  const options = MISSIONS.filter(item => !picker.place || item.locationId === picker.place);
+  return `<section class="q-page q-picker"><button class="q-back" data-nav="home">← Map</button><h1 data-focus tabindex="-1">Pick a story</h1>
+      <div class="q-mission-list">${options.map(item => `<button class="q-mission-row" data-mission="${attr(item.id)}"><span class="q-mission-thumb">${artwork(item.artworkId)}</span><span><strong>${escape(item.title)}</strong></span><b aria-label="${state.completed[item.id] ? 'Explored' : 'Open story'}">${state.completed[item.id] ? '✓' : '→'}</b></button>`).join('')}</div>
     </section>`;
-}
-// Translate the internal mission step into the four visible progress labels.
-function missionProgress(active) {
-  return storyTrail(active);
 }
 // Create either positioned scene hotspots or a plain clue list from the same clue IDs.
 // Guided mode reveals labels; both versions dispatch the same discovery action.
@@ -574,14 +545,14 @@ function guideLine(item, active) {
 // Pair the story sentence with a character expression, narration and vocabulary controls.
 function guideBubble(item, active) {
   const happy = active.step === 'outcome' || active.feedback?.correct;
-  return `<aside class="q-guide-dialogue" aria-label="${item.character === 'pip' ? 'Pip' : 'Flo'} says"><div class="q-guide-portrait">${artwork(item.character, { expression: happy ? 'success' : ['explore','plan'].includes(active.step) ? 'thinking' : 'happy' })}</div><div><b>${item.character === 'pip' ? 'Pip' : 'Flo'}</b><p>${escape(guideLine(item, active))}</p></div><div class="q-guide-tools">${listenButton('Hear the story')}<button class="q-word-help" data-word-help>Word help</button></div></aside>`;
+  return `<aside class="q-guide-dialogue" aria-label="${item.character === 'pip' ? 'Pip' : 'Flo'} says"><div class="q-guide-portrait">${artwork(item.character, { expression: happy ? 'success' : ['explore','plan'].includes(active.step) ? 'thinking' : 'happy' })}</div><div><b>${item.character === 'pip' ? 'Pip' : 'Flo'}</b><p>${escape(guideLine(item, active))}</p></div></aside>`;
 }
 // Show the optional two-picture evidence question, retry hint or saved correct explanation.
 // The event handler asks the engine to save a correct answer; this renderer does not score it.
 function renderReflection(item) {
   if (!item.reflection) return '';
   const done = Boolean(state.reflections?.[item.id]);
-  return `<section class="q-reflection ${done ? 'answered' : ''}" aria-label="A picture question about your story"><div class="q-reflection-heading"><div><p class="q-eyebrow">${done ? 'You connected the clues' : 'One more little discovery · +10 Sparks'}</p><h2 data-reflection-focus tabindex="-1">${escape(done ? 'You spotted the reason!' : item.reflection.prompt)}</h2></div>${listenButton('Hear the question')}</div>${done ? `<p>${escape(item.reflection.explanation)}</p>` : `<div class="q-reflection-options">${item.reflection.options.map(option => `<button data-reflection="${attr(option.id)}"><span>${artwork(option.artworkId)}</span><strong>${escape(option.label)}</strong></button>`).join('')}</div>${reflectionHint === item.id ? `<p class="q-reflection-hint" role="status">Here’s a clue: ${escape(item.reflection.explanation)} Try again.</p>` : '<p class="q-small-note">Tap a picture. You can try again.</p>'}`}</section>`;
+  return `<section class="q-reflection ${done ? 'answered' : ''}" aria-label="A picture question about your story"><div class="q-reflection-heading"><h2 data-reflection-focus tabindex="-1">${escape(done ? 'You spotted the reason!' : item.reflection.prompt)}</h2></div>${done ? `<p>${escape(item.reflection.explanation)}</p>` : `<div class="q-reflection-options">${item.reflection.options.map(option => `<button data-reflection="${attr(option.id)}"><span>${artwork(option.artworkId)}</span><strong>${escape(option.label)}</strong></button>`).join('')}</div>${reflectionHint === item.id ? `<p class="q-reflection-hint" role="status">${escape(item.reflection.explanation)} Try again.</p>` : ''}`}</section>`;
 }
 
 // Display which authored clues were collected without inventing evidence for unopened clues.
@@ -652,17 +623,15 @@ function renderMission() {
   const clueId = pictureView?.missionId === item.id ? pictureView.clueId : item.clues[0]?.id;
   const pictureOpen = pictureView?.missionId === item.id;
   const result = feedback ? planFeedback(item, active) : null;
-  const preview = rewardPreview(state, { missionId: item.id });
-  return `<section class="q-page q-mission q-stage-${stage} ${final ? 'q-resolved' : ''} ${pictureOpen ? 'q-has-picture-help' : ''}"><div class="q-mission-top"><button class="q-back" data-nav="home">← Adventure map</button><span>${escape(locationTitle(item.locationId))}</span>${item.cooperative ? '<button class="q-back" data-companion>Secret envelope ✉</button>' : ''}</div>${missionProgress(active)}
-    <div class="q-story-heading" data-read><p class="q-eyebrow">${final ? 'You changed the story' : `${item.character === 'flo' ? 'Flo' : 'Pip'} has a mystery for you`}</p><h1 data-focus tabindex="-1">${escape(final ? item.outcome.title : item.title)}</h1><p>${escape(final ? item.outcome.text : stage === 'intro' ? item.fictionalContext : '')}</p></div>
+  return `<section class="q-page q-mission q-stage-${stage} ${final ? 'q-resolved' : ''} ${pictureOpen ? 'q-has-picture-help' : ''}"><div class="q-mission-top"><button class="q-back" data-nav="home">← Map</button>${item.cooperative ? '<button class="q-back" data-companion>Secret envelope ✉</button>' : ''}</div>
+    <div class="q-story-heading" data-read><h1 data-focus tabindex="-1">${escape(final ? item.outcome.title : item.title)}</h1>${final || stage === 'intro' ? `<p>${escape(final ? item.outcome.text : item.fictionalContext)}</p>` : ''}</div>
     ${guideBubble(item, active)}
-    ${final ? `<div class="q-projector-controls"><span><b aria-hidden="true">▶</b> Your story projector</span><button data-play-ending aria-label="Play the story ending again">▶ Replay ending</button><details class="q-projector-compare" ${storyBefore ? 'open' : ''}><summary>Compare before and after</summary><div role="group" aria-label="Compare your story before and after"><button data-story-view="before" aria-pressed="${storyBefore}">Before your choice</button><button data-story-view="after" aria-pressed="${!storyBefore}">The next chapter</button></div></details></div>` : ''}
-    <div class="q-mission-scene ${stage === 'plan' || feedback ? 'q-scene-small' : ''}" data-story-scene>${scene(item.locationId, item.artworkId, final && !storyBefore ? item.outcome.scene : null)}${stage === 'explore' && state.settings.mode === 'challenge' ? clueButtons(item, active, true) : stage === 'explore' || pictureOpen ? sceneClues(item, clueId) : ''}<span class="q-scene-tag">${final ? (storyBefore ? 'Where our story started' : 'What your choice changed') : stage === 'intro' ? 'Meet the friend in our picture story' : 'Our picture story · Look for a numbered clue'}</span></div>
-    ${stage === 'intro' ? `<div class="q-mission-intro">${playTrail({step:'look'})}<p class="q-first-clue">Tap a number in the picture to find a clue.</p><div class="q-points-preview"><b>✦ ${escape(preview.label)}</b><small>${preview.reflectionPoints ? `Then +${preview.reflectionPoints} for the picture question. ` : ''}Hints and retries are free.</small></div>${button('Find the clues →', 'data-start-mission')}${item.cooperative ? button('Open the secret envelope', 'data-evidence', 'secondary') : ''}</div>` : ''}
+    <div class="q-mission-scene ${stage === 'plan' || feedback ? 'q-scene-small' : ''}" data-story-scene>${scene(item.locationId, item.artworkId, final ? item.outcome.scene : null)}${stage === 'explore' && state.settings.mode === 'challenge' ? clueButtons(item, active, true) : stage === 'explore' || pictureOpen ? sceneClues(item, clueId) : ''}</div>
+    ${stage === 'intro' ? `<div class="q-mission-intro">${button('Find the clues →', 'data-start-mission')}${item.cooperative ? button('Open the secret envelope', 'data-evidence', 'secondary') : ''}</div>` : ''}
     ${stage === 'explore' ? `<div class="q-explore-controls">${state.settings.mode === 'guided' || pictureOpen ? renderPictureHelp(item, clueId, { close: pictureView?.returnSelector === '[data-hint]', closeLabel: 'Back to clues' }) : ''}${state.settings.mode === 'challenge' ? `${cluePocket(item, active)}<div>${button(openClueList ? 'Hide fact list' : 'Show fact list', 'data-clue-list', 'quiet')}<div class="q-clue-list" ${!openClueList ? 'hidden' : ''}>${clueButtons(item, active)}</div></div>` : ''}<div class="q-step-actions">${button('Help me choose', 'data-hint', 'quiet')}${button(state.settings.mode === 'guided' && item.clues.some(entry => entry.id !== clueId && !active.clueIds.includes(entry.id)) ? 'Next clue →' : 'Make a plan →', 'data-open-plan')}</div></div>` : ''}
     ${stage === 'plan' ? `<div class="q-plan-desk">${pictureOpen ? renderPictureHelp(item, clueId, { close: true }) : state.settings.mode === 'guided' ? factRecap(item) : cluePocket(item, active)}${renderPlan(item, active)}</div>` : ''}
-    ${feedback ? `<section class="q-feedback q-plan-feedback ${correct ? 'correct' : 'retry'}" data-read><div class="q-feedback-mark" aria-hidden="true">${correct ? '✦' : result.mixed ? '✓' : '×'}</div><div><h2 tabindex="-1" data-feedback-focus>${escape(correct ? 'Your clues unlocked the next chapter!' : result.summary)}</h2>${renderChoiceResults(result)}<p class="q-points-preview">${correct ? escape(preview.completionPoints ? `See your ending to collect ${preview.completionPoints} Sparks.` : 'Enjoy your ending again. You keep your Sparks.') : 'Trying again is free. Your Sparks stay with you.'}</p>${button(correct ? 'See the next chapter →' : 'Try again', correct ? 'data-complete' : 'data-retry')}${!correct ? button('Revisit the clues', 'data-revisit-clues', 'quiet') : ''}</div></section>` : ''}
-    ${final ? `<div class="q-outcome">${renderCelebration()}${renderReward()}<div class="q-unlocked"><div class="q-earned-story-stamp q-stamp-earned">${passportStamp(item.id)}</div><div><p class="q-eyebrow">One story. Your stamp.</p><h2>${escape(item.conceptIds.map(id => concept(id)?.title).filter(Boolean).join(' + '))}</h2><p>${escape(item.postcardLine || 'A next chapter worth keeping.')}</p></div></div>${renderReflection(item)}<div class="q-step-actions">${button('Choose another mission →', 'data-picker')}</div><details class="q-outcome-more"><summary>Make, replay or finish</summary><div class="q-creative-invite"><div><h2>Make a postcard of your story.</h2><p>Pick its colours. Add your mark. Keep your creation.</p></div>${button('Create my story postcard ✦', `data-postcard="${attr(item.id)}"`)}</div><div class="q-step-actions">${button('Open my Discovery Book', 'data-nav="book"', 'secondary')}${button('Finish for now', 'data-nav="home"', 'quiet')}${button('Play this story again', 'data-replay', 'quiet')}</div></details><p class="q-small-note">${active.assisted ? 'You followed a clue and found your way. That’s exploring.' : 'You connected the clues yourself.'}</p></div>` : ''}
+    ${feedback ? `<section class="q-feedback q-plan-feedback ${correct ? 'correct' : 'retry'}" data-read><div class="q-feedback-mark" aria-hidden="true">${correct ? '✦' : result.mixed ? '✓' : '×'}</div><div><h2 tabindex="-1" data-feedback-focus>${escape(correct ? 'Your clues unlocked the next chapter!' : result.summary)}</h2>${renderChoiceResults(result)}${button(correct ? 'See the next chapter →' : 'Try again', correct ? 'data-complete' : 'data-retry')}${!correct ? button('Revisit the clues', 'data-revisit-clues', 'quiet') : ''}</div></section>` : ''}
+    ${final ? `<div class="q-outcome">${renderCelebration()}${renderReward()}<div class="q-unlocked"><div class="q-earned-story-stamp q-stamp-earned">${passportStamp(item.id)}</div><h2>${escape(item.conceptIds.map(id => concept(id)?.title).filter(Boolean).join(' + '))}</h2></div>${renderReflection(item)}<div class="q-step-actions">${button('Next story →', 'data-picker')}${button('Play again', 'data-replay', 'quiet')}</div></div>` : ''}
   </section>`;
 }
 
@@ -684,10 +653,10 @@ function renderChoiceResults(result) {
 // Drag the artwork itself, or use the same labelled buttons with a tap or keyboard.
 function renderPlan(item, active) {
   const single = item.slots.length === 1;
-  return `<section class="q-plan-section ${single ? 'q-single-plan' : ''}"><div class="q-plan-instruction" data-read><h2 tabindex="-1" data-plan-focus>What should happen next?</h2><p>${single ? 'Tap a picture to choose. Or drag it to your plan.' : 'Drag a picture to a space. Or tap the picture, then the space.'}</p><p class="q-selection" role="status">${selectedAction ? `Your choice: ${escape(item.allowedActions.find(action => action.id === selectedAction)?.label)}${single ? '' : '. Tap a space below.'}` : 'Use the clues to help you choose.'}</p></div>
+  return `<section class="q-plan-section ${single ? 'q-single-plan' : ''}"><div class="q-plan-instruction" data-read><h2 tabindex="-1" data-plan-focus>What should happen next?</h2><p class="q-selection" role="status">${selectedAction ? `Your choice: ${escape(item.allowedActions.find(action => action.id === selectedAction)?.label)}${single ? '' : '. Tap a space below.'}` : single ? 'Tap a picture.' : 'Tap a picture, then a space.'}</p></div>
     <div class="q-plan-layout"><div class="q-action-bank" aria-label="Actions to choose">${item.allowedActions.map(action => `<div class="q-action-tile ${selectedAction === action.id || Object.values(active.plan).includes(action.id) ? 'selected' : ''}"><button data-action-select="${attr(action.id)}" aria-pressed="${selectedAction === action.id || Object.values(active.plan).includes(action.id)}"><span class="q-action-art">${artwork(action.artworkId || item.artworkId)}</span><strong>${escape(action.label)}</strong>${Object.values(active.plan).includes(action.id) ? '<span class="q-choice-tick">Chosen</span>' : ''}</button></div>`).join('')}</div>
     <div class="q-plan-slots">${item.slots.map((slot, index) => { const action = item.allowedActions.find(action => action.id === active.plan[slot.id]); const prior = checkedPlan?.slots.find(row => row.slotId === slot.id && row.chosenActionId === action?.id); return `<div class="q-slot-wrap ${prior?.chosenCorrect ? 'q-kept-choice' : ''}">${prior ? `<small class="q-slot-review">${prior.chosenCorrect ? '✓ Keep this choice' : `Try another picture for this ${item.planKind === 'sequence' ? 'step' : 'item'}`}</small>` : ''}<span>${index + 1}. ${escape(slot.label)}</span><button class="q-plan-slot ${action ? 'filled' : ''}" data-plan-slot="${attr(slot.id)}" aria-label="${attr(slot.label)}: ${attr(action?.label || 'empty, choose an action first')}"><span aria-hidden="true">${prior?.chosenCorrect ? '✓' : action ? '●' : '+'}</span>${escape(action?.label || 'Your plan goes here')}</button>${action ? `<button class="q-back" data-remove-slot="${attr(slot.id)}">Change my choice</button>` : ''}</div>`; }).join('')}</div></div>
-    <div class="q-step-actions">${button('Help me choose', 'data-hint', 'quiet')}${button('See what happens →', `data-check-plan aria-describedby="q-plan-help" aria-disabled="${!item.slots.every(slot => active.plan[slot.id])}"`)}</div><p id="q-plan-help" data-plan-help class="q-small-note" role="status">${item.slots.every(slot => active.plan[slot.id]) ? 'Your plan is ready to try.' : 'Choose a picture for each empty space first.'}</p></section>`;
+    <div class="q-step-actions">${button('Help me choose', 'data-hint', 'quiet')}${button('See what happens →', `data-check-plan aria-describedby="q-plan-help" aria-disabled="${!item.slots.every(slot => active.plan[slot.id])}"`)}</div><p id="q-plan-help" data-plan-help class="q-small-note" role="status"></p></section>`;
 }
 
 const destinations = [
@@ -707,17 +676,16 @@ function renderSorting() {
     const independent = answers.filter(answer => !answer.assisted).length;
     // Offer an unfinished chapter after the round without locking any other story.
     const nextStory = MISSIONS.find(story => !Object.hasOwn(state.completed, story.id));
-    return `<section class="q-page q-sort-finish"><p class="q-eyebrow">Sorting Station</p><h1 data-focus tabindex="-1">Five thoughtful choices.</h1>${renderCelebration()}<div class="q-finish-art">${neighborhood({ unlocked: state.discoveries, decorations: state.decorations })}</div><p>You found a next step for five pictures. Nice thinking!</p><div class="q-run-reflection"><span><b>${independent}</b> on your own</span><span><b>${answers.length - independent}</b> with a clue</span></div><p>Clues are for everyone. Which one helped you?</p>${nextStory ? `<p>Your next adventure: <strong>${escape(nextStory.title)}</strong></p>` : `<p>All ${MISSIONS.length} story stamps are yours. What a journey!</p>`}<div class="q-step-actions">${nextStory ? button('Try a story mission →', `data-mission="${attr(nextStory.id)}"`) : ''}${button('Try another five cards →', 'data-sort-start', 'secondary')}${button('My Discovery Book', 'data-nav="book"', 'secondary')}${button('Finish for now', 'data-nav="home"', 'quiet')}</div></section>`;
+    return `<section class="q-page q-sort-finish"><h1 data-focus tabindex="-1">Five pictures sorted!</h1>${renderCelebration()}<p class="q-run-reflection"><b>${independent}</b> on your own · <b>${answers.length - independent}</b> with a clue</p><div class="q-step-actions">${nextStory ? button('Try a story →', `data-mission="${attr(nextStory.id)}"`) : ''}${button('Five more →', 'data-sort-start', nextStory ? 'secondary' : 'primary')}${button('Map', 'data-nav="home"', 'quiet')}</div></section>`;
   }
   if (!item) return renderHome();
   const feedback = run.status === 'feedback'; const correct = feedback && run.feedback?.correct;
-  const preview = rewardPreview(state, { sortItemId: item.id });
   const visualClues = sortingVisualClues(item); // Keep the full clue visible if a future card has no illustrated summary.
   const joy = celebrationCopy({ kind: 'sorting', conceptId: item.conceptId, points: lastReward?.amount || 0, seed: item.id });
   // Restoring an already solved card is not another attempt or a new reward.
   if (correct && !celebration) joy.pointsLine = 'Picture solved. Your Sparks are saved in the top bar.';
-  return `<section class="q-page q-sort"><div class="q-mission-top"><button class="q-back" data-nav="home">← Adventure map</button><span>Picture ${run.index + 1} of 5</span><span class="q-sort-ticket" aria-label="Untimed picture challenge">Think it through ✦</span></div><div class="q-sort-heading"><p class="q-eyebrow">Sorting Station</p><h1 data-focus tabindex="-1">Where does this picture go?</h1><p class="q-sort-rule"><strong>A warning or a missing clue? Pause and ask.</strong></p></div>
-    <div class="q-sort-board"><div class="q-sort-round-track" aria-label="Picture ${run.index + 1} of 5">${Array.from({length:5}, (_,i) => `<span class="${i < run.index || (i === run.index && correct) ? 'done' : i === run.index ? 'current' : ''}">${i < run.index || (i === run.index && correct) ? '✓' : i+1}</span>`).join('')}</div><article class="q-sort-object ${correct ? 'placed' : ''} ${sortPicked ? 'q-picked-object' : ''}" data-read tabindex="0" aria-label="Picture and clues">${!feedback ? `<aside class="q-sort-practice" data-sort-practice hidden aria-label="Practice moving a picture"><div data-sort-demo-stage></div><button class="q-button quiet" data-sort-demo-skip>Skip — let me try</button></aside>` : ''}<button class="q-sort-art q-sort-picture" data-sort-picture aria-label="Move ${attr(item.title)} picture" aria-pressed="${sortPicked}" ${feedback ? 'disabled' : ''}>${artwork(item.artworkId)}<span class="q-card-number">${run.index + 1}/5</span></button><div class="q-sort-object-copy"><h2>${escape(item.title)}</h2>${visualClues}<details class="q-full-clue" ${visualClues ? '' : 'open'}><summary>Read the full clue</summary><p>${escape(item.condition)}</p></details>${!feedback ? `<p class="q-sort-point-note">✦ ${escape(preview.label)}</p>` : ''}</div></article>
+  return `<section class="q-page q-sort"><div class="q-mission-top"><button class="q-back" data-nav="home">← Map</button></div><div class="q-sort-heading"><h1 data-focus tabindex="-1">Where does this picture go?</h1></div>
+    <div class="q-sort-board"><div class="q-sort-round-track" aria-label="Picture ${run.index + 1} of 5">${Array.from({length:5}, (_,i) => `<span class="${i < run.index || (i === run.index && correct) ? 'done' : i === run.index ? 'current' : ''}">${i < run.index || (i === run.index && correct) ? '✓' : i+1}</span>`).join('')}</div><article class="q-sort-object ${correct ? 'placed' : ''} ${sortPicked ? 'q-picked-object' : ''}" data-read tabindex="0" aria-label="Picture and clues">${!feedback ? `<aside class="q-sort-practice" data-sort-practice hidden aria-label="Practice moving a picture"><div data-sort-demo-stage></div><button class="q-button quiet" data-sort-demo-skip>Skip — let me try</button></aside>` : ''}<button class="q-sort-art q-sort-picture" data-sort-picture aria-label="Move ${attr(item.title)} picture" aria-pressed="${sortPicked}" ${feedback ? 'disabled' : ''}>${artwork(item.artworkId)}</button><div class="q-sort-object-copy"><h2>${escape(item.title)}</h2>${visualClues}<details class="q-full-clue" ${visualClues ? '' : 'open'}><summary>Read the full clue</summary><p>${escape(item.condition)}</p></details></div></article>
     <p class="q-sort-instruction">${feedback ? (correct ? 'You found a place that fits.' : 'Read the help, then press Try again.') : 'Drag the picture, or tap a place.'}</p>
     <div class="q-destinations" aria-label="Choose a place">${destinations.map(destination => `<button class="q-destination dest-${destination.id} ${feedback && run.feedback.destinationId === destination.id ? (correct ? 'q-accepted' : 'q-sort-retry') : ''}" data-destination="${destination.id}" ${feedback ? 'disabled' : ''}><span class="q-destination-drawing" aria-hidden="true">${destination.id === 'ewaste' ? '<svg viewBox="0 0 90 65"><path d="M10 55V26L45 8l35 18v29H10Z" fill="#d7e9dd"/><path d="M20 55V30h50v25M36 55V37h18v18"/><path d="M8 26 45 7l37 19"/><path d="m38 20 5-6 5 6m0-6h-5v9"/></svg>' : destination.id === 'paper' ? artwork('cardboard') : '<svg viewBox="0 0 90 65"><path d="M12 7h66v43H43L29 60V50H12Z" fill="#f8d39c"/><path d="M36 23q1-12 14-9t3 16l-8 5v5M45 44v2"/></svg>'}</span>${feedback && !correct && run.feedback.destinationId === destination.id ? '<span class="q-destination-cross" aria-label="Try again">×</span>' : ''}<strong>${escape(destination.title)}</strong><small>${escape(destination.short)}</small>${correct && run.feedback.destinationId === destination.id ? `<span class="q-placed-picture" aria-hidden="true">${artwork(item.artworkId)}</span>` : ''}${correct && run.feedback.destinationId === destination.id ? '<b class="q-destination-tick">✓ Placed</b>' : ''}</button>`).join('')}</div></div>
     ${feedback ? `${renderReward()}<section class="q-feedback ${correct ? 'correct' : 'retry'}" data-read>${correct ? `${renderCelebration()}<div class="q-sort-reaction q-play-enter" aria-hidden="true">${artwork(item.explanation.startsWith('Flo:') ? 'flo' : 'pip', {expression:'success'})}<span class="q-reaction-star">✦</span><span class="q-reaction-star">✦</span></div>` : ''}<span class="q-feedback-mark" aria-hidden="true">${correct ? '✓' : '×'}</span><div><h2 data-feedback-focus tabindex="-1">${correct ? escape(joy.headline) : 'Not this place. Try again.'}</h2><p>${escape(correct ? item.explanation : item.clue)}</p>${correct ? `<p class="q-earned-note">${escape(joy.pointsLine)}</p>` : ''}${button(correct ? (run.index === 4 ? 'Finish this round →' : 'Next picture →') : 'Try again', correct ? 'data-sort-next' : 'data-sort-retry')}</div></section>` : `${pictureView?.sortId === item.id ? sortingPictureHelp(item) : ''}<div class="q-sort-help">${button('Help me choose', 'data-hint', 'quiet')}${button('Show me the move', 'data-sort-demo-replay', 'quiet')}<p id="q-drag-message" role="status"></p></div>`}
@@ -726,20 +694,20 @@ function renderSorting() {
 // Build the discovery collection and decoration choices from earned concept IDs.
 function renderBook() {
   const earned = CONCEPTS.filter(item => state.discoveries.includes(item.id));
-  return `<section class="q-page q-book"><button class="q-back" data-nav="home">← Adventure map</button><p class="q-eyebrow">My Discovery Book</p><h1 data-focus tabindex="-1">Ideas I can use again.</h1><p>Each page explains something you learned while playing.</p>
-    ${earned.length ? `<div class="q-book-pages">${earned.map(item => `<article class="q-discovery"><div>${artwork(item.artworkId)}</div><section><p class="q-eyebrow">Discovered</p><h2>${escape(item.title)}</h2><p>${escape(item.text)}</p></section></article>`).join('')}</div>` : `<div class="q-book-empty">${artwork('pip', { expression: 'thinking' })}<h2>Your first page is waiting.</h2><p>Play a story or sort pictures to find your first idea.</p>${button('Choose a story →', 'data-picker')}</div>`}
-    <div class="q-step-actions">${button('My creations →', 'data-nav="creations"', 'secondary')}${button('Back to the map', 'data-nav="home"', 'quiet')}</div></section>`;
+  return `<section class="q-page q-book"><button class="q-back" data-nav="home">← Map</button><h1 data-focus tabindex="-1">Discovery Book</h1>
+    ${earned.length ? `<div class="q-book-pages">${earned.map(item => `<article class="q-discovery"><div>${artwork(item.artworkId)}</div><section><h2>${escape(item.title)}</h2><p>${escape(item.text)}</p></section></article>`).join('')}</div>` : `<div class="q-book-empty">${artwork('pip', { expression: 'thinking' })}<h2>Play a story to fill this book.</h2>${button('Choose a story →', 'data-picker')}</div>`}
+    <div class="q-step-actions">${button('My creations →', 'data-nav="creations"', 'secondary')}</div></section>`;
 }
 // Keep making separate from solving: selecting a saved design does not start its
 // story again. Every postcard belongs to a finished story and exports on this device.
 function renderCreations() {
   const earned = CONCEPTS.filter(item => state.discoveries.includes(item.id));
   const finished = MISSIONS.filter(item => Object.hasOwn(state.completed, item.id));
-  return `<section class="q-page q-creations-studio"><button class="q-back" data-nav="home">← Adventure map</button><p class="q-eyebrow">My creations</p><h1 data-focus tabindex="-1">Make something that's yours.</h1><p>Design a postcard. Decorate your map. There are no right or wrong colours here.</p>
-    <section class="q-created-postcards"><h2>My story postcards</h2><p>Pick a finished story to change its colours and sticker, then save a picture.</p>${finished.length ? `<div class="q-creation-grid">${finished.map(item => `<button class="q-creation-card" data-postcard="${attr(item.id)}"><span>${postcard(item, state.postcards?.[item.id])}</span><strong>${escape(item.title)}</strong><small>Open my design →</small></button>`).join('')}</div>` : `<div class="q-creation-empty">${artwork('pip', {expression:'thinking'})}<p>Finish one story to unlock its postcard.</p>${button('Choose my first story →', 'data-picker')}</div>`}</section>
-    ${earned.length ? `<section class="q-decorating"><p class="q-eyebrow">Make this place your own</p><h2>A little garden? A splash of colour?</h2><p>Choose a decoration, then choose a place. You can move it whenever you like.</p><div class="q-decoration-picks">${[...new Set(earned.map(item => item.decoration))].map(id => `<div class="q-decoration-tile"><button data-decoration="${attr(id)}" aria-pressed="${selectedDecoration === id}">${artwork(id)}<span>${escape(id)}</span></button><button class="q-drag-handle" data-decoration-drag="${attr(id)}" aria-label="Drag ${attr(id)} decoration">⠿</button></div>`).join('')}</div><div class="q-decor-world">${neighborhood({ unlocked: state.discoveries, decorations: state.decorations })}</div><div class="q-decoration-slots">${LOCATIONS.map(place => `<button data-decoration-slot="${attr(place.id)}"><strong>${escape(place.title)}</strong><span>${escape(state.decorations[place.id] || 'An open space')}</span><small>${selectedDecoration ? `Place ${escape(selectedDecoration)} here` : 'Choose a decoration first'}</small></button>`).join('')}</div><p class="q-small-note">Make this little world look like yours.</p></section>` : ''}
-    ${!earned.length ? '<section class="q-creation-empty"><h2>My map decorations</h2><p>Find an idea in a story or sorting game to unlock your first decoration.</p></section>' : ''}
-    <div class="q-step-actions">${button('Read my Discovery Book', 'data-nav="book"', 'secondary')}${button('Back to the map', 'data-nav="home"', 'quiet')}</div></section>`;
+  return `<section class="q-page q-creations-studio"><button class="q-back" data-nav="home">← Map</button><h1 data-focus tabindex="-1">My creations</h1>
+    <section class="q-created-postcards"><h2>Postcards</h2>${finished.length ? `<div class="q-creation-grid">${finished.map(item => `<button class="q-creation-card" data-postcard="${attr(item.id)}"><span>${postcard(item, state.postcards?.[item.id])}</span><strong>${escape(item.title)}</strong></button>`).join('')}</div>` : `<div class="q-creation-empty">${artwork('pip', {expression:'thinking'})}<p>Finish a story to make a postcard.</p>${button('Choose my first story →', 'data-picker')}</div>`}</section>
+    ${earned.length ? `<section class="q-decorating"><h2>Decorate your map</h2><div class="q-decoration-picks">${[...new Set(earned.map(item => item.decoration))].map(id => `<div class="q-decoration-tile"><button data-decoration="${attr(id)}" aria-pressed="${selectedDecoration === id}">${artwork(id)}<span>${escape(id)}</span></button><button class="q-drag-handle" data-decoration-drag="${attr(id)}" aria-label="Drag ${attr(id)} decoration">⠿</button></div>`).join('')}</div><div class="q-decor-world">${neighborhood({ unlocked: state.discoveries, decorations: state.decorations })}</div><div class="q-decoration-slots">${LOCATIONS.map(place => `<button data-decoration-slot="${attr(place.id)}"><strong>${escape(place.title)}</strong><span>${escape(state.decorations[place.id] || 'An open space')}</span><small>${selectedDecoration ? `Place ${escape(selectedDecoration)} here` : 'Choose a decoration first'}</small></button>`).join('')}</div></section>` : ''}
+    
+    </section>`;
 }
 
 // Build the optional parent explanation, source links and relevant discussion prompt.
@@ -754,7 +722,7 @@ function renderPostcard() {
   const item = MISSIONS.find(value => value.id === postcardId);
   if (!item || !Object.hasOwn(state.completed, item.id)) { postcardId = null; return renderBook(); }
   const design = state.postcards?.[item.id] || { theme: 'sunshine', sticker: 'star' };
-  return `<section class="q-page q-postcard-studio"><button class="q-back" data-nav="creations">← My creations</button><p class="q-eyebrow">The next-chapter studio</p><h1 data-focus tabindex="-1">Your story. Your signature style.</h1><p>Turn <strong>${escape(item.title)}</strong> into a little piece of art.</p><div class="q-postcard-layout"><div class="q-postcard-preview" data-postcard-preview aria-label="Your designed story postcard">${postcard(item, design)}</div><div class="q-postcard-tools"><fieldset><legend>Set the mood</legend><div class="q-palette-choices">${validThemes.map(theme => `<button class="theme-${theme}" data-postcard-theme="${theme}" aria-pressed="${design.theme === theme}"><span aria-hidden="true"></span>${escape(theme)}</button>`).join('')}</div></fieldset><fieldset><legend>Leave your mark</legend><div class="q-sticker-choices">${validStickers.map(sticker => `<button data-postcard-sticker="${sticker}" aria-pressed="${design.sticker === sticker}"><b aria-hidden="true">${{star:'★',leaf:'<svg viewBox="0 0 32 32" width="30" height="30" style="width:30px;height:30px" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M7 24C1 10 14 4 27 4c0 14-5 25-20 20Z" fill="currentColor" fill-opacity=".18"/><path d="M5 28 22 10m-9 10-1-7m6 2 6-1"/></svg>',spark:'✦'}[sticker]}</b>${escape(sticker)}</button>`).join('')}</div></fieldset><p class="q-small-note">${storageAvailable ? 'Your design stays in My creations.' : 'Your design stays here during this visit.'}</p>${button('Save my postcard ↓', 'data-save-postcard')}<p class="q-small-note" id="q-download-message" role="status">Saves a picture to this device.</p>${button('Back to My creations', 'data-nav="creations"', 'quiet')}</div></div></section>`;
+  return `<section class="q-page q-postcard-studio"><button class="q-back" data-nav="creations">← My creations</button><h1 data-focus tabindex="-1">${escape(item.title)}</h1><div class="q-postcard-layout"><div class="q-postcard-preview" data-postcard-preview aria-label="Your designed story postcard">${postcard(item, design)}</div><div class="q-postcard-tools"><fieldset><legend>Set the mood</legend><div class="q-palette-choices">${validThemes.map(theme => `<button class="theme-${theme}" data-postcard-theme="${theme}" aria-pressed="${design.theme === theme}"><span aria-hidden="true"></span>${escape(theme)}</button>`).join('')}</div></fieldset><fieldset><legend>Leave your mark</legend><div class="q-sticker-choices">${validStickers.map(sticker => `<button data-postcard-sticker="${sticker}" aria-pressed="${design.sticker === sticker}"><b aria-hidden="true">${{star:'★',leaf:'<svg viewBox="0 0 32 32" width="30" height="30" style="width:30px;height:30px" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M7 24C1 10 14 4 27 4c0 14-5 25-20 20Z" fill="currentColor" fill-opacity=".18"/><path d="M5 28 22 10m-9 10-1-7m6 2 6-1"/></svg>',spark:'✦'}[sticker]}</b>${escape(sticker)}</button>`).join('')}</div></fieldset>${button('Save my postcard ↓', 'data-save-postcard')}<p class="q-small-note" id="q-download-message" role="status"></p></div></div></section>`;
 }
 // Replace the current game markup, update the title/count/motion setting, then reattach handlers.
 // Because innerHTML replaces elements, old drag listeners must be removed first.
@@ -798,20 +766,6 @@ function savePostcard() {
   document.body.append(link); link.click(); link.remove();
   message.textContent = 'Postcard download started. Check your browser’s downloads.';
 }
-// An explicit hello tap introduces each memorable name through the same visible
-// words and recorded narrator. It changes no progress and never starts on arrival.
-function greet(id) {
-  const message = id === 'pip' ? STORY_LINES.pipHello : id === 'flo' ? STORY_LINES.floHello : null;
-  if (!message) return;
-  const bubble = app.querySelector('.q-world-dialogue'); bubble.textContent = message;
-  const friends = app.querySelector('.q-greeting-friends'); friends.classList.remove('q-play-enter');
-  // Replacing only the tapped guide gives it one finite greeting, without moving the map.
-  const guide = friends.querySelector(`[data-greet="${id}"]`); guide.innerHTML = `${artwork(id, { expression: 'success' })}<span>${id === 'pip' ? 'Pip' : 'Flo'}</span>`;
-  guide.className = 'q-play-enter';
-  speakText(message);
-}
-
-// Open a temporary mission chooser, optionally limited to a neighbourhood place.
 function openPicker(place = null) { stopReading(); cleanDownload(); postcardId = null; picker = { place, character: null }; render('q-play-enter'); sounds.play('page'); rememberRoute(); focus(); window.scrollTo({ top: 0, behavior: 'auto' }); }
 // Record a valid clue, then highlight it in the same story scene. The larger
 // picture and exact words explain the evidence; a clue alone does not add Sparks.
@@ -880,7 +834,7 @@ function settings() {
   dialogBody.querySelector('#q-reset').onclick = () => {
     modal('Start a new adventure?', `<p>This clears your stories, Sparks, postcards and decorations in this browser. The other FixForward tab stays as it is.</p><div class="q-step-actions">${button('Keep my adventure', 'id="q-keep"', 'secondary')}${button('Yes, reset my adventure', 'id="q-confirm-reset"')}</div>`);
     dialogBody.querySelector('#q-keep').onclick = closeDialog;
-    dialogBody.querySelector('#q-confirm-reset').onclick = () => { stopReading(); if (!clearProgress()) { announce('This browser could not clear saved progress. Your adventure is still here.'); dialogBody.querySelector('#q-confirm-reset').textContent = 'Could not reset. Try again'; return; } historyEpoch += 1; state = createState(); sounds.enable(state.settings.sound, { gesture: true }); picker = null; selectedAction = null; selectedDecoration = null; postcardId = null; storyBefore = false; lastReward = null; reflectionHint = null; cleanDownload(); closeDialog(); render('q-play-enter'); focus(); rememberRoute(true); announce('Your new adventure is ready.'); };
+    dialogBody.querySelector('#q-confirm-reset').onclick = () => { stopReading(); if (!clearProgress()) { announce('This browser could not clear saved progress. Your adventure is still here.'); dialogBody.querySelector('#q-confirm-reset').textContent = 'Could not reset. Try again'; return; } historyEpoch += 1; state = createState(); sounds.enable(state.settings.sound, { gesture: true }); picker = null; selectedAction = null; selectedDecoration = null; postcardId = null; lastReward = null; reflectionHint = null; cleanDownload(); closeDialog(); render('q-play-enter'); focus(); rememberRoute(true); announce('Your new adventure is ready.'); };
   };
 }
 // Adapt the generic pointer helper to this screen and remember its cleanup callback.
@@ -952,15 +906,7 @@ function bind() {
     if (context?.classList.contains('q-reflection')) { speakText(state.reflections[mission().id] ? mission().reflection.explanation : mission().reflection.prompt); return; }
     readScene();
   });
-  app.querySelectorAll('[data-word-help]').forEach(el => el.onclick = wordHelp);
   app.querySelectorAll('[data-level-info]').forEach(el => el.onclick = levelInfo);
-  app.querySelector('[data-play-ending]')?.addEventListener('click', () => {
-    // A requested replay gets its brief scene response, then reading becomes
-    // still again. It dispatches no completion and cannot award more Sparks.
-    storyBefore = false; lastReward = null; celebration = true;
-    stopReading(); render('q-story-reveal'); focus('[data-play-ending]');
-    rewardReadingTimer = window.setTimeout(() => { rewardReadingTimer = null; celebration = false; updateMotionContext(); }, 1600);
-  });
 //   Wrong reflection choices show temporary help only; correct choices pass engine validation.
   app.querySelectorAll('[data-reflection]').forEach(el => el.onclick = () => {
     const item = mission();
@@ -968,21 +914,12 @@ function bind() {
     if (isReflectionCorrect(item, el.dataset.reflection)) { reflectionHint = null; dispatch({type:'CHECK_REFLECTION', missionId:item.id, answerId:el.dataset.reflection}, {focusTarget:'[data-reflection-focus]'}); }
     else { reflectionHint = item.id; lastReward = null; render(); showGameFeedback(false, 'Try the other picture!'); if (narration.getState().status !== 'speaking') sounds.play('retry'); focus('[data-reflection-focus]'); announce('Here’s a clue. You can try again.'); }
   });
-  app.querySelectorAll('[data-greet]').forEach(el => el.onclick = () => greet(el.dataset.greet));
   app.querySelectorAll('[data-postcard]').forEach(el => el.onclick = () => openPostcard(el.dataset.postcard));
-  app.querySelectorAll('[data-story-view]').forEach(el => el.onclick = () => {
-    storyBefore = el.dataset.storyView === 'before'; lastReward = null; stopReading(); render(storyBefore ? '' : 'q-story-reveal');
-    const compare = app.querySelector('.q-projector-compare'); if (compare) compare.open = true;
-    focus(`[data-story-view="${el.dataset.storyView}"]`);
-    announce(storyBefore ? 'The picture before your choice.' : 'The next chapter your choice made possible.');
-  });
   for (const [attribute, key] of [['data-postcard-theme','theme'], ['data-postcard-sticker','sticker']]) app.querySelectorAll(`[${attribute}]`).forEach(el => el.onclick = () => dispatch({ type: 'DESIGN_POSTCARD', id: postcardId, [key]: el.getAttribute(attribute) }, { focusTarget: `[${attribute}="${el.getAttribute(attribute)}"]`, speak: false }));
   app.querySelector('[data-save-postcard]')?.addEventListener('click', savePostcard);
   app.querySelectorAll('[data-nav]').forEach(el => el.onclick = () => navigate(el.dataset.nav));
   app.querySelectorAll('[data-picker]').forEach(el => el.onclick = () => openPicker());
   app.querySelectorAll('[data-place]').forEach(el => el.onclick = () => openPicker(el.dataset.place));
-  app.querySelectorAll('[data-character]').forEach(el => el.onclick = () => { picker.character = el.dataset.character; render('q-play-enter'); rememberRoute(true); focus(`[data-character="${picker.character}"]`); });
-  app.querySelector('[data-all-missions]')?.addEventListener('click', () => { picker = { character: null, place: null }; render(); rememberRoute(true); focus(); });
   app.querySelectorAll('[data-mission]').forEach(el => el.onclick = () => { picker = null; postcardId = null; selectedAction = null; openClueList = false; dispatch({ type: 'CHOOSE_MISSION', id: el.dataset.mission }); window.scrollTo({ top: 0, behavior: 'auto' }); });
   app.querySelectorAll('[data-continue]').forEach(el => el.onclick = () => navigate('mission'));
   app.querySelectorAll('[data-mode]').forEach(el => el.onclick = () => dispatch({ type: 'SET_SETTING', key: 'mode', value: el.dataset.mode }, { focusTarget: `[data-mode="${el.dataset.mode}"]`, speak: false }));
@@ -1048,7 +985,7 @@ document.addEventListener('keydown', event => { lastPointerType = 'keyboard'; if
 document.addEventListener('click', event => {
   const control = event.target.closest?.('button');
   if (!event.isTrusted || !control || control.disabled || narration.getState().status === 'speaking' || control.closest('[data-audio-dock]')) return;
-  if (control.matches('[data-game-sound],[data-enable-game-sound],[data-hear],[data-hear-picture],[data-hear-sort-clue],#read-aloud,[data-greet],[data-sort-drag],[data-sort-picture],[data-action-drag],[data-action-select],[data-decoration-drag],[data-destination],[data-check-plan],[data-reflection],[data-complete],[data-sort-next],[data-sort-retry],[data-retry],[data-replay],[data-start-mission],[data-mission],[data-sort-start],[data-clue],[data-picture-clue],[data-open-plan],[data-plan-slot],[data-nav],[data-picker],[data-place]')) return;
+  if (control.matches('[data-game-sound],[data-enable-game-sound],[data-hear],[data-hear-picture],[data-hear-sort-clue],[data-sort-drag],[data-sort-picture],[data-action-drag],[data-action-select],[data-decoration-drag],[data-destination],[data-check-plan],[data-reflection],[data-complete],[data-sort-next],[data-sort-retry],[data-retry],[data-replay],[data-start-mission],[data-mission],[data-sort-start],[data-clue],[data-picture-clue],[data-open-plan],[data-plan-slot],[data-nav],[data-picker],[data-place]')) return;
   sounds.play('tap');
 }, true);
 const chromeObserver = typeof window.ResizeObserver === 'function' ? new window.ResizeObserver(measureChrome) : null;
@@ -1068,8 +1005,6 @@ window.addEventListener('resize', measureChrome);
 document.querySelectorAll('.q-header [data-nav], .q-footer [data-nav]').forEach(el => el.onclick = () => navigate(el.dataset.nav));
 document.querySelector('#q-dialog-close').onclick = () => { stopReading(); closeDialog(); };
 dialog.addEventListener('cancel', () => { stopReading(); });
-document.querySelector('#quest-settings').onclick = settings;
-document.querySelector('#read-aloud').onclick = readScene;
 // Release temporary browser resources when leaving the page; saved progress remains.
 window.addEventListener('pagehide', event => { stopReading(); finishSortDemo(); sounds.stop(); haptics.stop(); clearGameEffects(); cleanDrag(); cleanDownload(); cleanDemo(); if (!event.persisted) { navigation?.dispose(); narration.dispose(); sounds.dispose(); haptics.dispose(); rewardFx.destroy(); touchFx.dispose(); sortDemo.dispose(); chromeObserver?.disconnect(); } });
 // A browser may cache the whole page when leaving Quest. Reattach cleaned drag

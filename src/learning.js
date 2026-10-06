@@ -84,13 +84,13 @@ export function learningFocusTarget(current) {
 
 // Return a local SVG picture for a fictional toaster, fan or recycling story.
 function illustration(kind) {
-  const toaster = `<rect x="70" y="70" width="180" height="120" rx="32" fill="#b6e9f4"/><path d="M96 72V60h128v12" fill="none"/><path d="M93 190v10m135-10v10M232 113h20v27h-20"/><circle cx="129" cy="123" r="6" fill="#061f57"/><circle cx="183" cy="123" r="6" fill="#061f57"/><path d="M143 145q13 12 26 0" fill="none"/>`;
+  const toaster = `<rect x="70" y="70" width="180" height="120" rx="32" fill="#b6e9f4"/><path d="M96 72V60h128v12" fill="none"/><path d="M93 190v10m135-10v10M232 113h20v27h-20"/><circle cx="129" cy="123" r="6" fill="#17352d"/><circle cx="183" cy="123" r="6" fill="#17352d"/><path d="M143 145q13 12 26 0" fill="none"/>`;
   const scene = kind === "fan"
     ? `<path d="M147 162v37h-36q-10 0-10 13h118q0-13-10-13h-36v-37" fill="#d1e5fa"/><circle cx="160" cy="100" r="76" fill="#d1e5fa"/><circle cx="160" cy="100" r="64" fill="#fff"/><path d="M160 100q-39-18-17-43t28 12zm0 0q32-29 43 2t-19 22zm0 0q8 42-25 32t-6-33z" fill="#77c9df"/><circle cx="160" cy="100" r="13" fill="#ffd773"/>`
     : kind === "recycle"
       ? `${toaster}<circle cx="259" cy="63" r="37" fill="#e2f3cf"/><path d="M243 65a17 17 0 0 1 29-13m-1-9 2 12-12-1M275 62a17 17 0 0 1-28 15m-1 9-2-12 12 1" fill="none"/>`
       : `${toaster}<path d="M250 167h15q18 0 18 15v13m0 15v9" fill="none"/><path d="m277 199 11-4m-11 13 11-4" stroke="#a44918"/><circle cx="61" cy="60" r="25" fill="#ffe5ad"/><path d="M61 46v16m0 9v1"/>`;
-  return `<svg class="learning-illustration" aria-hidden="true" viewBox="0 0 320 240" fill="none" stroke="#061f57" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="160" cy="222" rx="105" ry="10" fill="#dcecf4" stroke="none"/>${scene}</svg>`;
+  return `<svg class="learning-illustration" aria-hidden="true" viewBox="0 0 320 240" fill="none" stroke="#17352d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="160" cy="222" rx="105" ry="10" fill="#dcecf4" stroke="none"/>${scene}</svg>`;
 }
 
 // Count correct story steps and return the labelled discovery indicator.

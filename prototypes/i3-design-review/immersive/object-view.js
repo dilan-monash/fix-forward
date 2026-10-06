@@ -1,0 +1,28 @@
+import * as T from '../vendor/three/three.module.js';
+import {SoftwareRenderer} from './software-renderer.js';
+import {createItem,createAvatar,animateItem,reactToClue} from './models.js';
+let shared=null,unavailable=false;
+class ObjectSurface{
+ constructor(){
+  try{this.renderer=new T.WebGLRenderer({alpha:true,antialias:true,powerPreference:'low-power'});this.software=false;}catch{this.renderer=new SoftwareRenderer();this.software=true;}this.renderer.setPixelRatio?.(Math.min(devicePixelRatio||1,1.5));this.renderer.outputColorSpace=T.SRGBColorSpace;this.renderer.setClearColor(0,0);this.scene=new T.Scene();this.camera=new T.PerspectiveCamera(35,1,.05,40);this.scene.add(this.software?new T.AmbientLight(0xffffff,.7):new T.HemisphereLight(0xe9faff,0x63775e,2.6));const key=new T.DirectionalLight(0xffecd0,this.software?.7:3.3);key.position.set(-3,5,4);this.scene.add(key);const fill=new T.DirectionalLight(0xb6d9ff,this.software?.25:1.3);fill.position.set(4,2,-3);this.scene.add(fill);this.theta=.47;this.phi=1.14;this.distance=4.2;this.last=0;this.frame=0;this.visible=true;this.reduced=matchMedia('(prefers-reduced-motion: reduce)');this.resize=new ResizeObserver(()=>this.fit());this.intersect=new IntersectionObserver(entries=>{this.visible=entries.some(e=>e.isIntersecting);if(this.visible)this.start();});this.renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();this.pause();this.host?.classList.add('model-failed');this.host?.classList.remove('model-ready');});this.renderer.domElement.addEventListener('webglcontextrestored',()=>{this.host?.classList.remove('model-failed');this.host?.classList.add('model-ready');this.start();});document.addEventListener('visibilitychange',()=>document.hidden?this.pause():this.start());
+ }
+ attach(host){this.resize.disconnect();this.intersect.disconnect();this.host=host;host.append(this.renderer.domElement);host.classList.add('model-ready');host.classList.toggle('simple-3d',this.software);this.renderer.domElement.setAttribute('aria-hidden','true');this.renderer.domElement.style.touchAction='pan-y';this.resize.observe(host);this.intersect.observe(host);this.setModel();this.fit();this.bind(host);this.start();}
+ setModel(force=false){const id=this.host.getAttribute('item')||'toy';if(id===this.id&&!force)return;this.id=id;if(this.model)this.scene.remove(this.model);this.model=id==='avatar'?createAvatar(this.host.avatar||{}):createItem(id,{showPower:false});this.scene.add(this.model);this.theta=.47;this.distance=4.2;this.phi=1.14;this.model.userData.pulse=0;}
+ fit(){if(!this.host?.isConnected)return;const r=this.host.getBoundingClientRect();if(r.width<1||r.height<1)return;this.renderer.setSize(r.width,r.height,false);this.camera.aspect=r.width/r.height;this.camera.updateProjectionMatrix();if(this.software)this.render(performance.now());}
+ bind(host){let down=null;host.addEventListener('pointerdown',e=>{if(e.target.tagName==='BUTTON'||e.isPrimary===false)return;down={x:e.clientX,y:e.clientY,theta:this.theta};host.setPointerCapture?.(e.pointerId);});host.addEventListener('pointermove',e=>{if(!down)return;const dx=e.clientX-down.x;if(Math.abs(dx)>5){this.theta=down.theta-dx*.014;this.render(performance.now());}});const stop=()=>down=null;host.addEventListener('pointerup',stop);host.addEventListener('pointercancel',stop);host.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();this.theta+=e.key==='ArrowLeft'?.22:-.22;this.render(performance.now());}});}
+ render(now){if(!this.host?.isConnected||!this.model)return;const dt=Math.min(.05,(now-this.last)/1000||.016);this.last=now;const center=.84;this.camera.position.set(Math.sin(this.theta)*Math.sin(this.phi)*this.distance,Math.cos(this.phi)*this.distance+center,Math.cos(this.theta)*Math.sin(this.phi)*this.distance);this.camera.lookAt(0,center,0);animateItem(this.model,now/1000,dt,this.reduced.matches);this.renderer.render(this.scene,this.camera);if(this.software)this.renderer.domElement.style.background='transparent';}
+ start(){if(this.software){this.render(performance.now());return;}if(this.frame||document.hidden||!this.visible||!this.host?.isConnected)return;const loop=now=>{this.frame=0;if(!this.host?.isConnected||document.hidden||!this.visible)return;if(now-this.last>=32)this.render(now);this.frame=requestAnimationFrame(loop);};this.frame=requestAnimationFrame(loop);}
+ pause(){cancelAnimationFrame(this.frame);this.frame=0;}
+ clue(){if(this.model)reactToClue(this.model,1);this.host?.classList.add('power-revealed');this.render(performance.now());}
+ snapshot(){this.render(performance.now());try{return this.renderer.domElement.toDataURL('image/png');}catch{return '';}}
+}
+class FFObject extends HTMLElement{
+ static observedAttributes=['item'];
+ connectedCallback(){this.setAttribute('role','img');this.setAttribute('tabindex','0');if(!this.getAttribute('aria-label'))this.setAttribute('aria-label','Interactive 3D learning model. Slide sideways to turn it.');try{if(unavailable)throw Error('3D unavailable');shared??=new ObjectSurface();shared.attach(this);}catch{unavailable=true;this.classList.add('model-failed');this.setAttribute('aria-label','Illustrative item picture. 3D is unavailable; the activity still works.');}}
+ disconnectedCallback(){setTimeout(()=>{if(shared?.host===this&&!this.isConnected)shared.pause();},0);}
+ attributeChangedCallback(){if(shared?.host===this){shared.setModel();shared.render(performance.now());}}
+ react(){if(shared?.host===this)shared.clue();}
+ refresh(){if(shared?.host===this){shared.setModel(true);shared.render(performance.now());}}
+ snapshot(){return shared?.host===this?shared.snapshot():'';}
+}
+if(!customElements.get('ff-object'))customElements.define('ff-object',FFObject);

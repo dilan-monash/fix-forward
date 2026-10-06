@@ -11,6 +11,9 @@ from .config import Settings
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 FRONTEND_FILES = {"index.html", "styles.css", "favicon.svg", "404.html", "500.html"}
+# Shared brand stylesheet and its bundled open-licence fonts. They hold no content,
+# so access.py also serves them before sign-in to style the access page.
+BRAND_FILES = {"brand.css", "fonts/baloo-2-latin.woff2", "fonts/nunito-latin.woff2"}
 
 
 # Build one Flask application and attach its configuration, routes and response protections.
@@ -66,7 +69,7 @@ def create_app(test_config=None):
     def frontend_asset(asset_path):
         # Only public frontend assets are served. Backend code, migrations and
         # environment templates must never be downloadable from the website.
-        allowed = asset_path in FRONTEND_FILES or (
+        allowed = asset_path in FRONTEND_FILES or asset_path in BRAND_FILES or (
             asset_path.startswith("src/") and asset_path.endswith(".js")
         ) or (
             asset_path in {"quest/index.html", "quest/quest.css", "quest/app.js",

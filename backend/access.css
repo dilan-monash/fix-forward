@@ -1,41 +1,41 @@
 /* Standalone access-page styles consumed only by backend/templates/access.html.
-   The gate does not load adult or Quest styles, so both applications can remain protected. */
-:root { font-family: "Avenir Next", "Trebuchet MS", ui-sans-serif, sans-serif; color: #071c49; background: #f4faff; }
+   The gate does not load adult or Quest styles, so both applications can remain protected.
+   It does load the public /brand.css design system first, so colours, fonts and
+   button finishes match the adult guide and Quest; this file only lays out the card. */
+:root { font-family: var(--ff-font-body); color: var(--ff-ink); background: var(--ff-page); }
 * { box-sizing: border-box; }
-body { margin: 0; min-height: 100vh; padding: clamp(1rem, 5vw, 3rem); display: grid; place-items: center; background: radial-gradient(circle at 90% 0%, #dff4fb, transparent 35rem); }
-main { width: min(100%, 33rem); padding: clamp(1.25rem, 5vw, 3rem); border: 1px solid #d6e5ef; border-radius: 24px; background: #fff; box-shadow: 0 20px 65px #061f5714; }
+body { margin: 0; min-height: 100vh; padding: clamp(1rem, 5vw, 3rem); display: grid; place-items: center; background: radial-gradient(circle at 90% 0%, rgba(168,235,91,.2), transparent 35rem), var(--ff-page); }
+main { width: min(100%, 33rem); padding: clamp(1.25rem, 5vw, 3rem); border: 1px solid var(--ff-border); border-radius: var(--ff-radius-feature); background: #fff; box-shadow: var(--ff-shadow-float); }
 /* Shared identity and readable entry-page copy. */
-.brand { display: flex; align-items: center; gap: .65rem; margin-bottom: 2rem; }
-.brand img { flex-shrink: 0; }
-.brand strong, .brand small { display: block; }
-.brand strong { color: #061f57; font-size: 1.4rem; letter-spacing: -.04em; }
-.brand small { margin-top: .1rem; color: #006b9f; font-size: .68rem; font-weight: 800; letter-spacing: .055em; text-transform: uppercase; }
-.eyebrow { color: #006b9f; font-size: .75rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
-h1 { margin: .65rem 0 1rem; font-size: clamp(1.85rem, 7vw, 2.65rem); line-height: 1.1; letter-spacing: -.045em; overflow-wrap: anywhere; }
-p { line-height: 1.65; color: #5c6d85; }
+.brand { margin-bottom: 2rem; }
+.brand .ff-brand-mark { width: 3rem; height: 3rem; border-radius: 15px; }
+.eyebrow { color: var(--ff-accent); font-size: .75rem; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+h1 { margin: .65rem 0 1rem; font-family: var(--ff-font-heading); font-size: clamp(1.85rem, 7vw, 2.5rem); font-weight: 800; line-height: 1.1; overflow-wrap: anywhere; }
+p { line-height: 1.65; color: var(--ff-body); }
 /* Full-width form controls keep the password/confirmation flow usable on narrow screens. */
 form { display: grid; gap: .7rem; margin-top: 1.5rem; }
 label { font-weight: 800; }
-input, button { font: inherit; width: 100%; min-width: 0; min-height: 48px; border-radius: 12px; padding: .8rem 1rem; }
-input { border: 1px solid #8196aa; background: #fff; color: #071c49; }
-input[aria-invalid="true"] { border: 2px solid #b93835; }
-button { margin-top: .3rem; border: 2px solid #061f57; color: #fff; background: #061f57; font-weight: 800; cursor: pointer; }
-button:hover { background: #0a2e70; }
+input, button { font: inherit; width: 100%; min-width: 0; min-height: 52px; border-radius: var(--ff-radius-small); padding: .8rem 1rem; }
+input { border: 1.5px solid var(--ff-border-field); background: #fff; color: var(--ff-ink); }
+input[aria-invalid="true"] { border: 2px solid var(--ff-danger-border); }
+/* The main action is the shared glossy meadow bubble with ink text. */
+button { margin-top: .3rem; border: 0; border-radius: var(--ff-radius-pill); color: var(--ff-ink); background: var(--ff-gloss), linear-gradient(180deg, var(--ff-primary-from), var(--ff-primary-to)); box-shadow: var(--ff-bubble-rim), 0 6px 14px -4px var(--ff-primary-shadow); font-weight: 800; cursor: pointer; }
+button:hover { filter: brightness(1.05); }
 /* Keep Show password beside the field with a separate, comfortable touch target.
    Without JavaScript the hidden toggle leaves the original input at full width. */
 .password-controls { display: flex; align-items: stretch; gap: .5rem; min-width: 0; }
 .password-controls input { flex: 1 1 0; width: 0; }
-.password-toggle { flex: 0 0 auto; width: auto; margin: 0; padding: .7rem .75rem; color: #061f57; background: #edf6fc; border-color: #a1bad0; font-size: .85rem; white-space: nowrap; }
-.password-toggle:hover { background: #dceef9; }
-.password-toggle[aria-pressed="true"] { background: #dceef9; border-color: #061f57; }
+.password-toggle { flex: 0 0 auto; width: auto; margin: 0; padding: .7rem .9rem; color: var(--ff-ghost-text); background: #fff; border: 1.5px solid var(--ff-ghost-border); box-shadow: none; font-size: .85rem; white-space: nowrap; }
+.password-toggle:hover { background: var(--ff-mint-bg); filter: none; }
+.password-toggle[aria-pressed="true"] { background: var(--ff-mint-bg); border-color: var(--ff-accent-bright); }
 /* Text states make Caps Lock understandable without depending on colour alone.
    Updates are quiet until the keyboard provides evidence or touch cannot report it. */
-.caps-lock-status { margin: 0; padding: .55rem .7rem; border-radius: 8px; font-size: .82rem; line-height: 1.45; color: #4b6076; background: #f2f6fa; }
-.caps-lock-status[data-state="on"] { color: #774405; background: #fff0ce; border-left: 3px solid #aa6710; }
-.caps-lock-status[data-state="off"] { color: #205e51; background: #ebf7f2; }
+.caps-lock-status { margin: 0; padding: .55rem .8rem; border-radius: var(--ff-radius-small); font-size: .82rem; line-height: 1.45; color: var(--ff-body); background: var(--ff-neutral-bg); }
+.caps-lock-status[data-state="on"] { color: var(--ff-caution-text); background: var(--ff-caution-bg); border-left: 3px solid var(--ff-caution-mark); }
+.caps-lock-status[data-state="off"] { color: var(--ff-mint-text); background: var(--ff-mint-bg); }
 [hidden] { display: none !important; }
-.secondary { display: flex; align-items: center; justify-content: center; min-height: 48px; padding: .7rem; color: #006b9f; text-underline-offset: 3px; font-weight: 800; }
+.secondary { display: flex; align-items: center; justify-content: center; min-height: 48px; padding: .7rem; color: var(--ff-accent); text-underline-offset: 3px; font-weight: 800; }
 /* Keyboard focus and errors remain visible without relying on hover or colour alone. */
-:focus-visible { outline: 3px solid #006b9f; outline-offset: 3px; }
-.error { padding: .8rem 1rem; border-left: 4px solid #b93835; border-radius: 4px; color: #8e2927; background: #fff0ee; }
+:focus-visible { outline: 3px solid var(--ff-focus); outline-offset: 3px; box-shadow: 0 0 0 3px #fff; }
+.error { padding: .8rem 1rem; border-left: 4px solid var(--ff-danger-border); border-radius: 4px; color: var(--ff-danger-text); background: var(--ff-danger-bg); }
 .footnote { margin-top: 1.5rem; margin-bottom: 0; font-size: .85rem; }

@@ -12,12 +12,13 @@
   <!-- Metadata describes the child experience; the visible game text comes from app.js/content.js. -->
   <meta name="description" content="Help Pip and Flo find a next chapter in FixForward Quest, an illustrated adventure about clues, care and second chances.">
   <!-- Supporting browsers may use this colour for their own surrounding interface. -->
-  <meta name="theme-color" content="#fff8ec">
+  <meta name="theme-color" content="#ffffff">
   <!-- This initial title is replaced with the current mission/page title after the app renders. -->
   <title>FixForward Quest</title>
   <!-- Reuse the local FixForward tab icon so the two experiences share the same brand. -->
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<!-- CSS order matters: base layout, art motion, then tablet refinements. -->
+<!-- CSS order matters: the shared brand design system, base layout, art motion, then tablet refinements. -->
+  <link rel="stylesheet" href="/brand.css">
   <link rel="stylesheet" href="/quest/quest.css">
   <link rel="stylesheet" href="/quest/play-effects.css">
   <link rel="stylesheet" href="/quest/tablet-play.css">
@@ -50,10 +51,11 @@
   <header class="q-header">
     <!-- data-nav is read by app.js; this button requests the home view without opening a new page. -->
     <!-- Decorative arrow artwork is hidden from assistive tools; aria-label names the whole button. -->
-    <button class="q-brand" data-nav="home" aria-label="FixForward Quest home"><span class="q-brand-symbol" aria-hidden="true">↗</span><span>FixForward <b>Quest</b></span></button>
+    <!-- ff-brand is the shared FixForward mark and wordmark from brand.css, the same identity as the adult guide's header. -->
+    <button class="q-brand ff-brand" data-nav="home" aria-label="FixForward Quest home"><img class="ff-brand-mark" src="/favicon.svg" alt="" width="42" height="42"><span class="ff-brand-name"><strong>FixForward<span class="ff-brand-tag">Quest</span></strong></span></button>
     <!-- grownups is the saved internal name for the optional parent guide; book opens the discoveries. -->
     <!-- app.js replaces book-count with the current number of discovered concepts. -->
-    <nav aria-label="Adventure navigation"><button data-nav="grownups">Why Quest? · For parents</button><button data-nav="book">Discovery Book <span id="book-count">0</span></button></nav>
+    <nav aria-label="Adventure navigation"><button data-nav="grownups">For parents</button><button data-nav="book">Discovery Book <span id="book-count">0</span></button></nav>
   </header>
   <!-- app.js changes the displayed score here; the rule engine owns earned points. -->
   <div id="q-game-hud"></div>
@@ -66,7 +68,8 @@
   <!-- First play reads story steps after a gesture. Read to me replays a screen; Settings can turn automatic reading off. -->
   <!-- Voice controls stay outside re-rendered game content to preserve focus. -->
   <aside class="q-audio-dock" data-audio-dock hidden aria-label="Voice controls"><span data-audio-status role="status"></span><div class="q-audio-actions"><button data-audio-pause>Ⅱ Pause</button><button data-audio-resume hidden>▶ Resume</button><button data-audio-stop>■ Stop</button></div><details class="q-audio-transcript"><summary>Story words</summary><p data-audio-transcript></p></details></aside>
-  <footer class="q-footer"><span>Your ideas. Their next chapter.</span><button id="read-aloud">Read aloud</button><button id="quest-settings">Settings</button><button data-nav="grownups">About this adventure</button></footer>
+  <!-- Read aloud and Settings live in the top bar; the footer only links grown-ups onward. -->
+  <footer class="q-footer"><button data-nav="grownups">For parents</button><!-- Grown-ups can open the adult household guide, which shares this design; a new tab keeps the child's adventure open. --><a href="/" target="_blank" rel="noopener">Household guide <span class="q-sr">(opens in a new tab)</span>↗</a></footer>
 <!-- A polite live region announces short updates without taking keyboard focus. -->
   <!-- q-sr hides the region visually; aria-atomic asks assistive tools to read the complete update. -->
   <div id="q-announcement" class="q-sr" role="status" aria-live="polite" aria-atomic="true"></div>

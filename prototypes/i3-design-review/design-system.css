@@ -1,0 +1,129 @@
+/* Local design review layer based on the supplied FixForward Quest PDF.
+   The extended game's state, questions and storage keys remain in the original JS. */
+:root {
+  --quest-forest: #174f38;
+  --quest-green: #207c50;
+  --quest-green-soft: #eff8f1;
+  --quest-green-line: #cee4d6;
+  --quest-cream: #fffdf8;
+  --quest-gold: #f8b83e;
+  --quest-gold-shadow: #d98b18;
+  --quest-radius: 26px;
+}
+
+body { background: var(--quest-cream); color: var(--quest-forest); }
+
+.safety-strip {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: .7rem;
+  min-height: 46px;
+  padding: .65rem 1rem;
+  background: var(--quest-green);
+  color: #fff;
+  font-weight: 800;
+  text-align: center;
+}
+
+.prototype { background: #f3f7ef; border-color: var(--quest-green-line); color: #496557; }
+.site-head, .extended-discovery .header { background: var(--quest-cream); border-color: #e9e3d6; }
+.brand-mark, .extended-discovery .brand > span {
+  background: var(--quest-green);
+  border-radius: 15px 15px 15px 7px;
+  box-shadow: 0 4px 0 #0d5d39;
+}
+h1, h2, h3, .brand, .extended-discovery .brand { color: var(--quest-forest); }
+.main-shell, .extended-discovery main { width: min(1240px, 100%); }
+
+.home-top, .quest-head, .extended-discovery .page-heading {
+  padding: 1.8rem 2rem;
+  border: 1px solid var(--quest-green-line);
+  border-radius: var(--quest-radius);
+  background-color: #f5fbf6;
+  background-image: radial-gradient(circle, #d9eedf 2px, transparent 2px);
+  background-size: 34px 34px;
+}
+
+.home-top h1, .quest-head h1, .extended-discovery .page-heading h1 {
+  font-size: clamp(2.35rem, 5vw, 4.35rem);
+  line-height: 1.02;
+  letter-spacing: -.04em;
+}
+
+.home-paths { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 1.5rem; }
+.path-card, .panel, .item, .stamp, .selection-bar,
+.extended-discovery .start-controls, .extended-discovery .station-art,
+.extended-discovery .catalogue-card, .extended-discovery .book-card,
+.extended-discovery .episode-item, .extended-discovery .item-ticket {
+  border: 1px solid var(--quest-green-line);
+  border-radius: var(--quest-radius);
+  background: var(--quest-green-soft);
+  color: var(--quest-forest);
+  box-shadow: 0 7px 0 #dcece1;
+}
+
+.path-card.adult-path { background: #e9f6ed; color: var(--quest-forest); }
+.adult-path p, .adult-path .eyebrow { color: #456455; }
+.adult-path .path-item { background: #fff; }
+.kid-path { background: #fff5d8; border-color: #ecd99d; }
+
+button, .primary, .gold, .path-start,
+.extended-discovery .primary, .extended-discovery .secondary { border-radius: 999px; }
+
+.primary, .gold, .path-start, .adult-path .path-start, .kid-path .path-start,
+.extended-discovery .primary {
+  border-color: var(--quest-gold);
+  background: var(--quest-gold);
+  color: var(--quest-forest);
+  box-shadow: 0 5px 0 var(--quest-gold-shadow);
+  font-weight: 850;
+}
+
+.primary:hover, .gold:hover, .path-start:hover, .adult-path .path-start:hover,
+.kid-path .path-start:hover, .extended-discovery .primary:hover:not(:disabled) {
+  border-color: #ffc95c;
+  background: #ffc95c;
+  color: var(--quest-forest);
+  transform: translateY(-1px);
+}
+
+.primary:active, .gold:active, .path-start:active, .extended-discovery .primary:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 var(--quest-gold-shadow);
+}
+
+.notice, .discovery-invite, .extended-discovery .resume-note,
+.extended-discovery .new-clue, .extended-discovery .finish-note {
+  border: 1px solid var(--quest-green-line);
+  border-radius: 18px;
+  background: #f4fbf5;
+}
+
+.extended-discovery .quest-nav { background: #f4f8f1; border-color: var(--quest-green-line); }
+.extended-discovery .quest-nav > nav a[aria-current="page"] {
+  background: var(--quest-green);
+  color: #fff;
+  border-radius: 999px;
+}
+.extended-discovery .mode.selected, .extended-discovery .selected {
+  border-color: var(--quest-green);
+  background: #e4f4e9 !important;
+}
+.extended-discovery .station-art img { filter: saturate(.78) contrast(.96); }
+.footer, .extended-discovery .footer { border-color: var(--quest-green-line); }
+
+@media (max-width: 700px) {
+  .safety-strip { font-size: .84rem; }
+  .home-top, .quest-head, .extended-discovery .page-heading { padding: 1.35rem; }
+  .home-paths { grid-template-columns: 1fr; }
+  .path-card { min-height: 320px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation: none !important;
+    transition: none !important;
+  }
+}

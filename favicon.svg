@@ -1,8 +1,20 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
   <title id="title">FixForward</title>
-  <rect width="64" height="64" rx="12" fill="#f4faff"/>
-  <g transform="translate(10 8) scale(.44 .48)">
-    <path d="M0 20 23 0H100L72 24H32L0 55Z" fill="#061f57"/>
-    <path d="M0 65 26 43H91L62 67H26L0 100Z" fill="#12b6f4"/>
-  </g>
+  <!-- Shared FixForward mark: the design system's meadow gradient with a top gloss,
+       carrying a forward arrow that curves up from a fixed baseline. -->
+  <defs>
+    <linearGradient id="meadow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a8eb5b"/>
+      <stop offset="1" stop-color="#32c978"/>
+    </linearGradient>
+    <radialGradient id="gloss" cx=".5" cy="-.1" r=".75">
+      <stop offset="0" stop-color="#fff" stop-opacity=".85"/>
+      <stop offset=".55" stop-color="#fff" stop-opacity=".25"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="64" height="64" rx="18" fill="url(#meadow)"/>
+  <rect width="64" height="64" rx="18" fill="url(#gloss)"/>
+  <path d="M15 44c0-11 8-18 19-18h13" fill="none" stroke="#17352d" stroke-width="6.5" stroke-linecap="round"/>
+  <path d="M39 17l10 9-10 9" fill="none" stroke="#17352d" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>

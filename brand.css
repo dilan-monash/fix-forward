@@ -1,0 +1,117 @@
+/* SHARED FIXFORWARD BRAND: loaded first by the adult guide, Quest (including the
+   parent guide), the error pages and the access page, so all of them share one
+   design system. It adapts the FixForward Quest design system (Baloo 2 + Nunito,
+   green-neutral ink, meadow/aqua/sky actions, tinted status panels, pill buttons).
+   Each application maps its own older variable names onto these --ff- tokens,
+   so change a colour here rather than in styles.css or quest/*.css. */
+
+/* Fonts are bundled in /fonts so no font request leaves the website. Both are
+   variable fonts, so one file covers every weight. See fonts/README.md. */
+@font-face {
+  font-family: "Baloo 2";
+  src: url("/fonts/baloo-2-latin.woff2") format("woff2");
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Nunito";
+  src: url("/fonts/nunito-latin.woff2") format("woff2");
+  font-weight: 200 1000;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --ff-font-heading: "Baloo 2", "Nunito", ui-rounded, system-ui, sans-serif;
+  --ff-font-body: "Nunito", ui-rounded, system-ui, -apple-system, sans-serif;
+
+  /* Base ink and neutrals are fixed; only the action accents carry colour. */
+  --ff-ink: #17352d;
+  --ff-body: #3f5c50;
+  --ff-muted: #5d7568;
+  /* The system's faint #8aa096 fails text contrast on white, so faint text is
+     darkened just enough for WCAG AA; decorative uses may still use --ff-faint-mark. */
+  --ff-faint: #6b8378;
+  --ff-faint-mark: #8aa096;
+  --ff-page: #ffffff;
+  --ff-border: #e1eee4;
+  --ff-border-header: #eaf3ec;
+  /* Form fields need a 3:1 boundary, which the soft card border cannot give. */
+  --ff-border-field: #7f978a;
+  --ff-neutral-fill: #edf2ee;
+  --ff-neutral-bg: #f7faf8;
+  /* A slightly stronger divider and a mint fill for icon tiles and selected rows. */
+  --ff-border-strong: #c7dccf;
+  --ff-mint-strong: #e2f5ea;
+
+  /* Meadow accent (the default theme): one gradient pair per kind of action. */
+  --ff-primary-from: #a8eb5b;  /* decide, continue */
+  --ff-primary-to: #32c978;
+  --ff-primary-shadow: rgba(50, 201, 120, .4);
+  --ff-aqua-from: #8feee0;     /* find, search, locate */
+  --ff-aqua-to: #41d7d7;
+  --ff-aqua-shadow: rgba(65, 215, 215, .4);
+  --ff-sky-from: #8fc8ff;      /* learn, explore */
+  --ff-sky-to: #57b8ff;
+  --ff-sky-shadow: rgba(87, 184, 255, .4);
+  --ff-ghost-border: #cfebdb;
+  --ff-ghost-text: #1f7a4c;
+  /* Solid accents for links, eyebrows, selected borders and small marks. */
+  --ff-accent: #1f7a4c;
+  --ff-accent-bright: #32c978;
+
+  /* Tinted status panels. The colour carries meaning, never decoration. */
+  --ff-mint-bg: #f2fbf6;   --ff-mint-border: #cfebdb;   --ff-mint-text: #1f7a4c;
+  --ff-sky-bg: #f3fafc;    --ff-sky-border: #d6e9fa;    --ff-sky-text: #3f5c50;
+  --ff-caution-bg: #fff8e3; --ff-caution-border: #f2e0a8; --ff-caution-text: #7a5a12;
+  /* Solid caution mark (icon discs) carrying dark ink text. */
+  --ff-caution-mark: #f2c14e;
+  --ff-danger-bg: #fbeaec; --ff-danger-border: #d83a4a; --ff-danger-text: #8c1522; --ff-danger-strong: #6b0f1c;
+  /* A solid danger fill for white-text buttons; the border red is too light for AA text. */
+  --ff-danger-fill: #c22e3c;
+  --ff-unverified-bg: #fff3d6; --ff-unverified-border: #f2e0a8; --ff-unverified-text: #8a6b22;
+
+  /* Shape: very round feature cards, round panels, pill controls. */
+  --ff-radius-feature: 32px;
+  --ff-radius-card: 20px;
+  --ff-radius-panel: 18px;
+  --ff-radius-small: 14px;
+  --ff-radius-pill: 999px;
+
+  /* Soft, green-tinted depth. */
+  --ff-shadow-card: 0 10px 24px -16px rgba(23, 53, 45, .28);
+  --ff-shadow-raised: 0 18px 36px -20px rgba(23, 53, 45, .34);
+  --ff-shadow-float: 0 24px 60px -24px rgba(23, 53, 45, .38);
+
+  /* Keyboard focus: a dark ring with a white halo stays visible on every tint
+     (the system's light-blue ring is below 3:1 on white). */
+  --ff-focus: #17352d;
+
+  /* Touch targets: 44px floor, 52px for primary actions. */
+  --ff-target-min: 44px;
+  --ff-target-primary: 52px;
+
+  /* Springy press: fast squash in, overshooting recoil out. */
+  --ff-spring: cubic-bezier(.18, 1.9, .32, 1);
+  --ff-spring-soft: cubic-bezier(.2, 1.45, .35, 1);
+
+  /* The glossy "bubble" finish is layered over an action gradient. */
+  --ff-gloss: radial-gradient(120% 80% at 50% -10%, rgba(255, 255, 255, .85) 0, rgba(255, 255, 255, .3) 42%, rgba(255, 255, 255, 0) 65%);
+  --ff-bubble-rim: inset 0 1.5px 0 rgba(255, 255, 255, .7), inset 0 -3px 6px rgba(0, 0, 0, .14);
+
+  /* Flat diagonal hatch for illustration placeholders. */
+  --ff-hatch: repeating-linear-gradient(45deg, #e4efe6 0 6px, #f7fbf8 6px 12px);
+}
+
+/* Shared identity: the gradient mark and wordmark used in every header. */
+.ff-brand { display: inline-flex; align-items: center; gap: .65rem; color: var(--ff-ink); text-align: left; text-decoration: none; }
+.ff-brand-mark { display: block; flex: 0 0 auto; width: 2.6rem; height: 2.6rem; border-radius: 13px; box-shadow: 0 6px 14px -6px var(--ff-primary-shadow); }
+.ff-brand-name { display: flex; flex-direction: column; line-height: 1; }
+.ff-brand-name strong { font-family: var(--ff-font-heading); font-size: 1.4rem; font-weight: 800; letter-spacing: -.01em; color: var(--ff-ink); }
+.ff-brand-name small { margin-top: .2rem; color: var(--ff-accent); font-family: var(--ff-font-body); font-size: .68rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+/* The Quest tag is a small meadow pill beside the same wordmark. */
+.ff-brand-tag { display: inline-block; margin-left: .35rem; padding: .12rem .5rem .1rem; border-radius: var(--ff-radius-pill); background: linear-gradient(180deg, var(--ff-primary-from), var(--ff-primary-to)); color: var(--ff-ink); font-family: var(--ff-font-body); font-size: .72rem; font-weight: 900; letter-spacing: .04em; vertical-align: .22em; }
+
+/* Status badge shared by both applications (text always repeats the meaning). */
+.ff-badge { display: inline-flex; align-items: center; gap: .3rem; padding: 4px 12px; border: 1px solid var(--ff-mint-border); border-radius: var(--ff-radius-pill); background: var(--ff-mint-bg); color: var(--ff-mint-text); font: 700 .78rem/1.3 var(--ff-font-body); }
