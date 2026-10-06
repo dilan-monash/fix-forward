@@ -54,6 +54,35 @@
     })[character]);
   }
 
+  // Optional device details still need a plausible format before they can be saved or used in a lookup.
+  function validateDeviceDetail(value, label, kind) {
+    if (!value) return '';
+    if (value.length < 2 || value.length > 40) return `${label} must be between 2 and 40 characters.`;
+    if (!/^[\p{L}\p{N}][\p{L}\p{N}\s.&'’()+/_-]*$/u.test(value)) {
+      return `${label} contains unsupported characters.`;
+    }
+    if (kind === 'brand' && !/\p{L}/u.test(value)) return 'Brand must include at least one letter.';
+
+    const compact = value.toLocaleLowerCase().replace(/[\s.&'’()+/_-]/g, '');
+    if (/^(unknown|none|na|test|asd|qwe|zxc|abc|xyz|123)/i.test(compact)) {
+      return `${label} looks like placeholder text. Enter the label from the appliance, or leave it blank.`;
+    }
+    if (/(.)\1{3,}/u.test(compact)) {
+      return `${label} has too many repeated characters. Check the appliance label and try again.`;
+    }
+    if (compact.length >= 6) {
+      const pairs = new Map();
+      for (let index = 0; index < compact.length - 1; index += 1) {
+        const pair = compact.slice(index, index + 2);
+        pairs.set(pair, (pairs.get(pair) || 0) + 1);
+      }
+      if ([...pairs.values()].some(count => count >= 3)) {
+        return `${label} looks repetitive. Enter the label from the appliance, or leave it blank.`;
+      }
+    }
+    return '';
+  }
+
   function route(path) {
     location.hash = `#/${path.replace(/^\//, '')}`;
   }
@@ -317,7 +346,7 @@
     return `<section class="screen-head compact"><h1>What item do you have?</h1><p class="lead">Choose one we know, or search for your item.</p>${steps(0)}</section>
       <div class="search-row"><div><label for="appliance-search">Search</label><input id="appliance-search" value="${escapeHtml(state.appliance)}" placeholder="Type an appliance name"></div><button class="primary" data-pathway-search>Search</button></div>
       <h3>Popular choices</h3><div class="popular">${appliances.map(name => `<button class="chip-button ${state.appliance === name ? 'active' : ''}" data-appliance="${name}">${name}</button>`).join('')}</div>
-      <section class="brand-panel"><h2>Brand or model? <span class="muted">Optional</span></h2><p>This can help us check official recall notices for the right product.</p><div class="brand-fields"><div><label for="brand">Brand</label><input id="brand" value="${escapeHtml(state.brand)}"></div><div><label for="model">Model number</label><input id="model" value="${escapeHtml(state.model)}"></div></div><p class="small"><b class="blue-text">Where can I find the model number?</b> Look for a label on the outside, back or base. Don’t open the device to find it.</p></section>
+      <section class="brand-panel"><h2>Brand or model? <span class="muted">Optional</span></h2><p>This can help us check official recall notices for the right product.</p><div class="brand-fields"><div><label for="brand">Brand</label><input id="brand" value="${escapeHtml(state.brand)}" maxlength="40" autocomplete="organization" aria-describedby="device-details-help device-details-error"></div><div><label for="model">Model number</label><input id="model" value="${escapeHtml(state.model)}" maxlength="40" autocomplete="off" aria-describedby="device-details-help device-details-error"></div></div><p class="small" id="device-details-help">Use 2–40 letters or numbers from the appliance label. Spaces and common model punctuation are allowed.</p><p class="field-error" id="device-details-error" role="alert" aria-live="polite" hidden></p><p class="small"><b class="blue-text">Where can I find the model number?</b> Look for a label on the outside, back or base. Don’t open the device to find it.</p></section>
       <div class="actions end"><button class="primary green" data-pathway-continue>Continue</button></div>`;
   }
 
@@ -496,8 +525,27 @@
       if (!['Kettle', 'Toaster', 'Hair dryer', 'Vacuum', 'Fan', 'Microwave'].includes(state.appliance)) route('pathway/not-found');
       else showToast(`${state.appliance} selected`);
     } else if (target.hasAttribute('data-pathway-continue')) {
-      state.brand = document.querySelector('#brand').value.trim();
-      state.model = document.querySelector('#model').value.trim();
+      const brandInput = document.querySelector('#brand');
+      const modelInput = document.querySelector('#model');
+      const errorMessage = document.querySelector('#device-details-error');
+      const brand = brandInput.value.trim();
+      const model = modelInput.value.trim();
+      const brandError = validateDeviceDetail(brand, 'Brand', 'brand');
+      const modelError = validateDeviceDetail(model, 'Model number', 'model');
+      brandInput.removeAttribute('aria-invalid');
+      modelInput.removeAttribute('aria-invalid');
+      if (brandError || modelError) {
+        const invalidInput = brandError ? brandInput : modelInput;
+        invalidInput.setAttribute('aria-invalid', 'true');
+        errorMessage.textContent = brandError || modelError;
+        errorMessage.hidden = false;
+        invalidInput.focus();
+        showToast('Check the optional device details before continuing.');
+        return;
+      }
+      errorMessage.hidden = true;
+      state.brand = brand;
+      state.model = model;
       saveState();
       if (/rhk510/i.test(state.model)) route('pathway/recall');
       else route('pathway/safety');

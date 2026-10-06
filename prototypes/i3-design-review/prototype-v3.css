@@ -453,6 +453,8 @@ p { color: var(--muted); font-size: 1.08rem; line-height: 1.5; }
 .search-row { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: end; }
 label { display: block; margin-bottom: 10px; font-weight: 800; }
 input, select { width: 100%; min-height: 58px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); padding: 0 20px; color: var(--ink); }
+input[aria-invalid="true"] { border-color: var(--red); background: var(--red-soft); }
+.field-error { margin: 14px 0 0; color: #a51f2c; font-weight: 750; }
 .popular { display: flex; flex-wrap: wrap; gap: 14px; margin: 24px 0 38px; }
 .chip-button { min-height: 48px; padding: 0 24px; border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--ink); }
 .chip-button.active { background: var(--blue-soft); color: var(--blue); }
