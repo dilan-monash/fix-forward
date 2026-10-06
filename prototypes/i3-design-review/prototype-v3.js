@@ -142,22 +142,22 @@
       <a class="home-action blue-card" href="#/quest" data-home-card>
         <div class="card-art game-art" aria-hidden="true"><span>★</span><b>+</b><i>↻</i></div>
         <span class="card-stage">Learn</span><h2>FixForward Quest</h2><p>Play games and learn about e-waste.</p>
-        <span class="card-prompt"><b>Prompt</b> What happens when we repair, reuse or recycle?</span>
+        <span class="card-prompt">What happens when we repair, reuse or recycle?</span>
       </a>
       <a class="home-action green-card" href="#/lens" data-home-card>
         <div class="card-art lens-art" aria-hidden="true"><span>▰</span><b>⌕</b><i>⚙</i></div>
         <span class="card-stage">Explore</span><h2>FixForward Lens</h2><p>Explore everyday electronics and see what’s inside.</p>
-        <span class="card-prompt"><b>Prompt</b> What materials and parts might be hiding inside?</span>
+        <span class="card-prompt">What materials and parts might be hiding inside?</span>
       </a>
       <a class="home-action yellow-card" href="#/pathway" data-home-card>
         <div class="card-art pathway-art" aria-hidden="true"><span>◉</span><b>↗</b><i>♻</i></div>
         <span class="card-stage">Decide</span><h2>FixForward Pathway</h2><p>Work out what to do next with your item.</p>
-        <span class="card-prompt"><b>Prompt</b> Is it safe, repairable, reusable or ready to recycle?</span>
+        <span class="card-prompt">Is it safe, repairable, reusable or ready to recycle?</span>
       </a>
       <a class="home-action purple-card" href="#/finder" data-home-card>
         <div class="card-art finder-art" aria-hidden="true"><span>⌖</span><b>♡</b><i>⚒</i></div>
         <span class="card-stage">Act</span><h2>FixForward Finder</h2><p>Find nearby repair, donation and recycling options.</p>
-        <span class="card-prompt"><b>Prompt</b> Which nearby service has confirmed it accepts your item?</span>
+        <span class="card-prompt">Which nearby service has confirmed it accepts your item?</span>
       </a>
     </section>`;
   }
