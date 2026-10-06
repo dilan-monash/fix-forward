@@ -13,7 +13,7 @@ The root single-page application covers:
 - Finder location, results and place states; and
 - About, privacy and source explanations.
 
-Sunny's original extended Sorting Station remains available under `discover/`.
+The original extended Sorting Station remains available under `discover/`.
 Its catalogue, game logic and browser-storage progress code were not replaced.
 
 ## Run locally
@@ -58,7 +58,7 @@ and validation before release.
 
 ## Publish a separate design preview
 
-Use a **new Render Static Site**, connected to `dilan-monash/fix-forward`:
+Use a **new Render Static Site**, connected to this repository:
 
 - Branch: `feature/i3-design-review`
 - Root directory: `prototypes/i3-design-review`
@@ -84,5 +84,5 @@ Configuration instructions alone do not establish that a deployment succeeded.
 ## Third-party code
 
 The preserved immersive modules include Three.js under embedded MIT licence
-headers. The existing Sunny prototype assets and logic remain in their original
+headers. The existing extended prototype assets and logic remain in their original
 subdirectories.

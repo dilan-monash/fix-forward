@@ -161,7 +161,7 @@
     return `<section class="screen-head"><h1>Choose a game</h1></section>
       <div class="game-grid">${games.map(([title, copy, colour, path], index) =>
         `<article class="game-card ${colour}"><span class="round-icon">${index === 0 ? '↻' : index === 1 ? '●' : '◆'}</span><h2>${title}</h2><p>${copy}</p>${button('Play', path)}</article>`).join('')}</div>
-      <div class="actions"><a class="secondary" href="discover/">Open Sunny’s extended Sorting Station</a></div>`;
+      <div class="actions"><a class="secondary" href="discover/">Open the extended Sorting Station</a></div>`;
   }
 
   function fixit() {
