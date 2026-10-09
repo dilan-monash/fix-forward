@@ -1,0 +1,1046 @@
+{
+  "frozen_at_utc": "2026-10-09T15:18:56.843241Z",
+  "inputs": {
+    "prior_evidence": {
+      "bytes": 1174516,
+      "frozen_at_utc": "2026-10-09T15:06:51.290729Z",
+      "index_id": "all-prior-source-evidence-before-candidate-v3",
+      "overlap_found": false,
+      "path": "tmp/appliance-model-v3-fresh-validation/prior-evidence-index.json",
+      "prior_identity_count": 522,
+      "prior_image_hash_count": 3007,
+      "sha256": "e8ef21fd879957f5a82fa449d7d797761943042bfb33cef3c63c3cf3815e5b67",
+      "source_count": 3784
+    },
+    "reconciled_audit": {
+      "audit_id": "candidate-v3-fresh-reconciled-blind-review",
+      "bytes": 119308,
+      "frozen_at_utc": "2026-10-09T15:18:56.843241Z",
+      "independent_audits": [
+        {
+          "audit_id": "v3-independent-a",
+          "auditor_id": "v3_blind_audit_a",
+          "bytes": 72176,
+          "frozen_at_utc": "2026-10-09T15:16:53Z",
+          "path": "tmp/appliance-model-v3-fresh-validation/independent-audit-a.json",
+          "sha256": "76777ce11661a504f99c1db20d840525033512c38f98f2ac211e60ab12888275"
+        },
+        {
+          "audit_id": "v3-independent-b",
+          "auditor_id": "v3_blind_audit_b",
+          "bytes": 69690,
+          "frozen_at_utc": "2026-10-09T15:14:32.825Z",
+          "path": "tmp/appliance-model-v3-fresh-validation/independent-audit-b.json",
+          "sha256": "d1c5593258a31d68280b032e4b45c52e65afa999a8597edbbbbe521baf1378c9"
+        }
+      ],
+      "path": "tmp/appliance-model-v3-fresh-validation/combined-reconciled-blind-audit.json",
+      "sha256": "b38166986374e522fc1fe197a378dd1873973466013db23673c3a463648e586f"
+    },
+    "source_manifests": {
+      "ood": {
+        "bytes": 46856,
+        "frozen_at_utc": "2026-10-09T15:10:20.015595Z",
+        "manifest_id": "candidate-v3-ood-review-ood-final",
+        "path": "tmp/appliance-model-v3-fresh-validation/review-ood-final/ood-source-manifest.json",
+        "rows": 144,
+        "sha256": "c5e1658430349282542c16ddf15e110d4f05d834ced0726b1078cfcccc7d5a76"
+      },
+      "positives": {
+        "bytes": 36170,
+        "frozen_at_utc": "2026-10-09T15:03:51.951948Z",
+        "manifest_id": "candidate-v3-positives-review-positives-final",
+        "path": "tmp/appliance-model-v3-fresh-validation/review-positives-final/positives-source-manifest.json",
+        "rows": 109,
+        "sha256": "7e02b5e7a4439791195cd64f44b703033d1e8f28724de4c0270b5c4785acdb6c"
+      }
+    }
+  },
+  "manifest_id": "candidate-v3-fresh-test-manifest",
+  "prediction_blind": true,
+  "samples": [
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P001.jpg",
+      "image_id": "positives:P001",
+      "sha256": "80c0607766e731237ee518bcf6c812daa1e7bcc9a1aae3a021788b021b8c9d00"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P002.jpg",
+      "image_id": "positives:P002",
+      "sha256": "0549bfb99c8f9848857ab9067e2a7383857bceb5d707d8c53df5c5fe185cbed0"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P003.jpg",
+      "image_id": "positives:P003",
+      "sha256": "69533fb6b5ded42038a2394b743802d5aa657ed7133c3a20023c5b48ea0a562a"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P004.jpg",
+      "image_id": "positives:P004",
+      "sha256": "4733b2ad4a6d49cffa1ed7529d0940ae8bdf03fd76fdfe95a9aa85005fd93ea1"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P005.jpg",
+      "image_id": "positives:P005",
+      "sha256": "d3c48514c07daf686665c58235c435b333c5d9c54344f4ce86289d5290907c38"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P012.jpg",
+      "image_id": "positives:P012",
+      "sha256": "2150df1ee4009104dabea17f6bf1747f1e18bd49d838890aad85a3f307824fe1"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P014.jpg",
+      "image_id": "positives:P014",
+      "sha256": "afa8c27a79dc90219d275acbca7726e68fb3087eb77ea6b35a96d68dc811acd8"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P015.jpg",
+      "image_id": "positives:P015",
+      "sha256": "6e70624b19c1f8a8daf0bd699d748d0b32143575ed9b9db64b5b20528b44d5e7"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P016.jpg",
+      "image_id": "positives:P016",
+      "sha256": "d47229b4a3fef6f88a51051b3e824ecf9263aebfb4250be324e858385630cb16"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P017.jpg",
+      "image_id": "positives:P017",
+      "sha256": "837c6bab2c2550dcb131e0ae5238d8ffd391edad8e6f8934e59c6c32b99af7fe"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P018.jpg",
+      "image_id": "positives:P018",
+      "sha256": "89b1450cd27fb6119e9b77e03cd3d43dbfac75dfdfd76ec72f5520b429b4faf4"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P021.jpg",
+      "image_id": "positives:P021",
+      "sha256": "fe33185b1d6ebd88da9156dd264544b884cb4afb7c93a66c5ada007bc1f46c59"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P032.jpg",
+      "image_id": "positives:P032",
+      "sha256": "121c174eabe1178a1ba567e38ef01ec73e35da6de12fc89da470e45e18f2c13a"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P035.jpg",
+      "image_id": "positives:P035",
+      "sha256": "117332b4da60d0d1086522517b4b2868e26c19ae8e87884f29f40e46ca76f93c"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P037.jpg",
+      "image_id": "positives:P037",
+      "sha256": "10b2875501907d907fcfcebf0d878ff233b59944490776a343c16955ab172eb8"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P040.jpg",
+      "image_id": "positives:P040",
+      "sha256": "685274a19476dd4fcbd3d385364cc5ac717227124878d8ced189f110732772d2"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P042.jpg",
+      "image_id": "positives:P042",
+      "sha256": "bb9ad372f61523426dc762747225df4939d9816c35ceb86dc6ad211bd4e8bff0"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P043.jpg",
+      "image_id": "positives:P043",
+      "sha256": "ebe9dde98e4c2749cc668698037e95428fd2bdfcc13010d6b50e8191cb3e919a"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P046.jpg",
+      "image_id": "positives:P046",
+      "sha256": "5b1a5a83bd04938b5cdd205d2354a7c649dca8dc8a13d2984c8576eb312632fa"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P047.jpg",
+      "image_id": "positives:P047",
+      "sha256": "01d9380ccdb936b357a6830686823ea2f940c7ce5493434d5f13c7361290efc5"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P048.jpg",
+      "image_id": "positives:P048",
+      "sha256": "52bfda54095d35d624a2f9b72e35afc9617ceef9e46c3a82596296f46cde2c08"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P050.jpg",
+      "image_id": "positives:P050",
+      "sha256": "8dbb84051417938da73124281da74a1ba83bd9d8369e538202632392d44a7fb3"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P052.jpg",
+      "image_id": "positives:P052",
+      "sha256": "a8097b5161963bffa430a90784e177aed5b07db59f9873270e6ffbf4bb31233b"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P053.jpg",
+      "image_id": "positives:P053",
+      "sha256": "c7964a40f94eac077a39223233da2217eb8bba76619f646b4a81047b9cf6bfc7"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P055.jpg",
+      "image_id": "positives:P055",
+      "sha256": "74049d500dbd37ad5de7ceb92b1987dd4ffb7532a42fb70e7ee180330b6dc5b3"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P057.jpg",
+      "image_id": "positives:P057",
+      "sha256": "832dead993468282047c7133debdd749f4ae807ca80e113899a0abb012bc57b5"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P058.jpg",
+      "image_id": "positives:P058",
+      "sha256": "4ecca57cbdf611bb17de911d47a66fe29211bacbf88afe1349bf9ad7caf32203"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P061.jpg",
+      "image_id": "positives:P061",
+      "sha256": "0948e0e59cc632da51746ddbb22c3b10ae7d07ea77dc54921b5e3f7b1cded6fe"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P063.jpg",
+      "image_id": "positives:P063",
+      "sha256": "0d0199dd6086bf3054301cf0550fc5f11f7c89e571abcdcf30a24c4c218bb351"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P066.jpg",
+      "image_id": "positives:P066",
+      "sha256": "cfba5d6e965ca13f36eb3263aedf850f2377b5810e91b6b231a66dda4de7ea1b"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P067.jpg",
+      "image_id": "positives:P067",
+      "sha256": "b9c19f8f875489a10c07208440b774d1117411b5e28da2697279cf9d5686f404"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P068.jpg",
+      "image_id": "positives:P068",
+      "sha256": "47169291ab68a2ce9cb5d61406550ef034adc0a0576d7a20ce71c59ca72c1b3e"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P069.jpg",
+      "image_id": "positives:P069",
+      "sha256": "150158e59daac336e1771fa89768149ad96d663240128385b671157036397948"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P070.jpg",
+      "image_id": "positives:P070",
+      "sha256": "6f794d9c8b862910426161d83d1eb6015ba893378467a6e7a0ec6bd52ae29c03"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P075.jpg",
+      "image_id": "positives:P075",
+      "sha256": "f689426a11f752d86487afb5303240ff9cf0f647578109b92dee236f0de819c4"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P079.jpg",
+      "image_id": "positives:P079",
+      "sha256": "b5f0b4a0dd2bc3c2f3661b10b00632fade046f336b32608ea1ea46b56adc856f"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P081.jpg",
+      "image_id": "positives:P081",
+      "sha256": "fbd0d010b7d4a47772afc1605d9c10aa9c7ce4ac360149f5c1f4f9aae6c64a82"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P082.jpg",
+      "image_id": "positives:P082",
+      "sha256": "e6b623e6f20532fd236865bc6565723654708e783606b248f1af4337f61b9c24"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P083.jpg",
+      "image_id": "positives:P083",
+      "sha256": "be1b35a4f21f6f76d1264ee1ec92b9c41a753f461187e1e4f91de91774f08fe7"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P084.jpg",
+      "image_id": "positives:P084",
+      "sha256": "1447fd3bb4b3bed84c4c4bbbba7d5f75d5264c248a7f667069a6c1e075e65820"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P085.jpg",
+      "image_id": "positives:P085",
+      "sha256": "6b5654375f6845370a38b83d53d5f7f16dd61269a52b182dbb424c508af9c020"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P086.jpg",
+      "image_id": "positives:P086",
+      "sha256": "b31b4f77e3760e1ea4a36aa3ff561fb9c6dfa217f334545c739b8f9e058574b3"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P087.jpg",
+      "image_id": "positives:P087",
+      "sha256": "ecba31039533508b3ce50db3ea121983219fbc379708f48433f53a7c1b741f21"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P089.jpg",
+      "image_id": "positives:P089",
+      "sha256": "4c9256be915dc3185b124bb00ad7ee716898c340253f04c40e2dcf348dc7331f"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P092.jpg",
+      "image_id": "positives:P092",
+      "sha256": "520f3919ab2e1c302d5a5719743ec1c23da262ff94af1b2a86b07232ce5daa08"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P095.jpg",
+      "image_id": "positives:P095",
+      "sha256": "0e8d93ef2210ccedafe27fe11ef6ccec04129aad2c404e323b60ad1ec6523e7e"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P096.jpg",
+      "image_id": "positives:P096",
+      "sha256": "55c4fd4cf720cd235f527feb481facb85450575f9a744f3c93c66b4cbc186718"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P097.jpg",
+      "image_id": "positives:P097",
+      "sha256": "84c21e690105933f78cfb9fec4e9019000687ef3efd3f9288a88a331c1db3400"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P102.jpg",
+      "image_id": "positives:P102",
+      "sha256": "871b067632b98294b3699f3ec8de3da0dc8df6bb7360299a9e2f5aedc9b5d793"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P106.jpg",
+      "image_id": "positives:P106",
+      "sha256": "c484bd74e77072df17bcc7eb0f51c95de2e989b3edf2964b10b8daad09701544"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P107.jpg",
+      "image_id": "positives:P107",
+      "sha256": "af513ecd6a9beeee38275dadd8e4469bb341e67a4fc6c8f5b344578c6eb4d83f"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-positives-final/images/P109.jpg",
+      "image_id": "positives:P109",
+      "sha256": "3bb5f2141124e666c88a2e733b9746b082ced88c872dd795de5baca8ed95331f"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O001.jpg",
+      "image_id": "ood:O001",
+      "sha256": "28e607e332fb9d60e4b53daca46339a0be604cc20ceb186c9f750f85df0b37ec"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O002.jpg",
+      "image_id": "ood:O002",
+      "sha256": "c5a0465927ddf27dece47a5329c5a79bb8dce313e4cc6e6d5c0ab949d6a1b513"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O003.jpg",
+      "image_id": "ood:O003",
+      "sha256": "c12aaf48e75576787a4f8c56dd0e8854dcb077625ab8c2ce090363a4f937be8d"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O004.jpg",
+      "image_id": "ood:O004",
+      "sha256": "9919daba6c14cfdf63fa138abd5a4bc8af9eb8a3cb16e00ef953d9a93c5e4eec"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O005.jpg",
+      "image_id": "ood:O005",
+      "sha256": "dc5b1b5790f091b1501873659cedf111ef96a16bd636ac249ef63232b7f55802"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O006.jpg",
+      "image_id": "ood:O006",
+      "sha256": "0c5aa053726d3f9291670adc00eefd8ab3ad65ae0dde06f5dbc6fa3ec0e2a842"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O007.jpg",
+      "image_id": "ood:O007",
+      "sha256": "272d34bdf3eb1e6ff3f1db2af9b5323b4c256ea3ed1cd6fcbfcd91e7cbf53e10"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O008.jpg",
+      "image_id": "ood:O008",
+      "sha256": "474caa385e4bced2dfa60cf95210a93195ad91ad15e79dbb94dd34fd66ff8960"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O009.jpg",
+      "image_id": "ood:O009",
+      "sha256": "477d318946e280fa10b49895fcbb64be272c78ce504db4451c57548f71a22b3b"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O010.jpg",
+      "image_id": "ood:O010",
+      "sha256": "67774f6b8b48796e11f1aaf551b7a980211174ff514d6b867d3a3ba887dcaf84"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O011.jpg",
+      "image_id": "ood:O011",
+      "sha256": "3856290d2208e1e515e0d623f26d7b24f91576ebc84d232539147e9ea42cd627"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O012.jpg",
+      "image_id": "ood:O012",
+      "sha256": "50265fdbb0e33d96fa05b0697c47b0fff46aed26d766aa6dccf46f0d63be1b82"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O013.jpg",
+      "image_id": "ood:O013",
+      "sha256": "795750a12c659db240494f1b728fb395f3dd30dce595f7d4c4ac06c951bc5059"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O014.jpg",
+      "image_id": "ood:O014",
+      "sha256": "c39890bd728494732e55c36a5764ad12125c1aa8710466f3fc1f3ab0518ab625"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O015.jpg",
+      "image_id": "ood:O015",
+      "sha256": "d9ab10fce007f742f1de23d0c3282ea98e5ede7b4071b05bfacd32972b508f35"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O016.jpg",
+      "image_id": "ood:O016",
+      "sha256": "5eca31e84ca610b37b4d81c0f50470ee374590c54711cbcc77b498b0b2402270"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O017.jpg",
+      "image_id": "ood:O017",
+      "sha256": "43999c125d7431e93873f5badb7962bb05c7c49ee94a7bcd3943e33464c9152b"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O018.jpg",
+      "image_id": "ood:O018",
+      "sha256": "ba8042e062a113df41a8ffe1a8813dd5edc8489ca65083701dea6612273ea52d"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O019.jpg",
+      "image_id": "ood:O019",
+      "sha256": "d21e54cf855b946bd1ac99c423462bd770d50480a8dc8fe47a907b6e64864c98"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O020.jpg",
+      "image_id": "ood:O020",
+      "sha256": "79521103e43d0f488e721778adb223da5509c2e4734f03729f16508b4082e7d9"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O021.jpg",
+      "image_id": "ood:O021",
+      "sha256": "8d011091c9d773fc0234b560cc8e4d24bb39664a0612b0e0ee07a6e98c415872"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O022.jpg",
+      "image_id": "ood:O022",
+      "sha256": "da3709d998b6c9d3351b56f779ef84347d2d305fdcb62b32362c94850e2339ad"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O023.jpg",
+      "image_id": "ood:O023",
+      "sha256": "0c13d2cd9de17938598243c1d23ea7850ffd4584101d731bb0531e3bd042f9b1"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O024.jpg",
+      "image_id": "ood:O024",
+      "sha256": "171fe03b5e82397e0379f68b0b5fff0f9254d1cca19289caec2521a6428c3577"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O025.jpg",
+      "image_id": "ood:O025",
+      "sha256": "d2eabfde3019d064e70bcc600e6aee15dfd2df03b91d0f2de011a34f7396c1cd"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O026.jpg",
+      "image_id": "ood:O026",
+      "sha256": "f11ddfba11678c41ff0d0166d6ae09b0b0840103e98dcdc497c48db611dff3db"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O027.jpg",
+      "image_id": "ood:O027",
+      "sha256": "d7a207670e9cb3342a14d86622f2bb6c79bb3b155728d62d9bf931e30d20595c"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O028.jpg",
+      "image_id": "ood:O028",
+      "sha256": "a7d57f608d0d9df9233d3e1b9c34b619815ffe775160c6c50531f18dcee5f4bc"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O029.jpg",
+      "image_id": "ood:O029",
+      "sha256": "e6feb4c7befcab63a49e529669a2908a246ff6853d9ba8717f7471b5de7a683f"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O030.jpg",
+      "image_id": "ood:O030",
+      "sha256": "f014990c4f869534d8ade966d678a26ba4ad84b70e91eb9b0fb8210059ff7f15"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O031.jpg",
+      "image_id": "ood:O031",
+      "sha256": "a5c6f5d83c7e29092bc0b23e3165d572beb034cdadc6c2cdb2f32eabac42cec3"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O032.jpg",
+      "image_id": "ood:O032",
+      "sha256": "ac6c378c8935a6421ba805d41898c44c88ddb93b54715b1a9110dc34fff356d6"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O033.jpg",
+      "image_id": "ood:O033",
+      "sha256": "7bcae7bdffbbb9508ec80d7267a27b8fc23128d2fb2d13d7d9520d8415db7914"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O034.jpg",
+      "image_id": "ood:O034",
+      "sha256": "1bd3a6d735d50687df78759d720c1707410d2a8c2aee236fb9e13858a4784158"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O035.jpg",
+      "image_id": "ood:O035",
+      "sha256": "c3ac39637a0edbdf125dd1ef8697fb487e8d5e0b8db0ccf691b7005a9909177b"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O036.jpg",
+      "image_id": "ood:O036",
+      "sha256": "8ecff09761ca8201aafc76cb6f2934026f588e1a4811c0845811a9fa393389b8"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O037.jpg",
+      "image_id": "ood:O037",
+      "sha256": "ae3d37fa85c9967941213a94392cfec973a30bcf4492b235ea7aa5eb4d116a53"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O038.jpg",
+      "image_id": "ood:O038",
+      "sha256": "f397c0490a1a87ff8adca6a159ef16687fe1470771329565c702e0265546de29"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O039.jpg",
+      "image_id": "ood:O039",
+      "sha256": "5b3310e578a3c4dd909a7a4bf32ec850685faabbd7f8b62331a2f16239da59f1"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O040.jpg",
+      "image_id": "ood:O040",
+      "sha256": "2050445373bf2689f2cad9b87731292bccba4c3f6acae2f9be4dec7fb79af24c"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O041.jpg",
+      "image_id": "ood:O041",
+      "sha256": "7af608f23ebac228146b3bba1d19441e57c393b0fbc87519eb3ca6bbe378f03d"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O042.jpg",
+      "image_id": "ood:O042",
+      "sha256": "82407a94348ab4ba2f1ab42a4b3bda6a31c2c8457c56b5722700eb9ce693052f"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O043.jpg",
+      "image_id": "ood:O043",
+      "sha256": "d81479b1f484f4943304513601c4bf48eba15d9803f2f4dcbc1668eba7aef816"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O044.jpg",
+      "image_id": "ood:O044",
+      "sha256": "a4d2ece52a315efd1414af40b677f7d2965940ecf91d4dcf958a2c2988c36d18"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O045.jpg",
+      "image_id": "ood:O045",
+      "sha256": "da04c428d54632e6c63d3ed9d9dd015e069811ad76dd9508aa55c4792f891f71"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O046.jpg",
+      "image_id": "ood:O046",
+      "sha256": "7de36e2a4e935fa76f437e77e39eff3799421d93d8667c2751f93d8cf9ae21a1"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O047.jpg",
+      "image_id": "ood:O047",
+      "sha256": "be19ef6e66c58c1b36750de0180c00505e9e72377c9a44be93db91dd8e0d251b"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O048.jpg",
+      "image_id": "ood:O048",
+      "sha256": "ff80df50586f3eb0c0add7b919d0818e2fcc5e294470437b258a56b44d28e63d"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O049.jpg",
+      "image_id": "ood:O049",
+      "sha256": "e6a72c2e0de0ac78173a955035fceef57cfaa4386196b4f0f021d8c6e90fe031"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O050.jpg",
+      "image_id": "ood:O050",
+      "sha256": "038d8cad4671c572fca501e91e49d574bafe368be71dd8589907e0e0c25c6b56"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O051.jpg",
+      "image_id": "ood:O051",
+      "sha256": "03d9850d6ba6b76ea8f9d14090e8751e91240e346aafd77729f23b4feb5e6236"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O052.jpg",
+      "image_id": "ood:O052",
+      "sha256": "25123a96e7f59d0e92d461e34e2d4546736b559449fd21c23038c914697bdf98"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O053.jpg",
+      "image_id": "ood:O053",
+      "sha256": "66d13f8926b9ee3dd53e43730d45d79acd98cdccc6f3373b390ec3161c26e8ae"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O054.jpg",
+      "image_id": "ood:O054",
+      "sha256": "e0291ba579b0f0a4e5fc9ff31c0ea84231de18cbc082bdf2cda2a4cb86dfa6f8"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O055.jpg",
+      "image_id": "ood:O055",
+      "sha256": "9482e81c05aa2ec2b8640a81e646fdf7c4851921349bb49fd673fe8151cfb93f"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O056.jpg",
+      "image_id": "ood:O056",
+      "sha256": "3c299b03e75e9c328d549857a15c538c35374b359b7303c1167f7d5a305302a4"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O057.jpg",
+      "image_id": "ood:O057",
+      "sha256": "69165e41baf5461d64d3602a633d8088c81fab5d1ef5d4123c15f3c2379ef011"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O058.jpg",
+      "image_id": "ood:O058",
+      "sha256": "bfb6715e10261e731e65bf61e437062ec0150aa65158d8ef010dc7a1efc728ed"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O059.jpg",
+      "image_id": "ood:O059",
+      "sha256": "178f508d1f323205bc8dd895ed18b7ca2ac6414d5a8b06227885748bafc6e9bd"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O060.jpg",
+      "image_id": "ood:O060",
+      "sha256": "10f77b7984beb6f50c9e13d337ee51b26cedcede69b47bece8f25cf792e736a5"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O061.jpg",
+      "image_id": "ood:O061",
+      "sha256": "cce51cdc3c877470b7f771392b9895c810f7aa0844c14b01e98d8f2c57733ac3"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O062.jpg",
+      "image_id": "ood:O062",
+      "sha256": "c25e5e050f1c3f0c2514d4fae8dd9a5e3446594ff76637ac1d1612dcc6796490"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O063.jpg",
+      "image_id": "ood:O063",
+      "sha256": "cf994021db67aced850b0c81582e3ac9165e0a26b4951671302123d29baa542b"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O064.jpg",
+      "image_id": "ood:O064",
+      "sha256": "5a117a92e6a5dfa2d7219a2ca4e3324811163b4e000a8b7c63a6a83a07aefca0"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O065.jpg",
+      "image_id": "ood:O065",
+      "sha256": "e972c8196506eec39abaafd82013ff2100f8b921a6e2c2a650d284fa59a2b1aa"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O066.jpg",
+      "image_id": "ood:O066",
+      "sha256": "ebf3b2efff68fc625c037ea1458afd31611bea6fe8a2754b3d5183974a4050c3"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O067.jpg",
+      "image_id": "ood:O067",
+      "sha256": "50baa350fd503d4030b1dc701c222dfc98f6d5bf096d14c0a8699f62457cb1be"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O068.jpg",
+      "image_id": "ood:O068",
+      "sha256": "1eb7ed663424936b8c3d0096d14193a92f5f164a3113643642b174d92db31147"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O069.jpg",
+      "image_id": "ood:O069",
+      "sha256": "fb89c95f86ddec9ffa881a276891e78a6ab781bb2edcab3ef0545d4aa981ab94"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O070.jpg",
+      "image_id": "ood:O070",
+      "sha256": "659a61be9dffaa93ce0321fb85c737aea851e270156cc964df494eeef8fc5804"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O071.jpg",
+      "image_id": "ood:O071",
+      "sha256": "a3929fea5af7c3375dff44be2d9b5d32943e2b0317abacdefc99ce442623e8d0"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O072.jpg",
+      "image_id": "ood:O072",
+      "sha256": "fcb0bed1024ad0294d549df30220288643efb6b5bf84cb2b4753dbf38e32eae0"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O073.jpg",
+      "image_id": "ood:O073",
+      "sha256": "41d9f60349261b947fee9287ba309418766c9775221170ffcc1440407a610861"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O074.jpg",
+      "image_id": "ood:O074",
+      "sha256": "df409cdd5eae39818fcad7779506d9d607dc7114db783f8e8b457c9dbb521395"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O075.jpg",
+      "image_id": "ood:O075",
+      "sha256": "cc5b25c40a0c30f1c7f9f35c3bd7998600e3ae16c756f0b19d048189db922c66"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O076.jpg",
+      "image_id": "ood:O076",
+      "sha256": "85ff381835eb2b118f14490e928656e4440304a6965dd49156fbe3fc63b30a17"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O077.jpg",
+      "image_id": "ood:O077",
+      "sha256": "36f532226ceb349437d26ed0bdd2d524e5310aae02823622ee612bd8ae653acc"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O078.jpg",
+      "image_id": "ood:O078",
+      "sha256": "3b80af2a4d9972b567e8c7c5f3817f940289d6e5518e0bbb818691fbe133684c"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O079.jpg",
+      "image_id": "ood:O079",
+      "sha256": "ba0d95f90d8eb0503d75afa6a81a3482ed06400168c84cd2f088e042957871da"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O080.jpg",
+      "image_id": "ood:O080",
+      "sha256": "4bb1c18a496e27252db508335411f40a67043c264edf10a4cf21a2b1c66f4256"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O081.jpg",
+      "image_id": "ood:O081",
+      "sha256": "446280debfad4ebd3f593ad3d13b938b48fb652a9510ec6b01c2f335938aa1d4"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O082.jpg",
+      "image_id": "ood:O082",
+      "sha256": "1c3c8380ef53b42ae852a147e7762fdb365e70a832e95216bcd210bee2483985"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O083.jpg",
+      "image_id": "ood:O083",
+      "sha256": "d1dcf920eb21994168af55f029771c3604cd68289b80a8df55767b844d5da8a8"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O084.jpg",
+      "image_id": "ood:O084",
+      "sha256": "8b2291ca450fddf0e89b53cca072a1aef0421729f472bbd587fe823b3509e39e"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O085.jpg",
+      "image_id": "ood:O085",
+      "sha256": "c55bb7f962eb186292cdcff34bdb83d051502b7dbd828cde7fd082982043db7a"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O086.jpg",
+      "image_id": "ood:O086",
+      "sha256": "2837c0cce6e829bd0108561867d5d1041be9a66de8f13207efee81cdccdbe163"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O087.jpg",
+      "image_id": "ood:O087",
+      "sha256": "dc448f5a1663322a4416f1d3357691a7a58ceedb7e70778bd9a63a5e3810316a"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O088.jpg",
+      "image_id": "ood:O088",
+      "sha256": "565739576417457dd1ddf0fa93aaf5ba1e926868e5e1ee191d1fc4783ad9ab13"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O089.jpg",
+      "image_id": "ood:O089",
+      "sha256": "2229fb6817e8019ce70c00b503d92022738439dc656391943c8cae99d9efde5e"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O090.jpg",
+      "image_id": "ood:O090",
+      "sha256": "f9256dc5416946042f955289882f7f39a3c8b3fdd10462b5b597b00fc922751d"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O091.jpg",
+      "image_id": "ood:O091",
+      "sha256": "7db0d24bc7e46c024dbb3ad5a3e1e58f47b9d79d71a25b80d6f9c160483e3a8e"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O092.jpg",
+      "image_id": "ood:O092",
+      "sha256": "33e1aaff09a98db96f1d9196eddf0f771292dadc6d09069d00508fd0343b009d"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O093.jpg",
+      "image_id": "ood:O093",
+      "sha256": "3e701ed9b9fa91888dd0343234e4e2cae41b36b45439efa1925b4efc3053b772"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O094.jpg",
+      "image_id": "ood:O094",
+      "sha256": "9f77eeb2ded91b1c103468949e94d57e5917e841152f232cb2f6a8ea99d2372f"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O095.jpg",
+      "image_id": "ood:O095",
+      "sha256": "de4c12ec805ef93927d99f7314a447ff543d3819a56d122b71588f4f3f3e6f0e"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O096.jpg",
+      "image_id": "ood:O096",
+      "sha256": "6531b6ab50da85e2dfcc0002ad1f7ad8723e0c55cc24de97c10bfddc36c2b5c9"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O097.jpg",
+      "image_id": "ood:O097",
+      "sha256": "d06316edd1764fc4d941b74505c0c23e08bb1d35a0faae2e342f7d5447207cc8"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O098.jpg",
+      "image_id": "ood:O098",
+      "sha256": "8c84d3577d2a05f7c718719c3f2670e63052a862f68c40394d011b76896e4b22"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O099.jpg",
+      "image_id": "ood:O099",
+      "sha256": "c1be0841e6d027a356fbd8a6f5de082e5b880b8e9b82741b26b99b9d07e2174b"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O100.jpg",
+      "image_id": "ood:O100",
+      "sha256": "7839121a42f3bec0821cfbc5652b0665678436e0c06034e303696febf5bbf2b9"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O101.jpg",
+      "image_id": "ood:O101",
+      "sha256": "7cb3e2eb7dca15efbab108fdf7310cc37260b1c5ea2e42563c39d5f7153381ac"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O102.jpg",
+      "image_id": "ood:O102",
+      "sha256": "e1d64d2198dbba1019a22ab83ee3b9cdb2eaf8819d8739ee0645a646a65daa58"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O103.jpg",
+      "image_id": "ood:O103",
+      "sha256": "f0ea1f3607e4d7bd47b5277a48089caf06b5ff6c3bf73610b4145bc11655a57a"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O104.jpg",
+      "image_id": "ood:O104",
+      "sha256": "589271159453b6b4c391f517cb97bed44cc5260fb96d2dee9e4763e064e0501a"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O105.jpg",
+      "image_id": "ood:O105",
+      "sha256": "721fdd6ca4d97d1776dcb6ce6375785960179080c4fdf760feb47ca34fe58041"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O106.jpg",
+      "image_id": "ood:O106",
+      "sha256": "a05098276debffcc196b6b15c8756aff4d7a64ca22e508a7e416c124d1a0f2dd"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O107.jpg",
+      "image_id": "ood:O107",
+      "sha256": "0e8dba8c53ec91b91fcb9e5db808839ac376663f46ab9e30161ee19ce6bb5500"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O108.jpg",
+      "image_id": "ood:O108",
+      "sha256": "9c8da3adb205d871a282ecea97b81e9412e6c8b5a50dca196d80cee134b6c0a9"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O109.jpg",
+      "image_id": "ood:O109",
+      "sha256": "58882c5cd4a32b37ce7dc0f2264e558cae4369c3651591f789ba36ee6c558feb"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O110.jpg",
+      "image_id": "ood:O110",
+      "sha256": "2c5b63dd066db1330cf48c40608c58be4e4379e6c9c731905eefc517cfee1178"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O111.jpg",
+      "image_id": "ood:O111",
+      "sha256": "c79e49fab16e176ccbc6cef9c6e9b5b897e406eec090acebf1f195cea412768e"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O112.jpg",
+      "image_id": "ood:O112",
+      "sha256": "d1f5f659d8f6a241c27b92ab8d9e0b3bfa43a77ab6e157ae2d5e768ebe32476d"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O113.jpg",
+      "image_id": "ood:O113",
+      "sha256": "1112b983b5f57c713f362d001106a828d0923ec1ee92a346cef709ebd94261f6"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O114.jpg",
+      "image_id": "ood:O114",
+      "sha256": "3f9825ad54158fccc346236d707356721c12b970df475e356b916795c57e9eaf"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O115.jpg",
+      "image_id": "ood:O115",
+      "sha256": "b34b43b0f923a029e69e86bdaf998b375cd5b64bad75153d2a12fc68ac11ecfa"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O116.jpg",
+      "image_id": "ood:O116",
+      "sha256": "44609e0b7241e10a9f12f97a68f2d47593485992b1d6b80825bf70b405ce9bcb"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O117.jpg",
+      "image_id": "ood:O117",
+      "sha256": "2d943ccdfe91d480c0b69277d4f32d53a5be012e78cdf85db6340d925a21fa75"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O118.jpg",
+      "image_id": "ood:O118",
+      "sha256": "756a7f1d6684d59c3d027969262867122e36041ddc1e339cd2a4990d810a17ef"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O119.jpg",
+      "image_id": "ood:O119",
+      "sha256": "157e9f64868c8cad27db7870dd32a394127e07c78073a46af83713624e035d1b"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O120.jpg",
+      "image_id": "ood:O120",
+      "sha256": "712bd5b2679d2090011dadea1f1aa122dfbf40763f800d9abf30eb364eecab13"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O121.jpg",
+      "image_id": "ood:O121",
+      "sha256": "eea9b5b6e04d46e1e702a7131168443afbb133d38ba070e928028c8515ce02c2"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O122.jpg",
+      "image_id": "ood:O122",
+      "sha256": "a7758bdbe5dbac329d7a8e8401c2365ade4c8f02e8efe8d7c943e9c07553c140"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O123.jpg",
+      "image_id": "ood:O123",
+      "sha256": "c93c67af5ee345f466f3df2e7fe26c0a379aa0b7a5bbc53bb30cd78882de01c9"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O124.jpg",
+      "image_id": "ood:O124",
+      "sha256": "162ff7445d348877cfa4aeb1f0874595b90bc5395dc91297ba9ff6337d7fa357"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O125.jpg",
+      "image_id": "ood:O125",
+      "sha256": "99e4b67dd8609232e8b83ddb935530f58b428835fd8b06cdc951e4ad142144bb"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O126.jpg",
+      "image_id": "ood:O126",
+      "sha256": "a52d171955f6711a4ab44b510bce20e2308647ba8ff1efcae0cc7bb622d15a1e"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O127.jpg",
+      "image_id": "ood:O127",
+      "sha256": "8911e572f1039caf4dae98256886c8e69d626198a19d6d40918eb8fead749dbd"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O128.jpg",
+      "image_id": "ood:O128",
+      "sha256": "bfcaca962d263aa892c5b4c40e28cbbf1cdda9fecbf5970a0d691da3b17c03e9"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O129.jpg",
+      "image_id": "ood:O129",
+      "sha256": "2b820b63a57ecdd6de6269a4b2a07f9cf3789041a8bcaea35fa378eca96f245c"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O130.jpg",
+      "image_id": "ood:O130",
+      "sha256": "0b48039aabf7593605a25123d276882988d37ddc8071bb57f5e63df1e05cb0eb"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O131.jpg",
+      "image_id": "ood:O131",
+      "sha256": "d4c4f431c8163de718687568f80afad32b1c7827319bdcbcac98ab5c374d1920"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O132.jpg",
+      "image_id": "ood:O132",
+      "sha256": "15a964530c822a59c37b8c55bc050beb72998ab5cf97e75d24c6645e98bb526b"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O133.jpg",
+      "image_id": "ood:O133",
+      "sha256": "d19cfb3b831f52ddc2e07bc966018e2abd3a01ea6c11a73ba1cdbe2ffdafad40"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O134.jpg",
+      "image_id": "ood:O134",
+      "sha256": "2255d0bb9c8e8ccb33ad21a31d58def8f169b3647a5b6f1f95202e24a0341e9e"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O135.jpg",
+      "image_id": "ood:O135",
+      "sha256": "2528adf4aaa0d2ba734cf7b8324bd5a640526d35ed81c14b98cf6073833f2aea"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O136.jpg",
+      "image_id": "ood:O136",
+      "sha256": "a3550bee6540dcc5ba0a1ef3b34d48ce7cf50affaf716ae92acf2102d8aca603"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O137.jpg",
+      "image_id": "ood:O137",
+      "sha256": "0402d00250bc617f0c974c2cd6b650ecc9184295ba6a1ffd03e7c8a932cf389f"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O138.jpg",
+      "image_id": "ood:O138",
+      "sha256": "27313f9b833b95cdfa0516a4ce6792158b166fc500e570b135a3cd4bac493a60"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O139.jpg",
+      "image_id": "ood:O139",
+      "sha256": "22ae3e557c8a5df5e11a434c9f5ecb2ce1fda11e3c06e56818ef72e28c894e11"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O140.jpg",
+      "image_id": "ood:O140",
+      "sha256": "84b490a665556d0e35c6ff4af809de110e8dbb71c383f93aefa65b32ad0788c1"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O141.jpg",
+      "image_id": "ood:O141",
+      "sha256": "c8792db7eeb83695fce26547928d0ece7e8eabcf6a3e033549e314cde59cc835"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O142.jpg",
+      "image_id": "ood:O142",
+      "sha256": "16d214b5d45cba147e568f7f12a1ffdeabfe3766b6f3c30b00bedb0acae5a69d"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O143.jpg",
+      "image_id": "ood:O143",
+      "sha256": "5e98cc68977d82311449c9568d4bd91b08e5f635210c52ae03ac09a5eff53927"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O144.jpg",
+      "image_id": "ood:O144",
+      "sha256": "43b97f464ff4effcae64049719703838c267303c0e7cbff57c57ca574383a113"
+    }
+  ],
+  "schema_version": 1,
+  "scope": "diagnostic_incomplete_cohort_not_release_evidence",
+  "selection_uses_model_predictions": false
+}

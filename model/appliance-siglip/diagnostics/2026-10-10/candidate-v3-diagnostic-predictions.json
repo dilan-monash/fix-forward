@@ -1,0 +1,3199 @@
+{
+  "evaluation": "fixforward-siglip2-quantized-node-parity",
+  "candidate_id": "fixforward-siglip2-selective-class-threshold-candidate-v3",
+  "cohort_scope": "diagnostic_incomplete_cohort_not_release_evidence",
+  "cohort_minimums_met": false,
+  "release_ready": false,
+  "scope": "Node parity harness for the proposed browser weights; not a device/browser release result.",
+  "model": "onnx-community/siglip2-base-patch32-256-ONNX",
+  "revision": "7efccb86b5b6601bfe9e14326e1c11b40b68d44c",
+  "dtype": "q4",
+  "model_sha256": "9e82237d9a1d89948502aff9df02129c28698d793e01f15f62e2267682615499",
+  "transformers_js_version": "caller-supplied; see transformers_dir in the command record",
+  "inputs": {
+    "manifest_sha256": "cdd39c4fd8cbcbbcc6c5f5aa76f1546998fe1f70b9443bd63b94c06c5560dc5a",
+    "audit_sha256": "7518d6c73cf71bd2acc36101646c535e1af7bc8c7ab592be8af8a5ad5632be9e",
+    "semantic_audit_sha256": null,
+    "policy_manifest_sha256": "c7d62dd45980771ffec56b4e5b8a303641ad3393f36ea77ade178af0c3b80ad7",
+    "text_manifest_sha256": "4b01be52acad78dae1783978e1bc191d50532dc63781a5cd7b96e24f3a390093",
+    "text_vectors_sha256": "2e63f55601cf3f011bf13b3c347bd456111c1b8132f9d8164105fff0a29877f2",
+    "cohort_lock_sha256": "4090947011140a0ea747925d474eac3f59c00d467525b3330b5fcd67e4000b9b"
+  },
+  "timing": {
+    "evaluated_images": 196,
+    "total_ms": 53132.3364,
+    "mean_ms": 271.08334897959185
+  },
+  "summary": {
+    "eligible_operational": {
+      "n": 21,
+      "accepted": 11,
+      "accepted_correct": 11,
+      "coverage": 0.5238095238095238,
+      "wrong_accepts": [],
+      "per_class": {
+        "air_fryer": {
+          "audited_operational_positives": 4,
+          "accepted": 0,
+          "accepted_correct": 0,
+          "wrong_accepts": [],
+          "coverage": 0
+        },
+        "coffee_machine": {
+          "audited_operational_positives": 0,
+          "accepted": 0,
+          "accepted_correct": 0,
+          "wrong_accepts": [],
+          "coverage": null
+        },
+        "fan": {
+          "audited_operational_positives": 3,
+          "accepted": 2,
+          "accepted_correct": 2,
+          "wrong_accepts": [],
+          "coverage": 0.6666666666666666
+        },
+        "hair_dryer": {
+          "audited_operational_positives": 3,
+          "accepted": 2,
+          "accepted_correct": 2,
+          "wrong_accepts": [],
+          "coverage": 0.6666666666666666
+        },
+        "kettle": {
+          "audited_operational_positives": 1,
+          "accepted": 1,
+          "accepted_correct": 1,
+          "wrong_accepts": [],
+          "coverage": 1
+        },
+        "microwave": {
+          "audited_operational_positives": 0,
+          "accepted": 0,
+          "accepted_correct": 0,
+          "wrong_accepts": [],
+          "coverage": null
+        },
+        "portable_ac": {
+          "audited_operational_positives": 4,
+          "accepted": 2,
+          "accepted_correct": 2,
+          "wrong_accepts": [],
+          "coverage": 0.5
+        },
+        "portable_heater": {
+          "audited_operational_positives": 2,
+          "accepted": 2,
+          "accepted_correct": 2,
+          "wrong_accepts": [],
+          "coverage": 1
+        },
+        "rice_cooker": {
+          "audited_operational_positives": 2,
+          "accepted": 1,
+          "accepted_correct": 1,
+          "wrong_accepts": [],
+          "coverage": 0.5
+        },
+        "sandwich_press": {
+          "audited_operational_positives": 2,
+          "accepted": 1,
+          "accepted_correct": 1,
+          "wrong_accepts": [],
+          "coverage": 0.5
+        },
+        "straightener": {
+          "audited_operational_positives": 0,
+          "accepted": 0,
+          "accepted_correct": 0,
+          "wrong_accepts": [],
+          "coverage": null
+        }
+      }
+    },
+    "manual_only_operational": {
+      "n": 17,
+      "accepted": 0,
+      "accepted_rows": []
+    },
+    "true_ood": {
+      "n": 158,
+      "source_groups": 32,
+      "accepted": 0,
+      "accepted_rows": []
+    }
+  },
+  "diagnostic_legacy_policy_summary": {
+    "thresholds": {
+      "min_ood_margin": 0.035,
+      "min_positive_margin": 0.01,
+      "enabled_classes": [
+        "air_fryer",
+        "blender",
+        "coffee_machine",
+        "fan",
+        "hair_dryer",
+        "kettle",
+        "microwave",
+        "mixer",
+        "portable_ac",
+        "portable_heater",
+        "sandwich_press",
+        "toaster",
+        "vaccum_cleaner"
+      ]
+    },
+    "audited_operational_positives": {
+      "n": 38,
+      "top1_correct": 32,
+      "top1_accuracy": 0.8421052631578947,
+      "accepted": 18,
+      "coverage": 0.47368421052631576,
+      "accepted_correct": 18,
+      "selective_accuracy": 1,
+      "wrong_accepts": [],
+      "per_class": {
+        "air_fryer": {
+          "n": 4,
+          "top1_correct": 2,
+          "accepted": 0,
+          "accepted_correct": 0,
+          "wrong_accepts": 0
+        },
+        "fan": {
+          "n": 3,
+          "top1_correct": 3,
+          "accepted": 3,
+          "accepted_correct": 3,
+          "wrong_accepts": 0
+        },
+        "hair_dryer": {
+          "n": 3,
+          "top1_correct": 3,
+          "accepted": 2,
+          "accepted_correct": 2,
+          "wrong_accepts": 0
+        },
+        "kettle": {
+          "n": 1,
+          "top1_correct": 1,
+          "accepted": 1,
+          "accepted_correct": 1,
+          "wrong_accepts": 0
+        },
+        "portable_heater": {
+          "n": 2,
+          "top1_correct": 2,
+          "accepted": 2,
+          "accepted_correct": 2,
+          "wrong_accepts": 0
+        },
+        "rice_cooker": {
+          "n": 2,
+          "top1_correct": 1,
+          "accepted": 0,
+          "accepted_correct": 0,
+          "wrong_accepts": 0
+        },
+        "sandwich_press": {
+          "n": 2,
+          "top1_correct": 1,
+          "accepted": 1,
+          "accepted_correct": 1,
+          "wrong_accepts": 0
+        },
+        "blender": {
+          "n": 3,
+          "top1_correct": 3,
+          "accepted": 2,
+          "accepted_correct": 2,
+          "wrong_accepts": 0
+        },
+        "food_processor": {
+          "n": 3,
+          "top1_correct": 3,
+          "accepted": 0,
+          "accepted_correct": 0,
+          "wrong_accepts": 0
+        },
+        "mixer": {
+          "n": 3,
+          "top1_correct": 3,
+          "accepted": 3,
+          "accepted_correct": 3,
+          "wrong_accepts": 0
+        },
+        "shaver": {
+          "n": 4,
+          "top1_correct": 4,
+          "accepted": 0,
+          "accepted_correct": 0,
+          "wrong_accepts": 0
+        },
+        "toaster": {
+          "n": 1,
+          "top1_correct": 1,
+          "accepted": 1,
+          "accepted_correct": 1,
+          "wrong_accepts": 0
+        },
+        "vaccum_cleaner": {
+          "n": 1,
+          "top1_correct": 1,
+          "accepted": 1,
+          "accepted_correct": 1,
+          "wrong_accepts": 0
+        },
+        "dehumidifier": {
+          "n": 1,
+          "top1_correct": 0,
+          "accepted": 0,
+          "accepted_correct": 0,
+          "wrong_accepts": 0
+        },
+        "steam_cleaner": {
+          "n": 1,
+          "top1_correct": 1,
+          "accepted": 0,
+          "accepted_correct": 0,
+          "wrong_accepts": 0
+        },
+        "portable_ac": {
+          "n": 4,
+          "top1_correct": 3,
+          "accepted": 2,
+          "accepted_correct": 2,
+          "wrong_accepts": 0
+        }
+      }
+    },
+    "audited_ood": {
+      "n": 158,
+      "false_accepts": 1,
+      "false_accept_rate": 0.006329113924050633,
+      "audit_basis": "audited_true_ood_ids",
+      "classification_complete": true,
+      "accepted_rows": [
+        {
+          "image_id": "positives:P087",
+          "expected": null,
+          "predicted": "portable_ac",
+          "ood_margin": 0.045583099629824125,
+          "positive_margin": 0.015993109472635658
+        }
+      ]
+    },
+    "audited_enabled_class_positives": {
+      "n": 27,
+      "top1_correct": 23,
+      "top1_accuracy": 0.8518518518518519,
+      "accepted": 18,
+      "coverage": 0.6666666666666666,
+      "accepted_correct": 18,
+      "selective_accuracy": 1,
+      "wrong_accepts": [],
+      "per_class": {
+        "air_fryer": {
+          "n": 4,
+          "top1_correct": 2,
+          "accepted": 0,
+          "accepted_correct": 0,
+          "wrong_accepts": 0
+        },
+        "fan": {
+          "n": 3,
+          "top1_correct": 3,
+          "accepted": 3,
+          "accepted_correct": 3,
+          "wrong_accepts": 0
+        },
+        "hair_dryer": {
+          "n": 3,
+          "top1_correct": 3,
+          "accepted": 2,
+          "accepted_correct": 2,
+          "wrong_accepts": 0
+        },
+        "kettle": {
+          "n": 1,
+          "top1_correct": 1,
+          "accepted": 1,
+          "accepted_correct": 1,
+          "wrong_accepts": 0
+        },
+        "portable_heater": {
+          "n": 2,
+          "top1_correct": 2,
+          "accepted": 2,
+          "accepted_correct": 2,
+          "wrong_accepts": 0
+        },
+        "sandwich_press": {
+          "n": 2,
+          "top1_correct": 1,
+          "accepted": 1,
+          "accepted_correct": 1,
+          "wrong_accepts": 0
+        },
+        "blender": {
+          "n": 3,
+          "top1_correct": 3,
+          "accepted": 2,
+          "accepted_correct": 2,
+          "wrong_accepts": 0
+        },
+        "mixer": {
+          "n": 3,
+          "top1_correct": 3,
+          "accepted": 3,
+          "accepted_correct": 3,
+          "wrong_accepts": 0
+        },
+        "toaster": {
+          "n": 1,
+          "top1_correct": 1,
+          "accepted": 1,
+          "accepted_correct": 1,
+          "wrong_accepts": 0
+        },
+        "vaccum_cleaner": {
+          "n": 1,
+          "top1_correct": 1,
+          "accepted": 1,
+          "accepted_correct": 1,
+          "wrong_accepts": 0
+        },
+        "portable_ac": {
+          "n": 4,
+          "top1_correct": 3,
+          "accepted": 2,
+          "accepted_correct": 2,
+          "wrong_accepts": 0
+        }
+      }
+    },
+    "audited_disabled_class_challenges": {
+      "n": 11,
+      "top1_correct": 9,
+      "top1_accuracy": 0.8181818181818182,
+      "accepted": 0,
+      "coverage": 0,
+      "accepted_correct": 0,
+      "selective_accuracy": null,
+      "wrong_accepts": [],
+      "per_class": {
+        "rice_cooker": {
+          "n": 2,
+          "top1_correct": 1,
+          "accepted": 0,
+          "accepted_correct": 0,
+          "wrong_accepts": 0
+        },
+        "food_processor": {
+          "n": 3,
+          "top1_correct": 3,
+          "accepted": 0,
+          "accepted_correct": 0,
+          "wrong_accepts": 0
+        },
+        "shaver": {
+          "n": 4,
+          "top1_correct": 4,
+          "accepted": 0,
+          "accepted_correct": 0,
+          "wrong_accepts": 0
+        },
+        "dehumidifier": {
+          "n": 1,
+          "top1_correct": 0,
+          "accepted": 0,
+          "accepted_correct": 0,
+          "wrong_accepts": 0
+        },
+        "steam_cleaner": {
+          "n": 1,
+          "top1_correct": 1,
+          "accepted": 0,
+          "accepted_correct": 0,
+          "wrong_accepts": 0
+        }
+      },
+      "acceptance_rule": "Every accepted output is a wrong acceptance because the expected class is manual-only."
+    },
+    "audited_true_ood": {
+      "n": 158,
+      "false_accepts": 1,
+      "false_accept_rate": 0.006329113924050633,
+      "audit_basis": "audited_true_ood_ids",
+      "classification_complete": true,
+      "accepted_rows": [
+        {
+          "image_id": "positives:P087",
+          "expected": null,
+          "predicted": "portable_ac",
+          "ood_margin": 0.045583099629824125,
+          "positive_margin": 0.015993109472635658
+        }
+      ]
+    },
+    "aggregate_wrong_accepts": {
+      "n": 1,
+      "rows": [
+        {
+          "cohort": "true_ood",
+          "image_id": "positives:P087",
+          "expected": null,
+          "predicted": "portable_ac",
+          "ood_margin": 0.045583099629824125,
+          "positive_margin": 0.015993109472635658
+        }
+      ]
+    }
+  },
+  "rows": [
+    {
+      "image_id": "positives:P001",
+      "expected": null,
+      "top_positive": {
+        "label": "rice_cooker",
+        "score": 0.052884105552558396
+      },
+      "top_ood": {
+        "label": "built_in_oven",
+        "score": 0.05358546208302257
+      },
+      "positive_margin": 0.003979693764695556,
+      "ood_margin": -0.0007013565304641728
+    },
+    {
+      "image_id": "positives:P002",
+      "expected": null,
+      "top_positive": {
+        "label": "food_processor",
+        "score": 0.11121064549141176
+      },
+      "top_ood": {
+        "label": "other_kitchen_appliance",
+        "score": 0.09578284002946796
+      },
+      "positive_margin": 0.004987537687129631,
+      "ood_margin": 0.015427805461943792
+    },
+    {
+      "image_id": "positives:P003",
+      "expected": null,
+      "top_positive": {
+        "label": "air_fryer",
+        "score": 0.04568016344516945
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.03131232686029223
+      },
+      "positive_margin": 0.02203995077842265,
+      "ood_margin": 0.014367836584877225
+    },
+    {
+      "image_id": "positives:P004",
+      "expected": null,
+      "top_positive": {
+        "label": "air_fryer",
+        "score": 0.12063525345833237
+      },
+      "top_ood": {
+        "label": "other_kitchen_appliance",
+        "score": 0.11033348775506993
+      },
+      "positive_margin": 0.03239108414442446,
+      "ood_margin": 0.010301765703262439
+    },
+    {
+      "image_id": "positives:P005",
+      "expected": null,
+      "top_positive": {
+        "label": "air_fryer",
+        "score": 0.14745455374315095
+      },
+      "top_ood": {
+        "label": "other_kitchen_appliance",
+        "score": 0.12680830874018478
+      },
+      "positive_margin": 0.02915520343391595,
+      "ood_margin": 0.020646245002966163
+    },
+    {
+      "image_id": "positives:P012",
+      "expected": null,
+      "top_positive": {
+        "label": "fan",
+        "score": 0.1511686768474314
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.09933408923888139
+      },
+      "positive_margin": 0.05329390220620342,
+      "ood_margin": 0.05183458760855002
+    },
+    {
+      "image_id": "positives:P014",
+      "expected": null,
+      "top_positive": {
+        "label": "fan",
+        "score": 0.1459343516683435
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.10047541242713409
+      },
+      "positive_margin": 0.056058068736572125,
+      "ood_margin": 0.04545893924120942
+    },
+    {
+      "image_id": "positives:P015",
+      "expected": null,
+      "top_positive": {
+        "label": "fan",
+        "score": 0.1518271609816857
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.08184484323841691
+      },
+      "positive_margin": 0.022116194676083778,
+      "ood_margin": 0.06998231774326878
+    },
+    {
+      "image_id": "positives:P016",
+      "expected": null,
+      "top_positive": {
+        "label": "hair_dryer",
+        "score": 0.1538096135728418
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.09677644166535729
+      },
+      "positive_margin": 0.0528528671755539,
+      "ood_margin": 0.057033171907484526
+    },
+    {
+      "image_id": "positives:P017",
+      "expected": null,
+      "top_positive": {
+        "label": "hair_dryer",
+        "score": 0.14773664934987735
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.10249034345850418
+      },
+      "positive_margin": 0.04218531707022444,
+      "ood_margin": 0.04524630589137317
+    },
+    {
+      "image_id": "positives:P018",
+      "expected": null,
+      "top_positive": {
+        "label": "hair_dryer",
+        "score": 0.11102214149798191
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.10345872939484291
+      },
+      "positive_margin": 0.014312419143218055,
+      "ood_margin": 0.007563412103139003
+    },
+    {
+      "image_id": "positives:P021",
+      "expected": null,
+      "top_positive": {
+        "label": "kettle",
+        "score": 0.14716535919886117
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.10361900544390301
+      },
+      "positive_margin": 0.04632728077915803,
+      "ood_margin": 0.04354635375495816
+    },
+    {
+      "image_id": "positives:P032",
+      "expected": null,
+      "top_positive": {
+        "label": "portable_heater",
+        "score": 0.1523042596463002
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.09686279246224694
+      },
+      "positive_margin": 0.029175831136920863,
+      "ood_margin": 0.05544146718405327
+    },
+    {
+      "image_id": "positives:P035",
+      "expected": null,
+      "top_positive": {
+        "label": "portable_heater",
+        "score": 0.13441983748684827
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.08853796468863809
+      },
+      "positive_margin": 0.038548214022804006,
+      "ood_margin": 0.04588187279821018
+    },
+    {
+      "image_id": "positives:P037",
+      "expected": null,
+      "top_positive": {
+        "label": "rice_cooker",
+        "score": 0.13605488592190113
+      },
+      "top_ood": {
+        "label": "other_kitchen_appliance",
+        "score": 0.1051332958577085
+      },
+      "positive_margin": 0.05084327782117408,
+      "ood_margin": 0.030921590064192622
+    },
+    {
+      "image_id": "positives:P040",
+      "expected": null,
+      "top_positive": {
+        "label": "toaster",
+        "score": 0.049685835255228294
+      },
+      "top_ood": {
+        "label": "refrigerator",
+        "score": 0.06629186073733961
+      },
+      "positive_margin": 0.009283249770330827,
+      "ood_margin": -0.01660602548211132
+    },
+    {
+      "image_id": "positives:P042",
+      "expected": null,
+      "top_positive": {
+        "label": "portable_heater",
+        "score": 0.12541492673054558
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.11386852217888674
+      },
+      "positive_margin": 0.008604522537445425,
+      "ood_margin": 0.01154640455165884
+    },
+    {
+      "image_id": "positives:P043",
+      "expected": null,
+      "top_positive": {
+        "label": "sandwich_press",
+        "score": 0.12592235171279936
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.08161834811515538
+      },
+      "positive_margin": 0.020767781456343393,
+      "ood_margin": 0.044304003597643984
+    },
+    {
+      "image_id": "positives:P046",
+      "expected": null,
+      "top_positive": {
+        "label": "rice_cooker",
+        "score": -0.011834641706986355
+      },
+      "top_ood": {
+        "label": "screen_device",
+        "score": 0.025426298922617708
+      },
+      "positive_margin": 0.0009072909323740823,
+      "ood_margin": -0.03726094062960406
+    },
+    {
+      "image_id": "positives:P047",
+      "expected": null,
+      "top_positive": {
+        "label": "portable_ac",
+        "score": 0.009048678245017823
+      },
+      "top_ood": {
+        "label": "vehicle",
+        "score": 0.05814941528486711
+      },
+      "positive_margin": 0.008256169723169345,
+      "ood_margin": -0.04910073703984929
+    },
+    {
+      "image_id": "positives:P048",
+      "expected": null,
+      "top_positive": {
+        "label": "portable_ac",
+        "score": 0.013662689290641131
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.024018926860495227
+      },
+      "positive_margin": 0.017613932732678445,
+      "ood_margin": -0.010356237569854095
+    },
+    {
+      "image_id": "positives:P050",
+      "expected": null,
+      "top_positive": {
+        "label": "portable_ac",
+        "score": 0.0026771489939312926
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.03525972452359804
+      },
+      "positive_margin": 0.000748806418153371,
+      "ood_margin": -0.032582575529666744
+    },
+    {
+      "image_id": "positives:P052",
+      "expected": null,
+      "top_positive": {
+        "label": "blender",
+        "score": 0.15036917521707038
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.1057482062482591
+      },
+      "positive_margin": 0.04113266537056913,
+      "ood_margin": 0.04462096896881128
+    },
+    {
+      "image_id": "positives:P053",
+      "expected": null,
+      "top_positive": {
+        "label": "blender",
+        "score": 0.14338433698462535
+      },
+      "top_ood": {
+        "label": "other_kitchen_appliance",
+        "score": 0.10696362132198843
+      },
+      "positive_margin": 0.03922522399996403,
+      "ood_margin": 0.036420715662636924
+    },
+    {
+      "image_id": "positives:P055",
+      "expected": null,
+      "top_positive": {
+        "label": "blender",
+        "score": 0.14188706074566493
+      },
+      "top_ood": {
+        "label": "other_kitchen_appliance",
+        "score": 0.12005983802409857
+      },
+      "positive_margin": 0.0266976303065274,
+      "ood_margin": 0.021827222721566356
+    },
+    {
+      "image_id": "positives:P057",
+      "expected": null,
+      "top_positive": {
+        "label": "food_processor",
+        "score": 0.15541223351691372
+      },
+      "top_ood": {
+        "label": "other_kitchen_appliance",
+        "score": 0.1276727078185049
+      },
+      "positive_margin": 0.03953791883537844,
+      "ood_margin": 0.027739525698408818
+    },
+    {
+      "image_id": "positives:P058",
+      "expected": null,
+      "top_positive": {
+        "label": "food_processor",
+        "score": 0.12718964906905006
+      },
+      "top_ood": {
+        "label": "other_kitchen_appliance",
+        "score": 0.09981055701764208
+      },
+      "positive_margin": 0.023544674366231838,
+      "ood_margin": 0.027379092051407983
+    },
+    {
+      "image_id": "positives:P061",
+      "expected": null,
+      "top_positive": {
+        "label": "mixer",
+        "score": 0.1433882245677753
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.10472816878059585
+      },
+      "positive_margin": 0.03824860723175283,
+      "ood_margin": 0.03866005578717946
+    },
+    {
+      "image_id": "positives:P063",
+      "expected": null,
+      "top_positive": {
+        "label": "mixer",
+        "score": 0.15764787582991882
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.11392983154018013
+      },
+      "positive_margin": 0.04198194782510639,
+      "ood_margin": 0.04371804428973869
+    },
+    {
+      "image_id": "positives:P066",
+      "expected": null,
+      "top_positive": {
+        "label": "shaver",
+        "score": 0.10915141712336428
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.10467999013758228
+      },
+      "positive_margin": 0.036344791211121816,
+      "ood_margin": 0.004471426985781998
+    },
+    {
+      "image_id": "positives:P067",
+      "expected": null,
+      "top_positive": {
+        "label": "shaver",
+        "score": 0.14618173725105074
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.10197059912098361
+      },
+      "positive_margin": 0.045393999835625934,
+      "ood_margin": 0.044211138130067135
+    },
+    {
+      "image_id": "positives:P068",
+      "expected": null,
+      "top_positive": {
+        "label": "shaver",
+        "score": 0.15148998269119132
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.1077276342519353
+      },
+      "positive_margin": 0.05425568648338289,
+      "ood_margin": 0.04376234843925603
+    },
+    {
+      "image_id": "positives:P069",
+      "expected": null,
+      "top_positive": {
+        "label": "shaver",
+        "score": 0.09912737347812325
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.09012859588142716
+      },
+      "positive_margin": 0.012484501972062648,
+      "ood_margin": 0.008998777596696095
+    },
+    {
+      "image_id": "positives:P070",
+      "expected": null,
+      "top_positive": {
+        "label": "shaver",
+        "score": 0.15124617262883946
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.09749688945138603
+      },
+      "positive_margin": 0.04633610257086855,
+      "ood_margin": 0.053749283177453436
+    },
+    {
+      "image_id": "positives:P075",
+      "expected": null,
+      "top_positive": {
+        "label": "toaster",
+        "score": 0.15114430106507878
+      },
+      "top_ood": {
+        "label": "other_kitchen_appliance",
+        "score": 0.11010879780026625
+      },
+      "positive_margin": 0.05962329286150958,
+      "ood_margin": 0.041035503264812534
+    },
+    {
+      "image_id": "positives:P079",
+      "expected": null,
+      "top_positive": {
+        "label": "vaccum_cleaner",
+        "score": 0.13472736248246725
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.08788421463940732
+      },
+      "positive_margin": 0.03620082911965858,
+      "ood_margin": 0.04684314784305993
+    },
+    {
+      "image_id": "positives:P081",
+      "expected": null,
+      "top_positive": {
+        "label": "portable_ac",
+        "score": 0.15712381685617818
+      },
+      "top_ood": {
+        "label": "refrigerator",
+        "score": 0.07772742633279521
+      },
+      "positive_margin": 0.0042995167561229175,
+      "ood_margin": 0.07939639052338297
+    },
+    {
+      "image_id": "positives:P082",
+      "expected": null,
+      "top_positive": {
+        "label": "dehumidifier",
+        "score": 0.04451011512924212
+      },
+      "top_ood": {
+        "label": "refrigerator",
+        "score": 0.05553195415434027
+      },
+      "positive_margin": 0.006385849681075986,
+      "ood_margin": -0.011021839025098151
+    },
+    {
+      "image_id": "positives:P083",
+      "expected": null,
+      "top_positive": {
+        "label": "portable_ac",
+        "score": 0.0978632576993378
+      },
+      "top_ood": {
+        "label": "refrigerator",
+        "score": 0.08662550388975167
+      },
+      "positive_margin": 0.004106892661767073,
+      "ood_margin": 0.011237753809586137
+    },
+    {
+      "image_id": "positives:P084",
+      "expected": null,
+      "top_positive": {
+        "label": "portable_ac",
+        "score": 0.0699999050823421
+      },
+      "top_ood": {
+        "label": "refrigerator",
+        "score": 0.07894933677300973
+      },
+      "positive_margin": 0.011626747437167143,
+      "ood_margin": -0.008949431690667628
+    },
+    {
+      "image_id": "positives:P085",
+      "expected": null,
+      "top_positive": {
+        "label": "kettle",
+        "score": 0.03101429736186762
+      },
+      "top_ood": {
+        "label": "screen_device",
+        "score": 0.056073948821437875
+      },
+      "positive_margin": 0.0005038074438252944,
+      "ood_margin": -0.025059651459570256
+    },
+    {
+      "image_id": "positives:P086",
+      "expected": null,
+      "top_positive": {
+        "label": "steam_cleaner",
+        "score": 0.14395155684811844
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.08566559532773528
+      },
+      "positive_margin": 0.0175178868926871,
+      "ood_margin": 0.058285961520383164
+    },
+    {
+      "image_id": "positives:P087",
+      "expected": null,
+      "top_positive": {
+        "label": "portable_ac",
+        "score": 0.1516185814222144
+      },
+      "top_ood": {
+        "label": "refrigerator",
+        "score": 0.10603548179239028
+      },
+      "positive_margin": 0.015993109472635658,
+      "ood_margin": 0.045583099629824125
+    },
+    {
+      "image_id": "positives:P089",
+      "expected": null,
+      "top_positive": {
+        "label": "portable_ac",
+        "score": 0.11940122718950719
+      },
+      "top_ood": {
+        "label": "refrigerator",
+        "score": 0.08512063344802946
+      },
+      "positive_margin": 0.022066453081117793,
+      "ood_margin": 0.034280593741477725
+    },
+    {
+      "image_id": "positives:P092",
+      "expected": null,
+      "top_positive": {
+        "label": "fan",
+        "score": 0.11394129068486522
+      },
+      "top_ood": {
+        "label": "refrigerator",
+        "score": 0.11808087131202674
+      },
+      "positive_margin": 0.002055236226113602,
+      "ood_margin": -0.004139580627161521
+    },
+    {
+      "image_id": "positives:P095",
+      "expected": null,
+      "top_positive": {
+        "label": "portable_ac",
+        "score": 0.1623498917849083
+      },
+      "top_ood": {
+        "label": "refrigerator",
+        "score": 0.08872063297683631
+      },
+      "positive_margin": 0.020323699509439713,
+      "ood_margin": 0.07362925880807199
+    },
+    {
+      "image_id": "positives:P096",
+      "expected": null,
+      "top_positive": {
+        "label": "portable_ac",
+        "score": 0.14945678758011163
+      },
+      "top_ood": {
+        "label": "washing_machine",
+        "score": 0.08943586892130104
+      },
+      "positive_margin": 0.0442807055491464,
+      "ood_margin": 0.060020918658810596
+    },
+    {
+      "image_id": "positives:P097",
+      "expected": null,
+      "top_positive": {
+        "label": "portable_ac",
+        "score": 0.13154887462514792
+      },
+      "top_ood": {
+        "label": "refrigerator",
+        "score": 0.11833973424358186
+      },
+      "positive_margin": 0.01957618026944241,
+      "ood_margin": 0.01320914038156605
+    },
+    {
+      "image_id": "positives:P102",
+      "expected": null,
+      "top_positive": {
+        "label": "rice_cooker",
+        "score": 0.09035574131887834
+      },
+      "top_ood": {
+        "label": "other_kitchen_appliance",
+        "score": 0.0875172487442754
+      },
+      "positive_margin": 0.03602028960645567,
+      "ood_margin": 0.0028384925746029466
+    },
+    {
+      "image_id": "positives:P106",
+      "expected": null,
+      "top_positive": {
+        "label": "food_processor",
+        "score": 0.1296423858101708
+      },
+      "top_ood": {
+        "label": "other_kitchen_appliance",
+        "score": 0.10889356210396516
+      },
+      "positive_margin": 0.025189940261516358,
+      "ood_margin": 0.020748823706205635
+    },
+    {
+      "image_id": "positives:P107",
+      "expected": null,
+      "top_positive": {
+        "label": "rice_cooker",
+        "score": 0.028746545255572336
+      },
+      "top_ood": {
+        "label": "person_or_pet",
+        "score": 0.04554346887707248
+      },
+      "positive_margin": 0.019643891015721962,
+      "ood_margin": -0.016796923621500145
+    },
+    {
+      "image_id": "positives:P109",
+      "expected": null,
+      "top_positive": {
+        "label": "mixer",
+        "score": 0.1635268191779052
+      },
+      "top_ood": {
+        "label": "other_kitchen_appliance",
+        "score": 0.1142779986094985
+      },
+      "positive_margin": 0.04717124510049171,
+      "ood_margin": 0.04924882056840671
+    },
+    {
+      "image_id": "ood:O001",
+      "expected": null,
+      "top_positive": {
+        "label": "fan",
+        "score": -0.019443211997767378
+      },
+      "top_ood": {
+        "label": "person_or_pet",
+        "score": 0.021305473016003655
+      },
+      "positive_margin": 0.00036074912031194145,
+      "ood_margin": -0.04074868501377103
+    },
+    {
+      "image_id": "ood:O002",
+      "expected": null,
+      "top_positive": {
+        "label": "steam_cleaner",
+        "score": -0.0005977713553923713
+      },
+      "top_ood": {
+        "label": "vehicle",
+        "score": 0.03285100597678074
+      },
+      "positive_margin": 0.00208779088978017,
+      "ood_margin": -0.033448777332173114
+    },
+    {
+      "image_id": "ood:O003",
+      "expected": null,
+      "top_positive": {
+        "label": "steam_cleaner",
+        "score": 0.0037406290991181066
+      },
+      "top_ood": {
+        "label": "vehicle",
+        "score": 0.03577607721223229
+      },
+      "positive_margin": 0.00424225570026693,
+      "ood_margin": -0.032035448113114186
+    },
+    {
+      "image_id": "ood:O004",
+      "expected": null,
+      "top_positive": {
+        "label": "shaver",
+        "score": 0.001465411880378996
+      },
+      "top_ood": {
+        "label": "nature",
+        "score": 0.029162009816587665
+      },
+      "positive_margin": 0.012022438735232982,
+      "ood_margin": -0.02769659793620867
+    },
+    {
+      "image_id": "ood:O005",
+      "expected": null,
+      "top_positive": {
+        "label": "portable_ac",
+        "score": 0.004032816719574678
+      },
+      "top_ood": {
+        "label": "vehicle",
+        "score": 0.02007551132500434
+      },
+      "positive_margin": 0.009909088436934943,
+      "ood_margin": -0.01604269460542966
+    },
+    {
+      "image_id": "ood:O006",
+      "expected": null,
+      "top_positive": {
+        "label": "fan",
+        "score": 0.010759228792174341
+      },
+      "top_ood": {
+        "label": "furniture",
+        "score": 0.04010733008833657
+      },
+      "positive_margin": 0.0017254411946446523,
+      "ood_margin": -0.029348101296162228
+    },
+    {
+      "image_id": "ood:O007",
+      "expected": null,
+      "top_positive": {
+        "label": "kettle",
+        "score": -0.021593692692313846
+      },
+      "top_ood": {
+        "label": "vehicle",
+        "score": 0.022117153704256654
+      },
+      "positive_margin": 0.0017476952157274121,
+      "ood_margin": -0.043710846396570496
+    },
+    {
+      "image_id": "ood:O008",
+      "expected": null,
+      "top_positive": {
+        "label": "fan",
+        "score": -0.0053938296195347735
+      },
+      "top_ood": {
+        "label": "screen_device",
+        "score": 0.02903336392184699
+      },
+      "positive_margin": 0.006037333525812431,
+      "ood_margin": -0.03442719354138177
+    },
+    {
+      "image_id": "ood:O009",
+      "expected": null,
+      "top_positive": {
+        "label": "kettle",
+        "score": 0.005868473107599246
+      },
+      "top_ood": {
+        "label": "person_or_pet",
+        "score": 0.027446027986828665
+      },
+      "positive_margin": 0.010361018188522824,
+      "ood_margin": -0.021577554879229417
+    },
+    {
+      "image_id": "ood:O010",
+      "expected": null,
+      "top_positive": {
+        "label": "kettle",
+        "score": -0.0016828242846603093
+      },
+      "top_ood": {
+        "label": "vehicle",
+        "score": 0.03715584041037864
+      },
+      "positive_margin": 0.004989517184981373,
+      "ood_margin": -0.03883866469503895
+    },
+    {
+      "image_id": "ood:O011",
+      "expected": null,
+      "top_positive": {
+        "label": "rice_cooker",
+        "score": -0.003632107215018142
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.037191535778657844
+      },
+      "positive_margin": 0.0048919002918671834,
+      "ood_margin": -0.04082364299367599
+    },
+    {
+      "image_id": "ood:O012",
+      "expected": null,
+      "top_positive": {
+        "label": "kettle",
+        "score": 0.001976493172862202
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.032209709621887565
+      },
+      "positive_margin": 0.011687296286632915,
+      "ood_margin": -0.030233216449025362
+    },
+    {
+      "image_id": "ood:O013",
+      "expected": null,
+      "top_positive": {
+        "label": "straightener",
+        "score": -0.010353508219189471
+      },
+      "top_ood": {
+        "label": "screen_device",
+        "score": 0.04002000195949696
+      },
+      "positive_margin": 0.0012546305417212456,
+      "ood_margin": -0.05037351017868643
+    },
+    {
+      "image_id": "ood:O014",
+      "expected": null,
+      "top_positive": {
+        "label": "dehumidifier",
+        "score": -0.041163184603523105
+      },
+      "top_ood": {
+        "label": "person_or_pet",
+        "score": 0.004264120407744589
+      },
+      "positive_margin": 0.0010603767204509298,
+      "ood_margin": -0.045427305011267696
+    },
+    {
+      "image_id": "ood:O015",
+      "expected": null,
+      "top_positive": {
+        "label": "portable_heater",
+        "score": -0.0033327807749166547
+      },
+      "top_ood": {
+        "label": "furniture",
+        "score": 0.02641276358225619
+      },
+      "positive_margin": 0.0002540641592755095,
+      "ood_margin": -0.029745544357172846
+    },
+    {
+      "image_id": "ood:O016",
+      "expected": null,
+      "top_positive": {
+        "label": "portable_heater",
+        "score": -0.014735151538726753
+      },
+      "top_ood": {
+        "label": "person_or_pet",
+        "score": 0.014977407939008184
+      },
+      "positive_margin": 0.005555389985574057,
+      "ood_margin": -0.029712559477734934
+    },
+    {
+      "image_id": "ood:O017",
+      "expected": null,
+      "top_positive": {
+        "label": "portable_heater",
+        "score": -0.024840877022807396
+      },
+      "top_ood": {
+        "label": "person_or_pet",
+        "score": 0.02851207740130165
+      },
+      "positive_margin": 0.0012899661114174066,
+      "ood_margin": -0.05335295442410905
+    },
+    {
+      "image_id": "ood:O018",
+      "expected": null,
+      "top_positive": {
+        "label": "kettle",
+        "score": -0.021546691003740445
+      },
+      "top_ood": {
+        "label": "person_or_pet",
+        "score": 0.023837486045198916
+      },
+      "positive_margin": 0.0006930737912448429,
+      "ood_margin": -0.045384177048939364
+    },
+    {
+      "image_id": "ood:O019",
+      "expected": null,
+      "top_positive": {
+        "label": "portable_ac",
+        "score": -0.001573462787543504
+      },
+      "top_ood": {
+        "label": "vehicle",
+        "score": 0.039557079709171064
+      },
+      "positive_margin": 0.002986643020972484,
+      "ood_margin": -0.04113054249671457
+    },
+    {
+      "image_id": "ood:O020",
+      "expected": null,
+      "top_positive": {
+        "label": "shaver",
+        "score": -0.008264004694270247
+      },
+      "top_ood": {
+        "label": "screen_device",
+        "score": 0.028440058315137393
+      },
+      "positive_margin": 0.004178016809904797,
+      "ood_margin": -0.036704063009407636
+    },
+    {
+      "image_id": "ood:O021",
+      "expected": null,
+      "top_positive": {
+        "label": "fan",
+        "score": -0.01859379947411309
+      },
+      "top_ood": {
+        "label": "person_or_pet",
+        "score": 0.029892705614661015
+      },
+      "positive_margin": 0.010417826630433315,
+      "ood_margin": -0.048486505088774105
+    },
+    {
+      "image_id": "ood:O022",
+      "expected": null,
+      "top_positive": {
+        "label": "portable_ac",
+        "score": 0.016685069417030254
+      },
+      "top_ood": {
+        "label": "person_or_pet",
+        "score": 0.0314522950417686
+      },
+      "positive_margin": 0.021428407707547954,
+      "ood_margin": -0.014767225624738346
+    },
+    {
+      "image_id": "ood:O023",
+      "expected": null,
+      "top_positive": {
+        "label": "vaccum_cleaner",
+        "score": -0.021495621173175057
+      },
+      "top_ood": {
+        "label": "person_or_pet",
+        "score": 0.03283260135791363
+      },
+      "positive_margin": 0.003532432317858155,
+      "ood_margin": -0.05432822253108869
+    },
+    {
+      "image_id": "ood:O024",
+      "expected": null,
+      "top_positive": {
+        "label": "portable_ac",
+        "score": 0.014955535322229466
+      },
+      "top_ood": {
+        "label": "vehicle",
+        "score": 0.027493464034471435
+      },
+      "positive_margin": 0.014746338711271121,
+      "ood_margin": -0.012537928712241969
+    },
+    {
+      "image_id": "ood:O025",
+      "expected": null,
+      "top_positive": {
+        "label": "fan",
+        "score": 0.03393939505844697
+      },
+      "top_ood": {
+        "label": "furniture",
+        "score": 0.08366121155409423
+      },
+      "positive_margin": 0.006605923679683472,
+      "ood_margin": -0.04972181649564726
+    },
+    {
+      "image_id": "ood:O026",
+      "expected": null,
+      "top_positive": {
+        "label": "fan",
+        "score": 0.004894695623231306
+      },
+      "top_ood": {
+        "label": "furniture",
+        "score": 0.046992892514986104
+      },
+      "positive_margin": 0.00377991328131955,
+      "ood_margin": -0.0420981968917548
+    },
+    {
+      "image_id": "ood:O027",
+      "expected": null,
+      "top_positive": {
+        "label": "fan",
+        "score": 0.007250873552601267
+      },
+      "top_ood": {
+        "label": "person_or_pet",
+        "score": 0.03291081017406699
+      },
+      "positive_margin": 0.0022371843662791204,
+      "ood_margin": -0.02565993662146572
+    },
+    {
+      "image_id": "ood:O028",
+      "expected": null,
+      "top_positive": {
+        "label": "fan",
+        "score": 0.02314095176747147
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.04898870850612785
+      },
+      "positive_margin": 0.0010343413164592176,
+      "ood_margin": -0.025847756738656375
+    },
+    {
+      "image_id": "ood:O029",
+      "expected": null,
+      "top_positive": {
+        "label": "fan",
+        "score": 0.008687996825862436
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.048328865880570775
+      },
+      "positive_margin": 0.0027723903148593647,
+      "ood_margin": -0.03964086905470834
+    },
+    {
+      "image_id": "ood:O030",
+      "expected": null,
+      "top_positive": {
+        "label": "microwave",
+        "score": -0.0009509697585752732
+      },
+      "top_ood": {
+        "label": "person_or_pet",
+        "score": 0.037855907920012984
+      },
+      "positive_margin": 0.008003960876462686,
+      "ood_margin": -0.03880687767858826
+    },
+    {
+      "image_id": "ood:O031",
+      "expected": null,
+      "top_positive": {
+        "label": "microwave",
+        "score": -0.008511117384877148
+      },
+      "top_ood": {
+        "label": "refrigerator",
+        "score": 0.020188330655814914
+      },
+      "positive_margin": 0.003191397378970808,
+      "ood_margin": -0.028699448040692063
+    },
+    {
+      "image_id": "ood:O032",
+      "expected": null,
+      "top_positive": {
+        "label": "kettle",
+        "score": 0.005717517990370329
+      },
+      "top_ood": {
+        "label": "refrigerator",
+        "score": 0.03704108169970935
+      },
+      "positive_margin": 0.004738385973916445,
+      "ood_margin": -0.03132356370933902
+    },
+    {
+      "image_id": "ood:O033",
+      "expected": null,
+      "top_positive": {
+        "label": "portable_ac",
+        "score": -0.005203728922655838
+      },
+      "top_ood": {
+        "label": "vehicle",
+        "score": 0.02253803318065262
+      },
+      "positive_margin": 0.013444602580936726,
+      "ood_margin": -0.02774176210330846
+    },
+    {
+      "image_id": "ood:O034",
+      "expected": null,
+      "top_positive": {
+        "label": "portable_ac",
+        "score": 0.0005300706094232355
+      },
+      "top_ood": {
+        "label": "vehicle",
+        "score": 0.027551171577973536
+      },
+      "positive_margin": 0.0004626476669364202,
+      "ood_margin": -0.027021100968550302
+    },
+    {
+      "image_id": "ood:O035",
+      "expected": null,
+      "top_positive": {
+        "label": "rice_cooker",
+        "score": 0.00019848080773069224
+      },
+      "top_ood": {
+        "label": "screen_device",
+        "score": 0.02168606249548327
+      },
+      "positive_margin": 0.003293581895777167,
+      "ood_margin": -0.02148758168775258
+    },
+    {
+      "image_id": "ood:O036",
+      "expected": null,
+      "top_positive": {
+        "label": "rice_cooker",
+        "score": -0.010995862127613854
+      },
+      "top_ood": {
+        "label": "refrigerator",
+        "score": 0.026685791250190636
+      },
+      "positive_margin": 0.0060454875974375755,
+      "ood_margin": -0.03768165337780449
+    },
+    {
+      "image_id": "ood:O037",
+      "expected": null,
+      "top_positive": {
+        "label": "kettle",
+        "score": 0.027960063492097967
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.09081846364813423
+      },
+      "positive_margin": 0.01154811829779628,
+      "ood_margin": -0.06285840015603626
+    },
+    {
+      "image_id": "ood:O038",
+      "expected": null,
+      "top_positive": {
+        "label": "kettle",
+        "score": 0.047077524047008025
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.08529652320212035
+      },
+      "positive_margin": 0.005002599571375714,
+      "ood_margin": -0.03821899915511232
+    },
+    {
+      "image_id": "ood:O039",
+      "expected": null,
+      "top_positive": {
+        "label": "rice_cooker",
+        "score": 0.05690732457148093
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.10788201032008383
+      },
+      "positive_margin": 0.005097577804312338,
+      "ood_margin": -0.05097468574860291
+    },
+    {
+      "image_id": "ood:O040",
+      "expected": null,
+      "top_positive": {
+        "label": "coffee_machine",
+        "score": 0.07112217021715841
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.08052747609311874
+      },
+      "positive_margin": 0.002727297653674854,
+      "ood_margin": -0.00940530587596032
+    },
+    {
+      "image_id": "ood:O041",
+      "expected": null,
+      "top_positive": {
+        "label": "coffee_machine",
+        "score": 0.06153952338057187
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.06666026091282688
+      },
+      "positive_margin": 0.019194110594984083,
+      "ood_margin": -0.005120737532255011
+    },
+    {
+      "image_id": "ood:O042",
+      "expected": null,
+      "top_positive": {
+        "label": "kettle",
+        "score": 0.05303068018466447
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.07236006761535566
+      },
+      "positive_margin": 0.010724380102771741,
+      "ood_margin": -0.019329387430691188
+    },
+    {
+      "image_id": "ood:O043",
+      "expected": null,
+      "top_positive": {
+        "label": "kettle",
+        "score": 0.053640953415707036
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.09923592204162074
+      },
+      "positive_margin": 0.003045612383392342,
+      "ood_margin": -0.0455949686259137
+    },
+    {
+      "image_id": "ood:O044",
+      "expected": null,
+      "top_positive": {
+        "label": "rice_cooker",
+        "score": 0.06225097485749125
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.07215095499699954
+      },
+      "positive_margin": 0.0317423022400098,
+      "ood_margin": -0.00989998013950829
+    },
+    {
+      "image_id": "ood:O045",
+      "expected": null,
+      "top_positive": {
+        "label": "food_processor",
+        "score": 0.060627110644630215
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.05934188126982966
+      },
+      "positive_margin": 0.029085321413248676,
+      "ood_margin": 0.0012852293748005575
+    },
+    {
+      "image_id": "ood:O046",
+      "expected": null,
+      "top_positive": {
+        "label": "rice_cooker",
+        "score": 0.025698435496426923
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.09033130718825967
+      },
+      "positive_margin": 0.010810127853978843,
+      "ood_margin": -0.06463287169183275
+    },
+    {
+      "image_id": "ood:O047",
+      "expected": null,
+      "top_positive": {
+        "label": "food_processor",
+        "score": 0.03018057698602718
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.04632206274296642
+      },
+      "positive_margin": 0.009600067023015309,
+      "ood_margin": -0.01614148575693924
+    },
+    {
+      "image_id": "ood:O048",
+      "expected": null,
+      "top_positive": {
+        "label": "rice_cooker",
+        "score": 0.06470966329724795
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.09037845026396919
+      },
+      "positive_margin": 0.01180295648529521,
+      "ood_margin": -0.025668786966721244
+    },
+    {
+      "image_id": "ood:O049",
+      "expected": null,
+      "top_positive": {
+        "label": "portable_ac",
+        "score": 0.013335526001744324
+      },
+      "top_ood": {
+        "label": "screen_device",
+        "score": 0.08532308174888893
+      },
+      "positive_margin": 0.0003461268515964882,
+      "ood_margin": -0.0719875557471446
+    },
+    {
+      "image_id": "ood:O050",
+      "expected": null,
+      "top_positive": {
+        "label": "shaver",
+        "score": 0.025814531888945336
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.08979145352878709
+      },
+      "positive_margin": 0.010443183055514912,
+      "ood_margin": -0.06397692163984176
+    },
+    {
+      "image_id": "ood:O051",
+      "expected": null,
+      "top_positive": {
+        "label": "shaver",
+        "score": 0.046131893335596405
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.10944198465592453
+      },
+      "positive_margin": 0.00011853272532890563,
+      "ood_margin": -0.06331009132032812
+    },
+    {
+      "image_id": "ood:O052",
+      "expected": null,
+      "top_positive": {
+        "label": "blender",
+        "score": 0.030039072432819423
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.08817391917484858
+      },
+      "positive_margin": 0.006387623677636994,
+      "ood_margin": -0.058134846742029164
+    },
+    {
+      "image_id": "ood:O053",
+      "expected": null,
+      "top_positive": {
+        "label": "shaver",
+        "score": 0.02975802412507919
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.08895367162524706
+      },
+      "positive_margin": 0.0006860360214447914,
+      "ood_margin": -0.05919564750016787
+    },
+    {
+      "image_id": "ood:O054",
+      "expected": null,
+      "top_positive": {
+        "label": "shaver",
+        "score": 0.05200880641129425
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.08850391245221134
+      },
+      "positive_margin": 0.021254660390645944,
+      "ood_margin": -0.03649510604091709
+    },
+    {
+      "image_id": "ood:O055",
+      "expected": null,
+      "top_positive": {
+        "label": "portable_ac",
+        "score": 0.04539025990408772
+      },
+      "top_ood": {
+        "label": "washing_machine",
+        "score": 0.06696150169238677
+      },
+      "positive_margin": 0.00198063513254175,
+      "ood_margin": -0.02157124178829905
+    },
+    {
+      "image_id": "ood:O056",
+      "expected": null,
+      "top_positive": {
+        "label": "rice_cooker",
+        "score": 0.043127722479690565
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.06874923999053213
+      },
+      "positive_margin": 0.003455059877091937,
+      "ood_margin": -0.025621517510841567
+    },
+    {
+      "image_id": "ood:O057",
+      "expected": null,
+      "top_positive": {
+        "label": "portable_ac",
+        "score": 0.04884594890078002
+      },
+      "top_ood": {
+        "label": "washing_machine",
+        "score": 0.06219895914778753
+      },
+      "positive_margin": 0.0013878917762309845,
+      "ood_margin": -0.01335301024700751
+    },
+    {
+      "image_id": "ood:O058",
+      "expected": null,
+      "top_positive": {
+        "label": "kettle",
+        "score": 0.06444868370610478
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.1217614253498648
+      },
+      "positive_margin": 0.013049274905339955,
+      "ood_margin": -0.05731274164376002
+    },
+    {
+      "image_id": "ood:O059",
+      "expected": null,
+      "top_positive": {
+        "label": "kettle",
+        "score": 0.039276373703198406
+      },
+      "top_ood": {
+        "label": "washing_machine",
+        "score": 0.04994870385488663
+      },
+      "positive_margin": 0.00697591448551052,
+      "ood_margin": -0.010672330151688225
+    },
+    {
+      "image_id": "ood:O060",
+      "expected": null,
+      "top_positive": {
+        "label": "dehumidifier",
+        "score": 0.06097593211424932
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.09080334743393051
+      },
+      "positive_margin": 0.001380272531935449,
+      "ood_margin": -0.029827415319681187
+    },
+    {
+      "image_id": "ood:O061",
+      "expected": null,
+      "top_positive": {
+        "label": "kettle",
+        "score": 0.050207181475222705
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.09390626385021586
+      },
+      "positive_margin": 0.0011271309156535778,
+      "ood_margin": -0.043699082374993155
+    },
+    {
+      "image_id": "ood:O062",
+      "expected": null,
+      "top_positive": {
+        "label": "vaccum_cleaner",
+        "score": 0.026061689760017662
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.0577152163760407
+      },
+      "positive_margin": 0.011839818390933472,
+      "ood_margin": -0.03165352661602304
+    },
+    {
+      "image_id": "ood:O063",
+      "expected": null,
+      "top_positive": {
+        "label": "vaccum_cleaner",
+        "score": 0.018022768028504485
+      },
+      "top_ood": {
+        "label": "person_or_pet",
+        "score": 0.06659931565824627
+      },
+      "positive_margin": 0.000777617896357382,
+      "ood_margin": -0.048576547629741784
+    },
+    {
+      "image_id": "ood:O064",
+      "expected": null,
+      "top_positive": {
+        "label": "kettle",
+        "score": 0.09480387349745835
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.09184362436847204
+      },
+      "positive_margin": 0.004204167007934495,
+      "ood_margin": 0.002960249128986306
+    },
+    {
+      "image_id": "ood:O065",
+      "expected": null,
+      "top_positive": {
+        "label": "kettle",
+        "score": 0.029815276314388107
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.08354951459226395
+      },
+      "positive_margin": 0.011287880024874158,
+      "ood_margin": -0.053734238277875844
+    },
+    {
+      "image_id": "ood:O066",
+      "expected": null,
+      "top_positive": {
+        "label": "vaccum_cleaner",
+        "score": 0.029501020772800236
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.050517387044293344
+      },
+      "positive_margin": 0.000028813252203847145,
+      "ood_margin": -0.021016366271493107
+    },
+    {
+      "image_id": "ood:O067",
+      "expected": null,
+      "top_positive": {
+        "label": "vaccum_cleaner",
+        "score": 0.07958569387262739
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.09605071000901763
+      },
+      "positive_margin": 0.009128427552668628,
+      "ood_margin": -0.016465016136390245
+    },
+    {
+      "image_id": "ood:O068",
+      "expected": null,
+      "top_positive": {
+        "label": "straightener",
+        "score": 0.04197798304803902
+      },
+      "top_ood": {
+        "label": "person_or_pet",
+        "score": 0.042052211527156734
+      },
+      "positive_margin": 0.009151418525811215,
+      "ood_margin": -0.00007422847911771335
+    },
+    {
+      "image_id": "ood:O069",
+      "expected": null,
+      "top_positive": {
+        "label": "vaccum_cleaner",
+        "score": 0.0553469168538826
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.07165005922125127
+      },
+      "positive_margin": 0.013335402153324877,
+      "ood_margin": -0.01630314236736867
+    },
+    {
+      "image_id": "ood:O070",
+      "expected": null,
+      "top_positive": {
+        "label": "vaccum_cleaner",
+        "score": 0.05508080912293634
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.07561058757700914
+      },
+      "positive_margin": 0.035131748705228213,
+      "ood_margin": -0.0205297784540728
+    },
+    {
+      "image_id": "ood:O071",
+      "expected": null,
+      "top_positive": {
+        "label": "fan",
+        "score": 0.0397434500785192
+      },
+      "top_ood": {
+        "label": "furniture",
+        "score": 0.04834651629883266
+      },
+      "positive_margin": 0.006489216791848065,
+      "ood_margin": -0.008603066220313461
+    },
+    {
+      "image_id": "ood:O072",
+      "expected": null,
+      "top_positive": {
+        "label": "fan",
+        "score": 0.025133313281329714
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.04991888424558453
+      },
+      "positive_margin": 0.00547310487027234,
+      "ood_margin": -0.024785570964254815
+    },
+    {
+      "image_id": "ood:O073",
+      "expected": null,
+      "top_positive": {
+        "label": "steam_cleaner",
+        "score": 0.053314203611355825
+      },
+      "top_ood": {
+        "label": "washing_machine",
+        "score": 0.05176929336711837
+      },
+      "positive_margin": 0.0011921117789848237,
+      "ood_margin": 0.0015449102442374532
+    },
+    {
+      "image_id": "ood:O074",
+      "expected": null,
+      "top_positive": {
+        "label": "fan",
+        "score": 0.05722910918678428
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.08072664284849958
+      },
+      "positive_margin": 0.01883728399072946,
+      "ood_margin": -0.023497533661715295
+    },
+    {
+      "image_id": "ood:O075",
+      "expected": null,
+      "top_positive": {
+        "label": "straightener",
+        "score": 0.04236919886237566
+      },
+      "top_ood": {
+        "label": "person_or_pet",
+        "score": 0.052345804491055976
+      },
+      "positive_margin": 0.0012252999115131072,
+      "ood_margin": -0.009976605628680316
+    },
+    {
+      "image_id": "ood:O076",
+      "expected": null,
+      "top_positive": {
+        "label": "rice_cooker",
+        "score": 0.05250061325036137
+      },
+      "top_ood": {
+        "label": "person_or_pet",
+        "score": 0.0574001378635837
+      },
+      "positive_margin": 0.023960174784604427,
+      "ood_margin": -0.004899524613222329
+    },
+    {
+      "image_id": "ood:O077",
+      "expected": null,
+      "top_positive": {
+        "label": "kettle",
+        "score": 0.06915788356984784
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.10274000247781082
+      },
+      "positive_margin": 0.001059276658835026,
+      "ood_margin": -0.03358211890796298
+    },
+    {
+      "image_id": "ood:O078",
+      "expected": null,
+      "top_positive": {
+        "label": "vaccum_cleaner",
+        "score": 0.0347732408361639
+      },
+      "top_ood": {
+        "label": "person_or_pet",
+        "score": 0.05253299121534499
+      },
+      "positive_margin": 0.010782390360160994,
+      "ood_margin": -0.017759750379181094
+    },
+    {
+      "image_id": "ood:O079",
+      "expected": null,
+      "top_positive": {
+        "label": "rice_cooker",
+        "score": 0.06639716881539669
+      },
+      "top_ood": {
+        "label": "other_kitchen_appliance",
+        "score": 0.10072539441142359
+      },
+      "positive_margin": 0.007229697875327998,
+      "ood_margin": -0.0343282255960269
+    },
+    {
+      "image_id": "ood:O080",
+      "expected": null,
+      "top_positive": {
+        "label": "sandwich_press",
+        "score": 0.04426073109952545
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.06466823700389132
+      },
+      "positive_margin": 0.008176769277935043,
+      "ood_margin": -0.020407505904365873
+    },
+    {
+      "image_id": "ood:O081",
+      "expected": null,
+      "top_positive": {
+        "label": "toaster",
+        "score": 0.05059941130524828
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.09720555338835081
+      },
+      "positive_margin": 0.005823237306695539,
+      "ood_margin": -0.04660614208310253
+    },
+    {
+      "image_id": "ood:O082",
+      "expected": null,
+      "top_positive": {
+        "label": "rice_cooker",
+        "score": 0.07102555922774925
+      },
+      "top_ood": {
+        "label": "other_kitchen_appliance",
+        "score": 0.09806448251650499
+      },
+      "positive_margin": 0.005799269713967242,
+      "ood_margin": -0.027038923288755734
+    },
+    {
+      "image_id": "ood:O083",
+      "expected": null,
+      "top_positive": {
+        "label": "straightener",
+        "score": 0.028792578101610476
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.08628753663365474
+      },
+      "positive_margin": 0.003707742143902723,
+      "ood_margin": -0.05749495853204426
+    },
+    {
+      "image_id": "ood:O084",
+      "expected": null,
+      "top_positive": {
+        "label": "rice_cooker",
+        "score": 0.0727107541125168
+      },
+      "top_ood": {
+        "label": "other_kitchen_appliance",
+        "score": 0.10787880215703388
+      },
+      "positive_margin": 0.005972687904041596,
+      "ood_margin": -0.03516804804451708
+    },
+    {
+      "image_id": "ood:O085",
+      "expected": null,
+      "top_positive": {
+        "label": "rice_cooker",
+        "score": 0.052168451154395175
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.05067059496773205
+      },
+      "positive_margin": 0.018845438598492865,
+      "ood_margin": 0.0014978561866631282
+    },
+    {
+      "image_id": "ood:O086",
+      "expected": null,
+      "top_positive": {
+        "label": "fan",
+        "score": 0.03271732478806375
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.05953562148011111
+      },
+      "positive_margin": 0.0037376955030083495,
+      "ood_margin": -0.026818296692047355
+    },
+    {
+      "image_id": "ood:O087",
+      "expected": null,
+      "top_positive": {
+        "label": "rice_cooker",
+        "score": 0.05529204996590823
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.10760665911698596
+      },
+      "positive_margin": 0.0004278598747970014,
+      "ood_margin": -0.052314609151077725
+    },
+    {
+      "image_id": "ood:O088",
+      "expected": null,
+      "top_positive": {
+        "label": "vaccum_cleaner",
+        "score": 0.04073218508127724
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.06425000621578231
+      },
+      "positive_margin": 0.006945930963738155,
+      "ood_margin": -0.023517821134505068
+    },
+    {
+      "image_id": "ood:O089",
+      "expected": null,
+      "top_positive": {
+        "label": "hair_dryer",
+        "score": 0.06107163603491128
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.09789286696184558
+      },
+      "positive_margin": 0.0010839532858732195,
+      "ood_margin": -0.036821230926934304
+    },
+    {
+      "image_id": "ood:O090",
+      "expected": null,
+      "top_positive": {
+        "label": "fan",
+        "score": 0.011961935667611057
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.04908296075434231
+      },
+      "positive_margin": 0.0034463862210389277,
+      "ood_margin": -0.037121025086731256
+    },
+    {
+      "image_id": "ood:O091",
+      "expected": null,
+      "top_positive": {
+        "label": "shaver",
+        "score": 0.06151232969352332
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.08405321439365869
+      },
+      "positive_margin": 0.0032120653826290257,
+      "ood_margin": -0.02254088470013537
+    },
+    {
+      "image_id": "ood:O092",
+      "expected": null,
+      "top_positive": {
+        "label": "portable_ac",
+        "score": 0.004970651620493191
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.05087600258500842
+      },
+      "positive_margin": 0.0027837197353022805,
+      "ood_margin": -0.04590535096451523
+    },
+    {
+      "image_id": "ood:O093",
+      "expected": null,
+      "top_positive": {
+        "label": "straightener",
+        "score": 0.0496676858467221
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.08322150750693925
+      },
+      "positive_margin": 0.002757440168255347,
+      "ood_margin": -0.033553821660217156
+    },
+    {
+      "image_id": "ood:O094",
+      "expected": null,
+      "top_positive": {
+        "label": "shaver",
+        "score": 0.03112722092197976
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.07450208244693544
+      },
+      "positive_margin": 0.010310772323979374,
+      "ood_margin": -0.043374861524955684
+    },
+    {
+      "image_id": "ood:O095",
+      "expected": null,
+      "top_positive": {
+        "label": "rice_cooker",
+        "score": 0.04646248146359988
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.07678485176525987
+      },
+      "positive_margin": 0.0023031427231689702,
+      "ood_margin": -0.03032237030165999
+    },
+    {
+      "image_id": "ood:O096",
+      "expected": null,
+      "top_positive": {
+        "label": "shaver",
+        "score": 0.04606871095388864
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.07171758677017509
+      },
+      "positive_margin": 0.0002566422794077622,
+      "ood_margin": -0.02564887581628645
+    },
+    {
+      "image_id": "ood:O097",
+      "expected": null,
+      "top_positive": {
+        "label": "vaccum_cleaner",
+        "score": 0.011290592600323172
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.052138466608465085
+      },
+      "positive_margin": 0.003088804033437186,
+      "ood_margin": -0.04084787400814191
+    },
+    {
+      "image_id": "ood:O098",
+      "expected": null,
+      "top_positive": {
+        "label": "fan",
+        "score": 0.03841408345218286
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.08019435927028042
+      },
+      "positive_margin": 0.006893623287607481,
+      "ood_margin": -0.041780275818097554
+    },
+    {
+      "image_id": "ood:O099",
+      "expected": null,
+      "top_positive": {
+        "label": "rice_cooker",
+        "score": -0.0015032847062725137
+      },
+      "top_ood": {
+        "label": "person_or_pet",
+        "score": 0.04060455022028085
+      },
+      "positive_margin": 0.003591150894345825,
+      "ood_margin": -0.042107834926553366
+    },
+    {
+      "image_id": "ood:O100",
+      "expected": null,
+      "top_positive": {
+        "label": "straightener",
+        "score": 0.012471868199050684
+      },
+      "top_ood": {
+        "label": "person_or_pet",
+        "score": 0.04464302520705703
+      },
+      "positive_margin": 0.0026975306650439176,
+      "ood_margin": -0.032171157008006344
+    },
+    {
+      "image_id": "ood:O101",
+      "expected": null,
+      "top_positive": {
+        "label": "sandwich_press",
+        "score": 0.009505327700653075
+      },
+      "top_ood": {
+        "label": "refrigerator",
+        "score": 0.05366782880347844
+      },
+      "positive_margin": 0.002542371988535846,
+      "ood_margin": -0.044162501102825366
+    },
+    {
+      "image_id": "ood:O102",
+      "expected": null,
+      "top_positive": {
+        "label": "toaster",
+        "score": 0.0005393575184280065
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.052956239749931175
+      },
+      "positive_margin": 0.0029420954038159902,
+      "ood_margin": -0.05241688223150317
+    },
+    {
+      "image_id": "ood:O103",
+      "expected": null,
+      "top_positive": {
+        "label": "kettle",
+        "score": -0.007497351700553816
+      },
+      "top_ood": {
+        "label": "person_or_pet",
+        "score": 0.027186069881651797
+      },
+      "positive_margin": 0.010741907111228279,
+      "ood_margin": -0.03468342158220561
+    },
+    {
+      "image_id": "ood:O104",
+      "expected": null,
+      "top_positive": {
+        "label": "portable_ac",
+        "score": 0.00993581100698302
+      },
+      "top_ood": {
+        "label": "vehicle",
+        "score": 0.04060551483067311
+      },
+      "positive_margin": 0.013625487464440242,
+      "ood_margin": -0.030669703823690088
+    },
+    {
+      "image_id": "ood:O105",
+      "expected": null,
+      "top_positive": {
+        "label": "shaver",
+        "score": 0.0038941824501039094
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.035335096165770664
+      },
+      "positive_margin": 0.0008041064692358782,
+      "ood_margin": -0.031440913715666756
+    },
+    {
+      "image_id": "ood:O106",
+      "expected": null,
+      "top_positive": {
+        "label": "vaccum_cleaner",
+        "score": -0.001889878208392793
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.035561231829623376
+      },
+      "positive_margin": 0.0005260375120039438,
+      "ood_margin": -0.03745111003801617
+    },
+    {
+      "image_id": "ood:O107",
+      "expected": null,
+      "top_positive": {
+        "label": "vaccum_cleaner",
+        "score": 0.01747869680853859
+      },
+      "top_ood": {
+        "label": "furniture",
+        "score": 0.051139525249134524
+      },
+      "positive_margin": 0.006781850936773779,
+      "ood_margin": -0.03366082844059594
+    },
+    {
+      "image_id": "ood:O108",
+      "expected": null,
+      "top_positive": {
+        "label": "shaver",
+        "score": -0.001474035755499363
+      },
+      "top_ood": {
+        "label": "person_or_pet",
+        "score": 0.025098224249809307
+      },
+      "positive_margin": 0.007051050494058844,
+      "ood_margin": -0.02657226000530867
+    },
+    {
+      "image_id": "ood:O109",
+      "expected": null,
+      "top_positive": {
+        "label": "portable_ac",
+        "score": -0.022443870254805282
+      },
+      "top_ood": {
+        "label": "vehicle",
+        "score": 0.020004040332505805
+      },
+      "positive_margin": 0.0020420033900042274,
+      "ood_margin": -0.04244791058731109
+    },
+    {
+      "image_id": "ood:O110",
+      "expected": null,
+      "top_positive": {
+        "label": "vaccum_cleaner",
+        "score": -0.03728415782857952
+      },
+      "top_ood": {
+        "label": "screen_device",
+        "score": 0.018300529661485754
+      },
+      "positive_margin": 0.00034520193163820045,
+      "ood_margin": -0.055584687490065274
+    },
+    {
+      "image_id": "ood:O111",
+      "expected": null,
+      "top_positive": {
+        "label": "vaccum_cleaner",
+        "score": -0.01908598107019657
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.028620924506181596
+      },
+      "positive_margin": 0.0002790963617448107,
+      "ood_margin": -0.04770690557637816
+    },
+    {
+      "image_id": "ood:O112",
+      "expected": null,
+      "top_positive": {
+        "label": "vaccum_cleaner",
+        "score": -0.015811005023477948
+      },
+      "top_ood": {
+        "label": "screen_device",
+        "score": 0.019139769674084404
+      },
+      "positive_margin": 0.006906032418345528,
+      "ood_margin": -0.03495077469756235
+    },
+    {
+      "image_id": "ood:O113",
+      "expected": null,
+      "top_positive": {
+        "label": "rice_cooker",
+        "score": -0.034402110656963254
+      },
+      "top_ood": {
+        "label": "person_or_pet",
+        "score": 0.023506117690523146
+      },
+      "positive_margin": 0.006407364139036663,
+      "ood_margin": -0.0579082283474864
+    },
+    {
+      "image_id": "ood:O114",
+      "expected": null,
+      "top_positive": {
+        "label": "fan",
+        "score": 0.009963032061477386
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.03314220992922031
+      },
+      "positive_margin": 0.0012072824465943592,
+      "ood_margin": -0.023179177867742925
+    },
+    {
+      "image_id": "ood:O115",
+      "expected": null,
+      "top_positive": {
+        "label": "shaver",
+        "score": 0.032900637111701034
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.03501366620583306
+      },
+      "positive_margin": 0.017189437896622348,
+      "ood_margin": -0.002113029094132024
+    },
+    {
+      "image_id": "ood:O116",
+      "expected": null,
+      "top_positive": {
+        "label": "shaver",
+        "score": 0.004575494806939519
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.020300056412396444
+      },
+      "positive_margin": 0.011243150161110877,
+      "ood_margin": -0.015724561605456926
+    },
+    {
+      "image_id": "ood:O117",
+      "expected": null,
+      "top_positive": {
+        "label": "shaver",
+        "score": 0.013517023496999537
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.025114359325380288
+      },
+      "positive_margin": 0.015055486626012636,
+      "ood_margin": -0.011597335828380751
+    },
+    {
+      "image_id": "ood:O118",
+      "expected": null,
+      "top_positive": {
+        "label": "shaver",
+        "score": 0.028017126783412363
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.03847420309306306
+      },
+      "positive_margin": 0.008903532425147225,
+      "ood_margin": -0.0104570763096507
+    },
+    {
+      "image_id": "ood:O119",
+      "expected": null,
+      "top_positive": {
+        "label": "shaver",
+        "score": 0.021694519592229955
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.030041953598549047
+      },
+      "positive_margin": 0.01092727721328641,
+      "ood_margin": -0.008347434006319092
+    },
+    {
+      "image_id": "ood:O120",
+      "expected": null,
+      "top_positive": {
+        "label": "shaver",
+        "score": 0.007786236328500986
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.0208139356131171
+      },
+      "positive_margin": 0.006566263277812971,
+      "ood_margin": -0.013027699284616116
+    },
+    {
+      "image_id": "ood:O121",
+      "expected": null,
+      "top_positive": {
+        "label": "vaccum_cleaner",
+        "score": 0.04805897289369963
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.04258683618932189
+      },
+      "positive_margin": 0.00393746515290927,
+      "ood_margin": 0.005472136704377739
+    },
+    {
+      "image_id": "ood:O122",
+      "expected": null,
+      "top_positive": {
+        "label": "portable_ac",
+        "score": 0.03929539433140351
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.04920045984355746
+      },
+      "positive_margin": 0.014610457284359862,
+      "ood_margin": -0.009905065512153949
+    },
+    {
+      "image_id": "ood:O123",
+      "expected": null,
+      "top_positive": {
+        "label": "portable_ac",
+        "score": 0.026781829781827526
+      },
+      "top_ood": {
+        "label": "vehicle",
+        "score": 0.04400426840225153
+      },
+      "positive_margin": 0.006569836475259824,
+      "ood_margin": -0.017222438620424003
+    },
+    {
+      "image_id": "ood:O124",
+      "expected": null,
+      "top_positive": {
+        "label": "portable_ac",
+        "score": 0.01708095819422595
+      },
+      "top_ood": {
+        "label": "screen_device",
+        "score": 0.026345276704689134
+      },
+      "positive_margin": 0.014078417205785829,
+      "ood_margin": -0.009264318510463183
+    },
+    {
+      "image_id": "ood:O125",
+      "expected": null,
+      "top_positive": {
+        "label": "portable_ac",
+        "score": 0.06954373752012535
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.06309982376617802
+      },
+      "positive_margin": 0.052567436424716854,
+      "ood_margin": 0.006443913753947331
+    },
+    {
+      "image_id": "ood:O126",
+      "expected": null,
+      "top_positive": {
+        "label": "portable_ac",
+        "score": 0.01332063938005469
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.035641389215037775
+      },
+      "positive_margin": 0.008113647232574024,
+      "ood_margin": -0.022320749834983084
+    },
+    {
+      "image_id": "ood:O127",
+      "expected": null,
+      "top_positive": {
+        "label": "straightener",
+        "score": -0.00941189164695426
+      },
+      "top_ood": {
+        "label": "person_or_pet",
+        "score": 0.03966378048756554
+      },
+      "positive_margin": 0.003837417090832119,
+      "ood_margin": -0.0490756721345198
+    },
+    {
+      "image_id": "ood:O128",
+      "expected": null,
+      "top_positive": {
+        "label": "straightener",
+        "score": -0.012199679403270281
+      },
+      "top_ood": {
+        "label": "person_or_pet",
+        "score": 0.03835774958536416
+      },
+      "positive_margin": 0.0043087633638593855,
+      "ood_margin": -0.05055742898863445
+    },
+    {
+      "image_id": "ood:O129",
+      "expected": null,
+      "top_positive": {
+        "label": "straightener",
+        "score": -0.002448223686947676
+      },
+      "top_ood": {
+        "label": "person_or_pet",
+        "score": 0.042909736186117084
+      },
+      "positive_margin": 0.010693387482977545,
+      "ood_margin": -0.04535795987306476
+    },
+    {
+      "image_id": "ood:O130",
+      "expected": null,
+      "top_positive": {
+        "label": "straightener",
+        "score": -0.0006498273768853202
+      },
+      "top_ood": {
+        "label": "person_or_pet",
+        "score": 0.028838036176476012
+      },
+      "positive_margin": 0.011080736399943608,
+      "ood_margin": -0.029487863553361332
+    },
+    {
+      "image_id": "ood:O131",
+      "expected": null,
+      "top_positive": {
+        "label": "straightener",
+        "score": -0.011229597570762997
+      },
+      "top_ood": {
+        "label": "person_or_pet",
+        "score": 0.039445471928882696
+      },
+      "positive_margin": 0.008609666322342575,
+      "ood_margin": -0.05067506949964569
+    },
+    {
+      "image_id": "ood:O132",
+      "expected": null,
+      "top_positive": {
+        "label": "straightener",
+        "score": -0.01404186608812968
+      },
+      "top_ood": {
+        "label": "person_or_pet",
+        "score": 0.03769932913526058
+      },
+      "positive_margin": 0.00637244014703086,
+      "ood_margin": -0.051741195223390254
+    },
+    {
+      "image_id": "ood:O133",
+      "expected": null,
+      "top_positive": {
+        "label": "straightener",
+        "score": -0.026339230055261613
+      },
+      "top_ood": {
+        "label": "nature",
+        "score": 0.08147621838032751
+      },
+      "positive_margin": 0.006921432763579226,
+      "ood_margin": -0.10781544843558913
+    },
+    {
+      "image_id": "ood:O134",
+      "expected": null,
+      "top_positive": {
+        "label": "straightener",
+        "score": -0.01614051689040771
+      },
+      "top_ood": {
+        "label": "nature",
+        "score": 0.030463001287461874
+      },
+      "positive_margin": 0.005563448439247633,
+      "ood_margin": -0.046603518177869584
+    },
+    {
+      "image_id": "ood:O135",
+      "expected": null,
+      "top_positive": {
+        "label": "straightener",
+        "score": -0.021882488103191922
+      },
+      "top_ood": {
+        "label": "nature",
+        "score": 0.08487754637759061
+      },
+      "positive_margin": 0.0010954276626777663,
+      "ood_margin": -0.10676003448078253
+    },
+    {
+      "image_id": "ood:O136",
+      "expected": null,
+      "top_positive": {
+        "label": "shaver",
+        "score": -0.02541849270028852
+      },
+      "top_ood": {
+        "label": "nature",
+        "score": 0.093443099382792
+      },
+      "positive_margin": 0.0010959625501296526,
+      "ood_margin": -0.11886159208308052
+    },
+    {
+      "image_id": "ood:O137",
+      "expected": null,
+      "top_positive": {
+        "label": "straightener",
+        "score": -0.002028637826438112
+      },
+      "top_ood": {
+        "label": "nature",
+        "score": 0.08778485707000357
+      },
+      "positive_margin": 0.0029926044140554994,
+      "ood_margin": -0.08981349489644168
+    },
+    {
+      "image_id": "ood:O138",
+      "expected": null,
+      "top_positive": {
+        "label": "straightener",
+        "score": -0.016861740382038116
+      },
+      "top_ood": {
+        "label": "nature",
+        "score": 0.08115541161663949
+      },
+      "positive_margin": 0.00018504188769591715,
+      "ood_margin": -0.09801715199867761
+    },
+    {
+      "image_id": "ood:O139",
+      "expected": null,
+      "top_positive": {
+        "label": "rice_cooker",
+        "score": -0.0006957049208305042
+      },
+      "top_ood": {
+        "label": "vehicle",
+        "score": 0.02358664560474489
+      },
+      "positive_margin": 0.0028320814844356446,
+      "ood_margin": -0.024282350525575393
+    },
+    {
+      "image_id": "ood:O140",
+      "expected": null,
+      "top_positive": {
+        "label": "dehumidifier",
+        "score": 0.007705958726465517
+      },
+      "top_ood": {
+        "label": "person_or_pet",
+        "score": 0.04063041180548069
+      },
+      "positive_margin": 0.003635630219942768,
+      "ood_margin": -0.03292445307901517
+    },
+    {
+      "image_id": "ood:O141",
+      "expected": null,
+      "top_positive": {
+        "label": "rice_cooker",
+        "score": -0.0009721558843793564
+      },
+      "top_ood": {
+        "label": "person_or_pet",
+        "score": 0.02311989321761226
+      },
+      "positive_margin": 0.0042404211054126555,
+      "ood_margin": -0.024092049101991617
+    },
+    {
+      "image_id": "ood:O142",
+      "expected": null,
+      "top_positive": {
+        "label": "fan",
+        "score": -0.006618548020775037
+      },
+      "top_ood": {
+        "label": "other_object",
+        "score": 0.028935281721351472
+      },
+      "positive_margin": 0.004330111304008307,
+      "ood_margin": -0.03555382974212651
+    },
+    {
+      "image_id": "ood:O143",
+      "expected": null,
+      "top_positive": {
+        "label": "shaver",
+        "score": -0.016628579859543014
+      },
+      "top_ood": {
+        "label": "person_or_pet",
+        "score": 0.028790595262210027
+      },
+      "positive_margin": 0.0015051009097664936,
+      "ood_margin": -0.045419175121753044
+    },
+    {
+      "image_id": "ood:O144",
+      "expected": null,
+      "top_positive": {
+        "label": "vaccum_cleaner",
+        "score": -0.007680911614869463
+      },
+      "top_ood": {
+        "label": "person_or_pet",
+        "score": 0.02657002787752645
+      },
+      "positive_margin": 0.00006277324381870342,
+      "ood_margin": -0.03425093949239591
+    }
+  ]
+}

@@ -1,0 +1,170 @@
+{
+  "_comment": "Local diagnostic evidence only. The unchanged whole-candidate gate failed. Archive copies preserve evaluated bytes; paths inside them still refer to the original local cache. This is not release approval.",
+  "schema_version": 1,
+  "archived_at_utc": "2026-10-09T15:22:28.926826+00:00",
+  "scope": "diagnostic_incomplete_cohort_not_release_evidence",
+  "release_ready": false,
+  "recognition_enabled": false,
+  "artifacts": [
+    {
+      "artifact": "candidate-v3-diagnostic-predictions.json",
+      "original_path": "tmp/appliance-model-v3-fresh-validation/diagnostic-2026-10-10/candidate-v3-diagnostic-predictions.json",
+      "bytes": 82107,
+      "sha256": "7fa2580405f979634c730d2d2abc8498ff193ce788ed885f4c55c2f439e84d39"
+    },
+    {
+      "artifact": "candidate-v3-diagnostic-gate-decision.json",
+      "original_path": "tmp/appliance-model-v3-fresh-validation/diagnostic-2026-10-10/candidate-v3-diagnostic-gate-decision.json",
+      "bytes": 8964,
+      "sha256": "c99ad2941183786a934816cb9d135d2a49f49b7d452533e3a901436f0cbb72d6"
+    },
+    {
+      "artifact": "candidate-v3-fresh-test-manifest.json",
+      "original_path": "tmp/appliance-model-v3-fresh-validation/diagnostic-2026-10-10/candidate-v3-fresh-test-manifest.json",
+      "bytes": 47803,
+      "sha256": "cdd39c4fd8cbcbbcc6c5f5aa76f1546998fe1f70b9443bd63b94c06c5560dc5a"
+    },
+    {
+      "artifact": "candidate-v3-fresh-audit-summary.json",
+      "original_path": "tmp/appliance-model-v3-fresh-validation/diagnostic-2026-10-10/candidate-v3-fresh-audit-summary.json",
+      "bytes": 192923,
+      "sha256": "7518d6c73cf71bd2acc36101646c535e1af7bc8c7ab592be8af8a5ad5632be9e"
+    },
+    {
+      "artifact": "candidate-v3-fresh-ground-truth-lock.json",
+      "original_path": "tmp/appliance-model-v3-fresh-validation/diagnostic-2026-10-10/candidate-v3-fresh-ground-truth-lock.json",
+      "bytes": 787,
+      "sha256": "4090947011140a0ea747925d474eac3f59c00d467525b3330b5fcd67e4000b9b"
+    },
+    {
+      "artifact": "independent-audit-a.json",
+      "original_path": "tmp/appliance-model-v3-fresh-validation/independent-audit-a.json",
+      "bytes": 72176,
+      "sha256": "76777ce11661a504f99c1db20d840525033512c38f98f2ac211e60ab12888275"
+    },
+    {
+      "artifact": "independent-audit-b.json",
+      "original_path": "tmp/appliance-model-v3-fresh-validation/independent-audit-b.json",
+      "bytes": 69690,
+      "sha256": "d1c5593258a31d68280b032e4b45c52e65afa999a8597edbbbbe521baf1378c9"
+    },
+    {
+      "artifact": "combined-reconciled-blind-audit.json",
+      "original_path": "tmp/appliance-model-v3-fresh-validation/combined-reconciled-blind-audit.json",
+      "bytes": 119308,
+      "sha256": "b38166986374e522fc1fe197a378dd1873973466013db23673c3a463648e586f"
+    },
+    {
+      "artifact": "positives-source-manifest.json",
+      "original_path": "tmp/appliance-model-v3-fresh-validation/review-positives-final/positives-source-manifest.json",
+      "bytes": 36170,
+      "sha256": "7e02b5e7a4439791195cd64f44b703033d1e8f28724de4c0270b5c4785acdb6c"
+    },
+    {
+      "artifact": "ood-source-manifest.json",
+      "original_path": "tmp/appliance-model-v3-fresh-validation/review-ood-final/ood-source-manifest.json",
+      "bytes": 46856,
+      "sha256": "c5e1658430349282542c16ddf15e110d4f05d834ced0726b1078cfcccc7d5a76"
+    },
+    {
+      "artifact": "original-positive-candidates.jsonl",
+      "original_path": "tmp/appliance-model-v3-fresh-validation/positives/candidate-manifest.jsonl",
+      "bytes": 135885,
+      "sha256": "54bf5f61fc5788dd718d4666644ad94ba940de5900f9f7be37c071b2d55325ec"
+    },
+    {
+      "artifact": "resumed-positive-candidates.jsonl",
+      "original_path": "tmp/appliance-model-v3-fresh-validation/positives-resumed/all-resumed-candidates-frozen.jsonl",
+      "bytes": 159191,
+      "sha256": "6ddc84a55d798aa9c19e96ab4186cde34af8baefc2d2792eb971da5f93d9e717"
+    },
+    {
+      "artifact": "resumed-ood-candidates.jsonl",
+      "original_path": "tmp/appliance-model-v3-fresh-validation/ood-resumed/candidate-manifest.jsonl",
+      "bytes": 311214,
+      "sha256": "a12a69da9ec15dafbf677ccbd84186a318081ae693ebbff370de7c30d102363a"
+    },
+    {
+      "artifact": "synthetic-control-predictions.json",
+      "original_path": "tmp/appliance-model-v3-fresh-validation/synthetic-controls/predictions.json",
+      "bytes": 8638,
+      "sha256": "6700b442dc996170bf5c18f1d506796bc64de69a8bc099b214a05ea6c82623e4"
+    },
+    {
+      "artifact": "synthetic-control-manifest.json",
+      "original_path": "tmp/appliance-model-v3-fresh-validation/synthetic-controls/manifest.json",
+      "bytes": 2092,
+      "sha256": "1b32c0d36b1c5142d91ecddb215220aaf3dbe4ad429bcb3f981b77898d166e96"
+    },
+    {
+      "artifact": "synthetic-control-audit.json",
+      "original_path": "tmp/appliance-model-v3-fresh-validation/synthetic-controls/audit.json",
+      "bytes": 876,
+      "sha256": "430a3709b8aabd99595b5a75dd8c48c21af549b3f4ba45ea2f7e7983a80d6e52"
+    },
+    {
+      "artifact": "make_rejection_controls.py",
+      "original_path": "tmp/appliance-model-v3-fresh-validation/make_rejection_controls.py",
+      "bytes": 2280,
+      "sha256": "9eb5f6f8df5850185f726667f4fd3482a7d17999a972b9b342c6da96d91b1278"
+    },
+    {
+      "artifact": "reconcile_blind_reviews.py",
+      "original_path": "tmp/appliance-model-v3-fresh-validation/reconcile_blind_reviews.py",
+      "bytes": 4220,
+      "sha256": "0e55a2e2d3e65f38a83d49c388a97a1411c5ac858ec87ee24108f856f7aeb788"
+    }
+  ],
+  "linked_artifacts": [
+    {
+      "path": "tmp/appliance-model-v3-fresh-validation/prior-evidence-index.json",
+      "bytes": 1174516,
+      "sha256": "e8ef21fd879957f5a82fa449d7d797761943042bfb33cef3c63c3cf3815e5b67"
+    },
+    {
+      "path": "model/appliance-siglip/candidate-v3-policy.json",
+      "bytes": 8807,
+      "sha256": "9f635e0a5098e0f8d0a09f07cdf653808e6d90a9ccdebabdd2fedc05510726f3"
+    },
+    {
+      "path": "model/appliance-siglip/pre-registered-release-gate-v3.json",
+      "bytes": 5405,
+      "sha256": "cfdcb10e3982eea16588b6ccc2d37340213596a53cf4f65e1982680076a253cd"
+    },
+    {
+      "path": "scripts/assemble-appliance-siglip-candidate-v3-test.py",
+      "bytes": 65337,
+      "sha256": "4d910da122aa909c15d78ce0a09c029a687947bc83094aaa55c7d9487fce6925"
+    },
+    {
+      "path": "scripts/evaluate-appliance-siglip-browser.mjs",
+      "bytes": 27178,
+      "sha256": "4ffc04ba8b38a8f4f8d97db890b911f80c25e807905a9c5a968945b5da6e2756"
+    },
+    {
+      "path": "scripts/evaluate-appliance-siglip-candidate-policy.mjs",
+      "bytes": 18148,
+      "sha256": "43c12bec38c1a5130fe5edbb9f9ecd5e189d0a592780f210fb3f08bdc1223b38"
+    },
+    {
+      "path": "test/siglip-browser-evaluator-policy.test.js",
+      "bytes": 5734,
+      "sha256": "6f9a0fbbb846582a847221957d60b3f7c8ce958ddf28faf6b1a153356bd527b7"
+    },
+    {
+      "path": "test_backend/test_candidate_v3_fresh_assembly.py",
+      "bytes": 10347,
+      "sha256": "376c0b6a98a5aaa05f2d5caca31f9bab065bdee7cee985ad3a49a123e1b6e84e"
+    }
+  ],
+  "images_included": false,
+  "image_cache": "tmp/appliance-model-v3-fresh-validation",
+  "limitations": [
+    "Some appliance classes have no clear audited positives.",
+    "Reviewers flagged similar product families and scenes; observations are not all independent households.",
+    "Two independent AI visual reviews, not human-labelled benchmark ground truth.",
+    "Old staged OOD files have reconstructed provenance; original download hashes/timestamps were unavailable for 36 candidates.",
+    "Model outputs are now open; this cohort cannot be reused as untouched validation for a tuned candidate.",
+    "No browser, physical tablet, frontend integration or live deployment validated by this experiment."
+  ]
+}

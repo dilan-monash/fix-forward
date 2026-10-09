@@ -1,0 +1,312 @@
+{
+  "evaluation": "fixforward-siglip2-quantized-node-parity",
+  "candidate_id": "fixforward-siglip2-selective-class-threshold-candidate-v3",
+  "release_ready": false,
+  "scope": "Node parity harness for the proposed browser weights; not a device/browser release result.",
+  "model": "onnx-community/siglip2-base-patch32-256-ONNX",
+  "revision": "7efccb86b5b6601bfe9e14326e1c11b40b68d44c",
+  "dtype": "q4",
+  "model_sha256": "9e82237d9a1d89948502aff9df02129c28698d793e01f15f62e2267682615499",
+  "transformers_js_version": "caller-supplied; see transformers_dir in the command record",
+  "inputs": {
+    "manifest_sha256": "1b32c0d36b1c5142d91ecddb215220aaf3dbe4ad429bcb3f981b77898d166e96",
+    "audit_sha256": "430a3709b8aabd99595b5a75dd8c48c21af549b3f4ba45ea2f7e7983a80d6e52",
+    "semantic_audit_sha256": null,
+    "policy_manifest_sha256": "c7d62dd45980771ffec56b4e5b8a303641ad3393f36ea77ade178af0c3b80ad7",
+    "text_manifest_sha256": "4b01be52acad78dae1783978e1bc191d50532dc63781a5cd7b96e24f3a390093",
+    "text_vectors_sha256": "2e63f55601cf3f011bf13b3c347bd456111c1b8132f9d8164105fff0a29877f2"
+  },
+  "timing": {
+    "evaluated_images": 8,
+    "total_ms": 2033.7788999999998,
+    "mean_ms": 254.22236249999997
+  },
+  "summary": {
+    "eligible_operational": {
+      "n": 0,
+      "accepted": 0,
+      "accepted_correct": 0,
+      "coverage": null,
+      "wrong_accepts": [],
+      "per_class": {
+        "air_fryer": {
+          "audited_operational_positives": 0,
+          "accepted": 0,
+          "accepted_correct": 0,
+          "wrong_accepts": [],
+          "coverage": null
+        },
+        "coffee_machine": {
+          "audited_operational_positives": 0,
+          "accepted": 0,
+          "accepted_correct": 0,
+          "wrong_accepts": [],
+          "coverage": null
+        },
+        "fan": {
+          "audited_operational_positives": 0,
+          "accepted": 0,
+          "accepted_correct": 0,
+          "wrong_accepts": [],
+          "coverage": null
+        },
+        "hair_dryer": {
+          "audited_operational_positives": 0,
+          "accepted": 0,
+          "accepted_correct": 0,
+          "wrong_accepts": [],
+          "coverage": null
+        },
+        "kettle": {
+          "audited_operational_positives": 0,
+          "accepted": 0,
+          "accepted_correct": 0,
+          "wrong_accepts": [],
+          "coverage": null
+        },
+        "microwave": {
+          "audited_operational_positives": 0,
+          "accepted": 0,
+          "accepted_correct": 0,
+          "wrong_accepts": [],
+          "coverage": null
+        },
+        "portable_ac": {
+          "audited_operational_positives": 0,
+          "accepted": 0,
+          "accepted_correct": 0,
+          "wrong_accepts": [],
+          "coverage": null
+        },
+        "portable_heater": {
+          "audited_operational_positives": 0,
+          "accepted": 0,
+          "accepted_correct": 0,
+          "wrong_accepts": [],
+          "coverage": null
+        },
+        "rice_cooker": {
+          "audited_operational_positives": 0,
+          "accepted": 0,
+          "accepted_correct": 0,
+          "wrong_accepts": [],
+          "coverage": null
+        },
+        "sandwich_press": {
+          "audited_operational_positives": 0,
+          "accepted": 0,
+          "accepted_correct": 0,
+          "wrong_accepts": [],
+          "coverage": null
+        },
+        "straightener": {
+          "audited_operational_positives": 0,
+          "accepted": 0,
+          "accepted_correct": 0,
+          "wrong_accepts": [],
+          "coverage": null
+        }
+      }
+    },
+    "manual_only_operational": {
+      "n": 0,
+      "accepted": 0,
+      "accepted_rows": []
+    },
+    "true_ood": {
+      "n": 8,
+      "source_groups": 1,
+      "accepted": 0,
+      "accepted_rows": []
+    }
+  },
+  "diagnostic_legacy_policy_summary": {
+    "thresholds": {
+      "min_ood_margin": 0.035,
+      "min_positive_margin": 0.01,
+      "enabled_classes": [
+        "air_fryer",
+        "blender",
+        "coffee_machine",
+        "fan",
+        "hair_dryer",
+        "kettle",
+        "microwave",
+        "mixer",
+        "portable_ac",
+        "portable_heater",
+        "sandwich_press",
+        "toaster",
+        "vaccum_cleaner"
+      ]
+    },
+    "audited_operational_positives": {
+      "n": 0,
+      "top1_correct": 0,
+      "top1_accuracy": null,
+      "accepted": 0,
+      "coverage": null,
+      "accepted_correct": 0,
+      "selective_accuracy": null,
+      "wrong_accepts": [],
+      "per_class": {}
+    },
+    "audited_ood": {
+      "n": 8,
+      "false_accepts": 0,
+      "false_accept_rate": 0,
+      "audit_basis": "audited_true_ood_ids",
+      "classification_complete": true,
+      "accepted_rows": []
+    },
+    "audited_enabled_class_positives": {
+      "n": 0,
+      "top1_correct": 0,
+      "top1_accuracy": null,
+      "accepted": 0,
+      "coverage": null,
+      "accepted_correct": 0,
+      "selective_accuracy": null,
+      "wrong_accepts": [],
+      "per_class": {}
+    },
+    "audited_disabled_class_challenges": {
+      "n": 0,
+      "top1_correct": 0,
+      "top1_accuracy": null,
+      "accepted": 0,
+      "coverage": null,
+      "accepted_correct": 0,
+      "selective_accuracy": null,
+      "wrong_accepts": [],
+      "per_class": {},
+      "acceptance_rule": "Every accepted output is a wrong acceptance because the expected class is manual-only."
+    },
+    "audited_true_ood": {
+      "n": 8,
+      "false_accepts": 0,
+      "false_accept_rate": 0,
+      "audit_basis": "audited_true_ood_ids",
+      "classification_complete": true,
+      "accepted_rows": []
+    },
+    "aggregate_wrong_accepts": {
+      "n": 0,
+      "rows": []
+    }
+  },
+  "rows": [
+    {
+      "image_id": "synthetic:black",
+      "expected": null,
+      "top_positive": {
+        "label": "straightener",
+        "score": 0.04131272159501723
+      },
+      "top_ood": {
+        "label": "screen_device",
+        "score": 0.0713659445309445
+      },
+      "positive_margin": 0.0045796674438458584,
+      "ood_margin": -0.03005322293592727
+    },
+    {
+      "image_id": "synthetic:white",
+      "expected": null,
+      "top_positive": {
+        "label": "straightener",
+        "score": 0.04241244663939515
+      },
+      "top_ood": {
+        "label": "refrigerator",
+        "score": 0.06693006293894853
+      },
+      "positive_margin": 0.0024496484948382316,
+      "ood_margin": -0.02451761629955338
+    },
+    {
+      "image_id": "synthetic:grey",
+      "expected": null,
+      "top_positive": {
+        "label": "straightener",
+        "score": 0.03790702842338195
+      },
+      "top_ood": {
+        "label": "vehicle",
+        "score": 0.06460675644915431
+      },
+      "positive_margin": 0.004522035106745877,
+      "ood_margin": -0.026699728025772362
+    },
+    {
+      "image_id": "synthetic:rgb-noise",
+      "expected": null,
+      "top_positive": {
+        "label": "vaccum_cleaner",
+        "score": 0.015939899455830377
+      },
+      "top_ood": {
+        "label": "screen_device",
+        "score": 0.06705475762005535
+      },
+      "positive_margin": 0.00414279683001401,
+      "ood_margin": -0.051114858164224966
+    },
+    {
+      "image_id": "synthetic:grey-noise",
+      "expected": null,
+      "top_positive": {
+        "label": "fan",
+        "score": 0.007643810446769755
+      },
+      "top_ood": {
+        "label": "furniture",
+        "score": 0.03672469137154587
+      },
+      "positive_margin": 0.006292381861455197,
+      "ood_margin": -0.029080880924776113
+    },
+    {
+      "image_id": "synthetic:fine-checkerboard",
+      "expected": null,
+      "top_positive": {
+        "label": "shaver",
+        "score": 0.026908687405852307
+      },
+      "top_ood": {
+        "label": "person_or_pet",
+        "score": 0.05398366649991677
+      },
+      "positive_margin": 0.003009504604412183,
+      "ood_margin": -0.02707497909406446
+    },
+    {
+      "image_id": "synthetic:coarse-checkerboard",
+      "expected": null,
+      "top_positive": {
+        "label": "shaver",
+        "score": 0.018181273021155422
+      },
+      "top_ood": {
+        "label": "screen_device",
+        "score": 0.04907276124516671
+      },
+      "positive_margin": 0.0003479756508518242,
+      "ood_margin": -0.03089148822401129
+    },
+    {
+      "image_id": "synthetic:text-only",
+      "expected": null,
+      "top_positive": {
+        "label": "straightener",
+        "score": 0.039234514015649896
+      },
+      "top_ood": {
+        "label": "other_kitchen_appliance",
+        "score": 0.07471085605183356
+      },
+      "positive_margin": 0.0042362029778159685,
+      "ood_margin": -0.03547634203618366
+    }
+  ]
+}

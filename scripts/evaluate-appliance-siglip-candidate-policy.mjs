@@ -381,7 +381,13 @@ async function main() {
   const summary = summariseClassThresholdEvaluation(report.rows, audit, policy);
   const decision = evaluateCandidateReleaseGate(summary, gate, policy);
   const output = {
-    evaluation: "fixforward-siglip2-class-threshold-candidate-v2-offline-gate",
+    // The evaluator is shared by frozen candidates. Identify the actual inputs
+    // instead of incorrectly labelling a later candidate's evidence as v2.
+    evaluation: "fixforward-siglip2-class-threshold-offline-gate",
+    candidate_id: policy.candidate_id,
+    gate_id: gate.gate_id,
+    cohort_scope: report.cohort_scope ?? "see input manifest",
+    cohort_minimums_met: audit.summary?.minimums_met ?? null,
     release_ready: false,
     candidate_policy_sha256: policyHash,
     cohort_lock_sha256: lockHash,
@@ -394,7 +400,9 @@ async function main() {
     decision,
   };
   await fs.mkdir(path.dirname(options.output), { recursive: true });
-  await fs.writeFile(options.output, `${JSON.stringify(output, null, 2)}\n`, "utf8");
+  // Once predictions have been opened, keep that evidence immutable. A new
+  // experiment must use its own output path rather than replacing an old run.
+  await fs.writeFile(options.output, `${JSON.stringify(output, null, 2)}\n`, { encoding: "utf8", flag: "wx" });
   console.log(JSON.stringify(decision, null, 2));
 }
 

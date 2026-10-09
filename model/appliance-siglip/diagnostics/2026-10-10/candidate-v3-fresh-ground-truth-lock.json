@@ -1,0 +1,14 @@
+{
+  "frozen_at_utc": "2026-10-09T15:18:57.843Z",
+  "inputs": {
+    "audit_sha256": "7518d6c73cf71bd2acc36101646c535e1af7bc8c7ab592be8af8a5ad5632be9e",
+    "candidate_policy_sha256": "9f635e0a5098e0f8d0a09f07cdf653808e6d90a9ccdebabdd2fedc05510726f3",
+    "gate_sha256": "cfdcb10e3982eea16588b6ccc2d37340213596a53cf4f65e1982680076a253cd",
+    "model_sha256": "9e82237d9a1d89948502aff9df02129c28698d793e01f15f62e2267682615499",
+    "test_manifest_sha256": "cdd39c4fd8cbcbbcc6c5f5aa76f1546998fe1f70b9443bd63b94c06c5560dc5a",
+    "text_manifest_sha256": "4b01be52acad78dae1783978e1bc191d50532dc63781a5cd7b96e24f3a390093",
+    "text_vectors_sha256": "2e63f55601cf3f011bf13b3c347bd456111c1b8132f9d8164105fff0a29877f2"
+  },
+  "model_outputs_opened": false,
+  "prediction_scores_opened": false
+}

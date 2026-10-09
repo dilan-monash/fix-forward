@@ -1,0 +1,3 @@
+# These are frozen experiment bytes. Keep their recorded SHA-256 values valid
+# across Windows and Linux checkouts by disabling automatic newline conversion.
+* -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
