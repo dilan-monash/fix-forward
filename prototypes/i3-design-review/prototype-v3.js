@@ -293,7 +293,7 @@
     return `<section class="screen-head"><h1>Explore an e-device</h1><p class="lead">Scan one with an adult, or choose from the list.</p></section>
       <div class="two-grid">
         <article class="panel blue-card center"><span class="round-icon">◎</span><h2>Scan with camera</h2><p>Point the camera at a device.</p>${button('Scan', 'lens/scan', 'primary blue')}</article>
-        <article class="panel green-card center"><span class="device-icon" aria-hidden="true"></span><h2>Choose a device</h2><p>Phone, tablet, laptop and more.</p>${button('Choose', 'lens/confirm', 'primary green')}</article>
+        <article class="panel green-card center"><h2>Choose a device</h2><p>Phone, tablet, laptop and more.</p>${button('Choose', 'lens/confirm', 'primary green')}</article>
       </div>`;
   }
 

@@ -398,6 +398,20 @@ p { color: var(--muted); font-size: 1.08rem; line-height: 1.5; }
   background: #fff;
 }
 .panel { padding: 34px; }
+.panel.center {
+  min-height: 430px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.panel.center > .round-icon,
+.panel.center > .device-icon {
+  flex: 0 0 auto;
+  margin: 0 auto 42px;
+}
+.panel.center > h2 { margin-bottom: 16px; }
+.panel.center > p { margin: 0 0 24px; }
 .tour-card { min-height: 235px; padding: 28px; }
 .tour-card b { display: grid; place-items: center; width: 42px; height: 42px; margin-bottom: 60px; border-radius: 50%; background: var(--navy); color: #fff; }
 .game-card { min-height: 570px; padding: 38px; display: flex; flex-direction: column; }
@@ -442,7 +456,7 @@ p { color: var(--muted); font-size: 1.08rem; line-height: 1.5; }
 .scan-box { min-height: 420px; border-radius: var(--radius); background: var(--navy); color: #fff; display: grid; place-items: center; text-align: center; }
 .camera-frame { width: min(420px, 80%); aspect-ratio: 16 / 10; border: 2px solid #fff; border-radius: 18px; display: grid; place-items: center; }
 .device-card { min-height: 360px; padding: 40px; border-radius: var(--radius); background: var(--surface); display: grid; place-items: center; text-align: center; }
-.device-icon { width: 160px; aspect-ratio: 4 / 3; border: 4px solid var(--blue); border-radius: 18px; background: #fff; position: relative; }
+.device-icon { display: block; width: 160px; aspect-ratio: 4 / 3; border: 4px solid var(--blue); border-radius: 18px; background: #fff; position: relative; }
 .device-icon::after { content: ""; position: absolute; width: 55px; height: 8px; border-radius: 8px; background: var(--ink); bottom: -20px; left: 50%; transform: translateX(-50%); }
 .tabs { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 28px; }
 .tabs a { padding: 11px 22px; border: 1px solid var(--line); border-radius: 999px; text-decoration: none; font-weight: 800; }
