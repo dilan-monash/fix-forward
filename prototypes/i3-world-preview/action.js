@@ -84,11 +84,26 @@ export function mountAction(host, { route = 'action?kind=recall', onNavigate = (
   const listen = (node, event, callback) => node?.addEventListener(event, callback, { signal: lifecycle.signal });
   const go = (destination) => { playSound('tap'); onNavigate(destination); };
   const queryFor = () => `appliance=${encodeURIComponent(draft.category)}`;
-  const exploreRoute = () => `explore?appliance=${encodeURIComponent(Object.keys(WORLD_ITEMS).find(key => WORLD_ITEMS[key] === draft.category) || draft.category)}`;
+  // The recall dataset covers more categories than the model collection. Only
+  // route to a named 3D object when it exists; never imply another model is this item.
+  const selectedWorldId = () => Object.keys(WORLD_ITEMS).find(key => WORLD_ITEMS[key] === draft.category);
+  const exploreRoute = () => selectedWorldId() ? `explore?appliance=${encodeURIComponent(selectedWorldId())}` : 'explore';
+  const bridgeContent = () => selectedWorldId() ? {
+    title: 'Understand what you are keeping in use.',
+    description: `Explore the <strong data-selected-appliance>${escape(draft.category)}</strong> in 3D: its parts, everyday care and electricity impact. Useful on your own, even better as a family conversation.`,
+    label: 'Explore this item ↗',
+  } : {
+    title: 'This item is not in the 3D collection yet.',
+    description: `Your <strong data-selected-appliance>${escape(draft.category)}</strong> stays selected in Take action. Keep using the tools above, or browse a different item from the available 3D models.`,
+    label: 'Browse the 3D collection ↗',
+  };
 
   // Adults can move directly between tasks. The selected item crosses the bridge
   // back to the same 3D object, so learning and action form one connected journey.
-  const familyBridge = () => `<aside class="action-family-bridge"><div class="action-bridge-symbol" aria-hidden="true">↗</div><div><p class="action-eyebrow">Same item. A bigger picture.</p><h2>Understand what you are keeping in use.</h2><p>Explore the <strong data-selected-appliance>${escape(draft.category)}</strong> in 3D: its parts, everyday care and electricity impact. Useful on your own, even better as a family conversation.</p></div><button class="button secondary" type="button" data-family-lens>Explore this item <span aria-hidden="true">↗</span></button></aside>`;
+  const familyBridge = () => {
+    const content = bridgeContent();
+    return `<aside class="action-family-bridge"><div class="action-bridge-symbol" aria-hidden="true">↗</div><div><p class="action-eyebrow">Understand the bigger picture.</p><h2 data-bridge-title>${content.title}</h2><p data-bridge-description>${content.description}</p></div><button class="button secondary" type="button" data-family-lens>${content.label}</button></aside>`;
+  };
   const options = () => `${!CATEGORIES.includes(draft.category) ? `<optgroup label="Your selected item"><option selected>${escape(draft.category)}</option></optgroup>` : ''}${FAMILIES.map((family) => `<optgroup label="${escape(family.name)}">${family.categories.map((name) => `<option${name === draft.category ? ' selected' : ''}>${escape(name)}</option>`).join('')}</optgroup>`).join('')}`;
 
   function render() {
@@ -375,6 +390,12 @@ export function mountAction(host, { route = 'action?kind=recall', onNavigate = (
   // without rebuilding the form or losing focus and entered information.
   function updateSelectedItem() {
     host.querySelectorAll('[data-selected-appliance]').forEach(node => { node.textContent = draft.category; });
+    // Editing the adult category also changes the bridge's promise and button,
+    // while preserving its listener, current form focus and the exact adult identity.
+    const content = bridgeContent();
+    host.querySelector('[data-bridge-title]').textContent = content.title;
+    host.querySelector('[data-bridge-description]').innerHTML = content.description;
+    host.querySelector('[data-family-lens]').textContent = content.label;
     // A saved task belongs to one item. Changing category updates the planner
     // without losing the currently focused appliance field or listing results.
     const form = host.querySelector('#action-save-plan');

@@ -70,6 +70,34 @@ test('known engine alias maps to its actual adult category and returns to the sa
   assert.equal(ui.routes[1], 'explore?appliance=vacuum');
 });
 
+test('adult categories without a 3D model offer an explicit collection link and retain identity', async t => {
+  const ui = await makeAction(t, { appliance: 'Sandwich press' });
+  assert.equal(ui.query('#action-category').value, 'Sandwich press');
+  assert.match(ui.query('[data-bridge-title]').textContent, /not in the 3D collection yet/i);
+  assert.match(ui.query('[data-bridge-description]').textContent, /Sandwich press.*stays selected/s);
+  assert.match(ui.query('[data-family-lens]').textContent, /browse the 3D collection/i);
+  ui.query('[data-family-lens]').click();
+  assert.equal(ui.routes[0], 'explore', 'Collection navigation must not pretend a kettle is the selected item');
+  assert.equal(ui.query('#action-category').value, 'Sandwich press');
+  ui.query('[data-action-kind="repair"]').click();
+  assert.equal(ui.routes[1], 'action?kind=repair&appliance=Sandwich%20press');
+});
+
+test('changing between modeled and unmodeled adult categories refreshes the bridge', async t => {
+  const ui = await makeAction(t, { appliance: 'kettle' });
+  const category = ui.query('#action-category');
+  category.value = 'Portable heater';
+  category.dispatchEvent(new ui.dom.window.Event('change', { bubbles: true }));
+  assert.match(ui.query('[data-family-lens]').textContent, /browse the 3D collection/i);
+  ui.query('[data-family-lens]').click();
+  assert.equal(ui.routes[0], 'explore');
+  category.value = 'Kettle';
+  category.dispatchEvent(new ui.dom.window.Event('change', { bubbles: true }));
+  assert.match(ui.query('[data-family-lens]').textContent, /explore this item/i);
+  ui.query('[data-family-lens]').click();
+  assert.equal(ui.routes[1], 'explore?appliance=kettle');
+});
+
 // The expanded world must preserve identity both through an adult task and back
 // to its 3D model. A display label is not necessarily the engine's shorter ID.
 for (const [id, title] of Object.entries({ ricecooker: 'Rice cooker', airfryer: 'Air fryer', coffeemachine: 'Coffee machine', mixer: 'Mixer' })) {
