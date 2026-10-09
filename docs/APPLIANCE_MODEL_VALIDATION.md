@@ -1,10 +1,16 @@
 # Appliance recognition: local candidate validation
 
-Checked locally on 10 October 2026 (Australia/Sydney). The adult photo helper remains unavailable:
-`model/appliance-siglip/model_manifest.json` keeps both `release_ready: false`
-and `recognition_enabled: false`. The manual appliance picker is the release
-path. No result below authorizes enabling recognition, making a public accuracy
-claim or diagnosing an appliance, fault, recall or safety condition.
+**Current state, 10 October 2026 (Australia/Sydney):** the user authorised an
+explicitly labelled experimental preview on Iteration 3 after reviewing the
+limitations below. Its browser policy now sets `recognition_enabled: true` and
+`experimental_preview: true`, while `release_ready` remains **false**. This is
+not a passing release evaluation or a public accuracy claim. Runtime scope is
+limited to the I3 hostname and local development. Suggestions require explicit
+confirmation and never diagnose faults, match recalls or certify safety.
+
+See [the experimental preview implementation](I3_EXPERIMENTAL_PHOTO_PREVIEW.md).
+The sections below preserve the research results and the state at each earlier
+checkpoint; enabling the preview does not change a failed gate into a pass.
 
 ## Why the old MobileNet export was retired
 
@@ -25,8 +31,9 @@ ONNX Runtime Web. The model, processor configuration, generated text embeddings,
 JavaScript runtime and WASM files are self-hosted at same-origin paths. Remote
 model loading is disabled. The first-use runtime, model, configuration and text
 assets total 92,560,078 bytes, about 92.5 MB. They are requested only after a
-person chooses a photo and only when both release flags are enabled; the current
-false flags prevent that download and inference.
+person chooses a photo and only when the runtime policy permits the current host. Before the
+experimental preview was authorised, the false flags prevented that download
+and inference.
 
 Photos stay in the browser and are not posted to Flask. Even if a later candidate
 passes every release step, an accepted appliance type is only a suggestion. The
@@ -80,7 +87,8 @@ The following SHA-256 values identify the current checked-in evidence files:
 | `model/appliance-siglip/candidate-v2-fresh-gate-decision.json` | `28bd3f6b9a1fe4a386aeb1861dc776bb5bc98b9e0911b13bc7b81a7e2def41ee` |
 
 Candidate v3 now has the incomplete-cohort diagnostic described below. It is
-still not wired into the browser and has not passed a release evaluation.
+now wired into the explicitly authorised experimental I3 preview, but has not
+passed a release evaluation.
 
 ## Resumed v3 experiment, 10 October 2026
 

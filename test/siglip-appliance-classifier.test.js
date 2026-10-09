@@ -4,6 +4,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 import {
+  canRunSiglipPolicy,
   classifyWithSiglipCandidate,
   releaseSiglipModelSession,
   resetSiglipCandidateForTests,
@@ -16,6 +17,9 @@ import {
 
 const shippedPolicy = JSON.parse(await readFile(
   new URL("../model/appliance-siglip/model_manifest.json", import.meta.url), "utf8",
+));
+const candidateV3 = JSON.parse(await readFile(
+  new URL("../model/appliance-siglip/candidate-v3-policy.json", import.meta.url), "utf8",
 ));
 const candidateV2 = JSON.parse(await readFile(
   new URL("../model/appliance-siglip/candidate-v2-policy.json", import.meta.url), "utf8",
@@ -116,13 +120,14 @@ function vectors() {
   };
 }
 
-test("shipped policy is paused and pins exact same-origin assets", () => {
+test("shipped I3 preview pins v3 thresholds and exact same-origin assets", () => {
   const value = validateSiglipPolicy(policy());
   assert.equal(value.release_ready, false);
-  assert.equal(value.recognition_enabled, false);
-  assert.deepEqual(value.acceptance.class_thresholds, candidateV2.acceptance.class_thresholds);
-  assert.deepEqual(value.enabled_classes, candidateV2.enabled_classes);
-  assert.deepEqual(value.manual_only_classes, candidateV2.manual_only_classes);
+  assert.equal(value.recognition_enabled, true);
+  assert.equal(value.experimental_preview, true);
+  assert.deepEqual(value.acceptance.class_thresholds, candidateV3.acceptance.class_thresholds);
+  assert.deepEqual(value.enabled_classes, candidateV3.enabled_classes);
+  assert.deepEqual(value.manual_only_classes, candidateV3.manual_only_classes);
   assert.equal(value.runtime.module_url, "/vendor/transformers/transformers.min.js");
   assert.equal(value.runtime.wasm_threads, 1);
   assert.deepEqual(value.runtime.assets, {
@@ -356,7 +361,7 @@ test("spoofed MIME and extreme dimensions fail before runtime or model assets", 
 
 test("enabled loader uses local-only single-thread settings and content-addressed model name", async () => {
   resetSiglipCandidateForTests();
-  const enabled = v2Policy({ release_ready: true, recognition_enabled: true });
+  const enabled = policy();
   const fetcher = async (url) => {
     if (url.endsWith("model_manifest.json")) return { ok: true, json: async () => enabled };
     if (url.endsWith("text-embeddings.json")) return { ok: true, arrayBuffer: async () => arrayBuffer(textManifestBytes) };
@@ -380,7 +385,7 @@ test("enabled loader uses local-only single-thread settings and content-addresse
   let importedUrl;
   await assert.rejects(() => classifyWithSiglipCandidate(
     pngFile(),
-    { fetcher, importer: async (url) => { importedUrl = url; return runtime; } },
+    { fetcher, hostname: "localhost", importer: async (url) => { importedUrl = url; return runtime; } },
   ), /checked/i);
   assert.equal(importedUrl, "/vendor/transformers/transformers.min.js");
   assert.equal(env.allowRemoteModels, false);
@@ -516,4 +521,33 @@ test("enabled inference is serialized so two large model calls cannot overlap", 
   assert.equal(modelLoads, 2);
   assert.equal(disposals, 1);
   assert.equal(maximumActive, 1);
+});
+
+// A preview is deliberately scoped; copying its manifest to Main cannot enable it.
+test("experimental preview runs only on I3/loopback and obeys the kill switch", async () => {
+  for (const host of ["fix-forward-iteration-3-r4sh.onrender.com", "localhost", "127.0.0.1"]) {
+    const status = await siglipClassifierAvailability(async () => ({ ok: true, json: async () => policy() }), { hostname: host });
+    assert.equal(status.enabled, true);
+    assert.equal(status.experimental, true);
+  }
+  for (const host of ["fixforward.me", "fix-forward-main.onrender.com", "fix-forward-iteration-2.onrender.com", "example.com", undefined]) {
+    assert.equal(canRunSiglipPolicy(policy(), host), false);
+  }
+  assert.equal(canRunSiglipPolicy(policy({ recognition_enabled: false }), "localhost"), false);
+  assert.throws(() => validateSiglipPolicy(policy({ release_ready: true })), /unavailable/i);
+  const changed = policy();
+  changed.acceptance.class_thresholds.fan.min_positive_margin = 0;
+  assert.throws(() => validateSiglipPolicy(changed), /unavailable/i);
+});
+
+test("a preview on Main never imports the runtime or inspects photo pixels", async () => {
+  resetSiglipCandidateForTests();
+  let imported = false;
+  const result = await classifyWithSiglipCandidate({ type: "image/png", size: 100 }, {
+    hostname: "fixforward.me",
+    fetcher: async () => ({ ok: true, json: async () => policy() }),
+    importer: async () => { imported = true; throw new Error("must not load"); },
+  });
+  assert.equal(result.reason, "recognition_paused");
+  assert.equal(imported, false);
 });

@@ -1,7 +1,7 @@
 /*
  * Gated SigLIP 2 browser candidate for adult appliance suggestions.
  *
- * The policy keeps this candidate off until both release flags are approved.
+ * Full release and the explicitly authorised I3 experimental preview are separate.
  * If it is enabled later, every runtime and model request stays same-origin,
  * image pixels remain in the browser, and the person must confirm a suggestion.
  * This helper never diagnoses a fault or decides whether an appliance is safe.
@@ -98,6 +98,29 @@ const V2_CLASS_THRESHOLDS = Object.freeze({
   toaster: Object.freeze({ min_ood_margin: 0.0358, min_positive_margin: 0.0497 }),
   vaccum_cleaner: Object.freeze({ min_ood_margin: 0.0484, min_positive_margin: 0.0224 }),
 });
+// V3 keeps its frozen class thresholds. The preview does not claim that its
+// failed/incomplete validation became a production release approval.
+const V3_CANDIDATE_ID = "fixforward-siglip2-selective-class-threshold-candidate-v3";
+const V3_ENABLED_CLASSES = Object.freeze([
+  "air_fryer", "coffee_machine", "fan", "hair_dryer", "kettle", "microwave",
+  "portable_ac", "portable_heater", "rice_cooker", "sandwich_press", "straightener",
+]);
+const V3_MANUAL_ONLY_CLASSES = Object.freeze([
+  "blender", "food_processor", "mixer", "shaver", "toaster", "vaccum_cleaner",
+  "dehumidifier", "steam_cleaner",
+]);
+const PREVIEW_HOSTS = new Set(["fix-forward-iteration-3-r4sh.onrender.com", "localhost", "127.0.0.1", "[::1]"]);
+
+// Keep this preview scoped to I3 and loopback testing. The normal release flag
+// stays false; the recognition switch still cancels a running preview remotely.
+export function canRunSiglipPolicy(policy, hostname = globalThis.location?.hostname) {
+  if (!policy?.recognition_enabled) return false;
+  if (policy.candidate_id === V3_CANDIDATE_ID) {
+    return policy.release_ready === false && policy.experimental_preview === true && PREVIEW_HOSTS.has(hostname);
+  }
+  return policy.release_ready === true;
+}
+
 const V2_ACCEPTANCE_RULE = "The top appliance label must be enabled and both thresholds for that winning label must pass. Never fall through to a lower-ranked enabled label.";
 const V2_SCORE_NOTICE = "Cosine margins are internal rejection evidence, not a user-facing confidence percentage.";
 
@@ -159,9 +182,9 @@ function hasExactKeys(value, expectedKeys) {
     equalArray(Object.keys(value), expectedKeys);
 }
 
-function matchesV2Thresholds(classThresholds) {
-  if (!hasExactKeys(classThresholds, V2_ENABLED_CLASSES)) return false;
-  return V2_ENABLED_CLASSES.every((slug) => {
+function matchesPinnedThresholds(classThresholds, enabledClasses = V2_ENABLED_CLASSES) {
+  if (!hasExactKeys(classThresholds, enabledClasses)) return false;
+  return enabledClasses.every((slug) => {
     const actual = classThresholds[slug];
     const expected = V2_CLASS_THRESHOLDS[slug];
     return hasExactKeys(actual, ["min_ood_margin", "min_positive_margin"]) &&
@@ -185,17 +208,22 @@ function matchesVersionedAcceptance(policy, acceptance, enabledClasses) {
   const manualOnlyClasses = policy.manual_only_classes;
   if (!Array.isArray(manualOnlyClasses)) return false;
   const allClasses = new Set([...enabledClasses, ...manualOnlyClasses]);
-  return policy.candidate_id === V2_CANDIDATE_ID &&
-    equalArray(enabledClasses, V2_ENABLED_CLASSES) &&
-    equalArray(manualOnlyClasses, V2_MANUAL_ONLY_CLASSES) &&
+  const preview = policy.candidate_id === V3_CANDIDATE_ID;
+  const expectedEnabled = preview ? V3_ENABLED_CLASSES : V2_ENABLED_CLASSES;
+  const expectedManual = preview ? V3_MANUAL_ONLY_CLASSES : V2_MANUAL_ONLY_CLASSES;
+  return (preview
+    ? policy.release_ready === false && policy.experimental_preview === true
+    : policy.candidate_id === V2_CANDIDATE_ID) &&
+    equalArray(enabledClasses, expectedEnabled) &&
+    equalArray(manualOnlyClasses, expectedManual) &&
     allClasses.size === APPLIANCE_CLASSES.length &&
     APPLIANCE_CLASSES.every(({ slug }) => allClasses.has(slug)) &&
-    acceptance?.rule === V2_ACCEPTANCE_RULE &&
+    acceptance?.rule === (preview ? V2_ACCEPTANCE_RULE.replace("both thresholds", "both frozen thresholds") : V2_ACCEPTANCE_RULE) &&
     acceptance?.comparison === "greater_than_or_equal" &&
     acceptance?.score_notice === V2_SCORE_NOTICE &&
     !Object.hasOwn(acceptance, "min_ood_margin") &&
     !Object.hasOwn(acceptance, "min_positive_margin") &&
-    matchesV2Thresholds(acceptance?.class_thresholds);
+    matchesPinnedThresholds(acceptance?.class_thresholds, expectedEnabled);
 }
 
 // The manifest is a release gate and an asset allowlist, not merely metadata.
@@ -261,12 +289,13 @@ async function loadPolicy(fetcher = fetch) {
   }
 }
 
-export async function siglipClassifierAvailability(fetcher = fetch) {
+export async function siglipClassifierAvailability(fetcher = fetch, { hostname = globalThis.location?.hostname } = {}) {
   try {
     const policy = await loadPolicy(fetcher);
-    const enabled = policy.release_ready === true && policy.recognition_enabled === true;
+    const enabled = canRunSiglipPolicy(policy, hostname);
     return {
       enabled,
+      ...(enabled && policy.experimental_preview ? { experimental: true } : {}),
       reason: enabled ? "" : "recognition_paused",
       message: enabled ? "" : FIXED_MESSAGES.recognition_paused,
     };
@@ -649,6 +678,7 @@ export async function classifyWithSiglipCandidate(file, {
   importer,
   onProgress = () => {},
   signal,
+  hostname = globalThis.location?.hostname,
 } = {}) {
   const validation = validatePhotoFile(file);
   if (!validation.ok) throw fixedError("prediction_failed");
@@ -660,7 +690,7 @@ export async function classifyWithSiglipCandidate(file, {
       assertNotAborted(signal);
       const policy = await loadPolicy(fetcher);
       assertNotAborted(signal);
-      if (!(policy.release_ready && policy.recognition_enabled)) {
+      if (!canRunSiglipPolicy(policy, hostname)) {
         return { accepted: false, requiresConfirmation: false, alternatives: [], reason: "recognition_paused", message: FIXED_MESSAGES.recognition_paused };
       }
       // Reject spoofed or decode-bomb-like files before importing the runtime,
@@ -688,7 +718,7 @@ export async function classifyWithSiglipCandidate(file, {
       // load. A policy revoked during download or inference cannot show a result.
       const latestPolicy = await loadPolicy(fetcher);
       assertNotAborted(signal);
-      if (!(latestPolicy.release_ready && latestPolicy.recognition_enabled)) {
+      if (!canRunSiglipPolicy(latestPolicy, hostname)) {
         return { accepted: false, requiresConfirmation: false, alternatives: [], reason: "recognition_paused", message: FIXED_MESSAGES.recognition_paused };
       }
       return suggestionFromSiglipScores(cosineScores(tensor.data, vectors), vectors, policy);

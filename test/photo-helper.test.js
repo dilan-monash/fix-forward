@@ -212,3 +212,17 @@ test("availability and recognition errors do not expose arbitrary debug text", a
   assert.equal(unavailable.container.hidden, true);
   assert.doesNotMatch(unavailable.container.textContent, /INTERNAL_SECRET/);
 });
+
+// Preview disclosure is visible before selecting a file; no model runs on entry.
+test("experimental preview is labelled and leaves confirmation mandatory", async (t) => {
+  const ui = await setup(t, { availability: async () => ({ enabled: true, experimental: true }) });
+  assert.match(ui.container.textContent, /Experimental photo helper/);
+  assert.match(ui.container.textContent, /cannot identify faults, check recalls or confirm safety/);
+  assert.equal(ui.recognitions(), 0);
+  ui.choose();
+  await settle();
+  assert.deepEqual(ui.confirmed, []);
+  ui.query("#confirm-photo-appliance").click();
+  assert.equal(ui.confirmed.length, 1);
+  assert.match(ui.query("#photo-detect-status").textContent, /selected/);
+});

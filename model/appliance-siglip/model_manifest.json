@@ -1,32 +1,32 @@
 {
-  "_comment": "Candidate-v2 runtime snapshot retained as failed local evidence. Both release flags must stay false because the whole pre-registered gate failed.",
-  "candidate_id": "fixforward-siglip2-class-threshold-candidate-v2",
+  "_comment": "User-authorised I3 experimental preview on 10 October 2026. The frozen v3 gate did not pass. Recognition is an optional appliance-type suggestion requiring confirmation; release_ready remains false. Main and I2 are not enabled by this preview.",
+  "candidate_id": "fixforward-siglip2-selective-class-threshold-candidate-v3",
   "policy_version": 2,
   "model_name": "siglip2-base-patch32-256-vision-q4",
   "release_ready": false,
-  "recognition_enabled": false,
-  "validation_status": "failed_candidate_v2_pre_registered_gate",
-  "validation_reason": "Candidate v2 accepted 43/81 operational positives correctly (53.086% coverage) with zero wrong or true-OOD accepts, but blender, food_processor, mixer, shaver, toaster and vaccum_cleaner each had zero accepted-correct examples, so the whole frozen gate failed.",
+  "recognition_enabled": true,
+  "validation_status": "experimental_preview_v3_gate_not_passed",
+  "validation_reason": "Incomplete diagnostic: 11/21 enabled photos accepted correctly, 0/158 unrelated images accepted; air fryers all rejected and several classes unrepresented. Not general accuracy evidence.",
   "enabled_classes": [
     "air_fryer",
-    "blender",
     "coffee_machine",
     "fan",
-    "food_processor",
     "hair_dryer",
     "kettle",
     "microwave",
-    "mixer",
     "portable_ac",
     "portable_heater",
     "rice_cooker",
     "sandwich_press",
-    "shaver",
-    "straightener",
-    "toaster",
-    "vaccum_cleaner"
+    "straightener"
   ],
   "manual_only_classes": [
+    "blender",
+    "food_processor",
+    "mixer",
+    "shaver",
+    "toaster",
+    "vaccum_cleaner",
     "dehumidifier",
     "steam_cleaner"
   ],
@@ -58,7 +58,7 @@
         "sha256": "c46655e8a94afc45338d4cb2b840475f88e5012d524509916e505079c00bfa39"
       }
     },
-    "load_policy": "Load only after a person chooses a valid photo and only when both release_ready and recognition_enabled are true."
+    "load_policy": "Load only after a valid photo is chosen and the I3/loopback experimental preview is authorised by the browser policy. Photos remain local; confirmation is required."
   },
   "vision_model": {
     "repository": "siglip2-base-patch32-256",
@@ -81,16 +81,12 @@
     "vectors_sha256": "2e63f55601cf3f011bf13b3c347bd456111c1b8132f9d8164105fff0a29877f2"
   },
   "acceptance": {
-    "rule": "The top appliance label must be enabled and both thresholds for that winning label must pass. Never fall through to a lower-ranked enabled label.",
+    "rule": "The top appliance label must be enabled and both frozen thresholds for that winning label must pass. Never fall through to a lower-ranked enabled label.",
     "comparison": "greater_than_or_equal",
     "class_thresholds": {
       "air_fryer": {
         "min_ood_margin": 0.0312,
         "min_positive_margin": 0.0386
-      },
-      "blender": {
-        "min_ood_margin": 0.0215,
-        "min_positive_margin": 0.0362
       },
       "coffee_machine": {
         "min_ood_margin": 0.0283,
@@ -99,10 +95,6 @@
       "fan": {
         "min_ood_margin": 0.0226,
         "min_positive_margin": 0.0349
-      },
-      "food_processor": {
-        "min_ood_margin": 0.0283,
-        "min_positive_margin": 0.0282
       },
       "hair_dryer": {
         "min_ood_margin": 0.0093,
@@ -115,10 +107,6 @@
       "microwave": {
         "min_ood_margin": 0.0044,
         "min_positive_margin": 0.0408
-      },
-      "mixer": {
-        "min_ood_margin": 0.0324,
-        "min_positive_margin": 0.0111
       },
       "portable_ac": {
         "min_ood_margin": 0.054,
@@ -136,21 +124,9 @@
         "min_ood_margin": 0.0309,
         "min_positive_margin": 0.0088
       },
-      "shaver": {
-        "min_ood_margin": 0.0493,
-        "min_positive_margin": 0.0583
-      },
       "straightener": {
         "min_ood_margin": 0.0061,
         "min_positive_margin": 0.0027
-      },
-      "toaster": {
-        "min_ood_margin": 0.0358,
-        "min_positive_margin": 0.0497
-      },
-      "vaccum_cleaner": {
-        "min_ood_margin": 0.0484,
-        "min_positive_margin": 0.0224
       }
     },
     "score_notice": "Cosine margins are internal rejection evidence, not a user-facing confidence percentage."
@@ -234,5 +210,7 @@
       "The cohort results are not a population accuracy estimate.",
       "Zero observed false accepts does not establish a zero false-accept rate."
     ]
-  }
+  },
+  "experimental_preview": true,
+  "preview_evidence": "model/appliance-siglip/diagnostics/2026-10-10/candidate-v3-diagnostic-gate-decision.json"
 }

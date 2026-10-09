@@ -1,4 +1,4 @@
-// Optional photo UI for the adult journey. The disabled-by-policy SigLIP helper
+// Optional photo UI for the adult journey. The policy-controlled SigLIP helper
 // is the only default recogniser; this module never loads a remote runtime or
 // uploads a photo. A suggestion changes the appliance only after confirmation.
 import { APPLIANCE_CLASSES, validatePhotoFile } from "./appliance-classifier.js?v=i3-photo-review-2";
@@ -7,7 +7,7 @@ import {
   friendlySiglipError,
   releaseSiglipModelSession,
   siglipClassifierAvailability,
-} from "./siglip-appliance-classifier.js?v=i3-siglip-local-2";
+} from "./siglip-appliance-classifier.js?v=i3-photo-preview-3";
 
 const FIRST_USE_DOWNLOAD = "about 92 MB";
 
@@ -40,7 +40,7 @@ export function mountPhotoHelper(container, {
   };
 
   // A paused experiment should not add a dead card to the adult journey. Keep
-  // this region absent until policy confirms that a validated helper can run.
+  // this region absent until policy permits either release use or the explicitly labelled I3 preview.
   container.replaceChildren();
   container.hidden = true;
 
@@ -73,7 +73,8 @@ export function mountPhotoHelper(container, {
       return;
     }
     container.innerHTML = `<section class="photo-detect-card" aria-labelledby="photo-detect-title">
-      <div><p class="eyebrow">Optional photo helper</p><h2 id="photo-detect-title">Would a photo help?</h2>
+      <div><p class="eyebrow">${policy.experimental ? "Experimental photo helper" : "Optional photo helper"}</p><h2 id="photo-detect-title">Identify an appliance from a photo</h2>
+      <p>Try one clear photo of the whole appliance. This preview may be wrong or unable to suggest a type. It cannot identify faults, check recalls or confirm safety.</p>
       <p class="photo-download-note">First use downloads ${FIRST_USE_DOWNLOAD}. Wi-Fi is recommended.</p>
       <p id="photo-detect-status" role="status" aria-live="polite"></p></div>
       <div class="photo-detect-actions" id="photo-input-controls"></div>
@@ -162,6 +163,7 @@ export function mountPhotoHelper(container, {
           clearSuggestion();
           clearInputs();
           container.dataset.photoHelperStatus = "confirmed";
+          status.textContent = `${confirmed.label} selected. Add the brand and model below if you know them.`;
           onConfirm(confirmed);
         });
         result.querySelector("#reject-photo-appliance").addEventListener("click", manualChoice);

@@ -7,7 +7,7 @@ import { matchRecall, findSuburbSuggestions, resolveAreaInput, getNearbyLocation
 import { productSuggestions } from '../../src/product-suggestions.js';
 import { SUBURB_POSTCODES } from '../../src/suburb-index.js';
 import { PRICE_SNAPSHOT } from '../../src/price-snapshot.js';
-import { mountPhotoHelper } from '../../src/photo-helper.js';
+import { mountPhotoHelper } from '../../src/photo-helper.js?v=i3-photo-preview-3';
 
 const RECALL_SOURCE = 'https://www.productsafety.gov.au/recalls';
 const RECYCLE_SOURCE = 'https://www.environment.vic.gov.au/household-waste-recycling/ewaste';
@@ -200,7 +200,7 @@ export function mountAction(host, { route = 'action?kind=recall', onNavigate = (
       <label class="action-field">Model number <span class="action-optional">if known</span><input name="model" id="action-model" value="${escape(draft.model)}" list="action-models" maxlength="50" autocomplete="off" placeholder="From the appliance label"><datalist id="action-models"></datalist></label></div>
       <p class="action-small">Type your own details or choose a suggestion. A suggested model is not a recall result.</p>
       <details class="action-details"><summary>Where is the model number?</summary><p>Check the packaging, manual or label when accessible. Do not move a hot, damaged or connected appliance to look for it. It may say “Model”, “Model No.” or “Type”.</p></details>
-      <details class="action-details"><summary>About photo suggestions</summary><p>Our optional photo helper suggests an appliance type only. It cannot read brand or model numbers, find a fault, or confirm a recall.</p><p>Photo suggestions are currently paused while accuracy is checked. The form works without them.</p></details>
+      <details class="action-details"><summary>About photo suggestions</summary><p>Our optional photo helper suggests an appliance type only. It cannot read brand or model numbers, find a fault, or confirm a recall.</p><p>The experimental helper can be wrong or unable to suggest a type. You must confirm any suggestion. Selecting an appliance manually always works.</p></details>
       <button type="submit" class="button primary action-submit">Check recall records <span aria-hidden="true">→</span></button>
       <p class="action-small" data-data-status role="status">Checking record availability…</p>
     </form><aside class="action-side-note"><p class="eyebrow">Why check first?</p><h2>The next step may already be set out.</h2><p>A recall notice explains the issue and what the supplier asks owners to do.</p><div class="action-note-rule"></div><p><strong>A clear result takes the right details.</strong></p><p>We search a limited collection of reviewed notices. The official notice is the place to confirm models, dates and instructions.</p>${link(RECALL_SOURCE, 'Open official recall search', 'action-text-link')}</aside></div>
