@@ -97,6 +97,21 @@ const datasets = new Map([
   ["/api/health", { status: "ok", mode: "synthetic-test-only", database: "not-used", ...meta }]
 ]);
 
+// Mirror Flask's exact self-hosted candidate list. The fixture server exposes
+// no other model/runtime files, even when extra files exist in those folders.
+const siglipAssets = new Set([
+  "/model/appliance-siglip/model_manifest.json",
+  "/model/appliance-siglip/text-embeddings.json",
+  "/model/appliance-siglip/text-embeddings.f32",
+  "/vendor/transformers/transformers.min.js",
+  "/vendor/transformers/ort-wasm-simd-threaded.jsep.mjs",
+  "/vendor/transformers/ort-wasm-simd-threaded.jsep.wasm",
+  "/model/appliance-siglip/upstream/siglip2-base-patch32-256/config.json",
+  "/model/appliance-siglip/upstream/siglip2-base-patch32-256/preprocessor_config.json",
+  "/model/appliance-siglip/upstream/siglip2-base-patch32-256/onnx/vision_model.9e82237d9a1d89948502aff9df02129c28698d793e01f15f62e2267682615499_q4.onnx",
+]);
+const binaryExtensions = new Set([".mp3", ".f32", ".onnx", ".wasm"]);
+
 // Return one labelled, non-cached fixture response. HEAD returns headers without a body.
 function send(request, response, status, body, type = "text/plain; charset=utf-8", headers = {}) {
   response.writeHead(status, {
@@ -136,15 +151,18 @@ const server = http.createServer(async (request, response) => {
   // backend files, local reports, fixtures or any file outside this workspace.
   // Keep browser review aligned with Flask's explicitly served local styles.
   const permitted = route === "/" || ["/index.html", "/styles.css", "/404.html", "/500.html", "/favicon.svg", "/quest", "/quest/", "/quest/index.html", "/quest/quest.css", "/quest/play-effects.css", "/quest/tablet-play.css", "/quest/game-feel.css", "/quest/clue-play.css", "/quest/family-guide.css", "/quest/visual-play.css", "/quest/word-help.css", "/quest/touch-fx.css", "/quest/scene-play.css", "/quest/adventure-world.css", "/quest/sort-demo.css", "/quest/learning-focus.css", "/quest/audio/story-manifest.js", "/quest/audio/KOKORO-LICENSE.txt"].includes(route)
+    // Read only the reviewed policies, runtime and content-addressed weights.
+    || route === "/model/appliance-classifier/model_manifest.json"
+    || siglipAssets.has(route)
     || /^\/quest\/audio\/[a-f0-9]{16}\.mp3$/.test(route)
     || /^\/(src|quest)\/[a-zA-Z0-9_-]+\.js$/.test(route);
   if (!permitted) { send(request, response, 404, "Not found."); return; }
   const relative = route === "/" ? "index.html" : ["/quest", "/quest/"].includes(route) ? "quest/index.html" : route.slice(1);
   try {
     const extension = path.extname(relative);
-    // MP3 is binary. UTF-8 decoding would corrupt a generated story recording.
-    let content = await readFile(path.join(workspace, relative), extension === ".mp3" ? undefined : "utf8");
-    const type = extension === ".mp3" ? "audio/mpeg" : extension === ".txt" ? "text/plain; charset=utf-8" : extension === ".js" ? "text/javascript; charset=utf-8"
+    // Audio, WASM, ONNX and raw float vectors must never pass through UTF-8 decoding.
+    let content = await readFile(path.join(workspace, relative), binaryExtensions.has(extension) ? undefined : "utf8");
+    const type = extension === ".json" ? "application/json; charset=utf-8" : extension === ".mp3" ? "audio/mpeg" : extension === ".wasm" ? "application/wasm" : [".f32", ".onnx"].includes(extension) ? "application/octet-stream" : extension === ".txt" ? "text/plain; charset=utf-8" : [".js", ".mjs"].includes(extension) ? "text/javascript; charset=utf-8"
       : extension === ".css" ? "text/css; charset=utf-8" : extension === ".svg" ? "image/svg+xml" : "text/html; charset=utf-8";
     // Tablet audio may ask for a byte range when resuming. Return binary bytes,
     // just as Flask's send_from_directory does in the real application.

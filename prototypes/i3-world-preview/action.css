@@ -1,0 +1,127 @@
+/* Adult tools belong to the same editorial green/lime world as Explore. Every
+   selector stays within .action-view, so the live app and older preview are untouched. */
+.action-view { --action-ink: var(--ink, #123b36); --action-paper: var(--paper, #f7f5ef); --action-lime: var(--accent, #bde876); --action-blue: var(--blue, #4463d5); max-width: 1250px; padding: 48px 32px 72px; margin: auto; color: var(--action-ink); }
+.action-view h1, .action-view h2, .action-view h3 { color: var(--action-ink); }
+.action-view h1 { margin: 14px 0 20px; font-size: clamp(2.6rem, 5.3vw, 4.65rem); line-height: 1.04; letter-spacing: -.06em; font-weight: 600; }
+.action-view h2 { margin: 0 0 12px; font-size: clamp(1.5rem, 2.3vw, 2rem); font-weight: 550; line-height: 1.16; letter-spacing: -.04em; }
+.action-view h3 { margin: 0 0 10px; font-size: 1.05rem; line-height: 1.35; font-weight: 650; }
+.action-view p { line-height: 1.65; }
+.action-eyebrow, .action-view .eyebrow { font-size: .69rem; text-transform: uppercase; letter-spacing: .16em; font-weight: 750; line-height: 1.6; margin: 0 0 13px; color: #54756b; }
+.action-heading { display: flex; justify-content: space-between; align-items: end; gap: 32px; margin-bottom: 34px; }
+.action-heading > div:first-child { max-width: 760px; }
+.action-heading p:last-child { color: #59706b; max-width: 620px; font-size: 1.03rem; margin: 0; }
+.action-heading-aside { display: flex; gap: 11px; align-items: start; border-top: 1px solid #c4cfc5; padding-top: 17px; flex: 0 0 200px; margin-bottom: 5px; font-size: .77rem; line-height: 1.6; color: #71837d; }
+.action-heading-aside strong { color: var(--action-ink); font-weight: 600; }
+.action-status-dot { width: 7px; height: 7px; border-radius: 50%; background: #6b963e; margin-top: 6px; }
+
+/* Four equally visible adult pathways avoid making a parent enter a game to find help. */
+.action-pathways { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid #cbd5cb; border-radius: 12px; overflow: hidden; margin-bottom: 32px; }
+.action-pathways button { border: 0; border-right: 1px solid #cbd5cb; background: transparent; min-height: 90px; padding: 18px 22px; display: grid; grid-template-columns: 1fr auto; gap: 8px; color: var(--action-ink); text-align: left; font: inherit; font-size: .9rem; font-weight: 650; cursor: pointer; transition: background .18s ease; }
+.action-pathways button:last-child { border-right: 0; }
+.action-pathways button > span { grid-column: 1 / -1; font-size: .66rem; letter-spacing: .1em; opacity: .65; font-weight: 500; }
+.action-pathways button i { font-style: normal; font-size: 1.05rem; }
+.action-pathways button:hover { background: #e8efdf; }
+.action-pathways button[aria-current] { background: var(--action-ink); color: white; }
+.action-pathways button:focus-visible { outline: 3px solid var(--action-blue); outline-offset: -4px; }
+
+/* The main task keeps stable form dimensions; secondary explanation is quieter
+   but large enough for owners to understand why and how the result is limited. */
+.action-main-grid { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(270px, 1fr); gap: 24px; align-items: start; }
+.action-panel { background: #fff; border: 1px solid #d9dfd5; border-radius: 14px; padding: 32px; }
+.action-panel-heading { margin-bottom: 25px; }
+.action-panel-heading p:last-child { color: #687a73; margin: 0; font-size: .9rem; }
+.action-side-note { padding: 32px; background: #e9eee3; border: 1px solid #dce3d4; border-radius: 14px; }
+.action-side-note h2 { max-width: 310px; margin-top: 21px; font-size: 1.85rem; }
+.action-side-note p { color: #567068; font-size: .91rem; }
+.action-side-note strong { color: var(--action-ink); }
+.action-note-rule { height: 1px; background: #cbd5c7; margin: 24px 0; }
+.action-field { display: flex; flex-direction: column; gap: 9px; margin: 19px 0; font-size: .83rem; font-weight: 650; }
+.action-field input, .action-field select { color: #213e36; width: 100%; min-height: 50px; padding: 12px 13px; box-sizing: border-box; background: white; border: 1px solid #c1cec3; border-radius: 7px; font: inherit; font-weight: 450; font-size: .94rem; }
+.action-field input:focus, .action-field select:focus { border-color: var(--action-blue); outline: 3px solid #4463d526; }
+.action-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.action-optional { font-weight: 400; font-size: .75rem; color: #718179; }
+.action-view .action-small { font-size: .76rem; color: #63776e; line-height: 1.65; }
+.action-coverage { background: #fff2d8; border-left: 3px solid #c99744; border-radius: 0 6px 6px 0; padding: 13px 15px; font-size: .82rem; color: #68572c; }
+.action-coverage[hidden] { display: none; }
+.action-details { border-top: 1px solid #e1e6de; margin: 14px 0 0; padding: 10px 0 0; }
+.action-details summary { cursor: pointer; min-height: 36px; padding: 8px 0; font-size: .82rem; color: #526b5e; font-weight: 600; }
+.action-details p { font-size: .82rem; color: #667c6e; }
+.action-view .button { display: inline-flex; align-items: center; justify-content: center; gap: 18px; min-height: 48px; padding: 13px 18px; border-radius: 7px; font: inherit; font-size: .86rem; font-weight: 650; cursor: pointer; text-decoration: none; box-sizing: border-box; transition: transform .16s ease, background .16s ease; }
+.action-view .button:active { transform: translateY(1px); }
+.action-view .button.primary { color: var(--action-ink); background: var(--action-lime); border: 1px solid var(--action-lime); }
+.action-view .button.primary:hover { background: #cbee99; }
+.action-view .button.secondary { color: var(--action-ink); background: transparent; border: 1px solid #aebdaf; }
+.action-view .button.secondary:hover { background: #ecf0e7; }
+.action-view .button:focus-visible, .action-text-link:focus-visible { outline: 3px solid var(--action-blue); outline-offset: 3px; }
+.action-submit { width: 100%; margin-top: 22px; }
+.action-text-link { display: inline-block; color: #315859; border: 0; background: none; padding: 8px 0; font: inherit; font-size: .84rem; font-weight: 650; cursor: pointer; text-decoration: underline; text-underline-offset: 5px; line-height: 1.5; }
+.action-text-link[hidden] { display: none; }
+
+/* Suburb options are ordinary large buttons rather than a mouse-only dropdown. */
+.action-area-options:empty { display: none; }
+.action-area-options { padding: 13px; background: #f3f6ee; border: 1px solid #d4ded0; border-radius: 8px; margin-top: -8px; }
+.action-area-options p { margin: 0 0 9px; font-size: .78rem; font-weight: 650; }
+.action-area-options [role=group] { display: flex; gap: 8px; flex-wrap: wrap; }
+.action-area-option { display: flex; gap: 12px; align-items: center; min-height: 44px; border: 1px solid #cbd5c4; border-radius: 6px; padding: 8px 11px; background: white; color: var(--action-ink); font: inherit; font-size: .82rem; cursor: pointer; }
+.action-area-option span { color: #768678; font-size: .72rem; }
+.action-area-option:hover, .action-area-option:focus-visible { border-color: #6c8e69; background: #eaf0e2; }
+.action-field-error { color: #9b432d; font-weight: 600; font-size: .8rem; }
+.action-field input[aria-invalid=true] { border-color: #ae5039; }
+.action-result:empty { display: none; }
+.action-result { margin-top: 24px; scroll-margin-top: 112px; }
+.action-result-box { border: 1px solid #d6dfd3; padding: 30px; border-radius: 14px; background: white; }
+.action-result-box > p { max-width: 860px; font-size: .91rem; color: #536d63; }
+.action-result-caution { background: #fff7e9; border-color: #dabf87; }
+.action-identity-pill { display: inline-block; padding: 9px 13px; border: 1px solid #d4dfcf; background: #f1f5ed; border-radius: 7px; font-weight: 650; }
+.action-actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 18px 0; }
+.action-notices, .action-location-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.action-notices article, .action-location { padding: 22px; background: #f6f8f2; border: 1px solid #dce3d7; border-radius: 10px; }
+.action-finder-card { display: flex; align-items: start; gap: 22px; background: #edf1e8; border-radius: 10px; padding: 26px; margin-top: 22px; }
+.action-finder-card p { font-size: .9rem; max-width: 720px; color: #587063; }
+.action-finder-icon { font-size: 2rem; color: #496e4f; }
+.action-plan { margin-top: 24px; padding-top: 22px; border-top: 1px solid #dde5d8; }
+.action-plan p { font-size: .85rem; color: #65796b; }
+.action-plan label { display: flex; align-items: center; gap: 12px; padding: 10px 0; font-size: .9rem; cursor: pointer; line-height: 1.5; }
+.action-plan input { accent-color: #426d47; width: 21px; height: 21px; flex: 0 0 21px; }
+.action-plan-status, .action-reuse-status { font-weight: 650; min-height: 25px; }
+.action-reuse-warning { border-left: 3px solid #d49f4f; background: #fff4df; padding: 20px; margin: 20px 0; border-radius: 0 7px 7px 0; }
+.action-reuse-warning[hidden] { display: none; }
+.action-reuse-warning p { font-size: .85rem; }
+.action-learning-handoff { display: flex; gap: 14px; align-items: center; padding: 14px 20px; margin: 0 0 24px; border: 1px solid #d6e0cb; background: #edf3e3; border-radius: 10px; }
+.action-learning-handoff p { font-size: .87rem; margin: 0; }
+
+/* A persistent personal task turns adult research into a useful return visit.
+   This is a self-authored plan, never a fabricated impact/CO2 achievement. */
+.action-personal-plan { display: grid; grid-template-columns: 1fr 1.1fr; gap: 70px; background: #173f35; color: #e8f0e5; border-radius: 15px; padding: 38px; margin-top: 34px; }
+.action-personal-plan h2 { color: #f4f6ef; font-size: 2rem; }
+.action-personal-plan > div > p { color: #b4cabc; font-size: .92rem; }
+.action-personal-plan .action-eyebrow { color: #b7d895; }
+.action-personal-plan strong { color: #e7efdc; }
+.action-personal-plan .action-field { margin-top: 0; }
+.action-personal-plan .action-optional { color: #afc2b3; }
+.action-personal-plan .action-small { color: #b8ccbc; margin-bottom: 0; }
+.action-personal-plan .action-text-link { color: #d3e2c4; }
+.action-plan-proof { display: flex; gap: 17px; align-items: center; border-top: 1px solid #436451; padding-top: 20px; margin-top: 28px; }
+.action-plan-proof > span { display: grid; place-items: center; width: 42px; height: 42px; border: 1px solid #668563; border-radius: 50%; font-size: 1.5rem; color: #bde876; }
+.action-plan-proof p { font-size: .76rem; color: #acc1ad; margin: 0; }
+.action-plan-buttons { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.action-family-bridge { display: flex; align-items: center; gap: 26px; padding: 34px 0 0; margin-top: 32px; border-top: 1px solid #ccd7c9; }
+.action-family-bridge > div:nth-child(2) { flex: 1; }
+.action-family-bridge h2 { font-size: 1.35rem; }
+.action-family-bridge p:not(.action-eyebrow) { color: #617767; max-width: 680px; font-size: .85rem; margin-bottom: 0; }
+.action-family-bridge .button { flex-shrink: 0; }
+.action-bridge-symbol { width: 55px; height: 55px; flex-shrink: 0; display: grid; place-items: center; border: 1px solid #c4d2be; border-radius: 50%; font-size: 1.7rem; color: #567259; }
+
+/* The existing AI view is styled if policy later permits it. CSS cannot change
+   that policy, start inference, or download model weights. */
+.action-view .photo-detect-card { background: #f0f4eb; border: 1px solid #d2ddc9; border-radius: 10px; padding: 20px; }
+.action-view .photo-detect-actions { display: grid; gap: 12px; }
+.action-view .photo-dropzone { display: grid; gap: 10px; padding: 20px; border: 2px dashed #adc29e; border-radius: 8px; }
+.action-view .photo-dropzone.drag-over { background: #e1eecf; }
+.action-view .text-button { color: var(--action-ink); font: inherit; padding: 10px; border: 0; background: none; cursor: pointer; }
+
+/* Tablets retain adult-sized controls; a phone stacks content without shrinking it. */
+@media (max-width: 900px) { .action-view { padding: 34px 24px 60px; } .action-heading-aside { display: none; } .action-main-grid { grid-template-columns: minmax(0, 1.4fr) minmax(230px, 1fr); gap: 18px; } .action-panel, .action-side-note { padding: 24px; } .action-pathways button { padding: 16px; font-size: .8rem; } .action-personal-plan { gap: 36px; padding: 30px; } .action-family-bridge { flex-wrap: wrap; } .action-family-bridge .button { margin-left: 81px; } }
+@media (max-width: 680px) { .action-view { padding: 25px 18px 44px; } .action-main-grid, .action-personal-plan { grid-template-columns: 1fr; } .action-heading h1 { font-size: 2.65rem; } .action-heading p:last-child { font-size: .93rem; } .action-pathways { grid-template-columns: repeat(2, 1fr); } .action-pathways button { min-height: 78px; } .action-pathways button:nth-child(2) { border-right: 0; } .action-pathways button:nth-child(-n+2) { border-bottom: 1px solid #cbd5cb; } .action-side-note h2 { max-width: none; } .action-side-note { padding: 25px; } .action-personal-plan { gap: 22px; padding: 26px; } .action-plan-proof { display: none; } .action-family-bridge { gap: 18px; } .action-family-bridge .button { margin-left: 0; } .action-bridge-symbol { display: none; } .action-family-bridge > div:nth-child(2) { flex-basis: 100%; } .action-notices, .action-location-grid { grid-template-columns: 1fr; } .action-finder-icon { display: none; } }
+@media (max-width: 420px) { .action-field-row { grid-template-columns: 1fr; gap: 0; } .action-field-row .action-field { margin: 10px 0; } .action-panel, .action-result-box { padding: 22px; } .action-heading h1 { font-size: 2.35rem; } }
+@media (prefers-reduced-motion: reduce) { .action-view .button, .action-pathways button { transition: none; } }

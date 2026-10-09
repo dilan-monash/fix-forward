@@ -1,0 +1,31 @@
+<!doctype html>
+<!-- Iteration 3 family frontend, served behind the existing Flask access gate. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#123b36">
+  <meta name="description" content="Explore everyday appliances in 3D, understand their impact, and find a thoughtful next step with FixForward.">
+  <title>FixForward — Give good things a longer life.</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/prototypes/i3-world-preview/world.css">
+  <link rel="stylesheet" href="/prototypes/i3-world-preview/explore.css">
+  <link rel="stylesheet" href="/prototypes/i3-world-preview/action.css">
+  <link rel="stylesheet" href="/prototypes/i3-family-preview/sorting.css">
+  <!-- Feature code uses modules; the 3D library is hosted locally and loaded when needed. -->
+  <script type="module" src="/prototypes/i3-world-preview/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <!-- The existing logo's two shapes and original colours are preserved in world.css. -->
+    <a class="brand" href="#home" aria-label="FixForward home"><span class="brand-mark" aria-hidden="true"></span><span><strong>FixForward</strong><small>Know your options</small></span></a>
+    <nav aria-label="Main navigation"><a href="#home" data-nav="home">Home</a><a href="#explore" data-nav="explore">Explore in 3D</a><a href="#action" data-nav="action">Take action</a><a href="#learn" data-nav="learn">Learn together</a></nav>
+    <div class="header-tools"><button id="sound-toggle" class="sound-toggle" aria-label="Turn on activity sounds" aria-pressed="false" type="button"><span aria-hidden="true">♪</span><span id="sound-label">Sound off</span></button><a href="#journal" class="space-link" id="spark-pocket" aria-label="My space, 0 sparks"><span aria-hidden="true">✧</span><span class="space-label">My space</span><span id="spark-total">0</span></a></div>
+  </header>
+  <main id="main" tabindex="-1"><div id="preview-app"></div></main>
+  <footer class="site-footer"><div><a href="#home">FixForward<span>↗</span></a><p>A little understanding can change what happens next.</p></div><nav aria-label="More information"><a href="#parents">For families</a><a href="#sources">Sources &amp; approach</a><a href="#action">Find a next step</a></nav><small>Learn on screen. Let an adult handle real appliances.</small></footer>
+  <div id="announcement" class="sr-only" role="status" aria-live="polite"></div><div id="reward-layer" aria-hidden="true"></div>
+  <noscript><p>This interactive experience needs JavaScript. Official information is available at <a href="https://www.productsafety.gov.au/recalls">Product Safety Australia</a>.</p></noscript>
+</body>
+</html>

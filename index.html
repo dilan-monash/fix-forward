@@ -19,8 +19,8 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" sizes="any">
   <!-- CSS controls colours, spacing and responsive layouts; it does not make appliance decisions. -->
   <link rel="stylesheet" href="styles.css">
-  <!-- TensorFlow.js runs the adult photo classifier locally; the photo is not uploaded. -->
-  <script defer src="https://unpkg.com/@tensorflow/tfjs@4.22.0/dist/tf.min.js" crossorigin="anonymous"></script>
+  <!-- The optional photo helper checks its disabled-by-default policy first, then
+       loads only same-origin SigLIP assets after a person chooses a photo. -->
   <!-- Native browser modules load the controller and its local imports; there is no bundled app here. -->
   <script type="module" src="src/app.js"></script>
 </head>

@@ -4,6 +4,7 @@
 """Flask application factory for the FixForward public-data API."""
 
 from pathlib import Path
+import hashlib
 import re
 
 from .config import Settings
@@ -11,6 +12,54 @@ from .config import Settings
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 FRONTEND_FILES = {"index.html", "styles.css", "favicon.svg", "404.html", "500.html"}
+
+# The I3 family world is a reviewed entry point, not an open prototype directory.
+# Exact names keep tests, local servers, documentation and future experiments private.
+WORLD_FRONTEND_ASSETS = {
+    f"prototypes/i3-world-preview/{name}" for name in (
+        "index.html", "app.js", "world.css", "world-engine.js", "models.js",
+        "explore.js", "explore.css", "catalogue.js", "action.js", "action.css",
+        "progress.js", "vendor/three.module.js", "vendor/three.core.js",
+        "vendor/OrbitControls.js",
+    )
+} | {"prototypes/i3-family-preview/sorting.js", "prototypes/i3-family-preview/sorting.css"}
+
+# The disabled SigLIP candidate may serve only these reviewed, same-origin files.
+# Keeping exact names here prevents the model folders becoming directory servers.
+SIGLIP_PUBLIC_ASSETS = {
+    "model/appliance-siglip/model_manifest.json",
+    "model/appliance-siglip/text-embeddings.json",
+    "model/appliance-siglip/text-embeddings.f32",
+    "vendor/transformers/transformers.min.js",
+    "vendor/transformers/ort-wasm-simd-threaded.jsep.mjs",
+    "vendor/transformers/ort-wasm-simd-threaded.jsep.wasm",
+    "model/appliance-siglip/upstream/siglip2-base-patch32-256/config.json",
+    "model/appliance-siglip/upstream/siglip2-base-patch32-256/preprocessor_config.json",
+    "model/appliance-siglip/upstream/siglip2-base-patch32-256/onnx/vision_model.9e82237d9a1d89948502aff9df02129c28698d793e01f15f62e2267682615499_q4.onnx",
+}
+
+# Python does not know the ONNX or raw float extensions. Explicit MIME types
+# keep nosniff enabled while allowing browser WASM/model fetches to succeed.
+SIGLIP_ASSET_MIME = {
+    ".f32": "application/octet-stream",
+    ".onnx": "application/octet-stream",
+    ".wasm": "application/wasm",
+    ".mjs": "text/javascript; charset=utf-8",
+}
+
+# The browser deliberately avoids downloading the large model twice merely to
+# hash it. Flask therefore verifies each executable/model artifact once per file
+# version before serving it, then reuses the result while size and mtime match.
+SIGLIP_ASSET_INTEGRITY = {
+    "model/appliance-siglip/text-embeddings.json": (3037, "4b01be52acad78dae1783978e1bc191d50532dc63781a5cd7b96e24f3a390093"),
+    "model/appliance-siglip/text-embeddings.f32": (89088, "2e63f55601cf3f011bf13b3c347bd456111c1b8132f9d8164105fff0a29877f2"),
+    "vendor/transformers/transformers.min.js": (888173, "aa5002b70e789798da263f5f99c62bd3e8fcd0c119258a493c40c180648365fa"),
+    "vendor/transformers/ort-wasm-simd-threaded.jsep.mjs": (44484, "08fb86ec433c78bfb032c5d84a68b8e8e5a8d81268fa39e24314179a5767a5b9"),
+    "vendor/transformers/ort-wasm-simd-threaded.jsep.wasm": (21596019, "c46655e8a94afc45338d4cb2b840475f88e5012d524509916e505079c00bfa39"),
+    "model/appliance-siglip/upstream/siglip2-base-patch32-256/config.json": (480, "9b84493fcc18f5ea0bb6b763ee0e740ea77e4323c431072834a1a8f80a1a21a4"),
+    "model/appliance-siglip/upstream/siglip2-base-patch32-256/preprocessor_config.json": (394, "d14ba2ee3fd816f3de8abaddc31953565128eaf37c73ad4bed32101a98465aff"),
+    "model/appliance-siglip/upstream/siglip2-base-patch32-256/onnx/vision_model.9e82237d9a1d89948502aff9df02129c28698d793e01f15f62e2267682615499_q4.onnx": (69938403, "9e82237d9a1d89948502aff9df02129c28698d793e01f15f62e2267682615499"),
+}
 
 
 # Build one Flask application and attach its configuration, routes and response protections.
@@ -22,7 +71,7 @@ def create_app(test_config=None):
     import time.
     """
 
-    from flask import Flask, jsonify, request, send_from_directory
+    from flask import Flask, jsonify, redirect, request, send_from_directory
     from werkzeug.middleware.proxy_fix import ProxyFix
 
     from .api import api
@@ -48,11 +97,53 @@ def create_app(test_config=None):
     app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
     app.register_blueprint(api)
     configure_access(app)
+    siglip_integrity_cache = {}
+
+    # Fail closed if a deployed executable/model file no longer matches the
+    # reviewed bytes. The cache key includes file metadata, so a replacement is
+    # hashed again without imposing a 70 MB hash on every request.
+    def siglip_asset_has_expected_bytes(asset_path):
+        expected = SIGLIP_ASSET_INTEGRITY.get(asset_path)
+        if expected is None:
+            return True
+        file_path = PROJECT_ROOT / asset_path
+        try:
+            stat = file_path.stat()
+        except OSError:
+            return False
+        expected_size, expected_digest = expected
+        if stat.st_size != expected_size:
+            return False
+        cache_key = (stat.st_size, stat.st_mtime_ns)
+        if siglip_integrity_cache.get(asset_path, {}).get("key") == cache_key:
+            return siglip_integrity_cache[asset_path]["valid"]
+        hasher = hashlib.sha256()
+        try:
+            with file_path.open("rb") as stream:
+                for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                    hasher.update(chunk)
+        except OSError:
+            return False
+        valid = hasher.hexdigest() == expected_digest
+        siglip_integrity_cache[asset_path] = {"key": cache_key, "valid": valid}
+        return valid
 
     @app.get("/")
-    # Serve the existing adult document after the shared access check has passed.
+    @app.get("/index.html")
+    # The same access gate now opens the unified I3 world. Its API calls remain
+    # same-origin GET requests to the existing read-only Flask routes below.
     def index():
+        return send_from_directory(PROJECT_ROOT / "prototypes/i3-world-preview", "index.html")
+
+    @app.get("/legacy")
+    # Keep the approved earlier adult journey available without copying or changing it.
+    def legacy():
         return send_from_directory(PROJECT_ROOT, "index.html")
+
+    @app.get("/legacy/")
+    def legacy_slash():
+        # Its relative stylesheet/script paths require the slash-free document URL.
+        return redirect("/legacy", code=302)
 
     @app.get("/quest")
     @app.get("/quest/")
@@ -66,8 +157,10 @@ def create_app(test_config=None):
     def frontend_asset(asset_path):
         # Only public frontend assets are served. Backend code, migrations and
         # environment templates must never be downloadable from the website.
-        allowed = asset_path in FRONTEND_FILES or (
-            asset_path.startswith("src/") and asset_path.endswith(".js")
+        allowed = asset_path in FRONTEND_FILES or asset_path in WORLD_FRONTEND_ASSETS or (
+            # Only direct app modules are public; src/../prototype tests must
+            # not bypass the exact world allowlist through an alternate path.
+            re.fullmatch(r"src/[A-Za-z0-9_-]+\.js", asset_path) is not None
         ) or (
             asset_path in {"quest/index.html", "quest/quest.css", "quest/app.js",
                            "quest/art.js", "quest/content.js", "quest/engine.js",
@@ -91,24 +184,33 @@ def create_app(test_config=None):
                 asset_path,
             ) is not None
         ) or (
+            asset_path in SIGLIP_PUBLIC_ASSETS
+        ) or (
             # Only generated, content-addressed story audio is public, not arbitrary files.
             re.fullmatch(r"quest/audio/[a-f0-9]{16}\.mp3", asset_path) is not None
         )
         if not allowed:
             return _not_found_response(request.path)
-        return send_from_directory(PROJECT_ROOT, asset_path)
+        if asset_path in SIGLIP_PUBLIC_ASSETS and not siglip_asset_has_expected_bytes(asset_path):
+            # A generic unavailable response keeps corrupt model details out of
+            # the UI; the photo helper converts this into its manual fallback.
+            return "Asset unavailable", 503
+        response = send_from_directory(PROJECT_ROOT, asset_path)
+        explicit_mime = SIGLIP_ASSET_MIME.get(Path(asset_path).suffix.lower())
+        if explicit_mime:
+            response.headers["Content-Type"] = explicit_mime
+        return response
 
     @app.after_request
     # Attach browser protections to every response; HTTPS-only HSTS depends on the trusted proxy scheme.
     def add_security_headers(response):
         # Inline styles remain in the Iteration 1 UI, hence style-src unsafe-inline.
-        # Leaflet 1.9.4 is loaded only on the map screen and pinned with Subresource Integrity; all other scripts are local.
+        # Leaflet 1.9.4 is loaded only on the map screen and pinned with Subresource Integrity.
+        # The optional inference runtime is local; WebAssembly compilation gets
+        # its narrow CSP token without granting general JavaScript eval.
         response.headers["Content-Security-Policy"] = (
             "default-src 'self'; "
-            # TensorFlow.js uses a generated kernel function for its CPU backend.
-            # Keep eval permission scoped to scripts; image bytes still have no
-            # network path because connect-src remains same-origin.
-            "script-src 'self' https://unpkg.com 'unsafe-eval'; "
+            "script-src 'self' https://unpkg.com 'wasm-unsafe-eval'; "
             "style-src 'self' 'unsafe-inline' https://unpkg.com; "
             "img-src 'self' data: https://tile.openstreetmap.org https://unpkg.com; "
             "connect-src 'self'; object-src 'none'; "
@@ -118,7 +220,9 @@ def create_app(test_config=None):
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         response.headers["Permissions-Policy"] = (
-            "camera=(), microphone=(), geolocation=(self), payment=(), usb=()"
+            # WebXR may use spatial tracking after an explicit user permission.
+            # Same-origin camera permission does not start capture on page load.
+            "camera=(self), xr-spatial-tracking=(self), microphone=(), geolocation=(self), payment=(), usb=()"
         )
         if request.is_secure:
             response.headers["Strict-Transport-Security"] = "max-age=31536000"

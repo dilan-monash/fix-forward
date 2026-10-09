@@ -1,0 +1,551 @@
+{
+  "_comment": "Prediction-blind ground truth frozen before the fresh SigLIP2 q4 evaluation. Operational positives exclude collages, severe detail crops, packaging-led retail scenes, ambiguous multi-appliance scenes and visually uncertain rows. A failed pre-registered gate must keep photo recognition disabled.",
+  "audit_id": "fixforward-siglip2-fresh-heldout-ground-truth-v1",
+  "frozen_at_utc": "2026-10-09T02:52:22.066824+00:00",
+  "model_outputs_opened": false,
+  "prediction_scores_opened": false,
+  "thresholds_used_to_label_images": false,
+  "inputs": {
+    "benchmark_lock": {
+      "path": "tmp/appliance-model-frozen-browser-validation-v1/fresh-benchmark-lock.json",
+      "sha256": "ae35785312cd8a36504eba1f92a97383e1929d305e45e4d92cafb7bb628d16d8"
+    },
+    "combined_manifest": {
+      "path": "tmp/appliance-model-frozen-browser-validation-v1/combined-candidate-manifest.json",
+      "sha256": "8eb856efe8d892b38cf5a4ea80867495ff5f72de9a43d269072450752ee4c766"
+    },
+    "openverse_audit_a": {
+      "path": "tmp/appliance-model-frozen-browser-validation-v1/openverse-audit-a.json",
+      "sha256": "f022ee6a76fcaa1f003ca801cde157849036f68ae8137f5736cc1db3442d6404"
+    },
+    "openverse_audit_b": {
+      "path": "tmp/appliance-model-frozen-browser-validation-v1/openverse-audit-b.json",
+      "sha256": "59e833a7d906df5a0d4784f9701f8fe63b995c8f54effd10349bdcad6454a5f7"
+    },
+    "open_images_adjudication": {
+      "path": "tmp/appliance-model-frozen-browser-validation-v1/open-images-fresh/adjudication.json",
+      "sha256": "46685d156a3c209e5d96cabbba33b6d849c0e94d2a2af6f5d4c56f3e99a7b6d8"
+    }
+  },
+  "rules": {
+    "operational_positive": "A visibly correct supported electrical appliance presented as a usable single-photo recognition task. Clear catalogue-style single-appliance images remain eligible because the UI accepts a chosen file; collages, severe detail crops, packaging-led scenes and ambiguous commercial sets do not.",
+    "disabled_class_challenge": "Operational positives in the six manual-only classes remain in the audit. Any accepted enabled-class suggestion for one is a wrong acceptance.",
+    "true_ood": "No supported appliance is visibly established, or the depicted equipment/subtype falls outside FixForward household electrical scope.",
+    "uncertain": "If pixels do not establish the object confidently, exclude it from both positive coverage and true-OOD false-accept rates."
+  },
+  "audited_operational_positive_ids": {
+    "00590a42-d3ba-4230-8468-4f1f24a1232e": "food_processor",
+    "063251d2-46ac-4281-9492-43679820b5d6": "toaster",
+    "182c1f2bfa4b4280": "coffee_machine",
+    "1dc4c4714bb8f4b0": "mixer",
+    "2523ac25dfbfa2f8": "microwave",
+    "2894cb2e-04fd-4b53-be79-fe0fd6e69dba": "sandwich_press",
+    "2a934ad9-081e-4ebc-b48d-812aa3c2b21b": "rice_cooker",
+    "2e53fb7a-9a9a-4996-b625-bc10741d10db": "coffee_machine",
+    "34c42e50-8abd-4e8a-ba91-1ba357db5109": "sandwich_press",
+    "3bafe11f-47ec-4bc5-8596-b99ec500589f": "food_processor",
+    "3dd40beb8e7f03b9": "microwave",
+    "49372d7c-84e9-4ea4-a824-3c8e248a6f78": "shaver",
+    "4d50416ae9b368c1": "microwave",
+    "51d275dd-ad2e-4bf5-8d3f-2a28a33c8d9f": "straightener",
+    "582284dd-c7b1-42b5-8f5f-9e5382bd382d": "air_fryer",
+    "5ad0bacd174019cb": "mixer",
+    "61a27d83-2250-47f9-9725-ea4e631c776a": "kettle",
+    "64878f4d-abda-4aa5-a180-a88682d10f00": "rice_cooker",
+    "6c8a69d1-de1a-41d0-b83f-c27a673a6e65": "toaster",
+    "6dc2e7bd-702c-4e1f-ac12-80414de3c027": "portable_ac",
+    "7549b4cb-3063-4ff3-a018-7a6d6bda4ab9": "fan",
+    "7b6f0e65-5630-481f-9962-2b2426c2fd81": "blender",
+    "7cf9458f30645774": "mixer",
+    "7f7e80a3-218a-4c95-badd-1666638a4c41": "toaster",
+    "800ee74da18e4ed4": "kettle",
+    "840237bed22924e9": "blender",
+    "85d8762b-ff4f-46a1-9b27-37599e597e37": "blender",
+    "8da3d7c3edb36065": "microwave",
+    "8dcb89ad-7cd6-4297-96ee-a0631c3d7561": "straightener",
+    "946e467d-0a4b-4495-9232-d4fd6a86ebe6": "vaccum_cleaner",
+    "94caeae0-ec43-46f8-b176-0a9ccbf765c9": "food_processor",
+    "9f9de0c3-420a-4f7b-859b-64229425de1c": "coffee_machine",
+    "a71de45d-e345-4374-85d3-3f2ba3cce68b": "microwave",
+    "aa9b35d1bee25627": "coffee_machine",
+    "b10730442db3217a": "microwave",
+    "bba20806674cede8": "coffee_machine",
+    "bf6872ad-6e59-4246-9284-c4036dc6534d": "kettle",
+    "ca4d5e79245e98d4": "blender",
+    "ccf21635-d0d2-414c-b8f9-33309f55c14e": "dehumidifier",
+    "cde785b6-f036-4431-b030-8f346dc834ef": "blender",
+    "d09fa078-e6ec-4b8c-8ee8-639b93747d4a": "portable_ac",
+    "d5bf2775-fb5a-447a-97a6-d7f643be597b": "portable_heater",
+    "db4cb441eda40a49": "food_processor",
+    "e6ce9ba3-71c0-4e75-998f-28ed73465137": "shaver",
+    "e78472d3-4797-403b-b276-63b9cfe2410d": "fan",
+    "f1afdb66db749d5e": "blender",
+    "f4b4e8594afb03f2": "mixer",
+    "f907d36a-1ea5-4058-9b6e-3230218ba4ee": "hair_dryer"
+  },
+  "audited_true_ood_ids": [
+    "01a6e2fe-2675-4b62-9f10-d029cd957f48",
+    "0a4c625f-cbfc-48d0-90f3-811006915729",
+    "0a6e7b16-1329-4848-93bd-c8a6d104b0bd",
+    "0af7a0d2-664d-4c5a-92e0-198c89af8dad",
+    "0cb30c92-8dfe-4ba7-bea2-42423ba02f51",
+    "0e0025eb-ed22-4df9-8051-089a086af097",
+    "102f8640-eb15-4f7a-91f8-60db75edb977",
+    "170f9f4d-6600-4f30-868a-0fc282b4a20a",
+    "178fe913-53c9-4156-a884-4aa0abf63fcc",
+    "1d2c5d94-492d-4e32-aedd-55c3d0e374cd",
+    "1e66ae71-ca19-46d3-ab3e-1764324c5afb",
+    "1f035b83-2a7d-464f-b267-1f1f65169134",
+    "2060c72e6db79c09",
+    "2287766d-0af1-4e70-a93d-2d676795c336",
+    "22c70721-d6e6-4b30-ab8f-f11e5fb52dc7",
+    "23c6d25c-c446-4064-8d62-96d19c2bca0c",
+    "24d72d32-0f1d-443a-932a-52b310ca3c29",
+    "29aaae05-8d9c-42e1-b418-4436f6222afb",
+    "2ecbf894-7bbf-4c6e-a094-f042297c68cd",
+    "30aa27d3-013b-4de7-9fa3-e2de3338409b",
+    "32fc733f-7b79-4759-8018-2e91c3680e55",
+    "335dcc47-d3e7-4597-a99e-8ca2d1245d67",
+    "3a62bb98-7084-4056-90be-04cf5172f5f4",
+    "3d32db98-19d3-42f5-b44d-2e7df85e41f0",
+    "4326983a-3d72-4d7c-b6dd-b2a09c6975b9",
+    "43de1865-067c-4f02-ac6d-192e4165aef6",
+    "48226ee0-510d-4e4e-a0b3-c7d5b03ac140",
+    "4a271537-41e0-4772-a2d6-7ac60926c517",
+    "4b71b6a1-010c-4fa3-a12d-6d1f7ad955a8",
+    "4c5723bd-783c-45a5-b64b-57b4d9a2fd12",
+    "534d423e-2c5d-4829-bf0e-a0ec693e2b60",
+    "556c5448-3fce-4f36-81fd-4e3e0544a674",
+    "58c8831f-dae2-4fed-94b9-1ce1ed9ede9d",
+    "5f1198da-443d-4ba0-b3b4-67e8b1831aa2",
+    "65e7ecc7-4a20-49fd-9d25-603a8fabb9f4",
+    "68cfdb11-e220-47f7-90cc-f83cac37a094",
+    "68f8075a-c919-47b0-8931-759a8dd5e757",
+    "69cc2d2f-14dd-430e-8e7b-65d148b17b56",
+    "6b214dbd-bfec-4f16-962c-9480a652af7d",
+    "6e0a2772-daea-4e1d-91d3-185b9d69b600",
+    "70193f7825e12c5c",
+    "7245e173-b5e4-43e7-9ac2-d244d2e477e5",
+    "739b5e8d-d6db-4cfa-ae9a-93960d3ec7d0",
+    "743a437b-a806-41d3-a196-ece974c7a420",
+    "74cad720-064d-47f9-96f7-cd6d1b778351",
+    "77bda6db-f636-4a7e-96d0-a1903bfd572d",
+    "783a9927-d78b-4604-a49a-57c5889369c4",
+    "7bf41735-e90c-4d80-baa9-75b7cf9509a4",
+    "7d46b1db-5903-45fb-9e76-e5584b55f2bf",
+    "7dc14066-ae73-41f0-8e6e-5e07dec0df40",
+    "7e38a545-0a4a-4ac5-875d-2e689036bb8f",
+    "7e97d173-5cfe-47a6-81b3-96e747093a3d",
+    "80381292-e39e-4416-8e9d-eded19f9d6aa",
+    "82fe86da-9a2d-43fe-8b9d-681847ee18a3",
+    "8deaeaef-428e-4397-ae6d-7f34e998f781",
+    "8f1f9457-0d16-4fcf-8b24-cfb62aa1a1df",
+    "91ac1c1a-3b11-4431-ac9a-e2f43b53297d",
+    "92c37820-aa79-4021-be0e-dada6062f8d8",
+    "93af2795-c259-4788-8e14-04cdd7a006c9",
+    "949065d0-85d0-4495-93cb-bf5bce4445d5",
+    "9983e6b8-aec8-4fc9-82e3-58f841fcf11a",
+    "9a7ca73d-1bcc-4c57-8c77-0c9540dd30e5",
+    "9c56d526fd608f18",
+    "9ed56e3a-f68c-42d8-b15e-ec5f15e04db9",
+    "a9f2313d-c28e-4f38-b9ec-7ec24cf67ba8",
+    "ab95ccce-cbdd-41a8-8b50-fc551375bccf",
+    "adbc155d-5376-43ec-8c29-1e193f2a8833",
+    "adfbf82c-d585-4305-a373-1d6c2ff029e9",
+    "b03e86fb-7834-4023-b45a-4e940932f4c2",
+    "b24ba631-8a88-4c3d-b7ae-47a0dff1883f",
+    "b4613b4d-87eb-4ad7-9563-4860563cc048",
+    "b63ef544-ffd3-4279-a60f-4cb6ee15e625",
+    "b6e8fa93-d92e-492c-9790-b54796c4c839",
+    "b74e6caff7b0229a",
+    "bbfc3338-d053-4ee7-899f-2c4bc221d182",
+    "be468317-eee5-4b70-8815-3dae8d09daa3",
+    "bff22353-c13c-4f3d-bbc2-acc37a948083",
+    "c30cd9c9-e051-406b-8484-6d7a7578c544",
+    "cba645a1-3b8f-4281-9f5f-50b79f7b57f3",
+    "cbef14ab-c60e-452f-8941-9f1c5e553412",
+    "cdfb027a-5914-4917-b954-49d2607d8d6d",
+    "cea644a5-c729-46ac-bf0d-632e6ad64105",
+    "d34d1f8d-d07a-4884-b059-4369588938ff",
+    "d47a3525-1af1-4c66-b13a-898b49888fda",
+    "d6954466-7041-42a7-8dbb-20da48d6deda",
+    "dcaf07749bc94f41",
+    "de28dc47-34c8-4e4b-97d5-341a3cb9d8a6",
+    "deec8b13-dc43-4412-ab2c-56ab3676150b",
+    "e0293740-00dc-4764-9b58-2cccc942e491",
+    "e5b41b16-c577-4610-9d4b-e3703f9cc242",
+    "ec37abd4-d10d-4e55-b602-4eb8c0508a1c",
+    "eca5679b-60a1-4512-8030-9977687c2916",
+    "f9665e58-4ac7-4264-9c2a-5d30a22091d2",
+    "fd993800-bfc0-4cf2-a402-91a19badbdf1",
+    "ffafbf37-3475-4654-9cff-49e88092d1c2"
+  ],
+  "supported_challenge_ids": [
+    "07fabe82-992c-412c-ba79-ee7a9f7d4f14",
+    "2fa845a0-7605-44a0-9819-db613fa5bc57",
+    "344c5b69-0236-4322-829c-9dd3fe2a0571",
+    "3d76574f1dec8b0a",
+    "4efcb18f-8cbb-4ed9-902f-c3f350adfd59",
+    "644dc8b5-a8b1-49ea-be47-03a989a1aa44",
+    "83eead6c29129724",
+    "9c9cc9cee894d22e",
+    "a80feff0-ad0c-4ecc-b7a6-5518f896ab76",
+    "aae49885-7c15-40c6-b4ee-37b86a216e44",
+    "e09eadbe-ae2e-4efe-b6cc-044e44dd23a2"
+  ],
+  "excluded_uncertain_ids": [
+    "3d82fef0-1f70-454e-9e9b-99d49d179747"
+  ],
+  "ood_group_by_id": {
+    "01a6e2fe-2675-4b62-9f10-d029cd957f48": "car",
+    "0a4c625f-cbfc-48d0-90f3-811006915729": "backpack",
+    "0a6e7b16-1329-4848-93bd-c8a6d104b0bd": "desk_lamp",
+    "0af7a0d2-664d-4c5a-92e0-198c89af8dad": "chair",
+    "0cb30c92-8dfe-4ba7-bea2-42423ba02f51": "backpack",
+    "0e0025eb-ed22-4df9-8051-089a086af097": "desk",
+    "102f8640-eb15-4f7a-91f8-60db75edb977": "mobile_phone",
+    "170f9f4d-6600-4f30-868a-0fc282b4a20a": "flower",
+    "178fe913-53c9-4156-a884-4aa0abf63fcc": "backpack",
+    "1d2c5d94-492d-4e32-aedd-55c3d0e374cd": "washing_machine",
+    "1e66ae71-ca19-46d3-ab3e-1764324c5afb": "floor_mop",
+    "1f035b83-2a7d-464f-b267-1f1f65169134": "person",
+    "2060c72e6db79c09": "non_electric_kettle_or_vessel",
+    "2287766d-0af1-4e70-a93d-2d676795c336": "car",
+    "22c70721-d6e6-4b30-ab8f-f11e5fb52dc7": "laptop",
+    "23c6d25c-c446-4064-8d62-96d19c2bca0c": "television",
+    "24d72d32-0f1d-443a-932a-52b310ca3c29": "washing_machine",
+    "29aaae05-8d9c-42e1-b418-4436f6222afb": "industrial_or_installed_out_of_scope",
+    "2ecbf894-7bbf-4c6e-a094-f042297c68cd": "chair",
+    "30aa27d3-013b-4de7-9fa3-e2de3338409b": "humidifier",
+    "32fc733f-7b79-4759-8018-2e91c3680e55": "person",
+    "335dcc47-d3e7-4597-a99e-8ca2d1245d67": "laptop",
+    "3a62bb98-7084-4056-90be-04cf5172f5f4": "laptop",
+    "3d32db98-19d3-42f5-b44d-2e7df85e41f0": "clothes_iron",
+    "4326983a-3d72-4d7c-b6dd-b2a09c6975b9": "car",
+    "43de1865-067c-4f02-ac6d-192e4165aef6": "cat",
+    "48226ee0-510d-4e4e-a0b3-c7d5b03ac140": "chair",
+    "4a271537-41e0-4772-a2d6-7ac60926c517": "floor_mop",
+    "4b71b6a1-010c-4fa3-a12d-6d1f7ad955a8": "person",
+    "4c5723bd-783c-45a5-b64b-57b4d9a2fd12": "dog",
+    "534d423e-2c5d-4829-bf0e-a0ec693e2b60": "washing_machine",
+    "556c5448-3fce-4f36-81fd-4e3e0544a674": "humidifier",
+    "58c8831f-dae2-4fed-94b9-1ce1ed9ede9d": "bottle",
+    "5f1198da-443d-4ba0-b3b4-67e8b1831aa2": "backpack",
+    "65e7ecc7-4a20-49fd-9d25-603a8fabb9f4": "television",
+    "68cfdb11-e220-47f7-90cc-f83cac37a094": "washing_machine",
+    "68f8075a-c919-47b0-8931-759a8dd5e757": "television",
+    "69cc2d2f-14dd-430e-8e7b-65d148b17b56": "dog",
+    "6b214dbd-bfec-4f16-962c-9480a652af7d": "flower",
+    "6e0a2772-daea-4e1d-91d3-185b9d69b600": "mobile_phone",
+    "70193f7825e12c5c": "non_electric_kettle_or_vessel",
+    "7245e173-b5e4-43e7-9ac2-d244d2e477e5": "clothes_iron",
+    "739b5e8d-d6db-4cfa-ae9a-93960d3ec7d0": "laptop",
+    "743a437b-a806-41d3-a196-ece974c7a420": "cat",
+    "74cad720-064d-47f9-96f7-cd6d1b778351": "desk_lamp",
+    "77bda6db-f636-4a7e-96d0-a1903bfd572d": "floor_mop",
+    "783a9927-d78b-4604-a49a-57c5889369c4": "bowl",
+    "7bf41735-e90c-4d80-baa9-75b7cf9509a4": "flower",
+    "7d46b1db-5903-45fb-9e76-e5584b55f2bf": "desk",
+    "7dc14066-ae73-41f0-8e6e-5e07dec0df40": "chair",
+    "7e38a545-0a4a-4ac5-875d-2e689036bb8f": "person",
+    "7e97d173-5cfe-47a6-81b3-96e747093a3d": "car",
+    "80381292-e39e-4416-8e9d-eded19f9d6aa": "industrial_or_installed_out_of_scope",
+    "82fe86da-9a2d-43fe-8b9d-681847ee18a3": "cat",
+    "8deaeaef-428e-4397-ae6d-7f34e998f781": "dog",
+    "8f1f9457-0d16-4fcf-8b24-cfb62aa1a1df": "desk_lamp",
+    "91ac1c1a-3b11-4431-ac9a-e2f43b53297d": "desk",
+    "92c37820-aa79-4021-be0e-dada6062f8d8": "television",
+    "93af2795-c259-4788-8e14-04cdd7a006c9": "laptop",
+    "949065d0-85d0-4495-93cb-bf5bce4445d5": "mobile_phone",
+    "9983e6b8-aec8-4fc9-82e3-58f841fcf11a": "person",
+    "9a7ca73d-1bcc-4c57-8c77-0c9540dd30e5": "flower",
+    "9c56d526fd608f18": "hot_water_urn",
+    "9ed56e3a-f68c-42d8-b15e-ec5f15e04db9": "clothes_iron",
+    "a9f2313d-c28e-4f38-b9ec-7ec24cf67ba8": "desk_lamp",
+    "ab95ccce-cbdd-41a8-8b50-fc551375bccf": "flower",
+    "adbc155d-5376-43ec-8c29-1e193f2a8833": "cat",
+    "adfbf82c-d585-4305-a373-1d6c2ff029e9": "desk",
+    "b03e86fb-7834-4023-b45a-4e940932f4c2": "bowl",
+    "b24ba631-8a88-4c3d-b7ae-47a0dff1883f": "bottle",
+    "b4613b4d-87eb-4ad7-9563-4860563cc048": "chair",
+    "b63ef544-ffd3-4279-a60f-4cb6ee15e625": "floor_mop",
+    "b6e8fa93-d92e-492c-9790-b54796c4c839": "dog",
+    "b74e6caff7b0229a": "non_electric_kettle_or_vessel",
+    "bbfc3338-d053-4ee7-899f-2c4bc221d182": "humidifier",
+    "be468317-eee5-4b70-8815-3dae8d09daa3": "bowl",
+    "bff22353-c13c-4f3d-bbc2-acc37a948083": "backpack",
+    "c30cd9c9-e051-406b-8484-6d7a7578c544": "mobile_phone",
+    "cba645a1-3b8f-4281-9f5f-50b79f7b57f3": "car",
+    "cbef14ab-c60e-452f-8941-9f1c5e553412": "desk",
+    "cdfb027a-5914-4917-b954-49d2607d8d6d": "dog",
+    "cea644a5-c729-46ac-bf0d-632e6ad64105": "desk_lamp",
+    "d34d1f8d-d07a-4884-b059-4369588938ff": "bottle",
+    "d47a3525-1af1-4c66-b13a-898b49888fda": "cat",
+    "d6954466-7041-42a7-8dbb-20da48d6deda": "bowl",
+    "dcaf07749bc94f41": "non_electric_kettle_or_vessel",
+    "de28dc47-34c8-4e4b-97d5-341a3cb9d8a6": "bottle",
+    "deec8b13-dc43-4412-ab2c-56ab3676150b": "humidifier",
+    "e0293740-00dc-4764-9b58-2cccc942e491": "television",
+    "e5b41b16-c577-4610-9d4b-e3703f9cc242": "washing_machine",
+    "ec37abd4-d10d-4e55-b602-4eb8c0508a1c": "clothes_iron",
+    "eca5679b-60a1-4512-8030-9977687c2916": "mobile_phone",
+    "f9665e58-4ac7-4264-9c2a-5d30a22091d2": "bottle",
+    "fd993800-bfc0-4cf2-a402-91a19badbdf1": "bowl",
+    "ffafbf37-3475-4654-9cff-49e88092d1c2": "floor_mop"
+  },
+  "counts": {
+    "combined_candidates": 155,
+    "audited_operational_positives": 48,
+    "enabled_class_operational_positives": 37,
+    "manual_only_class_challenges": 11,
+    "true_ood": 95,
+    "ood_source_groups": 21,
+    "supported_non_operational_challenges": 11,
+    "excluded_uncertain": 1
+  },
+  "operational_positive_class_counts": {
+    "air_fryer": 1,
+    "blender": 6,
+    "coffee_machine": 5,
+    "dehumidifier": 1,
+    "fan": 2,
+    "food_processor": 4,
+    "hair_dryer": 1,
+    "kettle": 3,
+    "microwave": 6,
+    "mixer": 4,
+    "portable_ac": 2,
+    "portable_heater": 1,
+    "rice_cooker": 2,
+    "sandwich_press": 2,
+    "shaver": 2,
+    "straightener": 2,
+    "toaster": 3,
+    "vaccum_cleaner": 1
+  },
+  "ood_source_group_counts": {
+    "backpack": 5,
+    "bottle": 5,
+    "bowl": 5,
+    "car": 5,
+    "cat": 5,
+    "chair": 5,
+    "clothes_iron": 4,
+    "desk": 5,
+    "desk_lamp": 5,
+    "dog": 5,
+    "floor_mop": 5,
+    "flower": 5,
+    "hot_water_urn": 1,
+    "humidifier": 4,
+    "industrial_or_installed_out_of_scope": 2,
+    "laptop": 5,
+    "mobile_phone": 5,
+    "non_electric_kettle_or_vessel": 4,
+    "person": 5,
+    "television": 5,
+    "washing_machine": 5
+  },
+  "openverse_adjudication": {
+    "V001": {
+      "decision": "operational_positive",
+      "expected": "air_fryer",
+      "reason": "both blind auditors identify the supported appliance; no excluded challenge rule applies"
+    },
+    "V002": {
+      "decision": "supported_challenge",
+      "reason": "text-heavy infographic/collage"
+    },
+    "V003": {
+      "decision": "operational_positive",
+      "expected": "blender",
+      "reason": "both blind auditors identify the supported appliance; no excluded challenge rule applies"
+    },
+    "V004": {
+      "decision": "operational_positive",
+      "expected": "blender",
+      "reason": "both blind auditors identify the supported appliance; no excluded challenge rule applies"
+    },
+    "V005": {
+      "decision": "operational_positive",
+      "expected": "coffee_machine",
+      "reason": "both blind auditors identify the supported appliance; no excluded challenge rule applies"
+    },
+    "V006": {
+      "decision": "operational_positive",
+      "expected": "coffee_machine",
+      "reason": "both blind auditors identify the supported appliance; no excluded challenge rule applies"
+    },
+    "V007": {
+      "decision": "operational_positive",
+      "expected": "dehumidifier",
+      "reason": "both blind auditors identify the supported appliance; no excluded challenge rule applies"
+    },
+    "V008": {
+      "decision": "true_ood",
+      "reason": "industrial ducted dehumidification cabinet is outside the portable household category"
+    },
+    "V009": {
+      "decision": "operational_positive",
+      "expected": "fan",
+      "reason": "both blind auditors identify the supported appliance; no excluded challenge rule applies"
+    },
+    "V010": {
+      "decision": "operational_positive",
+      "expected": "fan",
+      "reason": "both blind auditors identify the supported appliance; no excluded challenge rule applies"
+    },
+    "V011": {
+      "decision": "operational_positive",
+      "expected": "food_processor",
+      "reason": "both blind auditors identify the supported appliance; no excluded challenge rule applies"
+    },
+    "V012": {
+      "decision": "operational_positive",
+      "expected": "blender",
+      "reason": "both auditors identify a bullet blender rather than a food processor"
+    },
+    "V013": {
+      "decision": "operational_positive",
+      "expected": "food_processor",
+      "reason": "both blind auditors identify the supported appliance; no excluded challenge rule applies"
+    },
+    "V014": {
+      "decision": "operational_positive",
+      "expected": "food_processor",
+      "reason": "both blind auditors identify the supported appliance; no excluded challenge rule applies"
+    },
+    "V015": {
+      "decision": "operational_positive",
+      "expected": "kettle",
+      "reason": "both blind auditors identify the supported appliance; no excluded challenge rule applies"
+    },
+    "V016": {
+      "decision": "operational_positive",
+      "expected": "kettle",
+      "reason": "both blind auditors identify the supported appliance; no excluded challenge rule applies"
+    },
+    "V017": {
+      "decision": "supported_challenge",
+      "reason": "retail display with several dryers and attachments"
+    },
+    "V018": {
+      "decision": "operational_positive",
+      "expected": "hair_dryer",
+      "reason": "both blind auditors identify the supported appliance; no excluded challenge rule applies"
+    },
+    "V019": {
+      "decision": "supported_challenge",
+      "reason": "installed-equipment detail does not visibly establish a microwave"
+    },
+    "V020": {
+      "decision": "operational_positive",
+      "expected": "microwave",
+      "reason": "both blind auditors identify the supported appliance; no excluded challenge rule applies"
+    },
+    "V021": {
+      "decision": "supported_challenge",
+      "reason": "extreme detail crop; most of mixer is outside the frame"
+    },
+    "V022": {
+      "decision": "supported_challenge",
+      "reason": "multi-panel collage"
+    },
+    "V023": {
+      "decision": "operational_positive",
+      "expected": "portable_ac",
+      "reason": "both blind auditors identify the supported appliance; no excluded challenge rule applies"
+    },
+    "V024": {
+      "decision": "operational_positive",
+      "expected": "portable_ac",
+      "reason": "both blind auditors identify the supported appliance; no excluded challenge rule applies"
+    },
+    "V025": {
+      "decision": "operational_positive",
+      "expected": "portable_heater",
+      "reason": "both blind auditors identify the supported appliance; no excluded challenge rule applies"
+    },
+    "V026": {
+      "decision": "excluded_uncertain",
+      "reason": "overexposed rear/detail view cannot establish a portable heater from pixels alone"
+    },
+    "V027": {
+      "decision": "operational_positive",
+      "expected": "rice_cooker",
+      "reason": "both blind auditors identify the supported appliance; no excluded challenge rule applies"
+    },
+    "V028": {
+      "decision": "operational_positive",
+      "expected": "rice_cooker",
+      "reason": "both blind auditors identify the supported appliance; no excluded challenge rule applies"
+    },
+    "V029": {
+      "decision": "operational_positive",
+      "expected": "sandwich_press",
+      "reason": "both blind auditors identify the supported appliance; no excluded challenge rule applies"
+    },
+    "V030": {
+      "decision": "operational_positive",
+      "expected": "sandwich_press",
+      "reason": "both blind auditors identify the supported appliance; no excluded challenge rule applies"
+    },
+    "V031": {
+      "decision": "operational_positive",
+      "expected": "shaver",
+      "reason": "both blind auditors identify the supported appliance; no excluded challenge rule applies"
+    },
+    "V032": {
+      "decision": "operational_positive",
+      "expected": "shaver",
+      "reason": "both blind auditors identify the supported appliance; no excluded challenge rule applies"
+    },
+    "V033": {
+      "decision": "supported_challenge",
+      "reason": "commercial extraction/vacuum/fan set with no clear steam-cleaner identity"
+    },
+    "V034": {
+      "decision": "true_ood",
+      "reason": "truck-mounted commercial cleaning rig is outside the supported household categories"
+    },
+    "V035": {
+      "decision": "operational_positive",
+      "expected": "straightener",
+      "reason": "both blind auditors identify the supported appliance; no excluded challenge rule applies"
+    },
+    "V036": {
+      "decision": "operational_positive",
+      "expected": "straightener",
+      "reason": "both blind auditors identify the supported appliance; no excluded challenge rule applies"
+    },
+    "V037": {
+      "decision": "operational_positive",
+      "expected": "toaster",
+      "reason": "adjudication identifies two reflective toaster bodies; one auditor was uncertain"
+    },
+    "V038": {
+      "decision": "operational_positive",
+      "expected": "toaster",
+      "reason": "both blind auditors identify the supported appliance; no excluded challenge rule applies"
+    },
+    "V039": {
+      "decision": "operational_positive",
+      "expected": "toaster",
+      "reason": "both blind auditors identify the supported appliance; no excluded challenge rule applies"
+    },
+    "V040": {
+      "decision": "operational_positive",
+      "expected": "vaccum_cleaner",
+      "reason": "both blind auditors identify the supported appliance; no excluded challenge rule applies"
+    },
+    "V041": {
+      "decision": "supported_challenge",
+      "reason": "retail packaging display rather than an ordinary faulty-device photo"
+    }
+  },
+  "limitations": [
+    "Both visual audits were performed by independent assistant agents, not human study participants.",
+    "Openverse OOD rows contain repeated scenes and query-label mismatches; row count does not equal independent household situations.",
+    "This ground truth can evaluate the frozen cohort only and does not establish population accuracy."
+  ]
+}

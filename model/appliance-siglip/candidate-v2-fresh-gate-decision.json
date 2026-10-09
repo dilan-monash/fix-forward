@@ -1,0 +1,507 @@
+{
+  "evaluation": "fixforward-siglip2-class-threshold-candidate-v2-offline-gate",
+  "release_ready": false,
+  "candidate_policy_sha256": "01366d51bfc23354969918f868d7874b4fab83bffdae318b2397da4e72b83d04",
+  "cohort_lock_sha256": "c9e3b30051f0283ea71701fe9bf0557d3ef1b01ddfbaf44121267c6858a4a835",
+  "inputs": {
+    "prediction_report_sha256": "2a1e198f20ba587e68bc37dbc75ca8f6497e2d31c8c1b1d403b2fea3445e2b59",
+    "audit_sha256": "9802d5528eb1ab62fd70f0a8bd5368edf78455d6f38e51882304a20f941c3f78",
+    "gate_sha256": "224cbf43589f8799edd6973ccd3b7f913612648da241631bd22e71f704dae841"
+  },
+  "summary": {
+    "eligible_operational": {
+      "n": 81,
+      "accepted": 43,
+      "accepted_correct": 43,
+      "coverage": 0.5308641975308642,
+      "wrong_accepts": [],
+      "per_class": {
+        "air_fryer": {
+          "audited_operational_positives": 6,
+          "accepted": 4,
+          "accepted_correct": 4,
+          "wrong_accepts": [],
+          "coverage": 0.6666666666666666
+        },
+        "blender": {
+          "audited_operational_positives": 5,
+          "accepted": 0,
+          "accepted_correct": 0,
+          "wrong_accepts": [],
+          "coverage": 0
+        },
+        "coffee_machine": {
+          "audited_operational_positives": 6,
+          "accepted": 4,
+          "accepted_correct": 4,
+          "wrong_accepts": [],
+          "coverage": 0.6666666666666666
+        },
+        "fan": {
+          "audited_operational_positives": 6,
+          "accepted": 5,
+          "accepted_correct": 5,
+          "wrong_accepts": [],
+          "coverage": 0.8333333333333334
+        },
+        "food_processor": {
+          "audited_operational_positives": 2,
+          "accepted": 0,
+          "accepted_correct": 0,
+          "wrong_accepts": [],
+          "coverage": 0
+        },
+        "hair_dryer": {
+          "audited_operational_positives": 3,
+          "accepted": 3,
+          "accepted_correct": 3,
+          "wrong_accepts": [],
+          "coverage": 1
+        },
+        "kettle": {
+          "audited_operational_positives": 6,
+          "accepted": 3,
+          "accepted_correct": 3,
+          "wrong_accepts": [],
+          "coverage": 0.5
+        },
+        "microwave": {
+          "audited_operational_positives": 8,
+          "accepted": 5,
+          "accepted_correct": 5,
+          "wrong_accepts": [],
+          "coverage": 0.625
+        },
+        "mixer": {
+          "audited_operational_positives": 2,
+          "accepted": 0,
+          "accepted_correct": 0,
+          "wrong_accepts": [],
+          "coverage": 0
+        },
+        "portable_ac": {
+          "audited_operational_positives": 5,
+          "accepted": 3,
+          "accepted_correct": 3,
+          "wrong_accepts": [],
+          "coverage": 0.6
+        },
+        "portable_heater": {
+          "audited_operational_positives": 5,
+          "accepted": 3,
+          "accepted_correct": 3,
+          "wrong_accepts": [],
+          "coverage": 0.6
+        },
+        "rice_cooker": {
+          "audited_operational_positives": 8,
+          "accepted": 8,
+          "accepted_correct": 8,
+          "wrong_accepts": [],
+          "coverage": 1
+        },
+        "sandwich_press": {
+          "audited_operational_positives": 3,
+          "accepted": 3,
+          "accepted_correct": 3,
+          "wrong_accepts": [],
+          "coverage": 1
+        },
+        "shaver": {
+          "audited_operational_positives": 9,
+          "accepted": 0,
+          "accepted_correct": 0,
+          "wrong_accepts": [],
+          "coverage": 0
+        },
+        "straightener": {
+          "audited_operational_positives": 2,
+          "accepted": 2,
+          "accepted_correct": 2,
+          "wrong_accepts": [],
+          "coverage": 1
+        },
+        "toaster": {
+          "audited_operational_positives": 3,
+          "accepted": 0,
+          "accepted_correct": 0,
+          "wrong_accepts": [],
+          "coverage": 0
+        },
+        "vaccum_cleaner": {
+          "audited_operational_positives": 2,
+          "accepted": 0,
+          "accepted_correct": 0,
+          "wrong_accepts": [],
+          "coverage": 0
+        }
+      }
+    },
+    "manual_only_operational": {
+      "n": 0,
+      "accepted": 0,
+      "accepted_rows": []
+    },
+    "true_ood": {
+      "n": 143,
+      "source_groups": 38,
+      "accepted": 0,
+      "accepted_rows": []
+    }
+  },
+  "decision": {
+    "passed": false,
+    "whole_candidate": true,
+    "criteria": [
+      {
+        "name": "eligible operational positives",
+        "actual": 81,
+        "required": 40,
+        "passed": true
+      },
+      {
+        "name": "true OOD photos",
+        "actual": 143,
+        "required": 100,
+        "passed": true
+      },
+      {
+        "name": "true OOD source groups",
+        "actual": 38,
+        "required": 18,
+        "passed": true
+      },
+      {
+        "name": "eligible coverage",
+        "actual": 0.5308641975308642,
+        "required": 0.5,
+        "passed": true
+      },
+      {
+        "name": "wrong enabled-class accepts",
+        "actual": 0,
+        "required": 0,
+        "passed": true
+      },
+      {
+        "name": "manual-only-class accepts",
+        "actual": 0,
+        "required": 0,
+        "passed": true
+      },
+      {
+        "name": "true-OOD accepts",
+        "actual": 0,
+        "required": 0,
+        "passed": true
+      },
+      {
+        "name": "air_fryer: audited positives",
+        "actual": 6,
+        "required": 2,
+        "passed": true
+      },
+      {
+        "name": "air_fryer: accepted correct",
+        "actual": 4,
+        "required": 1,
+        "passed": true
+      },
+      {
+        "name": "air_fryer: wrong accepts",
+        "actual": 0,
+        "required": 0,
+        "passed": true
+      },
+      {
+        "name": "blender: audited positives",
+        "actual": 5,
+        "required": 2,
+        "passed": true
+      },
+      {
+        "name": "blender: accepted correct",
+        "actual": 0,
+        "required": 1,
+        "passed": false
+      },
+      {
+        "name": "blender: wrong accepts",
+        "actual": 0,
+        "required": 0,
+        "passed": true
+      },
+      {
+        "name": "coffee_machine: audited positives",
+        "actual": 6,
+        "required": 2,
+        "passed": true
+      },
+      {
+        "name": "coffee_machine: accepted correct",
+        "actual": 4,
+        "required": 1,
+        "passed": true
+      },
+      {
+        "name": "coffee_machine: wrong accepts",
+        "actual": 0,
+        "required": 0,
+        "passed": true
+      },
+      {
+        "name": "fan: audited positives",
+        "actual": 6,
+        "required": 2,
+        "passed": true
+      },
+      {
+        "name": "fan: accepted correct",
+        "actual": 5,
+        "required": 1,
+        "passed": true
+      },
+      {
+        "name": "fan: wrong accepts",
+        "actual": 0,
+        "required": 0,
+        "passed": true
+      },
+      {
+        "name": "food_processor: audited positives",
+        "actual": 2,
+        "required": 2,
+        "passed": true
+      },
+      {
+        "name": "food_processor: accepted correct",
+        "actual": 0,
+        "required": 1,
+        "passed": false
+      },
+      {
+        "name": "food_processor: wrong accepts",
+        "actual": 0,
+        "required": 0,
+        "passed": true
+      },
+      {
+        "name": "hair_dryer: audited positives",
+        "actual": 3,
+        "required": 2,
+        "passed": true
+      },
+      {
+        "name": "hair_dryer: accepted correct",
+        "actual": 3,
+        "required": 1,
+        "passed": true
+      },
+      {
+        "name": "hair_dryer: wrong accepts",
+        "actual": 0,
+        "required": 0,
+        "passed": true
+      },
+      {
+        "name": "kettle: audited positives",
+        "actual": 6,
+        "required": 2,
+        "passed": true
+      },
+      {
+        "name": "kettle: accepted correct",
+        "actual": 3,
+        "required": 1,
+        "passed": true
+      },
+      {
+        "name": "kettle: wrong accepts",
+        "actual": 0,
+        "required": 0,
+        "passed": true
+      },
+      {
+        "name": "microwave: audited positives",
+        "actual": 8,
+        "required": 2,
+        "passed": true
+      },
+      {
+        "name": "microwave: accepted correct",
+        "actual": 5,
+        "required": 1,
+        "passed": true
+      },
+      {
+        "name": "microwave: wrong accepts",
+        "actual": 0,
+        "required": 0,
+        "passed": true
+      },
+      {
+        "name": "mixer: audited positives",
+        "actual": 2,
+        "required": 2,
+        "passed": true
+      },
+      {
+        "name": "mixer: accepted correct",
+        "actual": 0,
+        "required": 1,
+        "passed": false
+      },
+      {
+        "name": "mixer: wrong accepts",
+        "actual": 0,
+        "required": 0,
+        "passed": true
+      },
+      {
+        "name": "portable_ac: audited positives",
+        "actual": 5,
+        "required": 2,
+        "passed": true
+      },
+      {
+        "name": "portable_ac: accepted correct",
+        "actual": 3,
+        "required": 1,
+        "passed": true
+      },
+      {
+        "name": "portable_ac: wrong accepts",
+        "actual": 0,
+        "required": 0,
+        "passed": true
+      },
+      {
+        "name": "portable_heater: audited positives",
+        "actual": 5,
+        "required": 2,
+        "passed": true
+      },
+      {
+        "name": "portable_heater: accepted correct",
+        "actual": 3,
+        "required": 1,
+        "passed": true
+      },
+      {
+        "name": "portable_heater: wrong accepts",
+        "actual": 0,
+        "required": 0,
+        "passed": true
+      },
+      {
+        "name": "rice_cooker: audited positives",
+        "actual": 8,
+        "required": 2,
+        "passed": true
+      },
+      {
+        "name": "rice_cooker: accepted correct",
+        "actual": 8,
+        "required": 1,
+        "passed": true
+      },
+      {
+        "name": "rice_cooker: wrong accepts",
+        "actual": 0,
+        "required": 0,
+        "passed": true
+      },
+      {
+        "name": "sandwich_press: audited positives",
+        "actual": 3,
+        "required": 2,
+        "passed": true
+      },
+      {
+        "name": "sandwich_press: accepted correct",
+        "actual": 3,
+        "required": 1,
+        "passed": true
+      },
+      {
+        "name": "sandwich_press: wrong accepts",
+        "actual": 0,
+        "required": 0,
+        "passed": true
+      },
+      {
+        "name": "shaver: audited positives",
+        "actual": 9,
+        "required": 2,
+        "passed": true
+      },
+      {
+        "name": "shaver: accepted correct",
+        "actual": 0,
+        "required": 1,
+        "passed": false
+      },
+      {
+        "name": "shaver: wrong accepts",
+        "actual": 0,
+        "required": 0,
+        "passed": true
+      },
+      {
+        "name": "straightener: audited positives",
+        "actual": 2,
+        "required": 2,
+        "passed": true
+      },
+      {
+        "name": "straightener: accepted correct",
+        "actual": 2,
+        "required": 1,
+        "passed": true
+      },
+      {
+        "name": "straightener: wrong accepts",
+        "actual": 0,
+        "required": 0,
+        "passed": true
+      },
+      {
+        "name": "toaster: audited positives",
+        "actual": 3,
+        "required": 2,
+        "passed": true
+      },
+      {
+        "name": "toaster: accepted correct",
+        "actual": 0,
+        "required": 1,
+        "passed": false
+      },
+      {
+        "name": "toaster: wrong accepts",
+        "actual": 0,
+        "required": 0,
+        "passed": true
+      },
+      {
+        "name": "vaccum_cleaner: audited positives",
+        "actual": 2,
+        "required": 2,
+        "passed": true
+      },
+      {
+        "name": "vaccum_cleaner: accepted correct",
+        "actual": 0,
+        "required": 1,
+        "passed": false
+      },
+      {
+        "name": "vaccum_cleaner: wrong accepts",
+        "actual": 0,
+        "required": 0,
+        "passed": true
+      }
+    ],
+    "failure_action": "Keep release_ready and recognition_enabled false. Treat the opened cohort as development evidence for any later candidate."
+  }
+}

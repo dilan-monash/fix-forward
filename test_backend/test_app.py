@@ -4,10 +4,11 @@
 """Integration tests for Flask routing using repository fakes, not Neon."""
 
 from datetime import date
+import hashlib
 import unittest
 from unittest.mock import patch
 
-from backend import create_app
+from backend import PROJECT_ROOT, SIGLIP_ASSET_INTEGRITY, SIGLIP_PUBLIC_ASSETS, create_app
 from backend.db import DatabaseUnavailable
 
 
@@ -29,6 +30,62 @@ class AppTests(unittest.TestCase):
         self.assertEqual(blocked.status_code, 404)
         response.close()
         blocked.close()
+
+    # Candidate files are exact, same-origin routes with explicit binary MIME.
+    # HEAD avoids copying the 70 MB ONNX body into this route test.
+    def test_siglip_assets_are_exactly_allowlisted_with_browser_safe_mime(self):
+        expected = {
+            "model/appliance-siglip/model_manifest.json": "application/json",
+            "model/appliance-siglip/text-embeddings.json": "application/json",
+            "model/appliance-siglip/text-embeddings.f32": "application/octet-stream",
+            "vendor/transformers/transformers.min.js": "application/javascript",
+            "vendor/transformers/ort-wasm-simd-threaded.jsep.mjs": "text/javascript",
+            "vendor/transformers/ort-wasm-simd-threaded.jsep.wasm": "application/wasm",
+            "model/appliance-siglip/upstream/siglip2-base-patch32-256/config.json": "application/json",
+            "model/appliance-siglip/upstream/siglip2-base-patch32-256/preprocessor_config.json": "application/json",
+            "model/appliance-siglip/upstream/siglip2-base-patch32-256/onnx/vision_model.9e82237d9a1d89948502aff9df02129c28698d793e01f15f62e2267682615499_q4.onnx": "application/octet-stream",
+        }
+        self.assertEqual(SIGLIP_PUBLIC_ASSETS, set(expected))
+        for path, mimetype in expected.items():
+            with self.subTest(path=path):
+                response = self.client.head(f"/{path}")
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.mimetype, mimetype)
+                self.assertEqual(response.headers["X-Content-Type-Options"], "nosniff")
+                response.close()
+        for blocked_path in (
+            "/vendor/transformers/LICENSE.txt",
+            "/model/appliance-siglip/upstream/LICENSE.txt",
+            "/model/appliance-siglip/upstream/siglip2-base-patch32-256/onnx/other.onnx",
+        ):
+            with self.subTest(blocked_path=blocked_path):
+                with self.client.get(blocked_path) as response:
+                    self.assertEqual(response.status_code, 404)
+
+    def test_csp_allows_local_wasm_without_remote_model_connections_or_general_eval(self):
+        with self.client.get("/") as response:
+            csp = response.headers["Content-Security-Policy"]
+        self.assertIn("'wasm-unsafe-eval'", csp)
+        self.assertIn("connect-src 'self'", csp)
+        self.assertNotIn("cdn.jsdelivr", csp)
+        self.assertNotIn("huggingface.co", csp)
+        self.assertNotIn(" 'unsafe-eval'", csp)
+
+    # The browser does not redownload large local assets merely to hash them.
+    # This build check binds the reviewed policy sizes and digests to the files.
+    def test_vendored_siglip_runtime_and_model_match_frozen_size_and_sha256(self):
+        self.assertEqual(set(SIGLIP_ASSET_INTEGRITY), SIGLIP_PUBLIC_ASSETS - {
+            "model/appliance-siglip/model_manifest.json",
+        })
+        for relative_path, (size, digest) in SIGLIP_ASSET_INTEGRITY.items():
+            with self.subTest(relative_path=relative_path):
+                asset = PROJECT_ROOT / relative_path
+                self.assertEqual(asset.stat().st_size, size)
+                hasher = hashlib.sha256()
+                with asset.open("rb") as stream:
+                    for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                        hasher.update(chunk)
+                self.assertEqual(hasher.hexdigest(), digest)
 
     def test_health_contract(self):
         response = self.client.get("/api/health")

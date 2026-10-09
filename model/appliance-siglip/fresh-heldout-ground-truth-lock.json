@@ -1,0 +1,27 @@
+{
+  "_comment": "Final prediction-blind audit lock. Written after both independent visual audits and adjudication, before the fresh candidate was run. This file must not be rewritten from model results.",
+  "lock_id": "fixforward-siglip2-fresh-heldout-ground-truth-lock-v1",
+  "locked_at_utc": "2026-10-09T02:52:35.367350+00:00",
+  "model_predictions_run": false,
+  "files": {
+    "pre_registered_gate": {
+      "path": "model/appliance-siglip/pre-registered-release-gate.json",
+      "sha256": "46097cec533e55e889f4e59867849bcc47b97a5a2cc284c7cd5af29f60e5e201"
+    },
+    "combined_candidate_manifest": {
+      "path": "tmp/appliance-model-frozen-browser-validation-v1/combined-candidate-manifest.json",
+      "sha256": "8eb856efe8d892b38cf5a4ea80867495ff5f72de9a43d269072450752ee4c766"
+    },
+    "audited_ground_truth": {
+      "path": "model/appliance-siglip/fresh-heldout-audit-summary.json",
+      "sha256": "eb5deb1e8197c41e437dab7f6799c18519341f17fe612b2563a42ddd2999e99d"
+    }
+  },
+  "frozen_counts": {
+    "enabled_class_operational_positives": 37,
+    "manual_only_class_challenges": 11,
+    "true_ood": 95,
+    "ood_source_groups": 21
+  },
+  "next_step": "Run the exact pinned q4 evaluator once. Do not change labels, prompts, thresholds or enabled classes from its result."
+}

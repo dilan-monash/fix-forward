@@ -1,0 +1,5 @@
+# Preserve the pinned third-party runtime byte-for-byte; its integrity hash is
+# part of the disabled browser-model policy, so Git must not rewrite or lint it.
+vendor/transformers/ort-wasm-simd-threaded.jsep.mjs -text -whitespace
+vendor/transformers/ort-wasm-simd-threaded.jsep.wasm -text -diff
+model/appliance-siglip/upstream/**/onnx/*.onnx -text -diff

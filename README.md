@@ -1,39 +1,40 @@
-# FixForward — Main with the approved Iteration 2 Quest
+# FixForward — Iteration 3
 
-**Approved Main source, 14 September 2026:** This `main` checkout promotes the reviewed Iteration 2 commit `c0d093886123faba3b02eeed471c91392a0cce15`, preserving Git history and Main's deployment metadata. The package version remains `2.0.0` and the release identifier remains `iteration-2-v2.0.0-quest`. This note records the approved source; the Main deployment is pending verification when this promotion is prepared.
+**Iteration 3 source, 9 October 2026:** The `iteration-3` branch started as an exact copy of commit `cba2b3b2983ca29684db3d0a1df65ad30602a3a0`, the Iteration 2 release that Render was serving when I3 was created, so I3 work starts from the familiar live I2 design. On this branch the package is `fixforward-iteration-3` version `3.0.0` and the default release identifier is `iteration-3-v3.0.0`.
 
-**Where to work:** Ordinary changes continue on `iteration-2` in `tmp/child-quest-prototype`. This checkout, `tmp/github-update`, is for explicitly approved Main promotions; the outer workspace is a separate older copy. In another clone, choose the intended branch and check the working tree before editing. Authored source files contain nearby explanations of functions and important rules. See the [agent working agreement](AGENTS.md) and [technology stack and source links](docs/TECH_STACK.md).
+**Where to work:** Ordinary changes happen on `iteration-3`, in the `FixForward-Iteration-3-From-Iteration-2` checkout. Older local folders (for example `tmp/child-quest-prototype` and `tmp/github-update` inside the v1.6 workspace) are earlier I2 and Main checkouts; leave them unchanged. In another clone, choose the intended branch and check the working tree before editing. Authored source files contain nearby explanations of functions and important rules. See the [agent working agreement](AGENTS.md) and [technology stack and source links](docs/TECH_STACK.md).
 
 ## Branches and websites
 
 | Website | GitHub branch | Website address | Role |
 |---|---|---|---|
 | Main | `main` | [fixforward.me](https://fixforward.me/) · [original Render address](https://fix-forward-main.onrender.com/) | Stable approved website. It changes only after the user explicitly approves the reviewed release for Main. |
-| Iteration 2 | `iteration-2` | [fix-forward-iteration-2.onrender.com](https://fix-forward-iteration-2.onrender.com/) | Ongoing development and review website for new changes to the adult guide and Quest. |
+| Iteration 3 | `iteration-3` | [fix-forward-iteration-3-r4sh.onrender.com](https://fix-forward-iteration-3-r4sh.onrender.com/) | Ongoing development and review website for new changes to the adult guide and Quest. |
+| Iteration 2 | `iteration-2` | [fix-forward-iteration-2.onrender.com](https://fix-forward-iteration-2.onrender.com/) | Preserved Iteration 2 comparison website. Keep its branch and service unchanged. |
 | Iteration 1 | `iteration-1` | [fix-forward-iteration-1.onrender.com](https://fix-forward-iteration-1.onrender.com/) | Preserved original comparison website. Keep its branch and service unchanged. |
 
-This checkout's `render.yaml` describes **fix-forward-main**, follows `main`, and keeps Auto Deploy off. Iteration 2 retains its own service and branch configuration. Do not repoint a service to publish a preview. The [Iteration 2 GitHub branch](https://github.com/dilan-monash/fix-forward/tree/iteration-2) shows review source; a GitHub push alone does not deploy either website.
+This checkout's `render.yaml` describes the existing **fix-forward-iteration-3** Python web service: it follows `iteration-3` and keeps Auto Deploy off. Main, Iteration 2 and Iteration 1 keep their own services and branch configuration. The older address [fix-forward-iteration-3.onrender.com](https://fix-forward-iteration-3.onrender.com/) is a separate static site that only forwards visitors to the I3 application; never deploy application changes there. Do not repoint a service to publish a preview. The [Iteration 3 GitHub branch](https://github.com/dilan-monash/fix-forward/tree/iteration-3) shows review source; a GitHub push alone does not deploy any website.
 
 **Historical hosting verification, 13 September 2026:** Main's Render service was `srv-daj2bip594qs73ajd61g`, in **My project / Production**, on the **Free** plan in **Singapore**, with Auto Deploy off. The verified source then was `b6eb0496c4e369f82ade3ff297437d5711caeccb`. HTTPS worked for `fixforward.me` and `/quest`, and `www.fixforward.me` redirected to the apex domain. Existing email DNS records were retained. These are dated configuration and release observations; they do not establish deployment of the newly approved source. Verify the actual service, deployed commit, domain and journeys after the manual Main release.
 
 ## Development and review workflow
 
-1. Open the `iteration-2` checkout. Check `git branch --show-current`, `git status --short` and `git worktree list`; preserve any existing work. Make and review the requested code changes here, keeping nearby plain-English comments accurate.
+1. Open the `iteration-3` checkout. Check `git branch --show-current`, `git status --short` and `git worktree list`; preserve any existing work. Make and review the requested code changes here, keeping nearby plain-English comments accurate.
 2. Run the relevant checks and inspect the affected journeys. Before publishing application changes, run `npm.cmd run check` and `python -m unittest discover -s test_backend -v` in the configured development environment. Test adult `/`, child `/quest`, access and data behavior as appropriate. The local `dev:quest` helper uses synthetic adult records and is not a production server.
-3. Ordinary requested improvements are published to I2 for review under the user's current workflow; respect any later request to keep work local. Inspect the diff and commit only the intended files on `iteration-2`. Exclude credentials, local environments and temporary output. Record the commit ID that was reviewed and tested.
-4. Confirm the configured GitHub remote and current branch, then push only `iteration-2`, for example `git push origin iteration-2`. Saving a file changes the local working copy; committing records a local version; pushing publishes that version to GitHub. None of these steps alone updates the running website.
-5. In Render, open **fix-forward-iteration-2**, confirm its linked branch is `iteration-2`, and use **Manual Deploy** for the reviewed commit. Keep Auto Deploy off. If deploying the latest branch commit, first confirm it is still the reviewed commit. Wait for the deployment to succeed, then check the deployed commit, login, adult and Quest routes, and public-data availability on the I2 website.
-6. Share the I2 URL and the exact changes for review. Keep `fixforward.me` unchanged. Treat local checks, a GitHub push and a verified live deployment as separate results.
+3. Publish to I3 only when the user has authorized publishing the reviewed work; respect any request to keep work local. Inspect the diff and commit only the intended files on `iteration-3`. Exclude credentials, local environments and temporary output. Record the commit ID that was reviewed and tested.
+4. Confirm the configured GitHub remote and current branch, then push only `iteration-3`, for example `git push origin iteration-3`. Saving a file changes the local working copy; committing records a local version; pushing publishes that version to GitHub. None of these steps alone updates the running website.
+5. In Render, open the **fix-forward-iteration-3** Python web service (not the `fix-forward-iteration-3-link` forwarding static site), confirm its linked branch is `iteration-3` and its root is the repository root, and use **Manual Deploy** for the reviewed commit. Keep Auto Deploy off. If deploying the latest branch commit, first confirm it is still the reviewed commit. Wait for the deployment to succeed, then check the deployed commit, login, adult and Quest routes, and public-data availability on the I3 website.
+6. Share the I3 URL and the exact changes for review. Keep `fixforward.me`, Iteration 2 and Iteration 1 unchanged. Treat local checks, a GitHub push and a verified live deployment as separate results.
 
 ## Promotion to Main
 
-Promote a change only when the user explicitly approves the reviewed I2 commit for Main. I2 preview approval and successful tests do not grant that approval, and an earlier Main approval does not carry forward to later releases. Until then, do not edit, merge into, push or deploy Main or change its hosting configuration.
+Promote a change only when the user explicitly approves the reviewed I3 commit for Main. I3 preview approval and successful tests do not grant that approval, and an earlier Main approval does not carry forward to later releases. Until then, do not edit, merge into, push or deploy Main or change its hosting configuration.
 
-After explicit approval, use a history-preserving promotion of the approved commit, resolve conflicts against that reviewed version, and retain Main's own service name, `branch: main` and deployment policy. Compare the resulting application with the approved I2 version, allowing only the intended Main metadata differences, and run the relevant checks. Keep Main's Auto Deploy off and manually deploy only the approved release. Never force-push or reset Main to replace its history. Verify Main after deployment; ordinary development then continues on I2. A future iteration branch is a separate decision, not the default next step.
+After explicit approval, use a history-preserving promotion of the approved commit, resolve conflicts against that reviewed version, and retain Main's own service name, `branch: main`, release identifier and deployment policy. Compare the resulting application with the approved I3 version, allowing only the intended Main metadata differences, and run the relevant checks. Keep Main's Auto Deploy off and manually deploy only the approved release. Never force-push or reset Main to replace its history. Verify Main after deployment; ordinary development then continues on I3. A future iteration branch is a separate decision, not the default next step.
 
 ## Shared database boundary
 
-The websites currently share Neon reference data. Separate Git branches and Render services do not isolate database changes: an import or migration could affect Main even when started from I2. Ordinary application access remains read-only. Do not run imports, migrations, schema changes or reference-data writes against the shared database for I2 development. Use an explicitly separate database or Neon branch for database development; changes to shared production data need separate, specific authorization. Do not expose or copy credentials into source, logs or chat.
+The websites currently share Neon reference data. Separate Git branches and Render services do not isolate database changes: an import or migration could affect Main even when started from I3. Ordinary application access remains read-only. Do not run imports, migrations, schema changes or reference-data writes against the shared database for I3 development. Use an explicitly separate database or Neon branch for database development; changes to shared production data need separate, specific authorization. Do not expose or copy credentials into source, logs or chat.
 
 ## Current application and handover
 
@@ -252,7 +253,7 @@ See `docs/SECURE_ARCHITECTURE_I1.md`.
 
 ## Local setup
 
-Requirements: Python 3.11+ and Node.js 20+. The browser frontend calls the Flask API on the same origin, so it needs no separate connection secret. PostgreSQL/Neon credentials belong only in the backend environment.
+Requirements: Python 3.11+ and, for the Node test and preview tools, Node.js `^22.22.2`, `^24.15.0` or `26+`. Node 20 is not enough because the locked `jsdom` 30.0.1 test dependency requires one of those versions. Node is a development tool only; Render runs the site with Python. The browser frontend calls the Flask API on the same origin, so it needs no separate connection secret. PostgreSQL/Neon credentials belong only in the backend environment.
 
 ```powershell
 python -m venv .venv
@@ -262,20 +263,45 @@ python data/scripts/build_price_catalogue.py
 Copy-Item .env.example .env
 ```
 
-Adult photo detection uses the browser-only TensorFlow.js model in
-`model/appliance-classifier/`. The browser validates and resizes the image,
-loads the allowlisted model assets, and keeps the photo out of Flask entirely.
-The model is optional at runtime: if it cannot load, the adult site keeps the
-manual appliance picker available. To replace it, run the v2 training notebook,
-copy its `web_model/` files into that directory, and run the model verification
-script from the supplied photo-feature package before publishing.
+**Adult photo recognition status, 9 October 2026:** Recognition remains disabled:
+`model/appliance-siglip/model_manifest.json` sets both `release_ready: false` and
+`recognition_enabled: false`, so the manual picker remains the release path. The
+old TensorFlow.js MobileNet export failed a real-model random-noise diagnostic.
+The replacement local candidate uses the pinned Google SigLIP 2 q4 vision model,
+`@huggingface/transformers` 3.8.1 and ONNX Runtime Web. Its approximately 92.5 MB
+of first-use runtime, model and text assets are self-hosted on the same origin;
+remote model loading is disabled. Photos stay in the browser and are not posted
+to Flask. Any later accepted result remains a suggestion that the person must
+explicitly confirm before the form changes.
+
+The first SigLIP 2 policy failed its frozen gate: it accepted 10 of 37 eligible
+photos, 9 of the 10 accepts were correct (27.027% coverage), and one portable
+heater was wrongly accepted as a fan. Candidate v2 used a locked fresh cohort of
+81 operational positives across all 17 enabled classes plus 143 true-OOD photos
+from 38 source groups. It accepted 43, all correct, for 53.086% coverage, with
+zero wrong, manual-only or true-OOD accepts. The whole pre-registered gate still
+failed because `blender`, `food_processor`, `mixer`, `shaver`, `toaster` and
+`vaccum_cleaner` each had zero accepted-correct examples. Candidate v2 therefore
+cannot be enabled or repaired by removing classes after its result was opened.
+
+These results establish local Node parity for the pinned browser artifacts only.
+They do not prove physical-tablet or browser performance and are not a public
+accuracy claim. The old diagnostic, exact model/evidence filenames, SHA-256
+hashes and gate limitations are recorded in
+[the appliance model validation report](docs/APPLIANCE_MODEL_VALIDATION.md).
+Photo recognition never diagnoses a fault or proves an appliance safe.
 
 Open the new private, Git-ignored `.env`. Put the team member's own SELECT-only Neon URL after `DATABASE_URL=`, set `PRICE_CATALOGUE_STORAGE=postgres`, set `SITE_PASSWORD`, generate a random `SECRET_KEY` of at least 32 characters, and set `SESSION_COOKIE_SECURE=false` only for local HTTP. The URL must target the branch where migrations `003`/`004` and import `005` were applied. Existing shell or hosting variables take precedence. Never put real credentials in frontend code, Git, documentation, screenshots or chat. See [website access setup](docs/WEBSITE_ACCESS.md) and [Iteration 2 catalogue handover](docs/ITERATION2_COST_CATALOGUE.md).
 
 ```powershell
-$env:RELEASE_VERSION = "iteration-2-v2.0.0-quest"
+$env:RELEASE_VERSION = "iteration-3-v3.0.0"
 python -m flask --app app run --port 5000
 ```
+
+The release label uses the current I3 default only when `RELEASE_VERSION` is
+absent. An existing shell, `.env` or Render value overrides that fallback. Check
+the deployed commit and the service's release setting together when verifying a
+release; changing the source default alone cannot update an explicit old value.
 
 Open `http://127.0.0.1:5000` and enter the shared website password. Without valid `SITE_PASSWORD` and `SECRET_KEY` settings, the server returns an access-unavailable page instead of exposing the application.
 

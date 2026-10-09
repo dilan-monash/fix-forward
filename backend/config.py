@@ -39,8 +39,11 @@ class Settings:
             timeout = 5
         return cls(
             database_url=os.getenv("DATABASE_URL", "").strip(),
+            # This branch's fallback applies locally and on a hosted service when
+            # RELEASE_VERSION is absent. A configured environment value wins;
+            # deploying a new fallback cannot replace a stale Render override.
             release_version=os.getenv(
-                "RELEASE_VERSION", "iteration-2-v2.0.0-quest"
+                "RELEASE_VERSION", "iteration-3-v3.0.0"
             ).strip(),
             db_connect_timeout=timeout,
             # These never enter frontend code or the public API. Keep the shared

@@ -8,6 +8,8 @@ import { JSDOM, VirtualConsole } from "jsdom";
 // These fixtures exist only inside the test process. No live data, map tiles or
 // device location are requested, and nothing is inserted into the database.
 const pageHtml = await readFile(new URL("../index.html", import.meta.url), "utf8");
+// The visible helper now reads the disabled SigLIP policy; no runtime/model is loaded.
+const photoManifest = JSON.parse(await readFile(new URL("../model/appliance-siglip/model_manifest.json", import.meta.url), "utf8"));
 let appInstance = 0;
 // Let queued asynchronous handlers finish before inspecting the test page.
 const settle = () => new Promise((resolve) => setImmediate(resolve));
@@ -62,6 +64,7 @@ async function createJourney(t, { delayedData = false, delayedPrices = false, re
     requests.push(pathname);
     if (pathname === "/api/replacement-prices") await pricesReady;
     const datasets = {
+      "/model/appliance-siglip/model_manifest.json": photoManifest,
       "/api/recalls": { recalls },
       "/api/sources": { sources: [] },
       "/api/repair-evidence": { evidence: [] },
@@ -740,4 +743,20 @@ test("DOM: expired access has a recoverable route that keeps the current safety 
   await settle();
   assert.equal(journey.query('a[href="/login"]'), null);
   assert.equal(journey.required('input[name="burning"][value="unsure"]').checked, true);
+});
+
+// A quarantined experiment stays invisible while the ordinary adult flow works.
+test("DOM: quarantined photo model stays hidden and manual selection remains usable", async (t) => {
+  const journey = await createJourney(t);
+  journey.click('[data-intent="guide"]');
+  await waitUntil(() => journey.required("#photo-helper").dataset.photoHelperStatus === "recognition_paused");
+  assert.equal(journey.required("#photo-helper").hidden, true);
+  assert.equal(journey.query("#photo-detect-status"), null);
+  assert.equal(journey.query("#appliance-photo"), null);
+  assert.equal(journey.query('script[src*="tensorflow"]'), null);
+  journey.click('[data-family="heating-simple-cooking"]');
+  journey.click('[data-category="Kettle"]');
+  journey.fill('[name="brand"]', "Example brand");
+  journey.click("#continue-check");
+  journey.required("#safety-form");
 });

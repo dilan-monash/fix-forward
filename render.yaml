@@ -1,14 +1,18 @@
-# Render deployment blueprint for the Flask adult/Quest site; it does not provision or migrate Neon.
+# Render deployment description for the Iteration 3 Flask adult/Quest site; it does not provision or migrate Neon.
+# It documents the existing, manually created fix-forward-iteration-3 Python web service. Do not apply it as a
+# Blueprint without first comparing it with the live service: that could create a duplicate service or replace settings.
 # Secrets are supplied by hosting configuration, and app.py exposes the WSGI application imported below.
 services:
   - type: web
-    name: fix-forward-main
+    name: fix-forward-iteration-3
     runtime: python
-    # Main follows the main branch; the separate Iteration 1 and Iteration 2 services retain their comparison branches.
-    branch: main
-    # Release Main manually after approval, matching the existing Render service setting.
+    # Iteration 3 follows the iteration-3 branch; Main, Iteration 2 and Iteration 1 keep their own services and branches.
+    # The separate fix-forward-iteration-3-link static site only forwards the old address and never runs this code.
+    branch: iteration-3
+    # Publish manually after review, matching the existing Render service setting.
     autoDeployTrigger: "off"
     plan: free
+    region: singapore
     # The build installs runtime dependencies and rebuilds the local reviewed-price SQLite/JavaScript snapshot.
     # It does not refresh retailer data or invoke the separate hosted-data import pipeline.
     buildCommand: pip install -r requirements.txt && python data/scripts/build_price_catalogue.py
@@ -21,8 +25,9 @@ services:
       - key: DATABASE_URL
         sync: false
       - key: RELEASE_VERSION
-        # Main currently serves the approved Iteration 2 application, so its release identity stays unchanged.
-        value: iteration-2-v2.0.0-quest
+        # Identifies the Iteration 3 release in /api/health. The live service's own Environment value wins,
+        # so change it there (on the I3 service only, never a group shared with I2) to update the live label.
+        value: iteration-3-v3.0.0
       - key: SITE_PASSWORD
         sync: false
       - key: SECRET_KEY

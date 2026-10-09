@@ -1,5 +1,8 @@
 {
   "model_name": "fixforward-appliance-mobilenetv3-small",
+  "recognition_enabled": false,
+  "validation_status": "paused_pending_validation",
+  "validation_reason": "Recognition is paused while the current model is checked for incorrect high-confidence results. Choose the appliance manually.",
   "input_shape": [
     224,
     224,
@@ -29,7 +32,7 @@
   "metrics": {
     "calibration": {
       "min_confidence": 0.68,
-       "blur_threshold": 57.233463287353516
+      "blur_threshold": 57.233463287353516
     }
   },
   "photo_processing": "browser-local"

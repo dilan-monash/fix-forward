@@ -1,0 +1,141 @@
+{
+  "_comment": "Frozen before any candidate-v2 prediction on a new cohort. Any failed aggregate or per-class criterion keeps the entire helper disabled; classes may not be removed after results are opened.",
+  "gate_id": "fixforward-siglip2-candidate-v2-fresh-release-gate",
+  "gate_version": 2,
+  "frozen_at_utc": "2026-10-09T03:15:00Z",
+  "release_ready": false,
+  "recognition_enabled": false,
+  "candidate_policy": {
+    "path": "model/appliance-siglip/candidate-v2-policy.json",
+    "sha256": "01366d51bfc23354969918f868d7874b4fab83bffdae318b2397da4e72b83d04",
+    "candidate_id": "fixforward-siglip2-class-threshold-candidate-v2"
+  },
+  "frozen_candidate": {
+    "model_sha256": "9e82237d9a1d89948502aff9df02129c28698d793e01f15f62e2267682615499",
+    "text_manifest_sha256": "4b01be52acad78dae1783978e1bc191d50532dc63781a5cd7b96e24f3a390093",
+    "text_vectors_sha256": "2e63f55601cf3f011bf13b3c347bd456111c1b8132f9d8164105fff0a29877f2",
+    "enabled_classes": [
+      "air_fryer",
+      "blender",
+      "coffee_machine",
+      "fan",
+      "food_processor",
+      "hair_dryer",
+      "kettle",
+      "microwave",
+      "mixer",
+      "portable_ac",
+      "portable_heater",
+      "rice_cooker",
+      "sandwich_press",
+      "shaver",
+      "straightener",
+      "toaster",
+      "vaccum_cleaner"
+    ],
+    "manual_only_classes": [
+      "dehumidifier",
+      "steam_cleaner"
+    ],
+    "class_thresholds": {
+      "air_fryer": {
+        "min_ood_margin": 0.0312,
+        "min_positive_margin": 0.0386
+      },
+      "blender": {
+        "min_ood_margin": 0.0215,
+        "min_positive_margin": 0.0362
+      },
+      "coffee_machine": {
+        "min_ood_margin": 0.0283,
+        "min_positive_margin": 0.0224
+      },
+      "fan": {
+        "min_ood_margin": 0.0226,
+        "min_positive_margin": 0.0349
+      },
+      "food_processor": {
+        "min_ood_margin": 0.0283,
+        "min_positive_margin": 0.0282
+      },
+      "hair_dryer": {
+        "min_ood_margin": 0.0093,
+        "min_positive_margin": 0.0055
+      },
+      "kettle": {
+        "min_ood_margin": 0.0323,
+        "min_positive_margin": 0.0256
+      },
+      "microwave": {
+        "min_ood_margin": 0.0044,
+        "min_positive_margin": 0.0408
+      },
+      "mixer": {
+        "min_ood_margin": 0.0324,
+        "min_positive_margin": 0.0111
+      },
+      "portable_ac": {
+        "min_ood_margin": 0.054,
+        "min_positive_margin": 0.0154
+      },
+      "portable_heater": {
+        "min_ood_margin": 0.0272,
+        "min_positive_margin": 0.0152
+      },
+      "rice_cooker": {
+        "min_ood_margin": 0.0099,
+        "min_positive_margin": 0.0068
+      },
+      "sandwich_press": {
+        "min_ood_margin": 0.0309,
+        "min_positive_margin": 0.0088
+      },
+      "shaver": {
+        "min_ood_margin": 0.0493,
+        "min_positive_margin": 0.0583
+      },
+      "straightener": {
+        "min_ood_margin": 0.0061,
+        "min_positive_margin": 0.0027
+      },
+      "toaster": {
+        "min_ood_margin": 0.0358,
+        "min_positive_margin": 0.0497
+      },
+      "vaccum_cleaner": {
+        "min_ood_margin": 0.0484,
+        "min_positive_margin": 0.0224
+      }
+    }
+  },
+  "fresh_cohort_minimums": {
+    "audited_eligible_operational_positives": 40,
+    "audited_operational_positives_per_enabled_class": 2,
+    "audited_true_ood": 100,
+    "distinct_true_ood_source_groups": 18
+  },
+  "pass_criteria": {
+    "minimum_eligible_operational_coverage": 0.5,
+    "minimum_accepted_correct_per_enabled_class": 1,
+    "maximum_wrong_enabled_class_accepts": 0,
+    "maximum_manual_only_class_accepts": 0,
+    "maximum_true_ood_accepts": 0,
+    "per_class_wrong_accepts_must_be_zero": true
+  },
+  "whole_candidate_failure_policy": {
+    "any_unmet_aggregate_condition_fails_candidate": true,
+    "any_enabled_class_below_two_audited_positives_fails_candidate": true,
+    "any_enabled_class_without_an_accepted_correct_example_fails_candidate": true,
+    "any_enabled_class_wrong_accept_fails_candidate": true,
+    "post_test_class_removal_is_forbidden": true,
+    "failure_action": "Keep release_ready and recognition_enabled false. Treat the opened cohort as development evidence for any later candidate."
+  },
+  "cohort_lock_requirements": {
+    "labels_and_audits_frozen_before_predictions": true,
+    "source_group_labels_frozen_before_predictions": true,
+    "no_identity_overlap_with_derivation_evidence": true,
+    "no_threshold_prompt_model_or_class_changes_after_lock": true,
+    "model_outputs_scores_and_thresholds_hidden_from_visual_auditors": true
+  },
+  "scope": "Passing this offline gate would justify a separate local browser review only. It would not itself authorize a public deployment or establish real-tablet performance."
+}

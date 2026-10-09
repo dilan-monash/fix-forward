@@ -1,0 +1,163 @@
+/* Sorting is a compact play surface: clue, picture, destinations and feedback
+   belong together. These scoped names never change the existing Quest styles. */
+.sorting-page { color: #061f57; max-width: 1120px; margin: 0 auto; padding: 28px 32px 22px; font-family: 'Avenir Next', 'Trebuchet MS', sans-serif; }
+.sorting-page * { box-sizing: border-box; }
+.sorting-heading { display: flex; justify-content: space-between; align-items: center; gap: 18px; margin-bottom: 17px; }
+.sorting-heading .eyebrow, .sorting-page .eyebrow { margin: 0 0 7px; font-size: 11px; letter-spacing: .16em; font-weight: 800; }
+.sorting-page h1 { font-size: clamp(27px, 3.3vw, 39px); letter-spacing: -.045em; line-height: 1.12; margin: 0; }
+.sorting-count { flex-shrink: 0; padding: 9px 13px; border-radius: 30px; background: #eaf5fc; font-size: 12px; font-weight: 800; }
+.sorting-instruction { border-radius: 13px; padding: 10px 14px; background: #f1f7fb; display: flex; align-items: center; gap: 10px; }
+.sorting-step-dot { display: grid; place-items: center; width: 28px; height: 28px; flex-shrink: 0; color: #fff; background: #061f57; border-radius: 50%; font-size: 13px; font-weight: 800; }
+.sorting-instruction p { margin: 0; font-size: 14px; line-height: 1.45; }
+.sorting-help { margin-left: auto; font-size: 11px; color: #4b6484; text-align: right; max-width: 185px; }
+.sorting-playfield { min-height: 224px; display: grid; grid-template-columns: 44% 56%; align-items: center; padding: 8px 24px; position: relative; }
+.sorting-item-zone { display: grid; place-items: center; height: 213px; position: relative; }
+.sorting-orbit { position: absolute; width: 180px; height: 180px; background: #f9ecd3; border-radius: 50%; box-shadow: 0 0 0 13px #fdf8ef; }
+.sorting-item { border: 0; background: transparent; width: 227px; height: 212px; padding: 0 7px 7px; cursor: grab; touch-action: none; position: relative; color: #061f57; border-radius: 24px; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
+.sorting-item svg { display: block; width: 100%; height: 188px; pointer-events: none; filter: drop-shadow(0 8px 5px #12396708); }
+.sorting-item:active { cursor: grabbing; }
+.sorting-item:disabled { cursor: default; opacity: 1; }
+.sorting-item:focus-visible, .sorting-bay:focus-visible, .sorting-transfer-choice:focus-visible, .sorting-text-button:focus-visible { outline: 3px solid #079bd7; outline-offset: 4px; }
+.sorting-pick-cue { display: inline-block; font: 800 11px 'Avenir Next', 'Trebuchet MS', sans-serif; color: #684a20; background: #ffdf91; border: 1px solid #e2be71; border-radius: 30px; padding: 5px 12px; white-space: nowrap; }
+.sorting-item.is-picked { outline: 2px dashed #c4833f; outline-offset: 2px; }
+.sorting-item.is-dragging svg { opacity: .15; }
+/* The invitation runs at most three times, then stays still. Touching any item
+   removes it immediately. The clue and decision words themselves never move. */
+.sorting-first-touch .sorting-pick-cue { animation: sorting-invite 1.5s ease-in-out 3; }
+@keyframes sorting-invite { 0%, 65%, 100% { transform: translateY(0); } 78% { transform: translateY(-5px); } 90% { transform: translateY(0); } }
+.sorting-story { padding: 12px 16px 12px 27px; max-width: 460px; }
+.sorting-story-kicker { font-size: 10px; letter-spacing: .14em; font-weight: 800; color: #607593; margin: 0 0 8px; }
+.sorting-story h2 { font-size: clamp(20px, 2.1vw, 26px); margin: 0 0 9px; letter-spacing: -.035em; line-height: 1.15; }
+.sorting-fact { font-size: 17px; margin: 0; line-height: 1.45; }
+.sorting-evidence { color: #526983; font-size: 11px; margin-top: 15px; display: flex; gap: 6px; align-items: center; }
+.sorting-evidence > span { font-size: 21px; line-height: 14px; }
+.sorting-bays { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; }
+.sorting-bay { min-height: 122px; position: relative; padding: 8px 13px 13px; cursor: pointer; border: 2px solid #e6c896; border-radius: 19px; background: #fff8e9; color: #061f57; font-family: inherit; display: flex; gap: 6px; align-items: center; text-align: left; box-shadow: 0 4px 0 #e8d5b6; transition: transform .14s ease, background .14s ease, border-color .14s ease; -webkit-tap-highlight-color: transparent; }
+.sorting-bay:nth-child(2) { background: #fff1e8; border-color: #e8bda9; box-shadow: 0 4px 0 #e9c9b8; }
+.sorting-bay:nth-child(3) { background: #fff4e0; }
+.sorting-bay:not(:disabled):hover, .sorting-bay.is-over { transform: translateY(-4px); background: #ffefc6; border-color: #c8893c; }
+.sorting-bay.is-over { outline: 3px solid #f4c45d; outline-offset: 3px; }
+.sorting-bay-picture { width: 84px; flex: 0 0 84px; }
+.sorting-bay svg { width: 100%; display: block; }
+.sorting-bay-copy { display: flex; flex-direction: column; gap: 7px; }
+.sorting-bay strong { font-size: 15px; line-height: 1.2; }
+.sorting-bay-copy > span { font-size: 11px; color: #5c6374; line-height: 1.35; }
+.sorting-bay:disabled { opacity: .58; cursor: default; }
+.sorting-bay.is-correct { opacity: 1; border-color: #268778; background: #e7f3ed; box-shadow: 0 4px 0 #b6d9cc; }
+.sorting-bay-check { position: absolute; right: 7px; top: 7px; border-radius: 50%; background: #287e6e; color: white; width: 20px; height: 20px; text-align: center; font-weight: 800; line-height: 20px; }
+/* Feedback reserves space before the first move so it never appears below a
+   suddenly longer page. Wrong choices need no extra button or scroll step. */
+.sorting-feedback { margin-top: 20px; display: flex; gap: 11px; align-items: center; min-height: 76px; padding: 12px 15px; border-radius: 15px; background: #f2f6f9; }
+.sorting-feedback-icon { flex-shrink: 0; width: 31px; height: 31px; display: grid; place-items: center; font-size: 21px; border-radius: 50%; background: #e0eaf2; }
+.sorting-feedback strong { font-size: 14px; }
+.sorting-feedback p { margin: 4px 0 0; font-size: 12px; line-height: 1.4; }
+.sorting-feedback.is-correct { background: #eaf5ee; }
+.sorting-feedback.is-correct .sorting-feedback-icon { background: #cde8d9; color: #236f59; }
+.sorting-feedback.is-retry { background: #fff2df; }
+.sorting-feedback.is-retry .sorting-feedback-icon { background: #faddb0; color: #855426; }
+.sorting-next { flex-shrink: 0; margin-left: auto; white-space: nowrap; min-height: 44px; }
+.sorting-safety { font-size: 10px; line-height: 1.4; color: #6a7b90; margin: 11px 0 0; text-align: center; }
+/* The drag proxy contains only the appliance SVG; no text or cards follow the
+   finger. Pointer-events none lets us find the destination beneath the proxy. */
+.sorting-drag-ghost { position: fixed; width: 160px; height: 160px; transform: translate(-50%, -75%) rotate(-5deg); z-index: 9999; pointer-events: none; filter: drop-shadow(0 13px 9px #061f5726); }
+.sorting-drag-ghost svg { width: 100%; height: 100%; }
+.sorting-transfer { text-align: center; }
+.sorting-transfer .sorting-heading { text-align: left; }
+.sorting-transfer-art { width: 218px; height: 161px; margin: 15px auto 0; }
+.sorting-transfer-art svg { width: 100%; height: 100%; }
+.sorting-transfer h2 { margin: 8px 0; font-size: 27px; letter-spacing: -.04em; }
+.sorting-transfer-fact { margin: 0 0 25px; font-size: 16px; }
+.sorting-transfer-choices { max-width: 760px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 0 auto; }
+.sorting-transfer-choice { padding: 20px; font: inherit; color: #061f57; background: #fff4dd; border: 2px solid #e9ce9e; border-radius: 17px; min-height: 91px; display: flex; align-items: center; gap: 17px; text-align: left; cursor: pointer; box-shadow: 0 4px 0 #ecdec5; }
+.sorting-transfer-choice > span { font-size: 32px; }
+.sorting-transfer-choice strong { font-size: 15px; line-height: 1.4; }
+.sorting-transfer .sorting-feedback { max-width: 760px; margin: 25px auto 0; text-align: left; }
+.sorting-finish { text-align: center; }
+.sorting-finish-medal { width: 62px; height: 62px; margin: 0 auto 14px; color: #a9761b; background: #ffde91; border-radius: 22px; display: grid; place-items: center; font-size: 42px; box-shadow: 0 5px 0 #eac26d; }
+.sorting-finish h1 { font-size: clamp(27px, 3.5vw, 40px); }
+.sorting-finish-intro { font-size: 15px; line-height: 1.55; color: #5b6f8a; margin: 14px 0 18px; }
+.sorting-learning-cards { display: grid; grid-template-columns: repeat(3, 1fr); max-width: 740px; margin: 0 auto 23px; gap: 17px; }
+.sorting-learning-cards > div { padding: 7px 9px 13px; border-radius: 17px; background: #f5f8fb; }
+.sorting-learning-cards svg { width: 72px; height: 67px; display: block; margin: 0 auto 3px; }
+.sorting-learning-cards strong { font-size: 12px; }
+.sorting-learning-cards p { font-size: 12px; margin: 6px 0 0; }
+.sorting-family-step { display: flex; align-items: center; text-align: left; gap: 19px; padding: 22px; border-radius: 20px; background: #eaf5fc; }
+.sorting-family-icon { font-size: 36px; width: 49px; height: 49px; border-radius: 16px; color: #036c9a; background: #cbeafa; display: grid; place-items: center; flex-shrink: 0; }
+.sorting-family-step h2 { font-size: 18px; margin: 0 0 7px; letter-spacing: -.02em; }
+.sorting-family-step p:not(.eyebrow) { font-size: 12px; line-height: 1.45; margin: 0; color: #536b87; }
+.sorting-family-step .button { margin-left: auto; flex-shrink: 0; font-size: 12px; }
+.sorting-finish-actions { margin-top: 20px; display: flex; justify-content: center; align-items: center; gap: 20px; }
+.sorting-text-button { border: 0; border-bottom: 1px solid #b5c4d6; color: #536781; font-family: inherit; font-size: 12px; padding: 8px 0; background: none; cursor: pointer; }
+/* Tablet landscape has enough room for a picture and clue side by side. These
+   tighter dimensions leave the feedback and Next action visible at 1024x768. */
+@media (min-width: 721px) and (max-height: 820px) {
+  .sorting-page { padding: 18px 28px 15px; }
+  .sorting-heading { margin-bottom: 12px; }
+  .sorting-page h1 { font-size: 30px; }
+  .sorting-playfield { min-height: 207px; }
+  .sorting-item-zone { height: 195px; }
+  .sorting-item { height: 195px; }
+  .sorting-item svg { height: 171px; }
+  .sorting-orbit { width: 160px; height: 160px; }
+  .sorting-bay { min-height: 105px; padding: 7px 10px 10px; }
+  .sorting-bay-picture { width: 69px; flex-basis: 69px; }
+  .sorting-feedback { margin-top: 15px; min-height: 70px; }
+}
+@media (max-width: 900px) {
+  .sorting-page { padding-left: 23px; padding-right: 23px; }
+  .sorting-bay { flex-direction: column; text-align: center; gap: 0; padding-top: 3px; }
+  .sorting-bay-picture { width: 78px; flex-basis: auto; }
+  .sorting-bay-copy { gap: 4px; }
+  .sorting-bay strong { font-size: 14px; }
+  .sorting-help { max-width: 120px; }
+  .sorting-family-step { flex-wrap: wrap; }
+  .sorting-family-step .button { margin-left: 68px; }
+}
+/* Portrait tablets keep the three destinations in a single predictable row. */
+@media (max-width: 720px) {
+  .sorting-page { padding: 22px 18px; }
+  .sorting-heading { gap: 9px; align-items: flex-start; }
+  .sorting-page h1 { font-size: 27px; }
+  .sorting-count { font-size: 10px; padding: 8px; max-width: 95px; text-align: center; }
+  .sorting-instruction { padding: 10px; flex-wrap: wrap; gap: 7px; }
+  .sorting-instruction p { font-size: 12px; flex: 1; }
+  .sorting-help { max-width: none; width: 100%; margin: 0 0 0 35px; text-align: left; font-size: 10px; }
+  .sorting-playfield { padding: 10px 0; grid-template-columns: 44% 56%; min-height: 205px; }
+  .sorting-item-zone { height: 190px; }
+  .sorting-item { width: 100%; max-width: 190px; height: 180px; padding: 0; }
+  .sorting-item svg { height: 156px; }
+  .sorting-orbit { width: 135px; height: 135px; box-shadow: 0 0 0 7px #fdf8ef; }
+  .sorting-story { padding: 10px 0 10px 16px; }
+  .sorting-story h2 { font-size: 18px; }
+  .sorting-fact { font-size: 14px; }
+  .sorting-story-kicker { font-size: 8px; }
+  .sorting-evidence { font-size: 10px; margin-top: 10px; }
+  .sorting-bays { gap: 7px; }
+  .sorting-bay { padding: 4px 5px 10px; border-radius: 14px; }
+  .sorting-bay strong { font-size: 12px; }
+  .sorting-bay-copy > span { font-size: 9px; }
+  .sorting-bay-picture { width: 67px; }
+  .sorting-feedback { padding: 10px; flex-wrap: wrap; gap: 8px; min-height: 78px; }
+  .sorting-feedback > div { flex: 1; min-width: 200px; }
+  .sorting-feedback strong { font-size: 12px; }
+  .sorting-feedback p { font-size: 11px; }
+  .sorting-next { margin: 3px 0 0 39px; }
+  .sorting-transfer-choices { gap: 10px; }
+  .sorting-transfer-choice { padding: 13px; gap: 10px; }
+  .sorting-transfer-choice strong { font-size: 12px; }
+  .sorting-transfer-choice > span { font-size: 23px; }
+  .sorting-transfer h2 { font-size: 23px; }
+  .sorting-transfer-fact { font-size: 14px; }
+  .sorting-learning-cards { gap: 8px; }
+  .sorting-learning-cards strong, .sorting-learning-cards p { font-size: 10px; }
+  .sorting-family-step { gap: 12px; padding: 17px; }
+  .sorting-family-step > div { flex: 1; }
+  .sorting-family-step .button { margin-left: 0; width: 100%; justify-content: center; }
+  .sorting-family-step h2 { font-size: 16px; }
+  .sorting-finish-actions { gap: 13px; }
+}
+/* Reduced motion is respected even though the game has no motion toggle. */
+@media (prefers-reduced-motion: reduce) {
+  .sorting-page *, .sorting-drag-ghost { animation: none !important; transition: none !important; }
+  .sorting-drag-ghost { transform: translate(-50%, -75%); }
+}

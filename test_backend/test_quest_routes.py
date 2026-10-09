@@ -107,11 +107,16 @@ class QuestRouteTests(unittest.TestCase):
 
     def test_quest_navigation_keeps_adult_entry_available_in_the_same_session(self):
         self.login()
-        for path in ("/", "/quest/", "/index.html", "/quest", "/src/app.js"):
+        for path in ("/", "/quest/", "/index.html", "/quest", "/src/app.js", "/legacy"):
             with self.subTest(path=path):
                 with self.client.get(path) as response:
                     self.assertEqual(response.status_code, 200)
                     if path in ("/", "/index.html"):
+                        text = response.get_data(as_text=True)
+                        self.assertIn('id="preview-app"', text)
+                        self.assertIn('Explore in 3D', text)
+                        self.assertNotIn('id="quest-app"', text)
+                    if path == "/legacy":
                         text = response.get_data(as_text=True)
                         self.assertIn('src="src/app.js"', text)
                         self.assertIn('href="/quest"', text)

@@ -29,6 +29,7 @@ access = Blueprint("access", __name__, template_folder="templates")
 # encoded traversal and control characters without relying on browser URL repair.
 RETURN_PATHS = frozenset({
     "/", "/index.html", "/quest", "/quest/", "/quest/index.html",
+    "/legacy", "/legacy/",
     "/quest?view=parents", "/quest/?view=parents", "/quest/index.html?view=parents",
 })
 
