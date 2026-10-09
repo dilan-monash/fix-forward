@@ -13,6 +13,17 @@ from .config import Settings
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 FRONTEND_FILES = {"index.html", "styles.css", "favicon.svg", "404.html", "500.html"}
 
+# The I3 family world is a reviewed entry point, not an open prototype directory.
+# Exact names keep tests, local servers, documentation and future experiments private.
+WORLD_FRONTEND_ASSETS = {
+    f"prototypes/i3-world-preview/{name}" for name in (
+        "index.html", "app.js", "world.css", "world-engine.js", "models.js",
+        "explore.js", "explore.css", "catalogue.js", "action.js", "action.css",
+        "progress.js", "vendor/three.module.js", "vendor/three.core.js",
+        "vendor/OrbitControls.js",
+    )
+} | {"prototypes/i3-family-preview/sorting.js", "prototypes/i3-family-preview/sorting.css"}
+
 # The disabled SigLIP candidate may serve only these reviewed, same-origin files.
 # Keeping exact names here prevents the model folders becoming directory servers.
 SIGLIP_PUBLIC_ASSETS = {
@@ -60,7 +71,7 @@ def create_app(test_config=None):
     import time.
     """
 
-    from flask import Flask, jsonify, request, send_from_directory
+    from flask import Flask, jsonify, redirect, request, send_from_directory
     from werkzeug.middleware.proxy_fix import ProxyFix
 
     from .api import api
@@ -118,9 +129,21 @@ def create_app(test_config=None):
         return valid
 
     @app.get("/")
-    # Serve the existing adult document after the shared access check has passed.
+    @app.get("/index.html")
+    # The same access gate now opens the unified I3 world. Its API calls remain
+    # same-origin GET requests to the existing read-only Flask routes below.
     def index():
+        return send_from_directory(PROJECT_ROOT / "prototypes/i3-world-preview", "index.html")
+
+    @app.get("/legacy")
+    # Keep the approved earlier adult journey available without copying or changing it.
+    def legacy():
         return send_from_directory(PROJECT_ROOT, "index.html")
+
+    @app.get("/legacy/")
+    def legacy_slash():
+        # Its relative stylesheet/script paths require the slash-free document URL.
+        return redirect("/legacy", code=302)
 
     @app.get("/quest")
     @app.get("/quest/")
@@ -134,8 +157,10 @@ def create_app(test_config=None):
     def frontend_asset(asset_path):
         # Only public frontend assets are served. Backend code, migrations and
         # environment templates must never be downloadable from the website.
-        allowed = asset_path in FRONTEND_FILES or (
-            asset_path.startswith("src/") and asset_path.endswith(".js")
+        allowed = asset_path in FRONTEND_FILES or asset_path in WORLD_FRONTEND_ASSETS or (
+            # Only direct app modules are public; src/../prototype tests must
+            # not bypass the exact world allowlist through an alternate path.
+            re.fullmatch(r"src/[A-Za-z0-9_-]+\.js", asset_path) is not None
         ) or (
             asset_path in {"quest/index.html", "quest/quest.css", "quest/app.js",
                            "quest/art.js", "quest/content.js", "quest/engine.js",
@@ -195,7 +220,9 @@ def create_app(test_config=None):
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         response.headers["Permissions-Policy"] = (
-            "camera=(), microphone=(), geolocation=(self), payment=(), usb=()"
+            # WebXR may use spatial tracking after an explicit user permission.
+            # Same-origin camera permission does not start capture on page load.
+            "camera=(self), xr-spatial-tracking=(self), microphone=(), geolocation=(self), payment=(), usb=()"
         )
         if request.is_secure:
             response.headers["Strict-Transport-Security"] = "max-age=31536000"
