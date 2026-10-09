@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import { CATALOGUE, calculateImpact, findAppliance, GRID_FACTORS } from './catalogue.js';
 import { MODEL_PARTS } from './models.js';
-import { mountExplore } from './explore.js';
+import { mountExplore, layoutHotspots } from './explore.js';
 
 /** One fixture per test avoids global DOM state and reproduces route disposal. */
 async function fixture(route = 'explore', supported = false) {
@@ -45,7 +45,7 @@ test('zero use is valid but missing, nonfinite, negative and unreasonable entrie
 });
 
 test('every catalogue part maps to a real selectable mesh rather than a dead hotspot', () => {
-  assert.equal(CATALOGUE.length, 8);
+  assert.equal(CATALOGUE.length, 12);
   for (const product of CATALOGUE) assert.deepEqual(product.parts.map(part => part.id).sort(), [...MODEL_PARTS[product.id]].sort());
   assert.equal(findAppliance('Vacuum cleaner').id, 'vacuum');
   assert.equal(findAppliance('Kettle').id, 'kettle');
@@ -64,7 +64,7 @@ test('direct care links open the requested appliance and carry it into adult act
 
 test('part selection by button updates the mesh and explanation; mesh selection uses the same UI', async () => {
   const f = await fixture();
-  f.click('[data-part="heater"]');
+  f.click('.explore-part-list [data-part="heater"]');
   assert.ok(f.calls.some(call => call[0] === 'setSelectedPart' && call[1] === 'heater'));
   assert.match(f.host.querySelector('.explore-part-detail').textContent, /Heating element/);
   f.callbacks.onSelectPart({ applianceId: 'kettle', partId: 'handle' });
@@ -158,10 +158,10 @@ test('tab keys activate the next panel without trapping keyboard navigation', as
   f.cleanup(); f.dom.window.close();
 });
 
-test('prominent selector exposes eight products and synchronises the 3D view and cards', async () => {
+test('prominent selector exposes all products and synchronises the 3D view and cards', async () => {
   const f = await fixture();
   const picker = f.host.querySelector('[data-product-picker]');
-  assert.equal(picker.options.length, 8);
+  assert.equal(picker.options.length, CATALOGUE.length);
   assert.equal(f.host.querySelector('[data-world="enter-room"]'), null);
   picker.value = 'laptop';
   picker.dispatchEvent(new f.dom.window.Event('change', { bubbles: true }));
@@ -200,4 +200,53 @@ test('navigating away during asynchronous engine startup never overwrites the ne
   cleanup();
   assert.equal(disposals, 1, 'Root may safely call returned cleanup after the aborted mount resolves');
   dom.window.close();
+});
+
+test('all four additional appliances retain their care, energy scenario and adult category', async () => {
+  for (const [id, category] of [['ricecooker', 'Rice cooker'], ['airfryer', 'Air fryer'], ['coffeemachine', 'Coffee machine'], ['mixer', 'Mixer']]) {
+    const f = await fixture(`explore?appliance=${id}&tab=care`);
+    assert.equal(f.host.querySelector('#appliance-title').textContent, category);
+    assert.equal(f.host.querySelectorAll('.explore-care-list li').length, 3);
+    assert.ok(f.host.querySelector('.explore-care-reference a'));
+    assert.ok(f.host.querySelector('.explore-care-next').hash.includes(`appliance=${encodeURIComponent(category)}`));
+    f.click('[data-tab="impact"]');
+    assert.notEqual(f.host.querySelector('[data-impact-result]').textContent, '—');
+    f.click('[data-tab="parts"]');
+    assert.equal(f.host.querySelectorAll('.explore-part-list button').length, 5);
+    const item = findAppliance(id);
+    f.click(`[data-answer="${item.challenge.correct}"]`);
+    assert.equal(f.lessons[0].appliance, category);
+    f.cleanup(); f.dom.window.close();
+  }
+});
+
+test('projected numbered targets select their real part and hide outside the product view', async () => {
+  const f = await fixture();
+  f.callbacks.onPartProjection([{ partId: 'heater', x: .4, y: .6, visible: true }]);
+  const target = f.host.querySelector('.explore-hotspots [data-part="heater"]');
+  assert.equal(target.hidden, false);
+  assert.equal(target.style.left, '40%');
+  assert.equal(target.style.top, '60%');
+  target.click();
+  assert.match(f.host.querySelector('.explore-part-detail').textContent, /Heating element/);
+  assert.ok(f.calls.some(call => call[0] === 'setSelectedPart' && call[1] === 'heater'));
+  f.click('[data-product="kettle"]');
+  assert.equal(f.host.querySelector('.explore-hotspots [data-part="heater"]'), target);
+  assert.equal(target.hidden, false, 'Reselecting the same model preserves unchanged projected targets');
+  f.callbacks.onPartProjection([]);
+  assert.equal(target.hidden, true);
+  f.cleanup(); f.dom.window.close();
+});
+
+test('nearby 3D anchors produce separate finger targets and retain connector endpoints', () => {
+  const points = ['body', 'lid', 'handle', 'heater', 'base'].map((partId, index) => ({ partId, x: .5, y: .55 + index * .01, visible: true }));
+  for (const width of [320, 480, 700]) {
+    const placed = layoutHotspots(points, width, 430);
+    assert.equal(placed.length, 5);
+    placed.forEach((point, index) => {
+      assert.equal(point.anchorX, width * .5);
+      assert.ok(point.pixelX >= 25 && point.pixelX <= width - 25);
+      for (const other of placed.slice(index + 1)) assert.ok(Math.hypot(point.pixelX - other.pixelX, point.pixelY - other.pixelY) >= 48);
+    });
+  }
 });

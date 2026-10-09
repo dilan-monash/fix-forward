@@ -5,8 +5,8 @@ import * as THREE from './vendor/three.module.js';
 import { createAppliance, MODEL_PARTS } from './models.js';
 import { disposeObject } from './world-engine.js';
 
-test('all eight appliances expose distinct real geometry for every catalog part', () => {
-  assert.equal(Object.keys(MODEL_PARTS).length, 8);
+test('all twelve appliances expose distinct real geometry for every catalog part', () => {
+  assert.equal(Object.keys(MODEL_PARTS).length, 12);
   for (const [id, expected] of Object.entries(MODEL_PARTS)) {
     const model = createAppliance(id);
     assert.deepEqual([...model.userData.parts.keys()].sort(), [...expected].sort(), `${id} contract`);
@@ -21,6 +21,8 @@ test('all eight appliances expose distinct real geometry for every catalog part'
       assert.ok(meshes > 0, `${id}/${partId} has selectable geometry`);
       assert.equal(part.userData.applianceId, id);
       assert.ok(part.userData.exploded.toArray().every(Number.isFinite));
+      assert.ok(part.userData.anchor?.isVector3, `${id}/${partId} exposes a real 3D hotspot anchor`);
+      assert.ok(part.userData.anchor.toArray().every(Number.isFinite));
     }
     const bounds = new THREE.Box3().setFromObject(model);
     assert.ok(!bounds.isEmpty());

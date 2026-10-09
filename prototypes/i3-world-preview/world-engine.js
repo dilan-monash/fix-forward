@@ -8,7 +8,8 @@ import { OrbitControls } from './vendor/OrbitControls.js';
 import { createAppliance, MODEL_PARTS, roundedBox } from './models.js';
 
 const NAMES = { kettle: 'Kettle', fan: 'Fan', toaster: 'Toaster', blender: 'Blender',
-  microwave: 'Microwave', vacuum: 'Vacuum', hairdryer: 'Hairdryer', laptop: 'Laptop' };
+  microwave: 'Microwave', vacuum: 'Vacuum', hairdryer: 'Hairdryer', laptop: 'Laptop',
+  ricecooker: 'Rice cooker', airfryer: 'Air fryer', coffeemachine: 'Coffee machine', mixer: 'Stand mixer' };
 
 /** Release GPU allocations when a route closes. Materials can be shared by scene objects. */
 export function disposeObject(root) {
@@ -70,7 +71,7 @@ function addRoomDetails(room) {
   artCircle.position.set(-4.03, 3.17, -2.611); room.add(artCircle);
 }
 
-/** Build one navigable room with eight selectable appliances spread across work surfaces. */
+/** Build one navigable room with twelve selectable appliances spread across work surfaces. */
 function buildRoom() {
   const room = new THREE.Group(); room.name = 'Learning home';
   furniture(room, [11.8, .14, 7.6], 0xe6ddc9, [0, -.09, .25]);
@@ -89,12 +90,19 @@ function buildRoom() {
   for (const x of [2.45, 4.94]) furniture(room, [.12, 1.06, 1.25], 0x55755e, [x, .52, -1.6]);
   furniture(room, [1.54, .11, 1.32], 0xcfa783, [2.9, .63, 1.45]);
   furniture(room, [.15, .59, .15], 0x6a7c63, [2.9, .29, 1.45]);
+  // An island and raised kitchen shelf expand the collection without stacking products together.
+  furniture(room, [2.6, .13, 2.05], 0xc6a47d, [-3.9, .99, 1.58]);
+  furniture(room, [2.33, .94, 1.85], 0xe3eae7, [-3.9, .47, 1.58]);
+  furniture(room, [3.8, .13, 1.21], 0xc6a47d, [-.85, 2.92, -2.09]);
+  for (const x of [-2.39, .72]) furniture(room, [.055, .48, .8], 0x587966, [x, 2.67, -2.19]);
   addRoomDetails(room);
   const locations = {
     microwave: [-3.75, 1.22, -1.29, .72, .05], kettle: [-2.2, 1.22, -1.21, .7, .1],
     toaster: [-.65, 1.22, -1.2, .76, -.07], blender: [.93, 1.22, -1.31, .68, .05],
     laptop: [3.73, 1.18, -1.55, .86, .0], fan: [2.89, .71, 1.45, .67, -.3],
     vacuum: [.52, .08, 1.32, .75, -.12], hairdryer: [4.72, 1.21, -.91, .55, -.55],
+    ricecooker: [-4.57, 1.07, 1.47, .68, .15], airfryer: [-3.18, 1.07, 1.57, .66, -.13],
+    coffeemachine: [-1.83, 3.0, -2.04, .63, .05], mixer: [.03, 3.0, -2.04, .67, -.05],
   };
   const appliances = [];
   for (const [id, [x, y, z, scale, rotation]] of Object.entries(locations)) {
@@ -111,7 +119,7 @@ function buildRoom() {
  * The caller owns headings, learning text and accessible buttons; this owns pixels.
  */
 export async function createWorld(canvas, options = {}) {
-  const { mode = 'explore', onSelectAppliance = () => {}, onSelectPart = () => {}, onStatus = () => {} } = options;
+  const { mode = 'explore', onSelectAppliance = () => {}, onSelectPart = () => {}, onStatus = () => {}, onPartProjection } = options;
   let activeId = Object.hasOwn(MODEL_PARTS, options.appliance) ? options.appliance : 'kettle';
   let disposed = false, overview = mode === 'hero', exploded = false, selectedPart = null;
   let walking = false, walkYaw = 0, walkPitch = -.05;
@@ -161,6 +169,8 @@ export async function createWorld(canvas, options = {}) {
   const fromPosition = new THREE.Vector3(), targetPosition = new THREE.Vector3();
   const fromTarget = new THREE.Vector3(), targetTarget = new THREE.Vector3();
   let transition = null, pointerStart = null, hoverPart = null;
+  let lastProjectionSignature = null;
+  const projectedAnchor = new THREE.Vector3();
   const activePointers = new Set();
   const roomRotors = [];
   room.traverse((object) => { if (object.userData.rotor) roomRotors.push(object); });
@@ -200,6 +210,7 @@ export async function createWorld(canvas, options = {}) {
     controls.minDistance = 5; controls.maxDistance = 18;
     cameraTo([8.4, 6.1, 10.2], [0, 1.2, -.4], instant);
     invalidate();
+    reportPartPositions();
     onStatus({ type: 'room-overview', message: 'The whole home. Tap an appliance, or enter the room to look around.' });
   }
 
@@ -211,6 +222,7 @@ export async function createWorld(canvas, options = {}) {
     const start = new THREE.Vector3(0, 1.55, 3.32);
     const look = walkTarget(start);
     cameraTo(start.toArray(), look.toArray());
+    reportPartPositions();
     onStatus({ type: 'walk-entered', message: 'You are inside the 3D room. Drag to look; use the arrows to move. Tap an appliance to explore it.' });
     return true;
   }
@@ -228,6 +240,7 @@ export async function createWorld(canvas, options = {}) {
       { minX: -4.97, maxX: 2.22, minZ: -2.35, maxZ: -.33 },
       { minX: 2.15, maxX: 5.3, minZ: -2.48, maxZ: -.6 },
       { minX: 1.92, maxX: 3.87, minZ: .53, maxZ: 2.36 },
+      { minX: -5.4, maxX: -2.4, minZ: .34, maxZ: 2.79 },
     ];
     return !footprints.some((area) => x > area.minX && x < area.maxX && z > area.minZ && z < area.maxZ);
   }
@@ -320,6 +333,32 @@ export async function createWorld(canvas, options = {}) {
   function findPart(object) {
     for (let node = object; node; node = node.parent) if (node.userData.partId) return node.userData;
     return null;
+  }
+
+  /**
+   * Report real 3D anchor positions for accessible HTML hotspot buttons.
+   * x/y are normalized canvas coordinates, not viewport pixels. Visibility means
+   * within the camera frame; internal-part anchors intentionally remain available
+   * so learners can select a concealed part and then separate the digital model.
+   */
+  function reportPartPositions() {
+    if (typeof onPartProjection !== 'function' || disposed) return;
+    const points = [];
+    if (!overview && !renderer.xr.isPresenting) {
+      for (const partId of MODEL_PARTS[activeId]) {
+        const group = focused.userData.parts.get(partId);
+        projectedAnchor.copy(group.userData.anchor);
+        group.localToWorld(projectedAnchor); projectedAnchor.project(camera);
+        const x = (projectedAnchor.x + 1) / 2, y = (1 - projectedAnchor.y) / 2;
+        const visible = projectedAnchor.z >= -1 && projectedAnchor.z <= 1 && x >= 0 && x <= 1 && y >= 0 && y <= 1;
+        points.push({ partId, x: THREE.MathUtils.clamp(x, 0, 1), y: THREE.MathUtils.clamp(y, 0, 1), visible });
+      }
+    }
+    // Ignore sub-pixel settling; unchanged positions never cause repeated DOM writes.
+    const signature = points.map(({ partId, x, y, visible }) => `${partId}:${Math.round(x * 1000)}:${Math.round(y * 1000)}:${visible}`).join('|');
+    if (signature === lastProjectionSignature) return;
+    lastProjectionSignature = signature;
+    onPartProjection(points);
   }
 
   /** Translate a client tap to a ray through the canvas into the actual visible mesh. */
@@ -454,7 +493,7 @@ export async function createWorld(canvas, options = {}) {
           if (pose) reticle.matrix.fromArray(pose.transform.matrix);
         }
       }
-      renderer.render(scene, camera); return;
+      renderer.render(scene, camera); reportPartPositions(); return;
     }
     if (!visible || document.hidden) return;
     const ambient = mode === 'hero' && !reducedMotion.matches;
@@ -479,7 +518,7 @@ export async function createWorld(canvas, options = {}) {
       for (const rotor of roomRotors) rotor.rotation.z += delta * .45;
     }
     if (walking) camera.lookAt(controls.target); else controls.update(delta);
-    renderer.render(scene, camera);
+    renderer.render(scene, camera); reportPartPositions();
   }
 
   resize(); overview ? showRoom(true) : resetView(true);

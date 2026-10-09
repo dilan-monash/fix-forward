@@ -4,6 +4,34 @@ import { CATALOGUE, GRID_FACTORS, SOURCES, findAppliance, calculateImpact } from
  * escapes anything coming from a route, so URL text never becomes HTML. */
 const escape = value => String(value ?? '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
 
+/** Keep finger targets apart in screen space, while preserving their true 3D
+ * anchors for connector lines. A nearest-first ring search favours short lines.
+ * This does not move model geometry or pretend the label is the part itself. */
+export function layoutHotspots(points, width, height, gap = 48) {
+  const padding = 25;
+  const minY = Math.min(58, height / 4);
+  const maxY = Math.max(minY, height - Math.min(95, height / 4));
+  const placed = [];
+  for (const point of points) {
+    if (!point.visible || !Number.isFinite(point.x) || !Number.isFinite(point.y) || point.x < 0 || point.x > 1 || point.y < 0 || point.y > 1) continue;
+    const anchorX = point.x * width, anchorY = point.y * height;
+    const clamp = (x, y) => ({ x: Math.max(padding, Math.min(width - padding, x)), y: Math.max(minY, Math.min(maxY, y)) });
+    let candidate = clamp(anchorX, anchorY);
+    const clear = value => placed.every(other => Math.hypot(value.x - other.pixelX, value.y - other.pixelY) >= gap);
+    if (!clear(candidate)) {
+      let found = false;
+      for (let radius = gap / 2; radius <= Math.max(width, height) && !found; radius += gap / 2) {
+        for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 8) {
+          const next = clamp(anchorX + Math.cos(angle) * radius, anchorY + Math.sin(angle) * radius);
+          if (clear(next)) { candidate = next; found = true; break; }
+        }
+      }
+    }
+    placed.push({ ...point, anchorX, anchorY, pixelX: candidate.x, pixelY: candidate.y, x: candidate.x / width, y: candidate.y / height });
+  }
+  return placed;
+}
+
 /** Small flat catalogue icons are navigation aids. The large interactive viewport
  * is a real WebGL scene provided by world-engine.js, not these decorative icons. */
 export function productIcon(id) {
@@ -16,6 +44,10 @@ export function productIcon(id) {
     vacuum: '<rect x="8" y="31" width="25" height="23" rx="9"/><path d="M23 31V19c0-13 21-13 21 0v24m-6 10 6-10 8 10H38Z"/><circle cx="15" cy="54" r="4"/>',
     hairdryer: '<path d="M14 16h26l9 8-9 9H14a8 8 0 0 1 0-17Zm6 17-2 23h10l4-23M49 20h8v9h-8"/><path d="M12 21v8m5-8v8"/>',
     laptop: '<rect x="12" y="11" width="39" height="29" rx="3"/><path d="M12 40 4 51h55l-8-11M23 47h17"/>',
+    ricecooker: '<path d="M11 24h42v23a7 7 0 0 1-7 7H18a7 7 0 0 1-7-7V24Zm0 0c0-15 42-15 42 0M25 12V8h13v4M7 30H3v12h8m42-12h8v12h-8M20 57v3m24-3v3"/><rect x="24" y="35" width="15" height="10" rx="3"/>',
+    airfryer: '<rect x="12" y="8" width="40" height="48" rx="12"/><path d="M15 31h34M26 21h12M24 39h16v8H24ZM22 60h21"/>',
+    coffeemachine: '<path d="M13 8h35v47H13V8Zm4 20h27M18 50h25M25 30v6m11-6v6M23 39h16v10H23Z"/><path d="M48 13h9v29h-9M24 17h2m10 0h2M9 59h43"/>',
+    mixer: '<path d="M17 12h26a8 8 0 0 1 0 16H17V12ZM19 28v26h28M14 54h37v5H14ZM34 28v10m-8 0h20c0 15-20 15-20 0Z"/><circle cx="23" cy="20" r="3"/>',
   };
   return `<svg viewBox="0 0 64 64" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${paths[id] || paths.kettle}</svg>`;
 }
@@ -63,12 +95,13 @@ export async function mountExplore(host, options = {}) {
   options.signal?.addEventListener('abort', cleanup, { once: true });
 
   host.innerHTML = `<section class="explore-page page-width" aria-labelledby="explore-title">
-    <header class="explore-heading"><div><p class="eyebrow">FF LENS / EXPLORE TO UNDERSTAND</p><h1 id="explore-title">Every object has more to it.</h1><p>Look inside in 3D. Discover how it works, how to care for it and what comes next.</p></div><div class="explore-heading-actions"><label class="explore-product-picker">Choose an appliance <span>8 objects to explore</span><select data-product-picker>${CATALOGUE.map(item => `<option value="${item.id}"${item.id === appliance.id ? ' selected' : ''}>${escape(item.name)}</option>`).join('')}</select></label><a class="explore-help-link" href="#action?kind=repair&appliance=${encodeURIComponent(appliance.category)}">Have a faulty appliance? <span aria-hidden="true">↗</span></a></div></header>
+    <header class="explore-heading"><div><p class="eyebrow">FF LENS / EXPLORE TO UNDERSTAND</p><h1 id="explore-title">Every object has more to it.</h1><p>Look inside in 3D. Discover how it works, how to care for it and what comes next.</p></div><div class="explore-heading-actions"><label class="explore-product-picker">Choose an appliance <span>${CATALOGUE.length} objects to explore</span><select data-product-picker>${CATALOGUE.map(item => `<option value="${item.id}"${item.id === appliance.id ? ' selected' : ''}>${escape(item.name)}</option>`).join('')}</select></label><a class="explore-help-link" href="#action?kind=repair&appliance=${encodeURIComponent(appliance.category)}">Have a faulty appliance? <span aria-hidden="true">↗</span></a></div></header>
     <div class="explore-workspace">
       <div class="explore-stage-column">
         <div class="explore-stage" aria-label="Interactive appliance world">
           <div class="explore-stage-top"><span class="explore-stage-badge">LIVE 3D WORLD</span><span class="explore-room-label">${escape(appliance.room)} / ${escape(appliance.name)}</span></div>
           <canvas class="explore-canvas" aria-label="3D ${escape(appliance.name)}. Drag to rotate, pinch to zoom. Parts can also be selected in the adjacent panel." tabindex="0"></canvas>
+          <div class="explore-hotspots" aria-label="Parts on the 3D model"></div>
           <div class="explore-start-hint"><span class="explore-drag-symbol" aria-hidden="true">↔</span><span>Drag to look around.<br><strong>Tap a part to discover it.</strong></span></div>
           <div class="explore-stage-tools" aria-label="3D view controls">
             <button type="button" data-world="room" title="See the whole room" aria-pressed="false">⌂ <span>Room view</span></button>
@@ -87,13 +120,44 @@ export async function mountExplore(host, options = {}) {
         <div id="explore-panel" class="explore-panel" role="tabpanel" aria-labelledby="tab-${activeTab}" tabindex="0"></div>
       </aside>
     </div>
-    <section class="explore-catalogue" aria-labelledby="catalogue-title"><div class="explore-section-heading"><h2 id="catalogue-title">Pick something familiar.</h2><span>8 objects. New things to notice.</span></div><div class="explore-product-list">${CATALOGUE.map(item => `<button type="button" class="explore-product" data-product="${item.id}" aria-pressed="${item.id === appliance.id}" style="--product-colour:${item.colour}"><span class="explore-product-art">${productIcon(item.id)}</span><span>${escape(item.name)}</span><small>${escape(item.room)}</small></button>`).join('')}</div></section>
+    <section class="explore-catalogue" aria-labelledby="catalogue-title"><div class="explore-section-heading"><h2 id="catalogue-title">Pick something familiar.</h2><span>${CATALOGUE.length} objects. New things to notice.</span></div><div class="explore-product-list">${CATALOGUE.map(item => `<button type="button" class="explore-product" data-product="${item.id}" aria-pressed="${item.id === appliance.id}" style="--product-colour:${item.colour}"><span class="explore-product-art">${productIcon(item.id)}</span><span>${escape(item.name)}</span><small>${escape(item.room)}</small></button>`).join('')}</div></section>
     <section class="explore-to-action" aria-labelledby="explore-action-title"><div><p class="eyebrow">FROM UNDERSTANDING TO DOING</p><h2 id="explore-action-title">Make your next step a good one.</h2><p>A question for the family: <strong class="explore-family-question">${escape(appliance.question)}</strong></p></div><div class="explore-action-links"></div></section>
   </section>`;
 
   const panel = host.querySelector('#explore-panel');
   const canvas = host.querySelector('canvas');
   const stage = host.querySelector('.explore-stage');
+
+  /** Numbered targets sit on the real projected 3D part positions. They use the
+   * same part IDs and click handler as the text list, making tapping discoverable. */
+  function renderHotspots() {
+    const layer = host.querySelector('.explore-hotspots');
+    // Selecting the same appliance should preserve current projections. The
+    // renderer only emits changed coordinates, so replacing these would hide them.
+    if (layer.dataset.appliance === appliance.id) return;
+    layer.dataset.appliance = appliance.id;
+    layer.innerHTML = `<svg class="explore-hotspot-connectors" aria-hidden="true"><path fill="none"/></svg>` + appliance.parts.map((part, index) => `<button type="button" data-part="${part.id}" aria-label="Part ${index + 1}: ${escape(part.name)}" aria-pressed="${selectedPart === part.id}" hidden><span>${index + 1}</span></button>`).join('');
+  }
+
+  /** Three.js projects each part into normalized canvas coordinates. Updating
+   * positions never redraws the canvas or replaces a currently focused button.
+   * Empty projections hide targets for the room overview and real camera AR. */
+  function placeHotspots(projections = []) {
+    if (disposed) return;
+    const width = canvas.clientWidth || 640, height = canvas.clientHeight || 480;
+    const positions = layoutHotspots(projections, width, height);
+    const points = new Map(positions.map(point => [point.partId, point]));
+    const connectors = host.querySelector('.explore-hotspot-connectors');
+    connectors.setAttribute('viewBox', `0 0 ${width} ${height}`);
+    connectors.querySelector('path').setAttribute('d', positions.filter(point => Math.hypot(point.anchorX - point.pixelX, point.anchorY - point.pixelY) > 3).map(point => `M${point.anchorX},${point.anchorY}L${point.pixelX},${point.pixelY}`).join(' '));
+    host.querySelectorAll('.explore-hotspots [data-part]').forEach(button => {
+      const point = points.get(button.dataset.part);
+      const visible = point?.visible && Number.isFinite(point.x) && Number.isFinite(point.y) && point.x >= 0 && point.x <= 1 && point.y >= 0 && point.y <= 1;
+      button.hidden = !visible;
+      if (visible) { button.style.left = `${point.x * 100}%`; button.style.top = `${point.y * 100}%`; }
+      button.setAttribute('aria-pressed', String(button.dataset.part === selectedPart));
+    });
+  }
 
   /** Keep overview and focused-product labels consistent. Product selection is
    * available directly at the top; no walking navigation is required. */
@@ -122,6 +186,7 @@ export async function mountExplore(host, options = {}) {
     if (activeTab === 'parts') renderParts();
     if (activeTab === 'care') renderCare();
     if (activeTab === 'impact') renderImpact();
+    host.querySelectorAll('.explore-hotspots [data-part]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.part === selectedPart)));
   }
 
   /** Mesh IDs are the shared key: a real mesh hit and these keyboard/touch
@@ -135,6 +200,14 @@ export async function mountExplore(host, options = {}) {
    * apart real electronics. The child contribution is observation and discussion. */
   function renderCare() {
     panel.innerHTML = `<p class="explore-panel-intro">Look after what you own. Start with your model’s manual.</p><ol class="explore-care-list">${appliance.care.map(([title, detail], index) => `<li><span>${String(index + 1).padStart(2, '0')}</span><div><h3>${escape(title)}</h3><p>${escape(detail)}</p></div></li>`).join('')}</ol><div class="explore-care-boundary"><strong>For adults. Children explore the digital model.</strong><p>If there is damage, smoke, sparks or a burning smell, stop using the appliance and get appropriate help.</p></div><a class="explore-source-link" href="${SOURCES.safety}" target="_blank" rel="noopener noreferrer">Electrical safety guidance · Energy Safe Victoria ↗</a><a class="explore-care-next" href="#action?kind=repair&appliance=${encodeURIComponent(appliance.category)}">Something isn’t working? Find a next step →</a>`;
+    if (appliance.careSource) {
+      // These examples explain why model-specific instructions matter. They do
+      // not pretend our generic geometry is that manufacturer's exact product.
+      const reference = host.ownerDocument.createElement('p');
+      reference.className = 'explore-care-reference';
+      reference.innerHTML = `<a class="explore-source-link" href="${escape(appliance.careSource.url)}" target="_blank" rel="noopener noreferrer">${escape(appliance.careSource.label)} ↗</a><small>Use the instructions for your exact model.</small>`;
+      panel.querySelector('.explore-care-next').before(reference);
+    }
   }
 
   /** The impact form exposes every assumption. Its example can teach both
@@ -186,6 +259,7 @@ export async function mountExplore(host, options = {}) {
     host.querySelector('[data-product-picker]').value = appliance.id;
     host.querySelector('[data-world="explode"]').setAttribute('aria-pressed', 'false');
     updateViewControls();
+    renderHotspots();
     renderPanel();
     renderActionLinks();
     playSound('tap');
@@ -290,7 +364,7 @@ export async function mountExplore(host, options = {}) {
     if (action !== 'ar') playSound('tap');
   }, { signal: controller.signal });
 
-  /** The prominent selector reaches all eight products without scrolling to
+  /** The prominent selector reaches the complete catalogue without scrolling to
    * the catalogue cards. Both navigation methods share the same state handler. */
   host.querySelector('[data-product-picker]').addEventListener('change', event => {
     chooseAppliance(event.target.value);
@@ -330,6 +404,7 @@ export async function mountExplore(host, options = {}) {
   }, { signal: controller.signal });
   panel.addEventListener('submit', event => event.preventDefault(), { signal: controller.signal });
 
+  renderHotspots();
   renderPanel();
   renderActionLinks();
 
@@ -342,6 +417,7 @@ export async function mountExplore(host, options = {}) {
       mode: 'explore', appliance: appliance.id,
       onSelectAppliance: id => chooseAppliance(id, true),
       onSelectPart: ({ applianceId, partId }) => { if (appliance.id !== applianceId) chooseAppliance(applianceId, true); choosePart(partId, true); },
+      onPartProjection: placeHotspots,
       onStatus: handleWorldStatus,
     });
     if (disposed) { cleanup(); return cleanup; }

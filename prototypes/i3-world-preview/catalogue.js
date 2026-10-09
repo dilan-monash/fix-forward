@@ -165,6 +165,88 @@ export const CATALOGUE = [
     challenge: { question: 'A working laptop is going to another family. What else matters?', choices: ['Only making the outside look clean', 'An adult backing up and removing personal data'], correct: 1, explanation: 'A second life is useful, but personal information needs protection before the device changes hands.' },
     energyTip: 'Actual laptop draw varies with charging, screen and workload. Use a measured value if available; charger ratings are not constant use.',
   },
+  // These four models broaden kitchen discovery without changing the shared
+  // 3D -> care -> impact -> adult-action route. Their wattages remain examples.
+  {
+    id: 'ricecooker', name: 'Rice cooker', category: 'Rice cooker', room: 'Kitchen', colour: '#84aaba', watts: 700, minutes: 25,
+    question: 'Why is the removable bowl different from the electrical body?',
+    summary: 'Meet the bowl, heat and controls behind a familiar shared meal.',
+    parts: [
+      part('body', 'Outer body', 'Holds the electrical and heating parts around the cooking bowl.', 'Usually a mix of plastic and metal. Keep the electrical body out of water.'),
+      part('lid', 'Lid', 'Covers the rice as it cooks. Escaping steam and the lid can be very hot.', 'Glass, metal or plastic depending on the model.'),
+      part('bowl', 'Cooking bowl', 'Holds the rice and water. Its marked levels help the user follow the cooking instructions.', 'Often coated metal. The finish needs care suitable for that coating.'),
+      part('control', 'Cooking control', 'Selects or indicates a cooking mode. Warm and cook are different jobs.', 'A switch or electronic controls connect to internal components.'),
+      part('base', 'Heating base', 'Transfers heat into the bowl. The real electrical parts stay enclosed.', 'Contains a metal heating surface and electrical connections.'),
+    ],
+    care: [
+      ['Know what can be washed', 'Unplug and let it cool. Follow the manual for the removable bowl and lid; never immerse the electrical body.'],
+      ['Protect the bowl’s surface', 'Use the utensils and cleaning tools recommended for your bowl’s coating. Avoid scraping away its finish.'],
+      ['Check the fit before use', 'Follow the manual for seating a clean, dry bowl in the cooker. Keep steam outlets clear during cooking.'],
+    ],
+    careSource: { label: 'Example rice cooker care manual · Breville', url: 'https://www.breville.com/content/dam/breville/au/en/assets/miscellaneous/instruction-manual/cookers/BRC550-instruction-manual.pdf' },
+    challenge: { question: 'The bowl can be washed. Does that mean the whole cooker can go in water?', choices: ['Yes, every part can be washed the same way', 'No, the electrical body needs different care'], correct: 1, explanation: 'Parts have different jobs and care needs. The bowl’s cleaning rule does not apply to the electrical body.' },
+    energyTip: 'Cooking and keep-warm modes draw different power. Estimate one mode at a time using its power and active time; this example is not a whole-day measurement.',
+  },
+  {
+    id: 'airfryer', name: 'Air fryer', category: 'Air fryer', room: 'Kitchen', colour: '#95a8bd', watts: 1500, minutes: 20,
+    question: 'What needs to happen before an air fryer is cleaned?',
+    summary: 'Discover how hot air, a basket and careful habits work together.',
+    parts: [
+      part('body', 'Outer body', 'Houses the heater, fan and controls. Air needs space to flow around its vents.', 'Metal and heat-resistant plastic surround electrical components.'),
+      part('basket', 'Food basket', 'Holds food while hot air moves around it. Fill limits depend on the model.', 'Often coated metal. The coating needs suitable utensils and cleaning.'),
+      part('handle', 'Drawer handle', 'Gives a place to pull the basket drawer. Hot food and other surfaces still need care.', 'Usually heat-resistant plastic attached to the drawer.'),
+      part('control', 'Time and temperature controls', 'Set a cooking routine. A selected temperature is not the same thing as power in watts.', 'Buttons, dials or a screen connect to the controller inside.'),
+      part('heater', 'Heating assembly', 'Turns electricity into heat while a fan moves the hot air. Explore it digitally only.', 'Metal heating parts and wiring remain enclosed on the real appliance.'),
+    ],
+    care: [
+      ['Let it cool first', 'Switch off, unplug and allow hot parts to cool before following the model’s cleaning instructions.'],
+      ['Care for the basket', 'Check which removable parts can be washed and which cleaning tools are suitable. Do not assume every part is dishwasher-safe.'],
+      ['Give the vents room', 'Follow the manual’s placement and clearance guidance. Do not block air openings or immerse the electrical body.'],
+    ],
+    careSource: { label: 'Example air fryer care guidance · Philips', url: 'https://acc.usa.philips.com/c-f/XC000012903/how-to-clean-my-philips-airfryer' },
+    challenge: { question: 'Cooking has finished. Is the basket ready for a child to wash straight away?', choices: ['No, it can still be hot; an adult follows the cleaning guide', 'Yes, turning it off makes it cool immediately'], correct: 0, explanation: 'Turning something off does not remove its heat straight away. An adult lets it cool and follows its care instructions.' },
+    energyTip: 'The heater cycles during cooking, so rated watts × the whole cooking time can overestimate use. Replace the example with measured average power if available.',
+  },
+  {
+    id: 'coffeemachine', name: 'Coffee machine', category: 'Coffee machine', room: 'Kitchen', colour: '#a997be', watts: 1200, minutes: 8,
+    question: 'Does every coffee machine use the same cleaning routine?',
+    summary: 'Follow water through a machine and learn why its model matters.',
+    parts: [
+      part('body', 'Machine body', 'Contains the components that heat and move water. Keep the real enclosure closed.', 'Metal, plastic, tubing and electronics work together.'),
+      part('tank', 'Water tank', 'Stores water for making a drink. Its fill and care instructions belong to the specific model.', 'Often a removable plastic container; some models use a different water supply.'),
+      part('spout', 'Coffee outlet', 'Directs the prepared drink into a cup. The liquid and outlet can be hot.', 'Metal or plastic connects to the internal water pathway.'),
+      part('tray', 'Drip tray', 'Catches drips below the cup. Some have a marker to show when the tray is full.', 'Usually removable plastic or metal parts.'),
+      part('control', 'Drink controls', 'Choose a drink or a maintenance programme. Symbols and sequences differ between models.', 'Buttons or electronic controls send instructions to the machine.'),
+    ],
+    care: [
+      ['Use your model’s cleaning guide', 'Follow the manual for the water tank, drip tray and drink outlets. Let hot parts cool and isolate power as directed.'],
+      ['Descale the instructed way', 'Use the descaling product, amounts and rinse programme specified for your model. Another machine’s routine may not apply.'],
+      ['Treat leaks as a reason to check', 'Stop using a machine with an unexpected leak or damaged lead and seek appropriate advice. Do not open its enclosure to investigate.'],
+    ],
+    careSource: { label: 'Example model-specific descaling guide · De’Longhi', url: 'https://support.delonghi.com/en/magnifica-evo-ecam29X.5X/Descaling-guide-f790' },
+    challenge: { question: 'A friend shares a descaling routine for a different model. What should your family do first?', choices: ['Use it because all coffee machines are identical', 'Find the guide for their own model'], correct: 1, explanation: 'Models can need different amounts, steps and rinses. Matching the model helps your family find the right instructions.' },
+    energyTip: 'Heating, brewing and standby are different modes. This example estimates active use only; it does not include all-day standby or every warm-up cycle.',
+  },
+  {
+    id: 'mixer', name: 'Mixer', category: 'Mixer', room: 'Kitchen', colour: '#bd8c75', watts: 300, minutes: 8,
+    question: 'What is the useful first step before cleaning moving parts?',
+    summary: 'See how a motor, mixing tool and bowl work as a team.',
+    parts: [
+      part('body', 'Motor head', 'Houses the motor that turns the mixing tool. It stays closed on the real appliance.', 'Metal, plastic and wiring form the drive assembly.'),
+      part('bowl', 'Mixing bowl', 'Holds ingredients beneath the mixing tool. Capacity limits depend on the recipe and model.', 'Often steel, glass or ceramic, with different cleaning requirements.'),
+      part('beaters', 'Mixing tool', 'Moves through ingredients to mix them. Keep hands, hair and utensils clear while it moves.', 'Usually coated or uncoated metal; care differs between attachments.'),
+      part('control', 'Speed control', 'Changes how fast the motor turns. A faster setting is not right for every mixture.', 'A lever, dial or electronic control connects to the drive.'),
+      part('base', 'Support base', 'Supports the mixer and bowl on a steady surface.', 'Often heavy metal with feet that help keep it stable.'),
+    ],
+    care: [
+      ['Switch off and unplug', 'Disconnect power before cleaning or changing attachments, following your model’s instructions.'],
+      ['Check each attachment', 'Use the cleaning method approved for your bowl and mixing tools. Coatings and materials may need different care.'],
+      ['Respect capacity and speed', 'Follow the manual’s quantity, speed and running-time limits. Stop and seek advice if the mixer behaves unusually.'],
+    ],
+    careSource: { label: 'Example mixer cleaning guidance · KitchenAid', url: 'https://producthelp.kitchenaid.com/Countertop_Appliances/Stand_Mixers/Mini_3.5_Quart_Tilt-Head_Stand_Mixer/Cleaning_and_Maintenance/How_to_Clean_the_Stand_Mixer' },
+    challenge: { question: 'The mixer has stopped. Before cleaning or changing its tool, what should an adult do?', choices: ['Switch off and unplug, then follow the manual', 'Reach into the bowl while it stays connected'], correct: 0, explanation: 'Disconnecting power helps prevent an unexpected start. The adult follows the model’s cleaning and attachment instructions.' },
+    energyTip: 'Motor power varies with speed and load. This editable example uses constant power for clarity; measured average use would be more accurate.',
+  },
 ];
 
 /** Accept an ID or a familiar appliance label from a family-to-adult route. */

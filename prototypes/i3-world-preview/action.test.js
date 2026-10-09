@@ -11,7 +11,7 @@ const settle = () => new Promise(resolve => setImmediate(resolve));
 
 // Each mount owns a DOM and a mocked GET adapter. Listener teardown is always
 // exercised at the end so later tests cannot receive a stale API update.
-async function makeAction(t, { kind = 'recall', appliance = 'kettle', available = false } = {}) {
+async function makeAction(t, { kind = 'recall', appliance = 'kettle', available = false, datasets = {} } = {}) {
   const dom = new JSDOM('<!doctype html><main id="host"></main>', { url: 'http://preview.test/' });
   const previous = new Map();
   for (const [key, value] of Object.entries({ window: dom.window, document: dom.window.document, AbortController: dom.window.AbortController })) {
@@ -25,7 +25,7 @@ async function makeAction(t, { kind = 'recall', appliance = 'kettle', available 
     requests.push({ path, method: options.method || 'GET' });
     if (!available || !path.startsWith('/api/')) return { ok: false, status: 404, json: async () => ({}) };
     const field = path.endsWith('repair-evidence') ? 'evidence' : path.split('/').at(-1);
-    return { ok: true, status: 200, json: async () => ({ [field]: [], meta: { retrievalDate: 'Synthetic fixture' } }) };
+    return { ok: true, status: 200, json: async () => ({ [field]: datasets[field] || [], meta: { retrievalDate: 'Synthetic fixture' } }) };
   });
   const host = dom.window.document.querySelector('#host');
   const dispose = mountAction(host, { route: `action?kind=${kind}&appliance=${encodeURIComponent(appliance)}`, onNavigate: route => routes.push(route) });
@@ -68,6 +68,51 @@ test('known engine alias maps to its actual adult category and returns to the sa
   assert.equal(ui.routes[0], 'action?kind=repair&appliance=Vacuum%20cleaner');
   ui.query('[data-family-lens]').click();
   assert.equal(ui.routes[1], 'explore?appliance=vacuum');
+});
+
+// The expanded world must preserve identity both through an adult task and back
+// to its 3D model. A display label is not necessarily the engine's shorter ID.
+for (const [id, title] of Object.entries({ ricecooker: 'Rice cooker', airfryer: 'Air fryer', coffeemachine: 'Coffee machine', mixer: 'Mixer' })) {
+  test(`${title} keeps its reviewed category and exact world identity`, async t => {
+    const ui = await makeAction(t, { appliance: id });
+    assert.equal(ui.query('#action-category').value, title);
+    assert.equal(ui.query('[data-coverage-note]').hidden, true);
+    ui.query('[data-action-kind="repair"]').click();
+    assert.equal(ui.routes[0], `action?kind=repair&appliance=${encodeURIComponent(title)}`);
+    ui.query('[data-family-lens]').click();
+    assert.equal(ui.routes[1], `explore?appliance=${id}`);
+  });
+}
+
+test('successful API recall records flow through the real matcher and show their official notice', async t => {
+  const ui = await makeAction(t, { available: true, datasets: { recalls: [{
+    id: 'synthetic-recall', categoryCodes: ['kettle'], brand: 'Synthetic Brand',
+    title: 'Synthetic model recall fixture', productName: 'Synthetic kettle',
+    identifiers: [{ type: 'model', value: 'TEST-123', normalizedValue: 'TEST123' }],
+    noticeUrl: 'https://www.productsafety.gov.au/recalls/synthetic-fixture',
+  }] } });
+  type(ui, '#action-brand', 'Synthetic Brand'); type(ui, '#action-model', 'TEST-123');
+  submit(ui, '#action-recall-form');
+  assert.match(ui.query('#action-recall-result').textContent, /possible recall needs your attention/i);
+  assert.ok(ui.query('#action-recall-result a[href="https://www.productsafety.gov.au/recalls/synthetic-fixture"]'));
+  assert.match(ui.query('[data-data-status]').textContent, /reference records loaded/i);
+  assert.doesNotMatch(ui.query('#action-recall-result').textContent, /unavailable/i);
+  assert.ok(ui.requests.some(request => request.path === '/api/recalls'));
+});
+
+test('successful API locations render actual returned candidates rather than a fixed fallback', async t => {
+  const ui = await makeAction(t, { kind: 'repair', available: true, datasets: { locations: [{
+    id: 'synthetic-provider', pathway: 'repair', providerType: 'electronics_repair',
+    name: 'Synthetic repair provider fixture', suburb: 'Clayton', postcode: '3168',
+    latitude: -37.918, longitude: 145.12, address: 'Test address',
+    url: 'https://example.test/synthetic-provider', sourceRetrievedAt: 'Synthetic fixture',
+  }] } });
+  type(ui, '#action-area', '3168 — Clayton'); submit(ui, '#action-services-form');
+  assert.match(ui.query('#action-service-result').textContent, /synthetic repair provider fixture/i);
+  assert.match(ui.query('#action-service-result').textContent, /places to contact before visiting/i);
+  assert.ok(ui.query('.action-location'));
+  assert.doesNotMatch(ui.query('#action-service-result').textContent, /unavailable/i);
+  assert.ok(ui.requests.some(request => request.path === '/api/locations'));
 });
 
 test('a data outage stays unavailable, offers an official source, and performs GET only', async t => {

@@ -1,10 +1,14 @@
-# FixForward I3 — 3D world preview
+# FixForward I3 — 3D world frontend
 
-This is a separate local design review for one family product: understand an appliance, explore its parts and impact, and choose a practical next step. Adults can go straight to **Take action** without playing a game. Children can explore and practise decisions with an adult.
+This is the unified Iteration 3 family frontend: understand an appliance, explore its parts and impact, and choose a practical next step. Adults can go straight to **Take action** without playing a game. Children can explore and practise decisions with an adult. The folder keeps its development name, but Flask now serves this interface at the I3 website root.
 
 This frontend is now the Iteration 3 entry page served by Flask behind the existing password gate. The previous adult app remains at `/legacy` and the original Quest remains at `/quest`. Main and Iteration 2 are unchanged. This folder has its own styles and saved progress and reuses the earlier sorting module and existing public-data/AI adapters.
 
-## Run the preview
+## Run locally
+
+For the complete application, use the normal repository Flask startup and configured environment described in the root README. The existing website password gate and same-origin read-only APIs apply. No database migration or import is required by this frontend.
+
+For an isolated design review with operational data deliberately disconnected:
 
 From the repository root, in PowerShell:
 
@@ -18,7 +22,7 @@ The local server binds to `127.0.0.1`. It is a review server on this computer, n
 
 ## What is in this version
 
-- A real WebGL room with eight original geometric models: kettle, fan, toaster, blender, microwave, vacuum cleaner, hair dryer and laptop.
+- A real WebGL room with twelve original geometric models: kettle, fan, toaster, blender, microwave, vacuum cleaner, hair dryer, laptop, rice cooker, air fryer, coffee machine and mixer.
 - Room overview, orbit/zoom, selectable parts, animated separation of parts, and a reset view. The first-person walking controls have been removed from the interface.
 - **Parts / Care / Energy & CO₂e** panels for each product, with continuity into adult actions.
 - Camera AR through WebXR on supported devices, with honest support/permission feedback.
@@ -36,7 +40,7 @@ Models are simplified educational illustrations. Their separated parts are not i
 | Opens the 3D homepage | `app.js`: `mountHome()` → `world-engine.js`: `createWorld()` | The root app supplies a canvas. The engine builds the room, camera, lights and meshes, then renders them with Three.js. |
 | Chooses a product card | `explore.js`: `chooseAppliance()` → `world-engine.js`: `setAppliance()` | One product ID selects both its visible model and the matching teaching content in `catalogue.js`. The selected item also travels to Take action. |
 | Taps an actual model or part | `world-engine.js`: `hitAt()`, `findPart()`, `setSelectedPart()` → `explore.js`: `choosePart()` | A ray is cast through the tap into the scene. Mesh metadata identifies the product/part. The same state also drives the accessible text buttons and explanation. |
-| Opens the room or walks around | `world-engine.js`: `showRoom()`, `enterRoom()`, `walk()`, `canStandAt()` | Camera position changes inside the rendered room. This is desktop/touch 3D navigation, separate from camera AR. |
+| Opens the room overview | `world-engine.js`: `showRoom()` | The camera shows the shared room; selecting an appliance opens its close-up. First-person walking helpers remain in the engine but are not exposed by the current interface. This is separate from camera AR. |
 | Separates the digital parts | `world-engine.js`: `setExploded()` and frame `render()`; `models.js`: `part()` | Each part has its own geometry and an exploded offset. The frame loop moves it towards that offset instead of swapping in a flat picture. |
 | Clicks “View in my room” | `world-engine.js`: `enterAR()` | After support detection and a user action, the browser requests an `immersive-ar` session and surface hit testing. A detected surface positions the reticle; a select event places the model. |
 | Changes power, time or grid | `explore.js`: `renderImpact()` and `updateImpact()` → `catalogue.js`: `calculateImpact()` | Validated numeric inputs produce a transparent electricity-use estimate. No AI guesses the footprint. |
@@ -61,11 +65,15 @@ The chain is:
 
 The current photo policy remains paused. This preview does not enable a model, download its weights while paused, retrain it, or claim improved accuracy. A category suggestion is not OCR, a fault diagnosis, a recall decision or a safety certificate. The 3D models are original geometry and do not depend on the classifier.
 
-## Real data versus local review
+## Live application data versus the optional design server
 
-`action.js` calls the existing `../../src/data-service.js` adapter with **GET requests only**. In the deployed application's architecture, these endpoints are served by Flask. Here, `serve.mjs` deliberately returns **503** for `/api/*`.
+`action.js` calls the existing `../../src/data-service.js` adapter with **GET requests only**. `src/config.js` supplies same-origin `/api/recalls`, `/api/sources`, `/api/repair-evidence` and `/api/locations` endpoints. The adapter's normal deadline is retained, including time for cold database reads.
 
-This prevents the local review from connecting to Neon or showing invented successful searches. Recall/location records therefore display an unavailable state, with links to official recall information and current repair/recycling sources. An empty successful dataset would mean something different, so the preview does not return a fake empty list. The server never loads database credentials, performs migrations or exposes environment files.
+**When served by Flask:** the Action Centre consumes the actual API responses. `backend/api.py` reads reviewed recalls through `repository.reviewed_recall_products()` and household electrical service candidates through `repository.relevant_locations()`. The browser matches identifiers and filters distances. It does not substitute static recall/location fixtures. `PRICE_SNAPSHOT` is used only to assist brand/model typing; it does not supply recall decisions or provider listings.
+
+**When served by `serve.mjs`:** `/api/*` deliberately returns **503**, so this isolated design review never connects to Neon. Recall/location records display an unavailable state and official source links. The loopback server does not load database credentials, run migrations or expose environment files.
+
+In both modes, successful records, an empty successful response and an unavailable response remain distinct. Fallback arrays have `availability: false`; they cannot turn an outage into a reassuring no-match result. Tests cover both positive API-shaped responses and outage states. Live database availability still requires a live service check; a passing synthetic test is not evidence of current Neon health.
 
 The 3D catalogue includes Laptop, which is outside the existing reviewed recall-category list. The Action Centre retains Laptop and sends the owner to the official register; it does not silently replace it with Kettle or report “no recall”.
 
@@ -90,7 +98,7 @@ The renderer uses locally hosted **Three.js 0.180.0** and `OrbitControls`, with 
 
 The app lazy-loads feature modules. Models are built from local geometry instead of downloading large model/texture packs. The loopback server compresses and caches vendor files; authored preview files stay uncached for review. The renderer caps pixel ratio, skips hidden/offscreen views and idle frames, and disposes resources when leaving a route. Reduced-motion preferences are respected.
 
-**Camera AR still needs physical-device verification.** It requires a compatible browser/device, a secure context and the device's permission. Desktop 3D and mocked tests do not prove real surface detection, camera permissions, placement scale or AR tracking. The loopback-only preview is not a remote tablet URL; secure device access must be configured separately for a real-device test. Unsupported devices retain the 3D studio and clear feedback.
+**Camera AR still needs physical-device verification.** It requires a compatible browser/device, a secure context and the device's permission. Desktop 3D and mocked tests do not prove real surface detection, camera permissions, placement scale or AR tracking. Use the HTTPS I3 application on a compatible device for that check; the loopback-only design server is not a remote tablet URL. Flask allows same-origin camera/spatial-tracking features, but browser/device permission is still required. Unsupported devices retain the 3D studio and clear feedback.
 
 ## Tests and review
 

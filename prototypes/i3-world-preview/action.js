@@ -15,7 +15,11 @@ const REPAIR_SOURCE = 'https://www.repaircafe.org/en/visit/';
 const CATEGORIES = FAMILIES.flatMap((family) => family.categories);
 // The world includes items outside our existing reference dataset. Preserve them by
 // name and disclose coverage, instead of changing a laptop into a kettle silently.
-const WORLD_ITEMS = { kettle: 'Kettle', fan: 'Fan', toaster: 'Toaster', blender: 'Blender', microwave: 'Microwave', vacuum: 'Vacuum cleaner', hairdryer: 'Hair dryer', laptop: 'Laptop' };
+const WORLD_ITEMS = {
+  kettle: 'Kettle', fan: 'Fan', toaster: 'Toaster', blender: 'Blender', microwave: 'Microwave',
+  vacuum: 'Vacuum cleaner', hairdryer: 'Hair dryer', laptop: 'Laptop',
+  ricecooker: 'Rice cooker', airfryer: 'Air fryer', coffeemachine: 'Coffee machine', mixer: 'Mixer',
+};
 const PLAN_KEY = 'fixforward-world-adult-plan-v1';
 // The adult's unfinished identity/location form lives only in this tab's memory.
 // The separate optional planner saves only its task, item name and date.
@@ -176,7 +180,7 @@ export function mountAction(host, { route = 'action?kind=recall', onNavigate = (
       <div class="action-panel-heading"><div><p class="action-eyebrow">RECALL CHECK</p><h2>Start with your appliance label.</h2><p class="muted">Brand and model help distinguish your item from a similar one.</p></div></div>
       <div class="action-photo-mount"></div>
       <label class="action-field">Appliance<select name="category" id="action-category">${options()}</select></label>
-      <p class="action-coverage" data-coverage-note${CATEGORIES.includes(draft.category) ? ' hidden' : ''}>${escape(draft.category)} is outside this preview’s reviewed recall categories. Keep the item selected and use the official recall search for its exact model.</p>
+      <p class="action-coverage" data-coverage-note${CATEGORIES.includes(draft.category) ? ' hidden' : ''}>${escape(draft.category)} is outside our reviewed recall categories. Keep the item selected and use the official recall search for its exact model.</p>
       <div class="action-field-row"><label class="action-field">Brand <span class="action-optional">if known</span><input name="brand" id="action-brand" value="${escape(draft.brand)}" list="action-brands" maxlength="60" autocomplete="off" placeholder="e.g. Breville"><datalist id="action-brands"></datalist></label>
       <label class="action-field">Model number <span class="action-optional">if known</span><input name="model" id="action-model" value="${escape(draft.model)}" list="action-models" maxlength="50" autocomplete="off" placeholder="From the appliance label"><datalist id="action-models"></datalist></label></div>
       <p class="action-small">Type your own details or choose a suggestion. A suggested model is not a recall result.</p>
@@ -200,7 +204,7 @@ export function mountAction(host, { route = 'action?kind=recall', onNavigate = (
       updateSelectedItem();
       const coverage = host.querySelector('[data-coverage-note]');
       coverage.hidden = CATEGORIES.includes(draft.category);
-      coverage.textContent = `${draft.category} is outside this preview’s reviewed recall categories. Keep the item selected and use the official recall search for its exact model.`;
+      coverage.textContent = `${draft.category} is outside our reviewed recall categories. Keep the item selected and use the official recall search for its exact model.`;
     };
     // Editing identity invalidates the displayed check immediately. A result for
     // the old model must never sit under a newly entered model as if it applied.
@@ -351,7 +355,7 @@ export function mountAction(host, { route = 'action?kind=recall', onNavigate = (
     const nearby = getNearbyLocations(searchedArea, isRepair ? 'repair' : 'dispose', relevant, { radiusKm: 20, limit: 6 });
     const available = data.availability.locations && !searchedArea.unlocated;
     target.innerHTML = `<div class="action-result-box"><p class="eyebrow">${escape(draft.category)} · ${escape(searchedArea.label)}</p><h2>${available ? (nearby.matches.length ? 'Places to contact before visiting' : 'No recorded options within 20 km') : 'Use a current finder for this area'}</h2>
-      <p>${searchedArea.unlocated ? 'This postcode is not in our local coordinate index. We have not calculated nearby places or distances. Enter the postcode in the official finder below to check your area.' : available ? 'These are public-data candidates. Confirm appliance acceptance, opening times and any fees directly.' : 'Our listing records are unavailable in this preview. We have not searched or confirmed nearby places. Continue with the source below.'}</p>
+      <p>${searchedArea.unlocated ? 'This postcode is not in our local coordinate index. We have not calculated nearby places or distances. Enter the postcode in the official finder below to check your area.' : available ? 'These are public-data candidates. Confirm appliance acceptance, opening times and any fees directly.' : 'Our listing records are unavailable right now. We have not searched or confirmed nearby places. Continue with the source below.'}</p>
       ${available && !nearby.matches.length ? '<p>This does not mean there are no services nearby. Our records have limited coverage.</p>' : ''}
       <div class="action-location-grid">${available ? nearby.matches.map(locationCard).join('') : ''}</div>
       <div class="action-finder-card"><span class="action-finder-icon" aria-hidden="true">${isRepair ? '↻' : '♲'}</span><div><h3>${isRepair ? 'Repair Café directory' : 'Victorian e-waste guidance & finders'}</h3><p>${isRepair ? 'For community repair events, check the directory and ask what the volunteers can work on. Suspected electrical faults need qualified advice.' : 'Use the Victorian Government’s guide to find electrical recycling and your council’s local options.'}</p>${link(isRepair ? REPAIR_SOURCE : RECYCLE_SOURCE, isRepair ? 'Open Repair Café directory' : 'Find a suitable drop-off', 'button secondary')}</div></div>
@@ -391,8 +395,9 @@ export function mountAction(host, { route = 'action?kind=recall', onNavigate = (
       <details class="action-details"><summary>Source & limits</summary><p>${escape(item.verificationNote || 'Acceptance has not been independently confirmed. Contact this provider before visiting.')}</p><p>Information date: ${escape(item.sourceRetrievedAt || 'not supplied')}</p>${link(item.sourceUrl, 'View source', 'action-text-link')}</details></article>`;
   }
 
-  // The same-origin adapter performs GET reads only. A static preview receives explicit unavailable
-  // flags, while an authenticated Flask preview can display real API records without another UI.
+  // The same-origin adapter performs GET reads only. Flask returns actual reviewed
+  // records; the optional loopback design server returns explicit unavailable flags.
+  // Preserve the established adapter deadline so a cold database read has time to finish.
   async function load() {
     const requestFetch = (url, options = {}) => {
       const combined = new AbortController();
@@ -401,7 +406,7 @@ export function mountAction(host, { route = 'action?kind=recall', onNavigate = (
       signals.forEach((signal) => signal.aborted ? abort() : signal.addEventListener('abort', abort, { once: true }));
       return fetch(url, { ...options, signal: combined.signal }).finally(() => signals.forEach((signal) => signal.removeEventListener('abort', abort)));
     };
-    try { data = await loadPublicData({ timeoutMs: 6000 }, requestFetch); }
+    try { data = await loadPublicData({}, requestFetch); }
     catch { data = getStaticSnapshot(); }
     if (disposed) return;
     loading = false;

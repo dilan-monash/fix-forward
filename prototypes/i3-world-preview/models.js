@@ -14,6 +14,10 @@ export const MODEL_PARTS = Object.freeze({
   vacuum: ['body', 'bin', 'filter', 'hose', 'nozzle'],
   hairdryer: ['body', 'motor', 'filter', 'handle', 'nozzle'],
   laptop: ['screen', 'keyboard', 'battery', 'body'],
+  ricecooker: ['body', 'lid', 'bowl', 'control', 'base'],
+  airfryer: ['body', 'basket', 'handle', 'control', 'heater'],
+  coffeemachine: ['body', 'tank', 'spout', 'tray', 'control'],
+  mixer: ['body', 'bowl', 'beaters', 'control', 'base'],
 });
 
 // A restrained material palette makes these objects feel like a shared home.
@@ -257,7 +261,109 @@ function laptop(root) {
   for (let i = 0; i < 3; i++) box(battery, [.35, .012, .43], 'sage', [-.42 + i * .42, .098, .2]);
 }
 
-const builders = { kettle, fan, toaster, blender, microwave, vacuum, hairdryer, laptop };
+/** The rice cooker has a removable metal bowl and domed lid, with familiar side grips. */
+function ricecooker(root) {
+  const body = part(root, 'body', [0, .1, -.2]);
+  const chamber = [[0, .2], [.49, .2], [.69, .31], [.71, .93], [.67, 1.1], [.6, 1.1]];
+  piece(body, new THREE.LatheGeometry(chamber.map(([x, y]) => new THREE.Vector2(x, y)), 56), 'cream', undefined, undefined,
+    { roughness: .24, metalness: .12 });
+  for (const x of [-.77, .77]) box(body, [.34, .14, .44], 'ink', [x, .84, 0]);
+  const bowl = part(root, 'bowl', [0, .55, .38]);
+  const bowlShape = [[0, .32], [.42, .32], [.57, .45], [.6, 1.1], [.56, 1.1], [.53, .49], [.4, .38], [0, .38]];
+  piece(bowl, new THREE.LatheGeometry(bowlShape.map(([x, y]) => new THREE.Vector2(x, y)), 56), 0x626d70,
+    undefined, undefined, { metalness: .65, roughness: .3, side: THREE.DoubleSide });
+  ring(bowl, .585, .023, 'steel', [0, 1.1, 0], [Math.PI / 2, 0, 0], { metalness: .8 });
+  const lid = part(root, 'lid', [0, 1.0, 0]);
+  const dome = piece(lid, new THREE.SphereGeometry(.68, 48, 24), 'teal', [0, 1.1, 0], undefined, { roughness: .22, metalness: .15 });
+  dome.scale.y = .29;
+  ring(lid, .665, .025, 'steel', [0, 1.1, 0], [Math.PI / 2, 0, 0], { metalness: .75 });
+  tube(lid, [[-.19, 1.28, 0], [-.16, 1.45, 0], [.16, 1.45, 0], [.19, 1.28, 0]], .045, 'ink');
+  cylinder(lid, .045, .045, .045, 'ink', [.36, 1.24, .13]);
+  const control = part(root, 'control', [0, .1, .62]);
+  box(control, [.48, .3, .045], 'ink', [0, .65, .691]);
+  box(control, [.2, .075, .018], 0xb0dacf, [0, .72, .727], undefined, { emissive: 0x568b75, emissiveIntensity: .18 });
+  box(control, [.13, .045, .06], 'gold', [0, .58, .74]);
+  const base = part(root, 'base', [0, -.45, 0]);
+  cylinder(base, .61, .66, .16, 'ink', [0, .11, 0]);
+  for (const x of [-.4, .4]) for (const z of [-.35, .35]) cylinder(base, .055, .06, .06, 'ink', [x, .03, z]);
+}
+
+/** An air fryer is a drawer-based appliance: the basket and its grip separate visibly. */
+function airfryer(root) {
+  const body = part(root, 'body', [0, .1, -.6]);
+  box(body, [1.42, 1.72, 1.36], 'teal', [0, .89, -.05], undefined, { roughness: .26, metalness: .16 });
+  for (let i = 0; i < 6; i++) box(body, [.075, .22, .017], 'ink', [-.33 + i * .13, 1.38, -.737]);
+  const basket = part(root, 'basket', [0, -.04, .95]);
+  box(basket, [1.23, .81, 1.27], 'ink', [0, .57, .04], undefined, { roughness: .38 });
+  box(basket, [1.28, .81, .085], 'teal', [0, .57, .716], undefined, { roughness: .24, metalness: .15 });
+  box(basket, [1.04, .018, .92], 'steel', [0, .25, .02], undefined, { metalness: .7 });
+  for (let i = 0; i < 6; i++) box(basket, [.029, .026, .83], 'ink', [-.43 + i * .17, .269, .02]);
+  const handle = part(root, 'handle', [0, .1, 1.4]);
+  box(handle, [.2, .48, .22], 'ink', [0, .7, .86]);
+  box(handle, [.22, .075, .23], 'gold', [0, .96, .86]);
+  const control = part(root, 'control', [.63, .55, .35]);
+  box(control, [.82, .36, .035], 'ink', [0, 1.38, .64]);
+  for (const x of [-.23, .23]) cylinder(control, .095, .095, .042, 'steel', [x, 1.38, .69], [Math.PI / 2, 0, 0], { metalness: .65 });
+  box(control, [.11, .08, .015], 'gold', [0, 1.39, .671]);
+  const heater = part(root, 'heater', [0, 1.08, 0]);
+  cylinder(heater, .49, .49, .05, 'steel', [0, 1.53, 0], undefined, { metalness: .75 });
+  for (const radius of [.17, .31, .44]) ring(heater, radius, .027, 'gold', [0, 1.49, 0], [Math.PI / 2, 0, 0]);
+}
+
+/** Open space below the coffee spout, a transparent tank and metal drip grate identify this model. */
+function coffeemachine(root) {
+  const body = part(root, 'body', [0, .1, -.5]);
+  box(body, [1.35, 1.6, .62], 'coral', [0, .92, -.3], undefined, { metalness: .15, roughness: .25 });
+  box(body, [1.43, .34, 1.15], 'coral', [0, 1.65, -.03], undefined, { metalness: .15, roughness: .25 });
+  box(body, [1.43, .16, 1.18], 'ink', [0, .13, -.01]);
+  const tank = part(root, 'tank', [1.0, .12, 0]);
+  box(tank, [.33, 1.16, .78], 'white', [.8, .82, -.24], undefined,
+    { transparent: true, opacity: .45, roughness: .1, depthWrite: false });
+  box(tank, [.25, .64, .68], 0x9bc8d1, [.8, .6, -.24], undefined, { transparent: true, opacity: .5, roughness: .12 });
+  box(tank, [.37, .08, .81], 'ink', [.8, 1.43, -.24]);
+  const spout = part(root, 'spout', [0, .05, .75]);
+  cylinder(spout, .2, .24, .12, 'steel', [0, 1.43, .24], undefined, { metalness: .8, roughness: .2 });
+  for (const x of [-.09, .09]) cylinder(spout, .03, .037, .15, 'steel', [x, 1.3, .27], undefined, { metalness: .8 });
+  cylinder(spout, .044, .044, .45, 'ink', [.39, 1.43, .24], [0, 0, Math.PI / 2]);
+  const tray = part(root, 'tray', [0, -.3, .78]);
+  box(tray, [1.2, .08, .72], 'steel', [0, .26, .17], undefined, { metalness: .8, roughness: .25 });
+  for (let i = 0; i < 8; i++) box(tray, [.047, .008, .55], 'ink', [-.49 + i * .14, .305, .17]);
+  const control = part(root, 'control', [0, .6, .55]);
+  box(control, [.91, .25, .028], 'ink', [0, 1.66, .571]);
+  for (const x of [-.27, .27]) cylinder(control, .068, .068, .04, 'gold', [x, 1.65, .606], [Math.PI / 2, 0, 0]);
+  box(control, [.21, .095, .02], 0xa9d3c6, [0, 1.67, .596], undefined, { emissive: 0x4a7665, emissiveIntensity: .15 });
+}
+
+/** A stand mixer has a cantilevered head, open metal bowl and physically modelled whisk loops. */
+function mixer(root) {
+  const body = part(root, 'body', [.38, .35, -.2]);
+  box(body, [.47, 1.21, .66], 'sage', [.51, .85, 0], undefined, { roughness: .22, metalness: .18 });
+  box(body, [1.43, .48, .71], 'sage', [.02, 1.58, 0], undefined, { roughness: .22, metalness: .18 });
+  cylinder(body, .18, .18, .044, 'steel', [-.716, 1.58, 0], [0, 0, Math.PI / 2], { metalness: .85 });
+  const bowl = part(root, 'bowl', [-.52, -.08, .63]);
+  const bowlProfile = [[0, .21], [.27, .21], [.43, .35], [.55, .81], [.54, .98], [.505, .98], [.5, .81], [.38, .38], [.25, .27], [0, .27]];
+  piece(bowl, new THREE.LatheGeometry(bowlProfile.map(([x, y]) => new THREE.Vector2(x, y)), 56), 'steel', [-.34, 0, 0], undefined,
+    { metalness: .83, roughness: .23, side: THREE.DoubleSide });
+  ring(bowl, .53, .024, 'steel', [-.34, .98, 0], [Math.PI / 2, 0, 0], { metalness: .8 });
+  const beaters = part(root, 'beaters', [-.43, .7, .45]);
+  cylinder(beaters, .035, .035, .48, 'steel', [-.37, 1.18, 0], undefined, { metalness: .8 });
+  for (let i = 0; i < 4; i++) {
+    const angle = i * Math.PI / 4;
+    const dx = Math.cos(angle) * .22, dz = Math.sin(angle) * .22;
+    tube(beaters, [[-.37, 1.03, 0], [-.37 + dx, .86, dz], [-.37 + dx * .7, .63, dz * .7],
+      [-.37, .56, 0], [-.37 - dx * .7, .63, -dz * .7], [-.37 - dx, .86, -dz], [-.37, 1.03, 0]], .012, 'steel');
+  }
+  const control = part(root, 'control', [.65, .28, .45]);
+  box(control, [.39, .035, .035], 'ink', [.44, 1.62, .369]);
+  cylinder(control, .055, .055, .08, 'gold', [.42, 1.62, .412], [Math.PI / 2, 0, 0]);
+  const base = part(root, 'base', [0, -.45, 0]);
+  box(base, [1.58, .17, 1.02], 'sage', [.06, .115, 0], undefined, { roughness: .23, metalness: .18 });
+  cylinder(base, .32, .34, .045, 'steel', [-.34, .22, 0], undefined, { metalness: .75 });
+  for (const x of [-.53, .65]) for (const z of [-.36, .36]) cylinder(base, .055, .055, .04, 'ink', [x, .025, z]);
+}
+
+const builders = { kettle, fan, toaster, blender, microwave, vacuum, hairdryer, laptop,
+  ricecooker, airfryer, coffeemachine, mixer };
 
 /** Public factory returns a model with stable semantic groups and no network calls. */
 export function createAppliance(id) {
@@ -265,5 +371,12 @@ export function createAppliance(id) {
   const root = new THREE.Group(); root.name = id;
   root.userData = { applianceId: id, parts: new Map(), model: true };
   builders[id](root);
+  // Cache one local-space label anchor per semantic part; animation only transforms these vectors.
+  // This avoids recomputing every mesh's bounding box on each tablet animation frame.
+  root.updateMatrixWorld(true);
+  for (const group of root.userData.parts.values()) {
+    const centre = new THREE.Box3().setFromObject(group).getCenter(new THREE.Vector3());
+    group.userData.anchor = group.worldToLocal(centre);
+  }
   return root;
 }
