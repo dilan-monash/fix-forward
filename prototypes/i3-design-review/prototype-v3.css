@@ -455,7 +455,17 @@ p { color: var(--muted); font-size: 1.08rem; line-height: 1.5; }
 
 .scan-box { min-height: 420px; border-radius: var(--radius); background: var(--navy); color: #fff; display: grid; place-items: center; text-align: center; }
 .camera-frame { width: min(420px, 80%); aspect-ratio: 16 / 10; border: 2px solid #fff; border-radius: 18px; display: grid; place-items: center; }
-.device-card { min-height: 360px; padding: 40px; border-radius: var(--radius); background: var(--surface); display: grid; place-items: center; text-align: center; }
+.device-card {
+  min-height: 360px;
+  padding: 40px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  display: grid;
+  place-items: center;
+  align-content: center;
+  row-gap: 40px;
+  text-align: center;
+}
 .device-icon { display: block; width: 160px; aspect-ratio: 4 / 3; border: 4px solid var(--blue); border-radius: 18px; background: #fff; position: relative; }
 .device-icon::after { content: ""; position: absolute; width: 55px; height: 8px; border-radius: 8px; background: var(--ink); bottom: -20px; left: 50%; transform: translateX(-50%); }
 .tabs { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 28px; }
