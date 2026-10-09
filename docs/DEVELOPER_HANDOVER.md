@@ -1,8 +1,8 @@
 # FixForward: read the code, trace a feature, explain the system
 
-Prepared on 13 September 2026 for this adult/Quest checkout, now on `iteration-2`. This guide explains the code that exists here. It supports a developer handover and a pre-deployment walkthrough; it does not certify a production release or claim to reproduce a course rubric.
+Prepared on 13 September 2026 for the Iteration 2 adult/Quest checkout. Since 9 October 2026 the same application code continues on `iteration-3`. This guide explains the code that exists here. It supports a developer handover and a pre-deployment walkthrough; it does not certify a production release or claim to reproduce a course rubric.
 
-Iteration 2 is the ongoing development and review website. Main at `fixforward.me` stays at the approved release until the user explicitly approves a reviewed I2 commit for promotion; Iteration 1 remains preserved separately. Follow the canonical [branch roles](../README.md#branches-and-websites), [manual I2 review workflow](../README.md#development-and-review-workflow) and [shared database boundary](../README.md#shared-database-boundary). A local check or Git push does not prove deployment.
+Iteration 3 is the ongoing development and review website. Main at `fixforward.me` stays at the approved release until the user explicitly approves a reviewed I3 commit for promotion; Iteration 2 and Iteration 1 remain preserved separately. Follow the canonical [branch roles](../README.md#branches-and-websites), [manual I3 review workflow](../README.md#development-and-review-workflow) and [shared database boundary](../README.md#shared-database-boundary). A local check or Git push does not prove deployment.
 
 ## Start here, even if you do not write code
 
@@ -33,11 +33,9 @@ For a source example, open [Quest's screen controller](../quest/app.js) and find
 
 ## Which folder should another developer receive?
 
-The current work is in **`tmp/child-quest-prototype` underneath the supplied workspace**, not the older files at the outer workspace root. Open that inner folder as the project. Its entry files are `package.json`, `app.py`, `index.html`, `src/` and `quest/`.
+The current work is the **`iteration-3` branch in the `FixForward-Iteration-3-From-Iteration-2` checkout**. It is an ordinary standalone clone of `dilan-monash/fix-forward` (its `.git` is a full folder, not a worktree pointer). Its entry files are `package.json`, `app.py`, `index.html`, `src/` and `quest/`. When this guide was written in September, the work lived in a `tmp/child-quest-prototype` worktree linked to `tmp/github-update` with many untracked Quest files; those older folders are I2 and Main checkouts and should be left unchanged.
 
-This folder is a Git worktree linked to `tmp/github-update`. Its `.git` file points to the parent repository; copying that pointer alone does not create an independent Git repository. Many Quest files are currently untracked. A handover made only from the starting commit, or only from `git diff`, would omit them.
-
-For a future source handover, include the current authored source and documentation, `package.json`, `package-lock.json`, requirements files, relevant reviewed data inputs and deployment configuration. Check new/untracked files as well as tracked modifications. Exclude `.env`, credentials, `.venv`, `node_modules`, local test logs, downloaded caches and the `tmp/` working area. Transfer source through the team's agreed repository or a reviewed source export; do not copy this worktree's `.git` pointer as though it were a standalone repository. No commit, push or deployment was made as part of the comment pass.
+For a future source handover, share the `iteration-3` branch through the team's GitHub repository, or a reviewed source export, including the current authored source and documentation, `package.json`, `package-lock.json`, requirements files, relevant reviewed data inputs and deployment configuration. Check new/untracked files as well as tracked modifications. Exclude `.env`, credentials, `.venv`, `node_modules`, local test logs and downloaded caches.
 
 ## The connection map
 
@@ -51,6 +49,8 @@ flowchart TD
   C --> E["src/app.js: adult screens and events"]
   E --> F["src/logic.js: local decision rules"]
   E --> G["data-service.js and price-catalogue.js"]
+  E --> W["photo-helper.js: suggestion, confirmation and recovery UI"]
+  W --> X["siglip-appliance-classifier.js: disabled browser-local SigLIP 2 candidate"]
   G --> H["backend/api.py: reference-data responses"]
   H --> I["repository.py and db.py: read-only queries"]
   I --> J["Neon PostgreSQL: public reference records"]
@@ -153,6 +153,14 @@ The adult entry [index.html](../index.html) loads [src/app.js](../src/app.js). I
 
 The controller calls pure helpers in [logic.js](../src/logic.js): `matchRecall`, `safetyPlanFor`, `evaluateSafety`, `journeyDecision`, `compareCosts`, and location-filtering functions. Those helpers return decisions or values; the controller handles screen changes. Brand/model suggestions come from [product-suggestions.js](../src/product-suggestions.js) and existing reference/price records, not a universal product search.
 
+The adult controller connects to [photo-helper.js](../src/photo-helper.js) for the suggestion, confirmation and recovery interface. Shared file validation and the appliance class list remain in [appliance-classifier.js](../src/appliance-classifier.js); inference now belongs to [siglip-appliance-classifier.js](../src/siglip-appliance-classifier.js). It pins `@huggingface/transformers` 3.8.1, ONNX Runtime Web, a q4 `google/siglip2-base-patch32-256` vision export and generated text embeddings. All runtime/model paths are same-origin, remote model loading is disabled, and selected photos stay in the browser rather than going to Flask. The first-use assets total about 92.5 MB.
+
+This replacement does not erase the earlier failure. The old TensorFlow.js MobileNet export failed a real-model random-noise diagnostic: generated non-appliance inputs passed its old score-and-blur rule. SigLIP candidate v1 then failed its frozen held-out gate with 10 accepts among 37 eligible photos, 9 accepted-correct (27.027% coverage) and one wrong accept. Candidate v2 used a new locked cohort of 81 operational positives covering 17 enabled classes plus 143 true-OOD photos from 38 groups. It accepted 43, all correct, for 53.086% coverage, with zero wrong, manual-only or true-OOD accepts. The whole pre-registered gate still failed because `blender`, `food_processor`, `mixer`, `shaver`, `toaster` and `vaccum_cleaner` had no accepted-correct example.
+
+The [SigLIP manifest](../model/appliance-siglip/model_manifest.json) therefore keeps both `release_ready: false` and `recognition_enabled: false`. With either flag false, the helper stops before downloading the runtime or model. The manual picker remains usable, and controlled recovery copy replaces technical errors. Even after any future gate and device review, a model output would remain a tentative appliance-type suggestion: the adult must confirm it before the selected appliance changes. The helper discards stale asynchronous results after the person changes the manual choice or leaves the flow, so a late reply cannot overwrite their decision.
+
+The checked-in reports establish local Node parity for the pinned browser runtime, model, vectors and policy. They do not establish download time, memory use or compatibility on a physical tablet/browser, and they are not a public accuracy claim. The exact evidence filenames and SHA-256 hashes are in [APPLIANCE_MODEL_VALIDATION.md](APPLIANCE_MODEL_VALIDATION.md). The candidate-v3 policy is incomplete future work, is not wired into the browser and has no new untouched-cohort result. None of these models diagnoses a fault or establishes that an appliance is safe.
+
 `reloadPublicData()` calls [loadPublicData](../src/data-service.js). The loader requests public datasets separately, validates their response shapes and tracks each dataset's availability. `Promise.allSettled` allows useful successful datasets to survive another request's failure. `loadGeneration` lets only the latest public-data refresh replace the dataset snapshot. The returned data is deliberately applied to the current appliance, and recall/render checks run again. Separately, `geoGeneration` and `journeyId` reject outdated device-location replies. Static safety definitions and page structure are available without treating unavailable live records as a successful check.
 
 A locations request follows this chain:
@@ -240,7 +248,7 @@ $env:PORT = '5504'
 npm.cmd run dev:quest
 ```
 
-`npm.cmd ci` installs the versions recorded in `package-lock.json`. The preview helper itself uses Node's built-in modules; the tests also use jsdom. **For the full installed test stack, use a supported Node version from the locked jsdom requirement:** `^22.22.2 || ^24.15.0 || >=26.0.0`. This machine runs Node 24.16.0. The project's `package.json` currently declares the broader `>=20` floor, which is insufficient to describe the test dependency. This mismatch is documented here and was not changed in this comments-only pass; reconcile the declared requirement before a release handover.
+`npm.cmd ci` installs the versions recorded in `package-lock.json`. The preview helper itself uses Node's built-in modules; the tests also use jsdom. **Use a Node version supported by the locked jsdom requirement:** `^22.22.2 || ^24.15.0 || >=26.0.0`. The I3 `package.json` declares that same range; Node 20 does not satisfy it. Use `node --version` to verify your own environment. Node runs development and test tools, while the configured production server runs Python.
 
 | View | Preview URL |
 |---|---|
@@ -305,7 +313,9 @@ Playback status is not an audible quality judgment. Naturalness, pronunciation, 
 | What prevents a second finger from interfering? | `drag.js` tracks the active pointer ID, handles cancellation and removes listeners on cleanup. The touch suite covers multiple-finger and pointer-ID-zero cases. |
 | How is reduced motion respected? | The app combines its saved movement setting with the device preference. CSS effects require full motion and still have explicit reduced-motion rules. |
 | Can children use this to test a real appliance? | No. Reports and scenarios are fictional teaching content. Real appliance decisions belong to the separate adult guide and appropriate adult/professional help. |
-| Is there a scanner or live image diagnosis here? | No. Quest uses authored SVG art and stories. Do not describe earlier scanner feedback as an implemented classifier. |
+| Is photo recognition implemented? | The disabled adult candidate is implemented with browser-local SigLIP 2 q4 inference and self-hosted `@huggingface/transformers` 3.8.1/ONNX assets. Candidate v2 failed its whole pre-registered gate, so both release flags are false and the manual picker is the release path. Any future suggestion still needs explicit confirmation. Quest uses authored art and stories. Neither flow diagnoses faults from an image. |
+| Does the latest local evaluation make recognition ready? | No. Candidate v2 had 43 accepted-correct results and zero wrong/OOD accepts, but six of its 17 enabled classes had no accepted-correct example, so the whole gate failed. The evidence is local Node parity only; it does not prove browser or physical-tablet performance or support a public accuracy claim. |
+| Why can the live release label still say I2? | `Settings.from_environment()` uses the I3 fallback only if `RELEASE_VERSION` is absent. A configured Render value overrides it, and the service may also be running an older commit. Verify both rather than inferring deployment from local files. |
 | What happens if one adult API fails? | Each dataset has its own availability state. The app preserves useful data and shows bounded recovery/uncertainty; an outage is never recall clearance. |
 | Is a no-match recall result proof of safety? | No. Matching is conservative and coverage limited. `matchRecall` and its tests preserve this distinction. |
 | Does the website send household answers to Neon? | The reference-data API loads public lists. Household answers and location filtering stay in browser memory; there is no corresponding journey-write endpoint. |

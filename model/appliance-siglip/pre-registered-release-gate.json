@@ -1,0 +1,79 @@
+{
+  "_comment": "Frozen before any prediction was run on the 9 October 2026 Openverse/Open Images test cohorts. A failed criterion keeps the photo helper disabled; the test must not be used to lower a threshold or expand a class list.",
+  "gate_id": "fixforward-siglip2-q4-fresh-heldout-gate-v1",
+  "frozen_at_utc": "2026-10-09T02:32:48.435549+00:00",
+  "candidate": {
+    "model_sha256": "9e82237d9a1d89948502aff9df02129c28698d793e01f15f62e2267682615499",
+    "min_ood_margin": 0.035,
+    "min_positive_margin": 0.01,
+    "enabled_classes": [
+      "air_fryer",
+      "blender",
+      "coffee_machine",
+      "fan",
+      "hair_dryer",
+      "kettle",
+      "microwave",
+      "mixer",
+      "portable_ac",
+      "portable_heater",
+      "sandwich_press",
+      "toaster",
+      "vaccum_cleaner"
+    ],
+    "manual_only_classes": [
+      "dehumidifier",
+      "food_processor",
+      "rice_cooker",
+      "shaver",
+      "steam_cleaner",
+      "straightener"
+    ]
+  },
+  "class_gate_selection": {
+    "rule": "At least one accepted-correct example in each of two distinct earlier q4 datasets and zero accepted-wrong examples.",
+    "reports": [
+      {
+        "path": "tmp/appliance-model-experiment-v3/browser-candidate/calibration-q4.json",
+        "sha256": "c525f3c3a3713891dba6a75aaa4e3ae27eeb685aafc2ae13c9d9fa308100c247"
+      },
+      {
+        "path": "tmp/appliance-model-experiment-v3/browser-candidate/abo-q4.json",
+        "sha256": "eef50229c0fabff508d7edc4036b72c57800e97ca5e394743c2af025f94c5505"
+      },
+      {
+        "path": "tmp/appliance-model-experiment-v3/browser-candidate/open-images-q4.json",
+        "sha256": "c57fc8f149519e5f90083e184ca5a2a6a238b0f6273c32dde06d0b6c598493d1"
+      }
+    ],
+    "fresh_test_used_for_selection": false
+  },
+  "ground_truth_lock": {
+    "required_before_scoring": true,
+    "minimum_independent_visual_audits": 2,
+    "disagreements_adjudicated_before_scoring": true,
+    "model_outputs_visible_to_auditors": false
+  },
+  "fresh_heldout_pass_criteria": {
+    "minimum_valid_enabled_class_positives": 30,
+    "minimum_true_ood_images": 80,
+    "minimum_ood_source_groups": 15,
+    "wrong_accepted_suggestions": 0,
+    "true_ood_accepted_suggestions": 0,
+    "minimum_enabled_positive_coverage": 0.5,
+    "coverage_definition": "Accepted suggestions divided by audited positives whose true class is in enabled_classes.",
+    "disabled_class_rule": "A disabled-class photo counts as a wrong acceptance if it is accepted as any enabled class."
+  },
+  "post_test_policy": {
+    "no_threshold_or_prompt_tuning": true,
+    "no_class_expansion": true,
+    "failure_action": "Keep release_ready and recognition_enabled false and collect a new untouched cohort after any change.",
+    "pass_action": "May enable only in the local Iteration 3 checkout for desktop browser review. Public deployment and tablet readiness remain separate."
+  },
+  "browser_gate": {
+    "same_origin_runtime_and_model_required": true,
+    "production_csp_required": true,
+    "supported_photo_and_unrelated_photo_smoke_required": true,
+    "tablet_validation_required_before_public_release": true
+  }
+}

@@ -4,11 +4,11 @@
 
 This document supersedes the feature descriptions in [QUEST_CREATIVE_REFRESH.md](QUEST_CREATIVE_REFRESH.md) for this refinement, including its earlier 580 ms motion limit. Earlier dated test totals and browser observations remain historical evidence in [QUEST_IMPLEMENTATION.md](QUEST_IMPLEMENTATION.md). The automated results and specific browser checks from this refinement are recorded below, with the remaining review limits. Those local checks did not change production hosting or databases and are not evidence of a live release.
 
-The development and review branch is `iteration-2`; its website can show proposed changes while Main at `fixforward.me` stays at the user's approved release. Iteration 1 remains preserved separately. Use the canonical [site roles](../README.md#branches-and-websites), [manual I2 deployment workflow](../README.md#development-and-review-workflow) and [shared database boundary](../README.md#shared-database-boundary). Main promotion requires explicit user approval for the reviewed release.
+This refinement was made on `iteration-2`. Development and review now continue on `iteration-3`; its website can show proposed changes while Main at `fixforward.me` stays at the user's approved release. Iteration 2 and Iteration 1 remain preserved separately. Use the canonical [site roles](../README.md#branches-and-websites), [manual I3 deployment workflow](../README.md#development-and-review-workflow) and [shared database boundary](../README.md#shared-database-boundary). Main promotion requires explicit user approval for the reviewed release.
 
 ## Open the local build
 
-Use the existing `tmp/child-quest-prototype` checkout on `iteration-2`. Run `npm.cmd run dev:quest` from that folder and keep the terminal open. The [implementation guide](QUEST_IMPLEMENTATION.md) has the full Windows path and commands.
+Use the `iteration-3` checkout (`FixForward-Iteration-3-From-Iteration-2`). Run `npm.cmd ci` once, then `npm.cmd run dev:quest` from that folder and keep the terminal open. The [implementation guide](QUEST_IMPLEMENTATION.md) has the older, dated Windows path and commands.
 
 | Entry | Local URL | Purpose |
 |---|---|---|

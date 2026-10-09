@@ -1,0 +1,57 @@
+{
+  "_comment": "Mechanical decision against the gate frozen before predictions. The failed candidate remains disabled and this cohort may not be reused as an untouched release test for a changed candidate.",
+  "decision_id": "fixforward-siglip2-q4-fresh-heldout-decision-v1",
+  "decided_at_utc": "2026-10-09T02:56:20.988391+00:00",
+  "passed": false,
+  "action": "keep_release_ready_and_recognition_enabled_false",
+  "inputs": {
+    "pre_registered_gate_sha256": "46097cec533e55e889f4e59867849bcc47b97a5a2cc284c7cd5af29f60e5e201",
+    "ground_truth_lock_sha256": "632f16d8f02e946872681f2592e7fe5cc18910dfc2f3bc772a1a20c78fecf012",
+    "audited_ground_truth_sha256": "eb5deb1e8197c41e437dab7f6799c18519341f17fe612b2563a42ddd2999e99d",
+    "evaluated_policy_snapshot_sha256": "c7d62dd45980771ffec56b4e5b8a303641ad3393f36ea77ade178af0c3b80ad7",
+    "evaluation_report_sha256": "158fa60ea27193ae9562ecdcf005d30f173c1c036dbeaee31466d299d3f1f73b"
+  },
+  "checks": {
+    "minimum_valid_enabled_class_positives": {
+      "required": 30,
+      "observed": 37,
+      "passed": true
+    },
+    "minimum_true_ood_images": {
+      "required": 80,
+      "observed": 95,
+      "passed": true
+    },
+    "minimum_ood_source_groups": {
+      "required": 15,
+      "observed": 21,
+      "passed": true
+    },
+    "wrong_accepted_suggestions": {
+      "required": 0,
+      "observed": 1,
+      "passed": false
+    },
+    "true_ood_accepted_suggestions": {
+      "required": 0,
+      "observed": 0,
+      "passed": true
+    },
+    "minimum_enabled_positive_coverage": {
+      "required": 0.5,
+      "observed": 0.2702702702702703,
+      "passed": false
+    }
+  },
+  "failure_details": [
+    {
+      "cohort": "enabled_class_positive",
+      "image_id": "d5bf2775-fb5a-447a-97a6-d7f643be597b",
+      "expected": "portable_heater",
+      "predicted": "fan",
+      "ood_margin": 0.0551097210380527,
+      "positive_margin": 0.01006454630243142
+    }
+  ],
+  "reuse_rule": "This exposed cohort is development evidence for later candidates. A changed model, class list, prompt set or threshold policy needs a new prediction-blind held-out cohort."
+}

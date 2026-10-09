@@ -1,0 +1,101 @@
+{
+  "_comment": "Candidate policy only. The adult photo helper must stay hidden until release_ready and recognition_enabled are both true after browser, tablet and new held-out validation.",
+  "policy_version": 1,
+  "model_name": "siglip2-base-patch32-256-vision-q4",
+  "release_ready": false,
+  "recognition_enabled": false,
+  "enabled_classes": [
+    "air_fryer",
+    "blender",
+    "coffee_machine",
+    "fan",
+    "hair_dryer",
+    "kettle",
+    "microwave",
+    "mixer",
+    "portable_ac",
+    "portable_heater",
+    "sandwich_press",
+    "toaster",
+    "vaccum_cleaner"
+  ],
+  "enabled_class_rule": {
+    "frozen_before_new_heldout_test": true,
+    "evidence_scope": "Previously observed q4 calibration, ABO and Open Images v1 reports only.",
+    "rule": "A class needs at least one accepted-correct example in each of two distinct earlier datasets and zero accepted-wrong examples.",
+    "manual_only_classes": [
+      "dehumidifier",
+      "food_processor",
+      "rice_cooker",
+      "shaver",
+      "steam_cleaner",
+      "straightener"
+    ],
+    "failure_policy": "A fresh held-out failure keeps the whole helper disabled; it does not tune this frozen list."
+  },
+  "validation_status": "candidate_pending_new_heldout_and_device_validation",
+  "validation_reason": "The quantized candidate is more accurate in local tests, but it still needs a new untouched benchmark and real browser/tablet checks.",
+  "photo_processing": "browser-local",
+  "requires_user_confirmation": true,
+  "runtime": {
+    "library": "@huggingface/transformers",
+    "version": "3.8.1",
+    "module_url": "/vendor/transformers/transformers.min.js",
+    "wasm_path": "/vendor/transformers/",
+    "local_model_path": "/model/appliance-siglip/upstream/",
+    "wasm_threads": 1,
+    "assets": {
+      "transformers_js": {
+        "url": "/vendor/transformers/transformers.min.js",
+        "bytes": 888173,
+        "sha256": "aa5002b70e789798da263f5f99c62bd3e8fcd0c119258a493c40c180648365fa"
+      },
+      "ort_wasm_module": {
+        "url": "/vendor/transformers/ort-wasm-simd-threaded.jsep.mjs",
+        "bytes": 44484,
+        "sha256": "08fb86ec433c78bfb032c5d84a68b8e8e5a8d81268fa39e24314179a5767a5b9"
+      },
+      "ort_wasm_binary": {
+        "url": "/vendor/transformers/ort-wasm-simd-threaded.jsep.wasm",
+        "bytes": 21596019,
+        "sha256": "c46655e8a94afc45338d4cb2b840475f88e5012d524509916e505079c00bfa39"
+      }
+    },
+    "load_policy": "Load only after the person chooses a photo and only when recognition is enabled."
+  },
+  "vision_model": {
+    "repository": "siglip2-base-patch32-256",
+    "revision": "7efccb86b5b6601bfe9e14326e1c11b40b68d44c",
+    "model_file_name": "vision_model.9e82237d9a1d89948502aff9df02129c28698d793e01f15f62e2267682615499",
+    "file": "onnx/vision_model.9e82237d9a1d89948502aff9df02129c28698d793e01f15f62e2267682615499_q4.onnx",
+    "dtype": "q4",
+    "bytes": 69938403,
+    "sha256": "9e82237d9a1d89948502aff9df02129c28698d793e01f15f62e2267682615499",
+    "base_model": "google/siglip2-base-patch32-256",
+    "base_model_revision": "94dffa8cb1179de3e03f091dbc3917e5d5a9ae84",
+    "license": "Apache-2.0"
+  },
+  "text_embeddings": {
+    "manifest_url": "/model/appliance-siglip/text-embeddings.json",
+    "manifest_sha256": "4b01be52acad78dae1783978e1bc191d50532dc63781a5cd7b96e24f3a390093",
+    "vectors_url": "/model/appliance-siglip/text-embeddings.f32",
+    "vectors_sha256": "2e63f55601cf3f011bf13b3c347bd456111c1b8132f9d8164105fff0a29877f2"
+  },
+  "acceptance": {
+    "rule": "Show a suggestion only when the best appliance beats the best OOD prompt and the second appliance by the frozen minimum margins.",
+    "min_ood_margin": 0.035,
+    "min_positive_margin": 0.01,
+    "score_notice": "Cosine similarities and margins are not user-facing confidence percentages."
+  },
+  "local_evidence": {
+    "quantized_calibration": "50/82 accepted and correct; 0/48 visually audited true-OOD accepted.",
+    "abo_external": "16/26 accepted and correct; 0/28 audited OOD accepted.",
+    "open_images_external": "5/7 accepted and correct; 0/19 audited OOD accepted.",
+    "blockers": [
+      "The frozen rule needs a new untouched test because earlier external outputs have now been observed.",
+      "Steam cleaner has no accepted calibration example under the browser rule.",
+      "Node execution does not prove browser or tablet memory, speed or compatibility.",
+      "The current OOD sample is too small to establish a low population false-accept rate."
+    ]
+  }
+}

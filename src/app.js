@@ -33,11 +33,8 @@ import { PRICE_SNAPSHOT } from "./price-snapshot.js";
 import { automaticCostContext, loadPriceCatalogue, matchPriceExamples, problemQuestions } from "./price-catalogue.js";
 import { productSuggestions } from "./product-suggestions.js";
 import { createLearningState, transitionLearning, renderLearning } from "./learning.js";
-import {
-  classifyAppliancePhoto,
-  friendlyRecognitionError,
-  validatePhotoFile,
-} from "./appliance-classifier.js?v=browser-model-1";
+// Versioned import prevents a browser from reusing the retired TensorFlow helper.
+import { mountPhotoHelper } from "./photo-helper.js?v=i3-siglip-local-2";
 
 const app = document.querySelector("#app");
 const main = document.querySelector("#main");
@@ -63,6 +60,8 @@ let geoGeneration = 0;
 let priceCatalogue = { ...PRICE_SNAPSHOT, mode: "saved-copy" };
 let priceRequest = null;
 let renderedScreen = null;
+// Cancel old photo work whenever navigation or a manual choice redraws its screen.
+let disposePhotoHelper = () => {};
 
 // Make a fresh adult journey in this tab, including empty safety answers and prices.
 // This state is separate from Quest saves; restarting creates another copy.
@@ -92,9 +91,7 @@ const emptyState = () => ({
   problemContext: null,
   feeExamplesOpen: false,
   fromRepairHub: false,
-  touched: false,
-  photoDetection: null,
-  photoFallback: ""
+  touched: false
 });
 let state = emptyState();
 
@@ -388,9 +385,34 @@ function destinationAfterCheck() {
   return "your options";
 }
 
+// Manual choices and explicitly confirmed suggestions share the same reset.
+// A different appliance cannot inherit a previous warning, brand, quote or location.
+function selectAppliance(family, category = "") {
+  disposePhotoHelper();
+  state.appliance = { family, category, categoryCode: CATEGORY_CODE_BY_NAME[category] || "", brand: "", model: "" };
+  state.safety = {};
+  state.recall = null;
+  state.safetyResult = null;
+  state.decision = null;
+  state.safetyOptOut = false;
+  state.serviceSafetyMode = "clear";
+  state.costs = { repair: "", replacement: "" };
+  state.selectedPrice = null;
+  state.comparison = null;
+  state.problem = "";
+  state.problemContext = null;
+  state.area = "";
+  state.areaSelection = null;
+  state.areaSuggestions = [];
+  state.areaActiveIndex = -1;
+  state.userLocation = null;
+  state.fromRepairHub = false;
+}
+
 // Draw appliance choices and bind brand/model entry and validation.
 // Changing the appliance clears dependent answers, prices and location choices before continuing.
 function renderIdentify() {
+  disposePhotoHelper();
   setStage("appliance");
   const selectedFamily = families().find((family) => family.id === state.appliance.family);
   const heading = intentHeading();
@@ -399,59 +421,8 @@ function renderIdentify() {
     ${renderBack("Back to choices")}
     <div class="step-heading friendly-heading"><p class="eyebrow">${heading.eyebrow}</p><h1>${heading.title}</h1><p>${heading.copy}</p></div>
     
-    <section class="photo-detect-card" aria-labelledby="photo-detect-title">
-      <div><p class="eyebrow">Photo helper</p><h2 id="photo-detect-title">Identify it from a photo</h2><p>Upload the correct image of one appliance. If we can identify it confidently, we will select the appliance for you. Otherwise, you can choose it manually.</p><details class="photo-scope"><summary>What can it recognise?</summary><p>It currently recognises six groups: <strong>everyday cooking</strong> (kettles, toasters, sandwich presses, rice cookers), <strong>blending and mixing</strong> (blenders, mixers, food processors), <strong>coffee, air fryers and microwaves</strong>, <strong>cleaning</strong> (vacuum and steam cleaners), <strong>personal care</strong> (hair dryers, shavers, straighteners), and <strong>heating and cooling</strong> (fans, portable heaters, dehumidifiers, portable air conditioners).</p></details></div>
-      <div class="photo-detect-actions"><label class="photo-dropzone" for="appliance-photo" tabindex="0"><span class="button secondary">Choose photo</span><span>or drag a photo here</span></label><input id="appliance-photo" type="file" accept="image/jpeg,image/png,image/webp" hidden><span id="photo-detect-status" role="status" aria-live="polite">JPG, PNG or WEBP · max 10 MB</span></div>
-    </section>
-    ${state.photoFallback ? `
-  <section class="photo-confirm-card" aria-labelledby="photo-fallback-title">
-    <p class="eyebrow">Try another photo</p>
-
-    <h2 id="photo-fallback-title">
-      We couldn't identify this photo
-    </h2>
-
-    <p>
-      ${escapeHtml(state.photoFallback)}
-    </p>
-
-    <div class="photo-confirm-actions">
-      <button
-        class="button secondary"
-        id="change-photo-appliance"
-        type="button"
-      >
-        Choose another photo
-      </button>
-    </div>
-  </section>
-
-` : state.photoDetection?.accepted ? `
-
-  <section class="photo-confirm-card" aria-labelledby="photo-result-title">
-    <p class="eyebrow">Appliance identified</p>
-
-    <h2 id="photo-result-title">
-      ${escapeHtml(state.photoDetection.category)}
-    </h2>
-
-    <p>
-      Model confidence:
-      <strong>${Math.round(state.photoDetection.confidence * 100)}%</strong>
-    </p>
-
-    <div class="photo-confirm-actions">
-      <button
-        class="button secondary"
-        id="change-photo-appliance"
-        type="button"
-      >
-        Choose another photo
-      </button>
-    </div>
-  </section>
-
-` : ""}
+    <!-- Optional photo suggestions never replace the manual appliance picker. -->
+    <div id="photo-helper"></div>
 
     <div class="identify-layout">
       <section>
@@ -477,99 +448,19 @@ function renderIdentify() {
   </section>`;
 
   bindBack();
-  const photoInput = app.querySelector("#appliance-photo");
-  const photoDropzone = app.querySelector(".photo-dropzone");
-  const processPhoto = async (file) => {
-    const status = app.querySelector("#photo-detect-status");
-    if (!file) return;
-    const validation = validatePhotoFile(file);
-    if (!validation.ok) {
-      status.textContent = validation.error;
-      return;
-    }
-    status.textContent = "Preparing your photo on this device…";
-    photoDropzone?.classList.add("is-processing");
-    await new Promise((resolve) => setTimeout(resolve, 250));
-    status.textContent = "Looking for the appliance on this device…";
-    try {
-      const payload = await classifyAppliancePhoto(file);
-      const confidence = Number(payload.confidence);
-      if (!payload.accepted) {
-        state.photoDetection = null;
-        state.photoFallback = "Please upload a clear image of one supported appliance or choose the appliance manually.";
-      renderIdentify();
-      focusElement("#photo-fallback-title");
-      return;}
-      
-      const suggestions = payload.alternatives || [];
-      const match = families().flatMap((family) => family.categories.map((category) => ({ family, category })))
-        .find((item) => item.category === suggestions[0]?.category);
-      if (!match) throw new Error("Choose the appliance manually.");
-      state.photoDetection = {
-        ...payload,
-        category: suggestions[0].category,
-        family: match.family.id,
-      };
-      state.appliance = {
-        family: match.family.id,
-        category: suggestions[0].category,
-        categoryCode: CATEGORY_CODE_BY_NAME[suggestions[0].category] || "",
-        brand: "",
-        model: ""
-      };
-
-      state.safety = {};
-      state.safetyOptOut = false;
-      state.safetyResult = null;
-      state.decision = null;
-      state.recall = null;
-      state.comparison = null;
-      state.problemContext = null;
-
-      renderIdentify();
-      const refreshedStatus = app.querySelector("#photo-detect-status");
-      if (refreshedStatus) {
-        refreshedStatus.textContent = "Appliance identified.";
+  disposePhotoHelper = mountPhotoHelper(app.querySelector("#photo-helper"), {
+    onChooseManually: () => focusElement("[data-family]"),
+    // Only an explicit confirmation can change the real appliance. The model
+    // never supplies brand/model, safety answers, recall results or diagnosis.
+    onConfirm: (suggestion) => {
+      const family = families().find((item) => item.categories.includes(suggestion.category));
+      if (!family) return;
+      if (state.appliance.family !== family.id || state.appliance.category !== suggestion.category) {
+        selectAppliance(family.id, suggestion.category);
       }
-      focusElement("#photo-result-title");
-    } catch (error) {
-      console.error("CLASSIFIER ERROR OBJECT:", error);
-      console.error("CLASSIFIER ERROR STACK:", error?.stack);
-
-      const errorName = error?.name || "UnknownError";
-      const errorMessage =
-       error?.message ||
-       String(error) ||
-       "No error message returned";
-
-      status.textContent = `CLASSIFIER ERROR → ${errorName}: ${errorMessage}`;
-    } finally {
-      if (photoInput) photoInput.value = "";
-      photoDropzone?.classList.remove("is-processing");
-    }
-  };
-  photoInput?.addEventListener("change", (event) =>
-   processPhoto(event.target.files?.[0])
-  );
-  photoDropzone?.addEventListener("dragover", (event) => {
-    event.preventDefault();
-    event.dataTransfer.dropEffect = "copy";
-    photoDropzone.classList.add("drag-over");
-  });
-  app.querySelector("#change-photo-appliance")?.addEventListener("click", () => {
-    photoInput?.click();
- });
-
-  photoDropzone?.addEventListener("dragleave", () => photoDropzone.classList.remove("drag-over"));
-  photoDropzone?.addEventListener("drop", (event) => {
-    event.preventDefault();
-    photoDropzone.classList.remove("drag-over");
-    processPhoto(event.dataTransfer.files?.[0]);
-  });
-  photoDropzone?.addEventListener("keydown", (event) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      photoInput?.click();
+      renderIdentify();
+      focusElement('[name="brand"]');
+      showToast("Appliance selected by you. Continue with your own details and answers.");
     }
   });
   app.querySelectorAll('[name="brand"], [name="model"]').forEach((input) => input.addEventListener("input", (event) => {
@@ -583,52 +474,13 @@ function renderIdentify() {
   }));
   bindProductSuggestions();
   app.querySelectorAll("[data-family]").forEach((button) => button.addEventListener("click", () => {
-    // A different appliance cannot inherit a previous appliance's warnings, quote or search centre.
-    state.appliance = { family: button.dataset.family, category: "", categoryCode: "", brand: "", model: "" };
-    state.photoDetection = null;
-    state.safety = {};
-    state.recall = null;
-    state.safetyResult = null;
-    state.decision = null;
-    state.safetyOptOut = false;
-    state.serviceSafetyMode = "clear";
-    state.costs = { repair: "", replacement: "" };
-    state.selectedPrice = null;
-    state.comparison = null;
-    state.problem = "";
-    state.problemContext = null;
-    state.area = "";
-    state.areaSelection = null;
-    state.areaSuggestions = [];
-    state.areaActiveIndex = -1;
-    state.userLocation = null;
-    state.fromRepairHub = false;
+    selectAppliance(button.dataset.family);
     renderIdentify();
     focusElement("[data-category]");
     app.querySelector(".category-panel")?.scrollIntoView({ block: "center", behavior: scrollBehavior() });
   }));
   app.querySelectorAll("[data-category]").forEach((button) => button.addEventListener("click", () => {
-    // Clear dependent results even within one family: questions and product evidence may differ.
-    state.appliance.category = button.dataset.category;
-    state.appliance.categoryCode = CATEGORY_CODE_BY_NAME[button.dataset.category] || "";
-    state.photoDetection = null;
-    state.safety = {};
-    state.recall = null;
-    state.safetyResult = null;
-    state.decision = null;
-    state.safetyOptOut = false;
-    state.serviceSafetyMode = "clear";
-    state.costs = { repair: "", replacement: "" };
-    state.selectedPrice = null;
-    state.comparison = null;
-    state.problem = "";
-    state.problemContext = null;
-    state.area = "";
-    state.areaSelection = null;
-    state.areaSuggestions = [];
-    state.areaActiveIndex = -1;
-    state.userLocation = null;
-    state.fromRepairHub = false;
+    selectAppliance(state.appliance.family, button.dataset.category);
     renderIdentify();
     focusElement('[name="brand"]');
     app.querySelector(".product-details-card")?.scrollIntoView({ block: "center", behavior: scrollBehavior() });
@@ -1767,6 +1619,7 @@ function bindBack() { app.querySelectorAll("[data-back]").forEach((button) => bu
 // A missing appliance, unanswered check, new recall or serious warning can redirect the request.
 // This prevents a saved history entry or delayed data refresh from bypassing current safety rules.
 function renderScreen() {
+  disposePhotoHelper();
   destroyMap();
   if (["check", "results", "repair-hub", "services", "cost"].includes(state.screen) && !state.appliance.category) state.screen = "landing";
   if (["results", "repair-hub", "services", "cost"].includes(state.screen) && !state.safetyOptOut && !relevantSigns().every(([id]) => Boolean(state.safety[id]))) {
@@ -1853,6 +1706,7 @@ function renderAbout() {
 // Discard this tab's adult answers and map, then return Home.
 // A new journey ID makes old browser-history entries and pending location callbacks inapplicable.
 function doRestart() {
+  disposePhotoHelper();
   ++journeyId;
   ++geoGeneration;
   destroyMap();

@@ -7,7 +7,7 @@
 // false safety/recall or service result from stale demo data.
 // Default version labels for the static snapshot; successful API metadata can replace the data status.
 export const META = Object.freeze({
-  releaseVersion: "iteration-2-v2.0.0-quest",
+  releaseVersion: "iteration-3-v3.0.0",
   dataVersion: "public-data-unavailable",
   retrievalDate: "See About the information"
 });

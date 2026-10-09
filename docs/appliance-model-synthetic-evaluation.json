@@ -1,0 +1,534 @@
+{
+  "evaluation": "synthetic-non-appliance-rejection-v1",
+  "scope": "Real exported-graph inference on deterministic generated pixels only; not real-world accuracy, an OOD benchmark, or validation of the reported microwave photo.",
+  "runtime": {
+    "tensorflow_js": "4.22.0",
+    "backend": "cpu"
+  },
+  "preprocessing": "512x512 RGB bytes [0,255]; TF.js bilinear resize to 224x224 with alignCorners=false; float32 batch. No external normalization; graph contains rescaling.",
+  "graph": {
+    "input": [
+      {
+        "name": "inputs",
+        "shape": [
+          -1,
+          224,
+          224,
+          3
+        ],
+        "dtype": "float32"
+      }
+    ],
+    "output": [
+      {
+        "name": "Identity"
+      }
+    ],
+    "embedded_rescaling_constants": [
+      {
+        "name": "StatefulPartitionedCall/fixforward_appliance_classifier_1/MobileNetV3Small_1/rescaling_1_1/Cast/x",
+        "values": [
+          0.007843137718737125
+        ]
+      },
+      {
+        "name": "StatefulPartitionedCall/fixforward_appliance_classifier_1/MobileNetV3Small_1/rescaling_1_1/Cast_1/x",
+        "values": [
+          -1
+        ]
+      }
+    ]
+  },
+  "artifacts": [
+    {
+      "file": "model.json",
+      "sha256": "5108a9047e7eaa2d829b8bddd82702c3ca933115f7b3d8fce87bec2760a10b02"
+    },
+    {
+      "file": "group1-shard1of1.bin",
+      "sha256": "bc78d74272e67baf0d5abff233f3c7aa47b3ccd5c338fdfd51df9b1fa1152897"
+    }
+  ],
+  "thresholds_from_manifest": {
+    "min_confidence": 0.68,
+    "blur_threshold": 57.233463287353516
+  },
+  "deployment_policy": {
+    "recognition_enabled": false,
+    "validation_status": "paused_pending_validation"
+  },
+  "fixture_count": 19,
+  "previous_gate_false_accept_count": 3,
+  "previous_gate_false_accept_fixtures": [
+    "grey-noise-1",
+    "checkerboard-1px",
+    "checkerboard-8px"
+  ],
+  "interpretation": "The prior confidence-plus-blur rule accepts some images containing no appliance. Keep recognition paused pending representative held-out and rejection validation; these cases do not establish the cause.",
+  "results": [
+    {
+      "name": "solid-black",
+      "kind": "blank",
+      "pixels_sha256": "599c1bb5ffd4b87229a81958f33f1060821cd01cd7aa7ccafa0d862f4522f3f6",
+      "top_three": [
+        {
+          "label": "straightener",
+          "score": 0.14127573370933533
+        },
+        {
+          "label": "dehumidifier",
+          "score": 0.08893629908561707
+        },
+        {
+          "label": "toaster",
+          "score": 0.07764418423175812
+        }
+      ],
+      "score_sum": 1.0000000288709998,
+      "previous_blur_score": 0,
+      "previous_confidence_gate_pass": false,
+      "previous_blur_gate_pass": false,
+      "previous_gate_would_accept": false
+    },
+    {
+      "name": "solid-white",
+      "kind": "blank",
+      "pixels_sha256": "902ab44f9b6b07c34a29958b325726ba7f6d506403335cf95a2af25e0ca1ad00",
+      "top_three": [
+        {
+          "label": "straightener",
+          "score": 0.1170630231499672
+        },
+        {
+          "label": "shaver",
+          "score": 0.07414776086807251
+        },
+        {
+          "label": "food_processor",
+          "score": 0.06493063271045685
+        }
+      ],
+      "score_sum": 1.0000000074505806,
+      "previous_blur_score": 0,
+      "previous_confidence_gate_pass": false,
+      "previous_blur_gate_pass": false,
+      "previous_gate_would_accept": false
+    },
+    {
+      "name": "solid-grey",
+      "kind": "blank",
+      "pixels_sha256": "fd92de53403dba9b673df2cba7ee3de7c7c4ca5ef4b8e1f7f2e8c0d72ed1e193",
+      "top_three": [
+        {
+          "label": "straightener",
+          "score": 0.2205658257007599
+        },
+        {
+          "label": "blender",
+          "score": 0.0737132579088211
+        },
+        {
+          "label": "steam_cleaner",
+          "score": 0.06445915251970291
+        }
+      ],
+      "score_sum": 1.0000000465661287,
+      "previous_blur_score": 0,
+      "previous_confidence_gate_pass": false,
+      "previous_blur_gate_pass": false,
+      "previous_gate_would_accept": false
+    },
+    {
+      "name": "solid-red",
+      "kind": "blank",
+      "pixels_sha256": "66a41bc69a990178b9783dc76428fccee229a801d97180bfef022ceac53c1956",
+      "top_three": [
+        {
+          "label": "straightener",
+          "score": 0.1362154334783554
+        },
+        {
+          "label": "blender",
+          "score": 0.07556979358196259
+        },
+        {
+          "label": "steam_cleaner",
+          "score": 0.06820859014987946
+        }
+      ],
+      "score_sum": 0.9999999981373549,
+      "previous_blur_score": 0,
+      "previous_confidence_gate_pass": false,
+      "previous_blur_gate_pass": false,
+      "previous_gate_would_accept": false
+    },
+    {
+      "name": "solid-green",
+      "kind": "blank",
+      "pixels_sha256": "149ae35fe8ce74679513f89af512055ab5dd062707b5329d055da5bc57adeadd",
+      "top_three": [
+        {
+          "label": "straightener",
+          "score": 0.20192478597164154
+        },
+        {
+          "label": "shaver",
+          "score": 0.10844026505947113
+        },
+        {
+          "label": "blender",
+          "score": 0.0868983045220375
+        }
+      ],
+      "score_sum": 0.9999999757856131,
+      "previous_blur_score": 0,
+      "previous_confidence_gate_pass": false,
+      "previous_blur_gate_pass": false,
+      "previous_gate_would_accept": false
+    },
+    {
+      "name": "solid-blue",
+      "kind": "blank",
+      "pixels_sha256": "f43a563448509b3dd5fe7fc92601580d0e1fd639787a511de1ca941b6ce827ee",
+      "top_three": [
+        {
+          "label": "shaver",
+          "score": 0.13902857899665833
+        },
+        {
+          "label": "straightener",
+          "score": 0.1329578012228012
+        },
+        {
+          "label": "dehumidifier",
+          "score": 0.11395516991615295
+        }
+      ],
+      "score_sum": 0.9999999795109034,
+      "previous_blur_score": 0,
+      "previous_confidence_gate_pass": false,
+      "previous_blur_gate_pass": false,
+      "previous_gate_would_accept": false
+    },
+    {
+      "name": "rgb-noise-1",
+      "kind": "noise",
+      "seed": 1,
+      "pixels_sha256": "be3d4d24e523060e85b7e753832b3beb448191644459b65f0f1f19f0a5946050",
+      "top_three": [
+        {
+          "label": "portable_heater",
+          "score": 0.34127077460289
+        },
+        {
+          "label": "kettle",
+          "score": 0.2865087389945984
+        },
+        {
+          "label": "steam_cleaner",
+          "score": 0.12393558770418167
+        }
+      ],
+      "score_sum": 0.9999999513966031,
+      "previous_blur_score": 48823.7845686645,
+      "previous_confidence_gate_pass": false,
+      "previous_blur_gate_pass": true,
+      "previous_gate_would_accept": false
+    },
+    {
+      "name": "rgb-noise-7",
+      "kind": "noise",
+      "seed": 7,
+      "pixels_sha256": "d215595aae6b22c7d5e2ebb9d7b99551cfef04ce3e6c6a39c7dd27a4a8713a4a",
+      "top_three": [
+        {
+          "label": "portable_heater",
+          "score": 0.41631466150283813
+        },
+        {
+          "label": "kettle",
+          "score": 0.2287033647298813
+        },
+        {
+          "label": "steam_cleaner",
+          "score": 0.10770826041698456
+        }
+      ],
+      "score_sum": 0.9999999651336111,
+      "previous_blur_score": 48682.20218475865,
+      "previous_confidence_gate_pass": false,
+      "previous_blur_gate_pass": true,
+      "previous_gate_would_accept": false
+    },
+    {
+      "name": "rgb-noise-42",
+      "kind": "noise",
+      "seed": 42,
+      "pixels_sha256": "f1c78ce89f75a109116f1ccfd11ae855577d24b22ae2ee1d812b496e0e5ead22",
+      "top_three": [
+        {
+          "label": "portable_heater",
+          "score": 0.3137759566307068
+        },
+        {
+          "label": "kettle",
+          "score": 0.23964029550552368
+        },
+        {
+          "label": "steam_cleaner",
+          "score": 0.14203312993049622
+        }
+      ],
+      "score_sum": 1.0000000308500603,
+      "previous_blur_score": 48977.38346341675,
+      "previous_confidence_gate_pass": false,
+      "previous_blur_gate_pass": true,
+      "previous_gate_would_accept": false
+    },
+    {
+      "name": "rgb-noise-2026",
+      "kind": "noise",
+      "seed": 2026,
+      "pixels_sha256": "11de321a578fe0d9a43f8e8adfc5a279c9d3d26472aa2f8a5f2f32361b7af25b",
+      "top_three": [
+        {
+          "label": "portable_heater",
+          "score": 0.6301071643829346
+        },
+        {
+          "label": "kettle",
+          "score": 0.10802891850471497
+        },
+        {
+          "label": "steam_cleaner",
+          "score": 0.07808917760848999
+        }
+      ],
+      "score_sum": 0.9999999673163984,
+      "previous_blur_score": 48912.15875714926,
+      "previous_confidence_gate_pass": false,
+      "previous_blur_gate_pass": true,
+      "previous_gate_would_accept": false
+    },
+    {
+      "name": "rgb-noise-3735928559",
+      "kind": "noise",
+      "seed": 3735928559,
+      "pixels_sha256": "e223a40d3e63b3d8e2a352c90c5cfee069c2041a27f35326dcdecd12f4c25343",
+      "top_three": [
+        {
+          "label": "portable_heater",
+          "score": 0.43998658657073975
+        },
+        {
+          "label": "kettle",
+          "score": 0.2046019434928894
+        },
+        {
+          "label": "steam_cleaner",
+          "score": 0.13905873894691467
+        }
+      ],
+      "score_sum": 1.0000000700820237,
+      "previous_blur_score": 48695.33655178333,
+      "previous_confidence_gate_pass": false,
+      "previous_blur_gate_pass": true,
+      "previous_gate_would_accept": false
+    },
+    {
+      "name": "grey-noise-1",
+      "kind": "noise",
+      "seed": 1,
+      "pixels_sha256": "adcab215f08e8f77a884c2105e4cd7f5a9ea3ed6f5e88e2997b505ad8f9aeb4b",
+      "top_three": [
+        {
+          "label": "portable_heater",
+          "score": 0.8290076851844788
+        },
+        {
+          "label": "steam_cleaner",
+          "score": 0.04121466726064682
+        },
+        {
+          "label": "dehumidifier",
+          "score": 0.030615216121077538
+        }
+      ],
+      "score_sum": 1.000000009262294,
+      "previous_blur_score": 109347.73187463942,
+      "previous_confidence_gate_pass": true,
+      "previous_blur_gate_pass": true,
+      "previous_gate_would_accept": true
+    },
+    {
+      "name": "grey-noise-42",
+      "kind": "noise",
+      "seed": 42,
+      "pixels_sha256": "7dd2dfe0815ad2fd54bd1e0f20b1ffe5ed4a0642092f56406fcfddbc5a7378cd",
+      "top_three": [
+        {
+          "label": "portable_heater",
+          "score": 0.6350687742233276
+        },
+        {
+          "label": "steam_cleaner",
+          "score": 0.09951197355985641
+        },
+        {
+          "label": "dehumidifier",
+          "score": 0.05254629626870155
+        }
+      ],
+      "score_sum": 1.0000000046857167,
+      "previous_blur_score": 109119.26938537585,
+      "previous_confidence_gate_pass": false,
+      "previous_blur_gate_pass": true,
+      "previous_gate_would_accept": false
+    },
+    {
+      "name": "grey-noise-2026",
+      "kind": "noise",
+      "seed": 2026,
+      "pixels_sha256": "b031572c77724a9a836075bcb73c9578fb494770894deab09bec77bec3fe9e7a",
+      "top_three": [
+        {
+          "label": "portable_heater",
+          "score": 0.6673218607902527
+        },
+        {
+          "label": "steam_cleaner",
+          "score": 0.08900025486946106
+        },
+        {
+          "label": "dehumidifier",
+          "score": 0.06076506897807121
+        }
+      ],
+      "score_sum": 1.0000000016589183,
+      "previous_blur_score": 108628.90955879519,
+      "previous_confidence_gate_pass": false,
+      "previous_blur_gate_pass": true,
+      "previous_gate_would_accept": false
+    },
+    {
+      "name": "checkerboard-1px",
+      "kind": "pattern",
+      "pixels_sha256": "fd575c26a2dcf0040a626fa00a30e754545ff7d5795d95f2bc710b43fead7ae0",
+      "top_three": [
+        {
+          "label": "portable_heater",
+          "score": 0.9343550801277161
+        },
+        {
+          "label": "dehumidifier",
+          "score": 0.018808841705322266
+        },
+        {
+          "label": "fan",
+          "score": 0.016033563762903214
+        }
+      ],
+      "score_sum": 0.9999999687843228,
+      "previous_blur_score": 1040400,
+      "previous_confidence_gate_pass": true,
+      "previous_blur_gate_pass": true,
+      "previous_gate_would_accept": true
+    },
+    {
+      "name": "checkerboard-8px",
+      "kind": "pattern",
+      "pixels_sha256": "9b7e7983adc19f96bcd86dd26bf4962dc1ea216075a9539985441878628b5307",
+      "top_three": [
+        {
+          "label": "portable_heater",
+          "score": 0.9774144887924194
+        },
+        {
+          "label": "dehumidifier",
+          "score": 0.011553162708878517
+        },
+        {
+          "label": "sandwich_press",
+          "score": 0.0071967411786317825
+        }
+      ],
+      "score_sum": 1.000000001614353,
+      "previous_blur_score": 40068,
+      "previous_confidence_gate_pass": true,
+      "previous_blur_gate_pass": true,
+      "previous_gate_would_accept": true
+    },
+    {
+      "name": "checkerboard-32px",
+      "kind": "pattern",
+      "pixels_sha256": "8e7b0ffdbb75ec6554b3587e4fd6627fc7d862dfd4b077d1a7d0b03ed1c980b7",
+      "top_three": [
+        {
+          "label": "portable_heater",
+          "score": 0.4318000376224518
+        },
+        {
+          "label": "steam_cleaner",
+          "score": 0.1716834455728531
+        },
+        {
+          "label": "air_fryer",
+          "score": 0.12207532674074173
+        }
+      ],
+      "score_sum": 0.9999999677093001,
+      "previous_blur_score": 8100,
+      "previous_confidence_gate_pass": false,
+      "previous_blur_gate_pass": true,
+      "previous_gate_would_accept": false
+    },
+    {
+      "name": "vertical-stripes-16px",
+      "kind": "pattern",
+      "pixels_sha256": "dd32edb9b32c9840e40d8bc275939700eee50c4481266ced69bca3b173ecd946",
+      "top_three": [
+        {
+          "label": "fan",
+          "score": 0.4833129048347473
+        },
+        {
+          "label": "portable_heater",
+          "score": 0.4825543761253357
+        },
+        {
+          "label": "portable_ac",
+          "score": 0.024936512112617493
+        }
+      ],
+      "score_sum": 0.9999999734377774,
+      "previous_blur_score": 7905,
+      "previous_confidence_gate_pass": false,
+      "previous_blur_gate_pass": true,
+      "previous_gate_would_accept": false
+    },
+    {
+      "name": "rgb-gradient",
+      "kind": "pattern",
+      "pixels_sha256": "ad59a926981c7418d0ff23b5d8989eb1d5aaa372246f45dd395a2f7d23045039",
+      "top_three": [
+        {
+          "label": "steam_cleaner",
+          "score": 0.1912393569946289
+        },
+        {
+          "label": "kettle",
+          "score": 0.1340133547782898
+        },
+        {
+          "label": "sandwich_press",
+          "score": 0.10476985573768616
+        }
+      ],
+      "score_sum": 1.0000000428408384,
+      "previous_blur_score": 0.433117409882268,
+      "previous_confidence_gate_pass": false,
+      "previous_blur_gate_pass": false,
+      "previous_gate_would_accept": false
+    }
+  ]
+}

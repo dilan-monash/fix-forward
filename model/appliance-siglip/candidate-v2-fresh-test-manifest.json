@@ -1,0 +1,2724 @@
+{
+  "frozen_at_utc": "2026-10-09T04:36:29.991Z",
+  "inputs": {
+    "critical": {
+      "assignment_counts": {
+        "eligible_operational_positive": 22,
+        "exclude_uncertain": 4
+      },
+      "audit": {
+        "audit_id": "critical-supplement-reconciled-audit",
+        "bytes": 50239,
+        "frozen_at_utc": "2026-10-09T04:36:29.991Z",
+        "path": "tmp/appliance-model-v2-fresh-validation/audits/critical-supplement-reconciled-audit.json",
+        "sha256": "1056f5c339ab7a7d84ae9fac9ecdf23463822c244343fb4ce270bbfcd16501f4"
+      },
+      "excluded_uncertain_ids": [
+        "critical:AF004",
+        "critical:AF019",
+        "critical:RC011",
+        "critical:SH021"
+      ],
+      "files_opened": [
+        {
+          "bytes": 79170,
+          "opened_by": [
+            "auditor_a",
+            "auditor_b"
+          ],
+          "path": "tmp/appliance-model-v2-fresh-validation/critical-supplement/selected-manifest.jsonl",
+          "purpose": "source_manifest",
+          "sha256": "7fd961fe4befbff33c29312937a1efd75c392285d5ae41e513b76f0315f33f2b"
+        },
+        {
+          "bytes": 26924,
+          "opened_by": [
+            "auditor_a",
+            "auditor_b"
+          ],
+          "path": "tmp/appliance-model-v2-fresh-validation/critical-supplement/validation-report.json",
+          "purpose": "validation_report",
+          "sha256": "8524c6e213ed34ea00e8e09dd3e9f70befec4c95a0a711c3b8500b13e829c1af"
+        },
+        {
+          "bytes": 8739,
+          "opened_by": [
+            "auditor_a",
+            "auditor_b"
+          ],
+          "path": "tmp/appliance-model-v2-fresh-validation/critical-supplement/LICENSE-EVIDENCE.md",
+          "purpose": "licensing_or_provenance_evidence",
+          "sha256": "503b6f59b9d66c875a49186390d5ced7dd845e95d95a429537edd09c90178f25"
+        },
+        {
+          "bytes": 200643,
+          "opened_by": [
+            "auditor_a",
+            "auditor_b"
+          ],
+          "path": "tmp/appliance-model-v2-fresh-validation/critical-supplement/selected-contact-sheets/air_fryer-selected.jpg",
+          "purpose": "selected_contact_sheet",
+          "sha256": "2f72626746c3ed91ae37eb34db276c726eaf94401ac3e9e03bf0b3a856e76810"
+        },
+        {
+          "bytes": 238603,
+          "opened_by": [
+            "auditor_a",
+            "auditor_b"
+          ],
+          "path": "tmp/appliance-model-v2-fresh-validation/critical-supplement/selected-contact-sheets/rice_cooker-selected.jpg",
+          "purpose": "selected_contact_sheet",
+          "sha256": "7fe1a14398b7a0bb58566a247edfbd702613d6b28e1b612117e5ee6d8bc5da9a"
+        },
+        {
+          "bytes": 228115,
+          "opened_by": [
+            "auditor_a",
+            "auditor_b"
+          ],
+          "path": "tmp/appliance-model-v2-fresh-validation/critical-supplement/selected-contact-sheets/shaver-selected.jpg",
+          "purpose": "selected_contact_sheet",
+          "sha256": "fe63c06fcf0608eed1f99b09ecd21cd3e087d833e97083e7bcd10a5222656024"
+        },
+        {
+          "bytes": 246117,
+          "opened_by": [
+            "auditor_a",
+            "auditor_b"
+          ],
+          "path": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/air_fryer/AF002.jpg",
+          "purpose": "referenced_image",
+          "sha256": "6c7a9c2be3a122f2e1c55662f070baf9e7f2ef4bb6e79aadb0f58eb7a12b26db"
+        },
+        {
+          "bytes": 152481,
+          "opened_by": [
+            "auditor_a",
+            "auditor_b"
+          ],
+          "path": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/air_fryer/AF004.jpg",
+          "purpose": "referenced_image",
+          "sha256": "f4e4a3bc90c55a89b6c62baf27a3e4bfc7176fa2f55aac5e2c3f7e01741fb786"
+        },
+        {
+          "bytes": 153930,
+          "opened_by": [
+            "auditor_a",
+            "auditor_b"
+          ],
+          "path": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/air_fryer/AF008.jpg",
+          "purpose": "referenced_image",
+          "sha256": "a779f1980470082e87d07b59f47bca6e1697756695e3e1209e6b5c0f44a02078"
+        },
+        {
+          "bytes": 211609,
+          "opened_by": [
+            "auditor_a",
+            "auditor_b"
+          ],
+          "path": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/air_fryer/AF009.jpg",
+          "purpose": "referenced_image",
+          "sha256": "b2902248c7c86b744cb4e086c2df55bbc8e9a84b681088eb53169b6a8dc29f39"
+        },
+        {
+          "bytes": 112508,
+          "opened_by": [
+            "auditor_a",
+            "auditor_b"
+          ],
+          "path": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/air_fryer/AF012.jpg",
+          "purpose": "referenced_image",
+          "sha256": "ee4f14501caf1fa68c2a28d5ddeeb994cae06f0fe66fbe3577fb470b982f71b8"
+        },
+        {
+          "bytes": 71743,
+          "opened_by": [
+            "auditor_a",
+            "auditor_b"
+          ],
+          "path": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/air_fryer/AF014.jpg",
+          "purpose": "referenced_image",
+          "sha256": "cb3b24707e1737c0fcdba71a9a2d398ee93f7711eb9a7ed64757785c33941a14"
+        },
+        {
+          "bytes": 131131,
+          "opened_by": [
+            "auditor_a",
+            "auditor_b"
+          ],
+          "path": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/air_fryer/AF016.jpg",
+          "purpose": "referenced_image",
+          "sha256": "4fb1ee9c98ac081348fd791eadb7711a7fd0ce692b5d700a9742778016085d6b"
+        },
+        {
+          "bytes": 234669,
+          "opened_by": [
+            "auditor_a",
+            "auditor_b"
+          ],
+          "path": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/air_fryer/AF019.jpg",
+          "purpose": "referenced_image",
+          "sha256": "c6d71d3ebd64d8f6ef1e6ac98429b5a9f4f850590dcfaa65bd39b1fa2d8d1e0d"
+        },
+        {
+          "bytes": 151455,
+          "opened_by": [
+            "auditor_a",
+            "auditor_b"
+          ],
+          "path": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/rice_cooker/RC005.jpg",
+          "purpose": "referenced_image",
+          "sha256": "5ccee7f1362574b61d7ead33affa3535004e6f41fc6bcfd2aec9418e42c6c932"
+        },
+        {
+          "bytes": 169317,
+          "opened_by": [
+            "auditor_a",
+            "auditor_b"
+          ],
+          "path": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/rice_cooker/RC006.jpg",
+          "purpose": "referenced_image",
+          "sha256": "8c66cfac6ed873cb755d38b93465720f3a005014bd5a6c563b6beb2aa732e65d"
+        },
+        {
+          "bytes": 116010,
+          "opened_by": [
+            "auditor_a",
+            "auditor_b"
+          ],
+          "path": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/rice_cooker/RC009.jpg",
+          "purpose": "referenced_image",
+          "sha256": "a3cacac0949b0ffdbff4b41fbf3c8525a1b22ad36824e7aa9129a80a76b7aaee"
+        },
+        {
+          "bytes": 161885,
+          "opened_by": [
+            "auditor_a",
+            "auditor_b"
+          ],
+          "path": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/rice_cooker/RC011.jpg",
+          "purpose": "referenced_image",
+          "sha256": "06ecc70d82b90c982cedc33de3f60b818b017b2b5f0ef6b538a2f87301a32988"
+        },
+        {
+          "bytes": 155685,
+          "opened_by": [
+            "auditor_a",
+            "auditor_b"
+          ],
+          "path": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/rice_cooker/RC012.jpg",
+          "purpose": "referenced_image",
+          "sha256": "7b779b349dde298744d23ff9ed5637b2851b440b4c4d49aa88eeef9fd6d0da1e"
+        },
+        {
+          "bytes": 278398,
+          "opened_by": [
+            "auditor_a",
+            "auditor_b"
+          ],
+          "path": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/rice_cooker/RC013.jpg",
+          "purpose": "referenced_image",
+          "sha256": "b7e891f86a1b4e87f71f9c406d4024ebddabc27b19a30f5ce33a850578f5bef4"
+        },
+        {
+          "bytes": 234802,
+          "opened_by": [
+            "auditor_a",
+            "auditor_b"
+          ],
+          "path": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/rice_cooker/RC014.jpg",
+          "purpose": "referenced_image",
+          "sha256": "9e6446fda6000885345f13f7ec73f3a1d337a29a378e1b684c40b84b857690cf"
+        },
+        {
+          "bytes": 141005,
+          "opened_by": [
+            "auditor_a",
+            "auditor_b"
+          ],
+          "path": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/rice_cooker/RC017.jpg",
+          "purpose": "referenced_image",
+          "sha256": "280e3d2a52d550660bf95499589ce3339b9477180928885fb5a6d80d2ea69dde"
+        },
+        {
+          "bytes": 184743,
+          "opened_by": [
+            "auditor_a",
+            "auditor_b"
+          ],
+          "path": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/rice_cooker/RC020.jpg",
+          "purpose": "referenced_image",
+          "sha256": "f84bcafc4faeb337cb981f9a706718bf0a4510196f48f6b69609877f8287bebb"
+        },
+        {
+          "bytes": 112528,
+          "opened_by": [
+            "auditor_a",
+            "auditor_b"
+          ],
+          "path": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/shaver/SH002.jpg",
+          "purpose": "referenced_image",
+          "sha256": "3c6de28cd106768549b598ae306381db4da92516140a2065d8f77bed88b5f1ac"
+        },
+        {
+          "bytes": 126859,
+          "opened_by": [
+            "auditor_a",
+            "auditor_b"
+          ],
+          "path": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/shaver/SH005.jpg",
+          "purpose": "referenced_image",
+          "sha256": "758efd0342e5d3d431b2cb430e9d16135aa63d532052a711c2e71e81e109c484"
+        },
+        {
+          "bytes": 187491,
+          "opened_by": [
+            "auditor_a",
+            "auditor_b"
+          ],
+          "path": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/shaver/SH008.jpg",
+          "purpose": "referenced_image",
+          "sha256": "8c00c850d0bac7e27fb63eed08f42b3ed4dd7f8a81886c8b3d3258ea9adf5575"
+        },
+        {
+          "bytes": 127448,
+          "opened_by": [
+            "auditor_a",
+            "auditor_b"
+          ],
+          "path": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/shaver/SH009.jpg",
+          "purpose": "referenced_image",
+          "sha256": "945febbc4f69203647305855197a1455084eefd4ef1ddb678dc73f8b2b8f1fe1"
+        },
+        {
+          "bytes": 112747,
+          "opened_by": [
+            "auditor_a",
+            "auditor_b"
+          ],
+          "path": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/shaver/SH016.jpg",
+          "purpose": "referenced_image",
+          "sha256": "ee1ddd36ad192adc7c417bc8bda4d7896752a17abd793e38a1c8298c7e04640e"
+        },
+        {
+          "bytes": 93932,
+          "opened_by": [
+            "auditor_a",
+            "auditor_b"
+          ],
+          "path": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/shaver/SH018.jpg",
+          "purpose": "referenced_image",
+          "sha256": "1cd5af8ffbee84786e870c41b8657c3e502caad829d0274cd77e89593e8c99d6"
+        },
+        {
+          "bytes": 174930,
+          "opened_by": [
+            "auditor_a",
+            "auditor_b"
+          ],
+          "path": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/shaver/SH019.jpg",
+          "purpose": "referenced_image",
+          "sha256": "6c1aad46c2c2b2408cfeb1b1ff90c6e34281e9ba1fd83ab3e9fc7798cc0d669e"
+        },
+        {
+          "bytes": 111032,
+          "opened_by": [
+            "auditor_a",
+            "auditor_b"
+          ],
+          "path": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/shaver/SH020.jpg",
+          "purpose": "referenced_image",
+          "sha256": "6b13bd8fac8100d60db25473e69dfbfbc5e6cf4b23a6ea5d5ef5ea2d455842ee"
+        },
+        {
+          "bytes": 256090,
+          "opened_by": [
+            "auditor_a",
+            "auditor_b"
+          ],
+          "path": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/shaver/SH021.jpg",
+          "purpose": "referenced_image",
+          "sha256": "4f74d7ee9ec9957c0e41961ee4c6ed45d65a334b26bbd08a12ff487dbef28f29"
+        }
+      ],
+      "independent_audits": {
+        "auditor_a": {
+          "audit_id": "critical-supplement-audit-a",
+          "bytes": 23671,
+          "path": "tmp/appliance-model-v2-fresh-validation/audits/critical-supplement-audit-a.json",
+          "sha256": "58c6f538655b1c1cc62d07ac925854c47a6ecdf2d9b73d0e78c677834527d094"
+        },
+        "auditor_b": {
+          "audit_id": "critical-supplement-audit-b",
+          "bytes": 29689,
+          "path": "tmp/appliance-model-v2-fresh-validation/audits/critical-supplement-audit-b.json",
+          "sha256": "2838b7aff358ca99345c5d12da6e79e5887913c11dfe94993c9b3c603af23bf5"
+        }
+      },
+      "source_manifest": {
+        "bytes": 79170,
+        "path": "tmp/appliance-model-v2-fresh-validation/critical-supplement/selected-manifest.jsonl",
+        "rows": 26,
+        "sha256": "7fd961fe4befbff33c29312937a1efd75c392285d5ae41e513b76f0315f33f2b"
+      },
+      "verified_evaluated_image_hashes": 26
+    },
+    "open_images": {
+      "assignment_counts": {
+        "eligible_operational_positive": 26,
+        "exclude_uncertain": 3,
+        "true_ood": 45
+      },
+      "audit": {
+        "audit_id": "open-images-reconciled-audit",
+        "bytes": 125944,
+        "frozen_at_utc": "2026-10-09T03:42:08.436Z",
+        "path": "tmp/appliance-model-v2-fresh-validation/audits/open-images-reconciled-audit.json",
+        "sha256": "6202566b2faafc9366a64e5d28d5733bb8e031415947df4747fa73661468f356"
+      },
+      "excluded_uncertain_ids": [
+        "open_images:2607f946dc091571",
+        "open_images:4e5670ec1484e9c4",
+        "open_images:3aa00c87122f009c"
+      ],
+      "source_manifest": {
+        "bytes": 173880,
+        "path": "tmp/appliance-model-v2-fresh-validation/open-images/open-images-v2-final.jsonl",
+        "rows": 74,
+        "sha256": "403e1b892d8e9b056d4b8a5ecde26261859971e397e5b872398715f00e5e924e"
+      },
+      "verified_evaluated_image_hashes": 74
+    },
+    "openverse": {
+      "assignment_counts": {
+        "eligible_operational_positive": 33,
+        "exclude_uncertain": 62,
+        "true_ood": 98
+      },
+      "audit": {
+        "audit_id": "openverse-final-reconciled-audit",
+        "bytes": 470213,
+        "frozen_at_utc": "2026-10-09T04:21:57.862Z",
+        "path": "tmp/appliance-model-v2-fresh-validation/audits/openverse-final-reconciled-audit.json",
+        "sha256": "4342eb4ccd0da6f4a1ad1ae15c49a0aefb6fcd165be814e5e79bc1db57e4c714"
+      },
+      "excluded_uncertain_ids": [
+        "openverse:6e26cfae-6edf-4aa1-a1b4-da7c24d00728",
+        "openverse:57a7e319-0d74-46fb-862c-447e7db2611a",
+        "openverse:c4501927-04ac-4187-a616-e683aff08c03",
+        "openverse:7d01c3ef-04cf-49db-bed8-81a51f3deee2",
+        "openverse:4eeed565-4b2a-48cf-b849-14435c202f52",
+        "openverse:3b4fe313-3b5f-476c-961c-8f79d77d9fb7",
+        "openverse:817b8e2f-0bb0-4237-8df8-8dda45ce2953",
+        "openverse:3759b53f-c2c8-4a2b-bdba-06c44ea0e92a",
+        "openverse:eb65535a-5333-4b0e-a084-d60a3cda5247",
+        "openverse:ac98346f-99a7-4936-942b-d23af22fa280",
+        "openverse:4ed30fd8-1d76-4720-a61e-61f680e4a4f5",
+        "openverse:a00657af-98e5-4f56-bf0a-0719c55938c9",
+        "openverse:2de59f0b-e2b3-425e-a715-880464fae546",
+        "openverse:d218cf15-79f0-4ad3-8e87-2788f3cca3ea",
+        "openverse:ff402daf-2643-43de-a430-bf6599fb8eb2",
+        "openverse:82dcbf23-b79a-42e9-aba5-ebc4e7ffeebb",
+        "openverse:8e0e2be9-4864-4a6b-b59a-297f84427ed8",
+        "openverse:ba6a2e50-e906-493d-aff5-0263c9b5cb66",
+        "openverse:5b383815-1414-467e-9f41-11aa9cf9e8f3",
+        "openverse:2bdaca2a-e426-4d6f-9de7-680baee42561",
+        "openverse:bbb4a786-cf62-43f8-bcb0-652d9c9fd90d",
+        "openverse:8bbbafb6-eafd-49ab-bd54-e8d58e3d0766",
+        "openverse:535459fc-74bc-4964-84c0-bbd0c8b54680",
+        "openverse:cba2e5cd-0cdc-4c1e-bfba-1f5106a5cc76",
+        "openverse:2b4999b8-46bb-4e71-81bf-8ef1d0f686d9",
+        "openverse:397936dc-f715-46f7-9df7-15adc7cf02ec",
+        "openverse:7ab17bf3-81ef-40ba-9671-0341b73aa852",
+        "openverse:052e5525-cb37-4d03-9ea5-df51656cd7dc",
+        "openverse:d412c49d-a03a-46c3-81d1-188da64f3c3a",
+        "openverse:b0162b27-34c2-4416-a1b6-55a33609f826",
+        "openverse:f24dc6f8-287f-4923-8a5e-76837c029e65",
+        "openverse:07323014-789a-401f-9b89-9aa76c1a8f2c",
+        "openverse:a48e45b4-5ff2-4d46-8917-9bdf6c20b091",
+        "openverse:80783fc4-4af7-4d8f-b656-981934697655",
+        "openverse:b0acd4bc-156d-4154-80da-a53b08e7ccdc",
+        "openverse:84a8e301-6e83-4933-af03-e9d6a01e10c8",
+        "openverse:6fe79b3f-09e8-4cdf-929d-b0d6b06d5e54",
+        "openverse:7fe039c3-cbb4-44bc-b1bc-2aa166050438",
+        "openverse:33bcb884-e756-4771-84f8-0ea25aef6097",
+        "openverse:54d0ff6b-1ce0-418f-a895-f3a9657666d9",
+        "openverse:c8ddc32f-42ab-48ce-90bd-98b0f45a3cf1",
+        "openverse:bdf73184-206d-4820-93f4-262ad1eca392",
+        "openverse:2cd85010-eb9a-44cf-86e3-ce3cec9b3832",
+        "openverse:ffd75cef-c5ad-4ea4-ba99-7838356e0c72",
+        "openverse:6f30432d-48cc-4a9d-80bb-993aa2fbc22f",
+        "openverse:4bdc79b7-07df-42d9-a8ef-a0b37c19c86e",
+        "openverse:d3386a6d-192d-4ac0-93b2-80a7b6124ed8",
+        "openverse:8d84a364-a2f8-483f-acca-4cf8e037082e",
+        "openverse:6acc7c59-2294-41a2-aace-b0d9f6512c96",
+        "openverse:94714fc4-c028-40c6-8e44-301ca8ff9159",
+        "openverse:56305318-47ca-42e9-9344-8f19fc7a7555",
+        "openverse:c77efb86-6d58-4a65-b4ac-01e937ee3a66",
+        "openverse:7f7cade7-d3d3-439c-9a0a-c9c6635fa420",
+        "openverse:f21906d1-228b-4b48-ba7d-58c637584cbd",
+        "openverse:998091e3-3abd-420f-ae6d-2a9b8f6e90f4",
+        "openverse:ac30e149-67d1-47b1-92b7-ddc27f229fc9",
+        "openverse:1b80e2ed-8c0d-4d8e-b562-61d47fa821d2",
+        "openverse:92d399e0-23b7-4d83-87e7-b9bc8568ae0c",
+        "openverse:acf54ba5-e778-4ca0-822a-406eb6067a0f",
+        "openverse:9dfd921e-8ff3-4cf6-ad79-087401b04965",
+        "openverse:a1802035-5328-4b5d-9d0e-690f76a990fd",
+        "openverse:5ab2f8d0-b486-402f-ad95-c64f4f3f3f98"
+      ],
+      "source_manifest": {
+        "bytes": 341526,
+        "path": "tmp/appliance-model-v2-fresh-validation/openverse-v2-final-pending-audit.jsonl",
+        "rows": 193,
+        "sha256": "9cca6620f6199bbfb8b031f47cbb930c650c408f1a494de5ff3d5775643acdb2"
+      },
+      "verified_evaluated_image_hashes": 193
+    }
+  },
+  "manifest_id": "candidate-v2-fresh-test-manifest",
+  "prediction_blind": true,
+  "samples": [
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/blender--2c091488adcffc85.jpg",
+      "expected": "blender",
+      "image_id": "open_images:2c091488adcffc85",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "aff9dbaa304d80de85e6562cbb5717eb01803f1d42e88a6bcbf9e69968ead6a5",
+      "source": "open_images",
+      "source_id": "2c091488adcffc85"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/blender--4711d1564fce44ea.jpg",
+      "expected": "blender",
+      "image_id": "open_images:4711d1564fce44ea",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "44a39d5e14fac994a7e1a652c5adfd54f0f7f2a53c0b8d8f605178ee9dbb1a5e",
+      "source": "open_images",
+      "source_id": "4711d1564fce44ea"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/blender--89b1c48fc36489d7.jpg",
+      "expected": "blender",
+      "image_id": "open_images:89b1c48fc36489d7",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "215938818666d31b9c3be7f5c9a667a166aab949262225498094ce54e3028317",
+      "source": "open_images",
+      "source_id": "89b1c48fc36489d7"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/blender--afdd2b6ab35d4986.jpg",
+      "expected": "blender",
+      "image_id": "open_images:afdd2b6ab35d4986",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "8886a925e01ca416310948d211fdd3e9a2da71284d9f731af717fbc5453fa9b4",
+      "source": "open_images",
+      "source_id": "afdd2b6ab35d4986"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/blender--b200ab6727d465ae.jpg",
+      "expected": "blender",
+      "image_id": "open_images:b200ab6727d465ae",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "4009f715cf58b86b60da645ff0bb04fbb9b3bc43c0bcd5af85c7e247c3f95571",
+      "source": "open_images",
+      "source_id": "b200ab6727d465ae"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/coffee_machine--1ee13fd389fd2eb3.jpg",
+      "expected": "coffee_machine",
+      "image_id": "open_images:1ee13fd389fd2eb3",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "16a9a2ff332ce8fca999538bdf8a92f3a7fcd08b9e7fd12b8e60160f34c9585e",
+      "source": "open_images",
+      "source_id": "1ee13fd389fd2eb3"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/coffee_machine--4df834b424dc549b.jpg",
+      "expected": "coffee_machine",
+      "image_id": "open_images:4df834b424dc549b",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "18996df8ff097711a7af3a58e2a1696391104780256d217345b1f918b26244ae",
+      "source": "open_images",
+      "source_id": "4df834b424dc549b"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/coffee_machine--68c2b7fa454da837.jpg",
+      "expected": "coffee_machine",
+      "image_id": "open_images:68c2b7fa454da837",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "b87d1252d28181e77596b4e06c5f7042bbb66e9a51420a91f497b7754a9b1f79",
+      "source": "open_images",
+      "source_id": "68c2b7fa454da837"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/coffee_machine--73f4ddc64280003b.jpg",
+      "expected": "coffee_machine",
+      "image_id": "open_images:73f4ddc64280003b",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "3a26a1421bc9cab7b877606f229f722122e1d3ee36fa0e291080800e6d8df5c4",
+      "source": "open_images",
+      "source_id": "73f4ddc64280003b"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/coffee_machine--c60b89ccf36b357a.jpg",
+      "expected": "coffee_machine",
+      "image_id": "open_images:c60b89ccf36b357a",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "ede928049dcee640d28d481f4aff6cc4f3fe0c618d2fb581e7efa884ae8551f0",
+      "source": "open_images",
+      "source_id": "c60b89ccf36b357a"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/fan--810fbdb975726857.jpg",
+      "expected": "fan",
+      "image_id": "open_images:810fbdb975726857",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "20513a0ff6920a4eb2c9e777ac4837c88f3e300da01e174cba354b27e7016901",
+      "source": "open_images",
+      "source_id": "810fbdb975726857"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/fan--a403b32a63d79277.jpg",
+      "expected": "fan",
+      "image_id": "open_images:a403b32a63d79277",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "d289d6ff835906c6a0be71fa6c45fefbf3d7fe5de28218adac54a56812203a8d",
+      "source": "open_images",
+      "source_id": "a403b32a63d79277"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/fan--bb2e266978fc8daa.jpg",
+      "expected": "fan",
+      "image_id": "open_images:bb2e266978fc8daa",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "d1b6b28cf74ce9e9445300a0715592f2d7d94646693a62e5b3fc692098c19fc2",
+      "source": "open_images",
+      "source_id": "bb2e266978fc8daa"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/fan--d91d43c867b707fd.jpg",
+      "expected": "fan",
+      "image_id": "open_images:d91d43c867b707fd",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "9bbc3dfc4591e72142b0050262a627ab5a2255dda2d904a040a72598c742f20a",
+      "source": "open_images",
+      "source_id": "d91d43c867b707fd"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/fan--e82d78d770e6d22c.jpg",
+      "expected": "fan",
+      "image_id": "open_images:e82d78d770e6d22c",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "956fa9170f8ed1ee78ac27fba38a73cc6f771f38803cd7dac40c03707e7f9da9",
+      "source": "open_images",
+      "source_id": "e82d78d770e6d22c"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/food_processor--66d3f65904b51e71.jpg",
+      "expected": "food_processor",
+      "image_id": "open_images:66d3f65904b51e71",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "92f5511486dbb95872983bcc63e58988dacc2bac835cd8d1305961239f528318",
+      "source": "open_images",
+      "source_id": "66d3f65904b51e71"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/food_processor--f8c3c17f36b5e432.jpg",
+      "expected": "food_processor",
+      "image_id": "open_images:f8c3c17f36b5e432",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "be622671768a7af96a63b3ad435bcd458c36dbced69267356dc8aebcc3222ba6",
+      "source": "open_images",
+      "source_id": "f8c3c17f36b5e432"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/hair_dryer--f41e84b53ff978a1.jpg",
+      "expected": "hair_dryer",
+      "image_id": "open_images:f41e84b53ff978a1",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "5ab814eef75b916024836c587402a6aaf3a723bd722a67a2952e863e88272f1a",
+      "source": "open_images",
+      "source_id": "f41e84b53ff978a1"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/kettle--7e295288b9607043.jpg",
+      "expected": "kettle",
+      "image_id": "open_images:7e295288b9607043",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "83e293c927df039f516bb2f549d9b46d0cbd04260f4242451f8e958fe30adf89",
+      "source": "open_images",
+      "source_id": "7e295288b9607043"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/microwave--1664c338a8380c25.jpg",
+      "expected": "microwave",
+      "image_id": "open_images:1664c338a8380c25",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "4dfa000dab79061bba6f2cbd9837f3ed060f1244b7dfd2fdecb149d3f3b881b0",
+      "source": "open_images",
+      "source_id": "1664c338a8380c25"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/microwave--60b3c35003cfb3d9.jpg",
+      "expected": "microwave",
+      "image_id": "open_images:60b3c35003cfb3d9",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "8b6ceb8ca19ee3e21a58005be0c663ab11c2455f4bab10327458ac62546e770a",
+      "source": "open_images",
+      "source_id": "60b3c35003cfb3d9"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/microwave--b4712091a42c8ea4.jpg",
+      "expected": "microwave",
+      "image_id": "open_images:b4712091a42c8ea4",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "68058279338d285d7286aca8450acddfac004de0ad9624035474cbf9c88f51e2",
+      "source": "open_images",
+      "source_id": "b4712091a42c8ea4"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/microwave--d04ba7bf3b56b1ba.jpg",
+      "expected": "microwave",
+      "image_id": "open_images:d04ba7bf3b56b1ba",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "338f3b88c4f55df6b9c881a0be54ac119fb93d958de07b776a4e4a14c41cce2c",
+      "source": "open_images",
+      "source_id": "d04ba7bf3b56b1ba"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/mixer--5d567013ea0ba90e.jpg",
+      "expected": "mixer",
+      "image_id": "open_images:5d567013ea0ba90e",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "4c2257a8d26c8e412405a6fec976c36ea8e5afe2f3d6f0c59a745ef0ab7f7a79",
+      "source": "open_images",
+      "source_id": "5d567013ea0ba90e"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/mixer--92c66476dc079909.jpg",
+      "expected": "mixer",
+      "image_id": "open_images:92c66476dc079909",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "97e22bfe6d56e7929caf7032bc45ea1b5732deeef1b6e9bcc6937b30ffae59fc",
+      "source": "open_images",
+      "source_id": "92c66476dc079909"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/mixer--9ee921ca3c6d3538.jpg",
+      "expected": null,
+      "image_id": "open_images:9ee921ca3c6d3538",
+      "kind": "ood",
+      "ood_class": "industrial_mixer",
+      "sha256": "e348ee5b3a5564711e4a4d20ee39a9727b49c6265ca279ffc45bd8aa2dd59b93",
+      "source": "open_images",
+      "source_id": "9ee921ca3c6d3538"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/toaster--87a6437eb03c0dfc.jpg",
+      "expected": "toaster",
+      "image_id": "open_images:87a6437eb03c0dfc",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "1e180a7d29d519cd7562796210616bb2d8870a03828ffab251962a6f9b758526",
+      "source": "open_images",
+      "source_id": "87a6437eb03c0dfc"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_refrigerator--0a449146fd461376.jpg",
+      "expected": null,
+      "image_id": "open_images:0a449146fd461376",
+      "kind": "ood",
+      "ood_class": "refrigerator",
+      "sha256": "8512be9375deb9f34c94e9166c51daaf3808335f4d2ff8cee1d334360753cf37",
+      "source": "open_images",
+      "source_id": "0a449146fd461376"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_refrigerator--2334af101eb10dce.jpg",
+      "expected": null,
+      "image_id": "open_images:2334af101eb10dce",
+      "kind": "ood",
+      "ood_class": "refrigerator",
+      "sha256": "6782c92027f5ae29edeaf0f62adab875547aeab6df693264e24d0554b9e919f6",
+      "source": "open_images",
+      "source_id": "2334af101eb10dce"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_refrigerator--6a6c4348e1313a0d.jpg",
+      "expected": null,
+      "image_id": "open_images:6a6c4348e1313a0d",
+      "kind": "ood",
+      "ood_class": "refrigerator",
+      "sha256": "4d80b405cf0b58946ffa8f2073acd36bb1d318facb05756e31064c6d79075154",
+      "source": "open_images",
+      "source_id": "6a6c4348e1313a0d"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_refrigerator--81d653f8cc985f18.jpg",
+      "expected": null,
+      "image_id": "open_images:81d653f8cc985f18",
+      "kind": "ood",
+      "ood_class": "refrigerator",
+      "sha256": "01a4155346ed0476c2e1fe911e1c45113e45a2e1ca3d06f9dd63dccf0c344eb9",
+      "source": "open_images",
+      "source_id": "81d653f8cc985f18"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_oven--7c43089cf235d1a9.jpg",
+      "expected": null,
+      "image_id": "open_images:7c43089cf235d1a9",
+      "kind": "ood",
+      "ood_class": "oven",
+      "sha256": "d374d9cdfe7b0cb725f65c62a3f6c166f6054814bdb070f2551b7b12e8c461d7",
+      "source": "open_images",
+      "source_id": "7c43089cf235d1a9"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_oven--86b12a1ce788541d.jpg",
+      "expected": null,
+      "image_id": "open_images:86b12a1ce788541d",
+      "kind": "ood",
+      "ood_class": "wine_cooler",
+      "sha256": "6ea6e86d46734d20d9819e660d3f1df75c78f141465cd429a7004f5f2bb5a50f",
+      "source": "open_images",
+      "source_id": "86b12a1ce788541d"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_oven--a266447e286d2b00.jpg",
+      "expected": null,
+      "image_id": "open_images:a266447e286d2b00",
+      "kind": "ood",
+      "ood_class": "oven",
+      "sha256": "d50fb6a08a227d6fd1e3b76d07125608b2b89c24d6e942f31f5cf0c767d059cb",
+      "source": "open_images",
+      "source_id": "a266447e286d2b00"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_oven--c5b2cd9f94f45817.jpg",
+      "expected": null,
+      "image_id": "open_images:c5b2cd9f94f45817",
+      "kind": "ood",
+      "ood_class": "wood_burning_stove_fireplace",
+      "sha256": "09c6a48803ad797a021e0a54c37276a1db582b92b59b903f90116f66f4e1996b",
+      "source": "open_images",
+      "source_id": "c5b2cd9f94f45817"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_washing_machine--3150b45dbe882b1e.jpg",
+      "expected": null,
+      "image_id": "open_images:3150b45dbe882b1e",
+      "kind": "ood",
+      "ood_class": "dishwasher",
+      "sha256": "6e00fae74d07fde8c086671ba532a613d36d5e3e9443ff8a5a71a5943194b736",
+      "source": "open_images",
+      "source_id": "3150b45dbe882b1e"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_washing_machine--33daf42b4b572d04.jpg",
+      "expected": null,
+      "image_id": "open_images:33daf42b4b572d04",
+      "kind": "ood",
+      "ood_class": "washing_machine",
+      "sha256": "e920e6cfb3d22baa73b53b6235be646b199de56730a33eb640fb4aaffe07b8f9",
+      "source": "open_images",
+      "source_id": "33daf42b4b572d04"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_washing_machine--9b4bde655182d630.jpg",
+      "expected": null,
+      "image_id": "open_images:9b4bde655182d630",
+      "kind": "ood",
+      "ood_class": "washing_machine",
+      "sha256": "a501cc5042aa279fae3ab4154bcd8f829d1f90e6735d7e26c5803120f8a2e49b",
+      "source": "open_images",
+      "source_id": "9b4bde655182d630"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_dishwasher--71b3bea110ee810c.jpg",
+      "expected": null,
+      "image_id": "open_images:71b3bea110ee810c",
+      "kind": "ood",
+      "ood_class": "oven",
+      "sha256": "afa29ac714991606a91d5bd648d37be9b733922b3a8de51b25f4b3e6838344ef",
+      "source": "open_images",
+      "source_id": "71b3bea110ee810c"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_dishwasher--d8e0c7825be12b2c.jpg",
+      "expected": null,
+      "image_id": "open_images:d8e0c7825be12b2c",
+      "kind": "ood",
+      "ood_class": "sink",
+      "sha256": "9feb2da8ede58603467cc4f24451c81670324eea4cdc1b44c959b6ddf46fc679",
+      "source": "open_images",
+      "source_id": "d8e0c7825be12b2c"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_sink--4afe952d531fb84a.jpg",
+      "expected": null,
+      "image_id": "open_images:4afe952d531fb84a",
+      "kind": "ood",
+      "ood_class": "sink",
+      "sha256": "a672a57650f31f57855e899a78bcf0266fbac78c401c5fa07e17221419cda202",
+      "source": "open_images",
+      "source_id": "4afe952d531fb84a"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_sink--7053ad0ed8118c44.jpg",
+      "expected": null,
+      "image_id": "open_images:7053ad0ed8118c44",
+      "kind": "ood",
+      "ood_class": "sink",
+      "sha256": "cd16b1efa23e47b07b9c102b49f89b17b46fd205f3fefcbdf09741bb5fa40fcd",
+      "source": "open_images",
+      "source_id": "7053ad0ed8118c44"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_sink--784bcad5a8866352.jpg",
+      "expected": null,
+      "image_id": "open_images:784bcad5a8866352",
+      "kind": "ood",
+      "ood_class": "sink",
+      "sha256": "c0f5137cc879eefc8ad0d75548a1e0aba79f06ab06a987463362c9c14ae6dae4",
+      "source": "open_images",
+      "source_id": "784bcad5a8866352"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_sink--cc51ce301afb5595.jpg",
+      "expected": null,
+      "image_id": "open_images:cc51ce301afb5595",
+      "kind": "ood",
+      "ood_class": "sink",
+      "sha256": "a2d2c955b656b4a7c8f22d13f5d3eb916668b132dbffc6b1d8342b2770fd7a02",
+      "source": "open_images",
+      "source_id": "cc51ce301afb5595"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_mug--0fb3b09b91685b46.jpg",
+      "expected": null,
+      "image_id": "open_images:0fb3b09b91685b46",
+      "kind": "ood",
+      "ood_class": "mug",
+      "sha256": "71456627c966d35bdbd53fc01e84ac6bd3d1cf569c316d7513c35eff3aa535ce",
+      "source": "open_images",
+      "source_id": "0fb3b09b91685b46"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_mug--12ae3e29de392848.jpg",
+      "expected": null,
+      "image_id": "open_images:12ae3e29de392848",
+      "kind": "ood",
+      "ood_class": "mug",
+      "sha256": "f5e8ee41890458746d90d2d3316c352acb33172f499828113bdb7d7bb2fff179",
+      "source": "open_images",
+      "source_id": "12ae3e29de392848"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_mug--1df6e430c821910b.jpg",
+      "expected": null,
+      "image_id": "open_images:1df6e430c821910b",
+      "kind": "ood",
+      "ood_class": "mug",
+      "sha256": "67873202e291625bbe08a814d2aa3054d7d3360c6bbf1407d99e44c7ab1f1175",
+      "source": "open_images",
+      "source_id": "1df6e430c821910b"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_mug--e68fdc0e1599c679.jpg",
+      "expected": null,
+      "image_id": "open_images:e68fdc0e1599c679",
+      "kind": "ood",
+      "ood_class": "mug",
+      "sha256": "e337c53646de1f22c0cb1a024bb7af92ecb98fc4c9c425d48827632c2648cc0b",
+      "source": "open_images",
+      "source_id": "e68fdc0e1599c679"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_bowl--0b180712901c4187.jpg",
+      "expected": null,
+      "image_id": "open_images:0b180712901c4187",
+      "kind": "ood",
+      "ood_class": "bowl",
+      "sha256": "3dd7c7ed4bdf2795da7348fae5c6975787894712727313d682e286d5058c2239",
+      "source": "open_images",
+      "source_id": "0b180712901c4187"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_bowl--27266488d4ea4203.jpg",
+      "expected": null,
+      "image_id": "open_images:27266488d4ea4203",
+      "kind": "ood",
+      "ood_class": "bowl",
+      "sha256": "ae5d9a3af515affeb31560b2fae8e6a9de752045516983b53478bfaec0871f98",
+      "source": "open_images",
+      "source_id": "27266488d4ea4203"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_bowl--8223e3dec9802fe7.jpg",
+      "expected": null,
+      "image_id": "open_images:8223e3dec9802fe7",
+      "kind": "ood",
+      "ood_class": "bowl",
+      "sha256": "11ec3fed06b7e1ee9c8e6faca765335985107e23c1a3eeb7d90098614db3567b",
+      "source": "open_images",
+      "source_id": "8223e3dec9802fe7"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_bowl--cea0bb0c123285a8.jpg",
+      "expected": null,
+      "image_id": "open_images:cea0bb0c123285a8",
+      "kind": "ood",
+      "ood_class": "bowl",
+      "sha256": "d040e1d044c310e64a3d7176d067271d02be1aab89dfe9a9fc3f618b0101357e",
+      "source": "open_images",
+      "source_id": "cea0bb0c123285a8"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_laptop--2516b87354b26f7c.jpg",
+      "expected": null,
+      "image_id": "open_images:2516b87354b26f7c",
+      "kind": "ood",
+      "ood_class": "laptop",
+      "sha256": "90ff8ed7d89b8771cede5d412c54d92850cd362e0a5caba618156f5083cff4a9",
+      "source": "open_images",
+      "source_id": "2516b87354b26f7c"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_laptop--30fbec4e8c9fb7ba.jpg",
+      "expected": null,
+      "image_id": "open_images:30fbec4e8c9fb7ba",
+      "kind": "ood",
+      "ood_class": "laptop",
+      "sha256": "e212f6efd5b8cc79b98cd5b048a063ba44e1036851c161b82b053d5548ac0c92",
+      "source": "open_images",
+      "source_id": "30fbec4e8c9fb7ba"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_laptop--67aa06cda243c64f.jpg",
+      "expected": null,
+      "image_id": "open_images:67aa06cda243c64f",
+      "kind": "ood",
+      "ood_class": "laptop",
+      "sha256": "7614767a8c1f8f328c5cfc5f7f4d748527022345b3c25414544fd6c423249d48",
+      "source": "open_images",
+      "source_id": "67aa06cda243c64f"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_laptop--8975f565d52b58c2.jpg",
+      "expected": null,
+      "image_id": "open_images:8975f565d52b58c2",
+      "kind": "ood",
+      "ood_class": "laptop",
+      "sha256": "45f982a1bee1ea8a3ad7f7d79d1eb710c31e54add83c2d96e21068ee7c992ed0",
+      "source": "open_images",
+      "source_id": "8975f565d52b58c2"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_mobile_phone--0ce07313dcca1f15.jpg",
+      "expected": null,
+      "image_id": "open_images:0ce07313dcca1f15",
+      "kind": "ood",
+      "ood_class": "cordless_phone",
+      "sha256": "34e4da8c8cc0ff3841456f8b18b31de4a185f02a531eb56784415db9950bc0f5",
+      "source": "open_images",
+      "source_id": "0ce07313dcca1f15"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_mobile_phone--3e29f53744272bb1.jpg",
+      "expected": null,
+      "image_id": "open_images:3e29f53744272bb1",
+      "kind": "ood",
+      "ood_class": "mobile_phone",
+      "sha256": "24c712673fbf53b8c1d2005194d49c231ccf7e27324fe592da33ffabe7f10b6d",
+      "source": "open_images",
+      "source_id": "3e29f53744272bb1"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_mobile_phone--6599893fa617d36e.jpg",
+      "expected": null,
+      "image_id": "open_images:6599893fa617d36e",
+      "kind": "ood",
+      "ood_class": "mobile_phone",
+      "sha256": "2ac44af2465755fe1e666be6009c2813127b04cb54936366731d480dd99b6a88",
+      "source": "open_images",
+      "source_id": "6599893fa617d36e"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_mobile_phone--f63d154f0fbb9ad3.jpg",
+      "expected": null,
+      "image_id": "open_images:f63d154f0fbb9ad3",
+      "kind": "ood",
+      "ood_class": "mobile_phone",
+      "sha256": "f10506a7b619c95a89a9fe9a4920b59064e84c2ee425678ef86a331cb44f59a6",
+      "source": "open_images",
+      "source_id": "f63d154f0fbb9ad3"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_television--5c341ac3248475db.jpg",
+      "expected": null,
+      "image_id": "open_images:5c341ac3248475db",
+      "kind": "ood",
+      "ood_class": "television",
+      "sha256": "49c744e6ed7c679cba4faa34ab1fb15358b314dee18a8286659a580fbdce42a6",
+      "source": "open_images",
+      "source_id": "5c341ac3248475db"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_television--6813ede09d2af8fe.jpg",
+      "expected": null,
+      "image_id": "open_images:6813ede09d2af8fe",
+      "kind": "ood",
+      "ood_class": "television",
+      "sha256": "aaaed8782f82bb5baa4b0b68e5ccf460482ac7b4a2cfac343b1b457220245b52",
+      "source": "open_images",
+      "source_id": "6813ede09d2af8fe"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_television--a200cb8633527837.jpg",
+      "expected": null,
+      "image_id": "open_images:a200cb8633527837",
+      "kind": "ood",
+      "ood_class": "laptop",
+      "sha256": "e1e642cb2c52d51695088fd9b93d250ffad04aebb5ebafa5ad947ea18478e758",
+      "source": "open_images",
+      "source_id": "a200cb8633527837"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_television--eb98a0c3356754e8.jpg",
+      "expected": null,
+      "image_id": "open_images:eb98a0c3356754e8",
+      "kind": "ood",
+      "ood_class": "computer_monitor",
+      "sha256": "f95422a1099caa3f8953eee1a14e36d28040a0e04f2ade18384b08f9dc5b5adb",
+      "source": "open_images",
+      "source_id": "eb98a0c3356754e8"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_printer--07ea34f3bcef0ba0.jpg",
+      "expected": null,
+      "image_id": "open_images:07ea34f3bcef0ba0",
+      "kind": "ood",
+      "ood_class": "printer",
+      "sha256": "b75944f40bb9af0eb28f0f5217cc6f73edece2cbe9a92f5ba96b400fffb709ed",
+      "source": "open_images",
+      "source_id": "07ea34f3bcef0ba0"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_printer--0a010cb030a212b1.jpg",
+      "expected": null,
+      "image_id": "open_images:0a010cb030a212b1",
+      "kind": "ood",
+      "ood_class": "printer",
+      "sha256": "2de10d9371b25c52b8ed981f3c7b0835cefd7593364b156a4fae1e6bbd8ad035",
+      "source": "open_images",
+      "source_id": "0a010cb030a212b1"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_printer--7e511c57e3d076d2.jpg",
+      "expected": null,
+      "image_id": "open_images:7e511c57e3d076d2",
+      "kind": "ood",
+      "ood_class": "printer",
+      "sha256": "8a603a5cec3425d1cf91f1adcba9f5eca76edd0c28cd391bcea7aabccf77d485",
+      "source": "open_images",
+      "source_id": "7e511c57e3d076d2"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_printer--943592d4d4624713.jpg",
+      "expected": null,
+      "image_id": "open_images:943592d4d4624713",
+      "kind": "ood",
+      "ood_class": "printer",
+      "sha256": "82be427b17c5f49d7a909419addc4e2d07e714b5f366f3a6b8eea9c94b127395",
+      "source": "open_images",
+      "source_id": "943592d4d4624713"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_camera--1f2d193f092e4685.jpg",
+      "expected": null,
+      "image_id": "open_images:1f2d193f092e4685",
+      "kind": "ood",
+      "ood_class": "camera",
+      "sha256": "75209d5d5961967eb68993eb194702032736a368418ca9e48766c9d819e4f0b0",
+      "source": "open_images",
+      "source_id": "1f2d193f092e4685"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_camera--5f8cfb1c585cb896.jpg",
+      "expected": null,
+      "image_id": "open_images:5f8cfb1c585cb896",
+      "kind": "ood",
+      "ood_class": "camera",
+      "sha256": "ef41329b075a22f7be1470b09265740b022b509996267bfbe19e9bd521b65c3c",
+      "source": "open_images",
+      "source_id": "5f8cfb1c585cb896"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/open-images/crops/ood_camera--fca5d806c27afd7a.jpg",
+      "expected": null,
+      "image_id": "open_images:fca5d806c27afd7a",
+      "kind": "ood",
+      "ood_class": "camera",
+      "sha256": "f98e6fcdb0b91ced52645354b7303ca0d6c13106581ae318d131b153e24f0dd5",
+      "source": "open_images",
+      "source_id": "fca5d806c27afd7a"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/positive/coffee_machine/dc8b4f22-68af-420b-9237-24f8a077b96c.jpg",
+      "expected": "coffee_machine",
+      "image_id": "openverse:dc8b4f22-68af-420b-9237-24f8a077b96c",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "4d527409fd5e425fe2d4f41c391fe55a4cdd3b4268044c375b5ee71aec5d9067",
+      "source": "openverse",
+      "source_id": "dc8b4f22-68af-420b-9237-24f8a077b96c"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/positive/fan/7f7209d2-7fb7-4161-9dab-cb9e9292507e.jpg",
+      "expected": "fan",
+      "image_id": "openverse:7f7209d2-7fb7-4161-9dab-cb9e9292507e",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "9f3eac593c8fe79b3d1355586cb5b2e89f5395ce0e96d7c8b8c5c9d449617673",
+      "source": "openverse",
+      "source_id": "7f7209d2-7fb7-4161-9dab-cb9e9292507e"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/positive/hair_dryer/da90c93f-c8c4-40fb-bbf0-28affc0b3b6e.jpg",
+      "expected": "hair_dryer",
+      "image_id": "openverse:da90c93f-c8c4-40fb-bbf0-28affc0b3b6e",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "6adff06e0d592a3d7433b9f79e4b23d913332d0df54b2fba7f674d7a8d15b3dc",
+      "source": "openverse",
+      "source_id": "da90c93f-c8c4-40fb-bbf0-28affc0b3b6e"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/positive/hair_dryer/6d3294ab-c4bf-4069-955f-aa1e9d8ae50a.jpg",
+      "expected": "hair_dryer",
+      "image_id": "openverse:6d3294ab-c4bf-4069-955f-aa1e9d8ae50a",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "acb7cb47cb8f0aff2a82d2e914811ac960c1fe83a2c6d0bbf7ad88c0eb9f1b6a",
+      "source": "openverse",
+      "source_id": "6d3294ab-c4bf-4069-955f-aa1e9d8ae50a"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/positive/microwave/839ac287-2178-4859-9a56-51a0ffa7a250.jpg",
+      "expected": "microwave",
+      "image_id": "openverse:839ac287-2178-4859-9a56-51a0ffa7a250",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "27bba57349d9ccb1f0318de7271d0377bea68b4351b88d6ecd44f4d55617c13c",
+      "source": "openverse",
+      "source_id": "839ac287-2178-4859-9a56-51a0ffa7a250"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/positive/microwave/4b5c2303-ce39-449d-a53d-b2243e0ef550.jpg",
+      "expected": "microwave",
+      "image_id": "openverse:4b5c2303-ce39-449d-a53d-b2243e0ef550",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "323877a16f252f2fb970382b596277a1399568e9d7b1815885fcd9478afb4879",
+      "source": "openverse",
+      "source_id": "4b5c2303-ce39-449d-a53d-b2243e0ef550"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/positive/microwave/08627079-b4cd-4032-9418-c3d6339f01b2.jpg",
+      "expected": "microwave",
+      "image_id": "openverse:08627079-b4cd-4032-9418-c3d6339f01b2",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "5a735b0534b2f1918adeb7f3984e6edf9a76f10a47813eab043e24506da3aca4",
+      "source": "openverse",
+      "source_id": "08627079-b4cd-4032-9418-c3d6339f01b2"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/positive/microwave/7bda41cd-0653-48b4-8f8d-27bf6ec410a2.jpg",
+      "expected": "microwave",
+      "image_id": "openverse:7bda41cd-0653-48b4-8f8d-27bf6ec410a2",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "7e7da49037d942fc35a09e344c614d5dc4eb473f74363a552aef3b29ffe4ff6a",
+      "source": "openverse",
+      "source_id": "7bda41cd-0653-48b4-8f8d-27bf6ec410a2"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/positive/shaver/add3a7a1-0037-4278-9258-1503d0537e64.jpg",
+      "expected": "shaver",
+      "image_id": "openverse:add3a7a1-0037-4278-9258-1503d0537e64",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "973ef05c382df8a8657d1774031fb59c1323c47d0b3dc912ec48b19d37cc8839",
+      "source": "openverse",
+      "source_id": "add3a7a1-0037-4278-9258-1503d0537e64"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/positive/straightener/3de6acb0-73c5-44e0-ac84-36c1f58547ef.jpg",
+      "expected": "straightener",
+      "image_id": "openverse:3de6acb0-73c5-44e0-ac84-36c1f58547ef",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "3ba9151291a9883382c32e21aabf9f4db9d30bf1f1e2c623da70d0890d1236c1",
+      "source": "openverse",
+      "source_id": "3de6acb0-73c5-44e0-ac84-36c1f58547ef"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/positive/straightener/aa0aec47-01da-49fc-ba68-cd606457c22a.jpg",
+      "expected": "straightener",
+      "image_id": "openverse:aa0aec47-01da-49fc-ba68-cd606457c22a",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "3ce014bed908168ac18de811b9743112c062dbfaecc9019167df9f6f270ca28a",
+      "source": "openverse",
+      "source_id": "aa0aec47-01da-49fc-ba68-cd606457c22a"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/positive/toaster/2e94df21-1e00-47e1-b502-c51d514cdef4.jpg",
+      "expected": "toaster",
+      "image_id": "openverse:2e94df21-1e00-47e1-b502-c51d514cdef4",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "2e5de0765a8d62d7f62a87d11e94687050c80bc667dda5c703f8e172b6e08c2c",
+      "source": "openverse",
+      "source_id": "2e94df21-1e00-47e1-b502-c51d514cdef4"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/positive/toaster/5f33d1bc-1e49-43b5-99f8-b9165aa7e431.jpg",
+      "expected": "toaster",
+      "image_id": "openverse:5f33d1bc-1e49-43b5-99f8-b9165aa7e431",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "d675f6902b3779c21d2e6c6622b8c17cd6cc3a0959f6b89cca2112516fad0c33",
+      "source": "openverse",
+      "source_id": "5f33d1bc-1e49-43b5-99f8-b9165aa7e431"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/positive/vaccum_cleaner/c5a47a65-cc51-4ed3-a20e-72f00baa4175.jpg",
+      "expected": "vaccum_cleaner",
+      "image_id": "openverse:c5a47a65-cc51-4ed3-a20e-72f00baa4175",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "e594bc066129a0c546f1a307d77cd552f34628c479b1329b7fe526791d9be726",
+      "source": "openverse",
+      "source_id": "c5a47a65-cc51-4ed3-a20e-72f00baa4175"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/positive/vaccum_cleaner/0dd7cf95-0f87-4dd1-b2bd-20c7edc49836.jpg",
+      "expected": "vaccum_cleaner",
+      "image_id": "openverse:0dd7cf95-0f87-4dd1-b2bd-20c7edc49836",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "77ae3fb389ebf7876d8cfc50fb6d40ee53c05a1655ed4d38056d176a9402f49b",
+      "source": "openverse",
+      "source_id": "0dd7cf95-0f87-4dd1-b2bd-20c7edc49836"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/dishwasher/d96fc9d1-9c3d-4bb8-a7f0-d659a39e93e7.jpg",
+      "expected": null,
+      "image_id": "openverse:d96fc9d1-9c3d-4bb8-a7f0-d659a39e93e7",
+      "kind": "ood",
+      "ood_class": "dishwasher",
+      "sha256": "f07ddac9a5ac8913a2229785184433366401a64749e0fc149545fc892102f784",
+      "source": "openverse",
+      "source_id": "d96fc9d1-9c3d-4bb8-a7f0-d659a39e93e7"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/dishwasher/31c818ec-880a-464f-89db-d9eff637dfb5.jpg",
+      "expected": null,
+      "image_id": "openverse:31c818ec-880a-464f-89db-d9eff637dfb5",
+      "kind": "ood",
+      "ood_class": "dishwasher",
+      "sha256": "97197debd92b9ad8f1ce8e7a01ed56ad7b976b19b5965b101416a0a1bba98328",
+      "source": "openverse",
+      "source_id": "31c818ec-880a-464f-89db-d9eff637dfb5"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/dishwasher/e276d315-0a3c-4e8a-bb49-d92509adb418.jpg",
+      "expected": null,
+      "image_id": "openverse:e276d315-0a3c-4e8a-bb49-d92509adb418",
+      "kind": "ood",
+      "ood_class": "commercial_dishwashing_station",
+      "sha256": "bfcd3540a769831e3045b202257b0964ca390604cb8b9eb00f024178322e155b",
+      "source": "openverse",
+      "source_id": "e276d315-0a3c-4e8a-bb49-d92509adb418"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/dishwasher/4bc489d4-f4bd-450d-908d-d6eee8cc8179.jpg",
+      "expected": null,
+      "image_id": "openverse:4bc489d4-f4bd-450d-908d-d6eee8cc8179",
+      "kind": "ood",
+      "ood_class": "dishwasher",
+      "sha256": "8091bbc6f0c6dc0a5cf61f0bc2e7abbb74e046074421a4b4130eeaa9cd596e99",
+      "source": "openverse",
+      "source_id": "4bc489d4-f4bd-450d-908d-d6eee8cc8179"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/dishwasher/b344dbe5-d9af-4049-a9fc-a00d2bb98bbe.jpg",
+      "expected": null,
+      "image_id": "openverse:b344dbe5-d9af-4049-a9fc-a00d2bb98bbe",
+      "kind": "ood",
+      "ood_class": "dishwasher",
+      "sha256": "09b6e71f45f098df082848261a2fd61621909fe478c906e17353cf16a0a5eb54",
+      "source": "openverse",
+      "source_id": "b344dbe5-d9af-4049-a9fc-a00d2bb98bbe"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/dishwasher/7173ad10-98c8-4aa6-a0a7-2440be9e2b24.jpg",
+      "expected": null,
+      "image_id": "openverse:7173ad10-98c8-4aa6-a0a7-2440be9e2b24",
+      "kind": "ood",
+      "ood_class": "dishwasher",
+      "sha256": "f82b46c1678033f88122e1a2cfca70f59e8749bf99fcecba83fcd20513bc9a11",
+      "source": "openverse",
+      "source_id": "7173ad10-98c8-4aa6-a0a7-2440be9e2b24"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/washing_machine/1d24f8a0-ee2a-4e1d-87cf-222c68374209.jpg",
+      "expected": null,
+      "image_id": "openverse:1d24f8a0-ee2a-4e1d-87cf-222c68374209",
+      "kind": "ood",
+      "ood_class": "washing_machine",
+      "sha256": "50e33122319e22f0f164df7b52f0ac772d5182b101b267b606d2e648b7b35b87",
+      "source": "openverse",
+      "source_id": "1d24f8a0-ee2a-4e1d-87cf-222c68374209"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/washing_machine/97646956-5c38-4372-b41f-76a49e0b0f00.jpg",
+      "expected": null,
+      "image_id": "openverse:97646956-5c38-4372-b41f-76a49e0b0f00",
+      "kind": "ood",
+      "ood_class": "washing_machine",
+      "sha256": "bbc13d80a5c33cffd22decfaa9e521689a53398e5777a629fa67ef15b6f8bf0d",
+      "source": "openverse",
+      "source_id": "97646956-5c38-4372-b41f-76a49e0b0f00"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/washing_machine/a9c1f210-b88a-4ab7-9592-62005dd9bd26.jpg",
+      "expected": null,
+      "image_id": "openverse:a9c1f210-b88a-4ab7-9592-62005dd9bd26",
+      "kind": "ood",
+      "ood_class": "washing_machine",
+      "sha256": "ca377632723656c146b0d85ecbd9894361c6e197d3fbeab5a23cbe17f683adcf",
+      "source": "openverse",
+      "source_id": "a9c1f210-b88a-4ab7-9592-62005dd9bd26"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/washing_machine/833801c8-879a-4e92-a0c0-20ad1572668e.jpg",
+      "expected": null,
+      "image_id": "openverse:833801c8-879a-4e92-a0c0-20ad1572668e",
+      "kind": "ood",
+      "ood_class": "washing_machine",
+      "sha256": "d2c790921796df577f65219c518616e3cb5a0ed23a8107a9a78830f9b9c97f63",
+      "source": "openverse",
+      "source_id": "833801c8-879a-4e92-a0c0-20ad1572668e"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/refrigerator/b48d0060-5f69-4966-96c1-1b77d138484d.jpg",
+      "expected": null,
+      "image_id": "openverse:b48d0060-5f69-4966-96c1-1b77d138484d",
+      "kind": "ood",
+      "ood_class": "wall_oven",
+      "sha256": "d7223437cc9bc273be14c3cc0bc3b72cdbd81a03153dadf0ceff29f0d6b64a45",
+      "source": "openverse",
+      "source_id": "b48d0060-5f69-4966-96c1-1b77d138484d"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/television/9318f12d-2543-4a90-b039-51bd6807ea4b.jpg",
+      "expected": null,
+      "image_id": "openverse:9318f12d-2543-4a90-b039-51bd6807ea4b",
+      "kind": "ood",
+      "ood_class": "broadcast_monitor",
+      "sha256": "8ce53df1e2a1d1a5ac89c2f40acbc0a8c31ec554ce4e7164af104f8bf46e85a5",
+      "source": "openverse",
+      "source_id": "9318f12d-2543-4a90-b039-51bd6807ea4b"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/television/3bad40fe-a535-4e1a-9e3f-163924014a07.jpg",
+      "expected": null,
+      "image_id": "openverse:3bad40fe-a535-4e1a-9e3f-163924014a07",
+      "kind": "ood",
+      "ood_class": "control_room_display",
+      "sha256": "d31b6e6577df1c50c74db4884f836bc502c53ad0854bd2dfa1bc777707a76584",
+      "source": "openverse",
+      "source_id": "3bad40fe-a535-4e1a-9e3f-163924014a07"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/television/f9577718-b101-44e3-9553-990d7b0a0be3.jpg",
+      "expected": null,
+      "image_id": "openverse:f9577718-b101-44e3-9553-990d7b0a0be3",
+      "kind": "ood",
+      "ood_class": "computer_workstation",
+      "sha256": "31238c2217ff582e1c820efd587be4952c06aec17662fbbe474eaaf1fd0d529e",
+      "source": "openverse",
+      "source_id": "f9577718-b101-44e3-9553-990d7b0a0be3"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/television/43efd7ef-faf0-4c0c-af86-1f4045f7bbce.jpg",
+      "expected": null,
+      "image_id": "openverse:43efd7ef-faf0-4c0c-af86-1f4045f7bbce",
+      "kind": "ood",
+      "ood_class": "control_room_display",
+      "sha256": "ca9446a25f367c3dc2f5b97c7b14396af29f9aec4897a5bee4062728ac4cc259",
+      "source": "openverse",
+      "source_id": "43efd7ef-faf0-4c0c-af86-1f4045f7bbce"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/television/3f82e936-f417-47ee-92cb-122f683f2254.jpg",
+      "expected": null,
+      "image_id": "openverse:3f82e936-f417-47ee-92cb-122f683f2254",
+      "kind": "ood",
+      "ood_class": "presentation_display",
+      "sha256": "e2d974ddf5ed002ceb1345c3fa8c75e017e08a580f8b804a5fc9b9bb914dc651",
+      "source": "openverse",
+      "source_id": "3f82e936-f417-47ee-92cb-122f683f2254"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/television/72adb055-18f8-45a2-a18d-1cee65c4cb41.jpg",
+      "expected": null,
+      "image_id": "openverse:72adb055-18f8-45a2-a18d-1cee65c4cb41",
+      "kind": "ood",
+      "ood_class": "computer_workstation",
+      "sha256": "426598c74b89c3733c3f20a3bd72ca8cf9e98aa254666fa9ed31a1a753ddab91",
+      "source": "openverse",
+      "source_id": "72adb055-18f8-45a2-a18d-1cee65c4cb41"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/laptop/dc04f295-5825-46c4-b8b0-54044dc11608.jpg",
+      "expected": null,
+      "image_id": "openverse:dc04f295-5825-46c4-b8b0-54044dc11608",
+      "kind": "ood",
+      "ood_class": "laptop",
+      "sha256": "d12c7d5c5210e89c981ad4165c1af3c25c5c9aaa8bc3303f9e12bca489b2819c",
+      "source": "openverse",
+      "source_id": "dc04f295-5825-46c4-b8b0-54044dc11608"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/laptop/9c3946c9-c811-4945-aa04-ecd619bd3b52.jpg",
+      "expected": null,
+      "image_id": "openverse:9c3946c9-c811-4945-aa04-ecd619bd3b52",
+      "kind": "ood",
+      "ood_class": "computer_workstation",
+      "sha256": "42decba06c4af73560754e8d2355284e190eaa0eff4128ba93ef6505a359ed21",
+      "source": "openverse",
+      "source_id": "9c3946c9-c811-4945-aa04-ecd619bd3b52"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/laptop/997dbeb1-c6fb-4091-a660-2d4a4c5dae2b.jpg",
+      "expected": null,
+      "image_id": "openverse:997dbeb1-c6fb-4091-a660-2d4a4c5dae2b",
+      "kind": "ood",
+      "ood_class": "computer_workstation",
+      "sha256": "b2e49602663b0d34dedd688edd93d0405d39917aeb6410e6c95ccbc8c17091e5",
+      "source": "openverse",
+      "source_id": "997dbeb1-c6fb-4091-a660-2d4a4c5dae2b"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/laptop/4a534fac-5663-43f4-85c9-81cb110af2ca.jpg",
+      "expected": null,
+      "image_id": "openverse:4a534fac-5663-43f4-85c9-81cb110af2ca",
+      "kind": "ood",
+      "ood_class": "mug",
+      "sha256": "cb6f6d62fc9c14242a5103e6d52c05da6ab4d6049e13a0e987e05de0aeffc5f7",
+      "source": "openverse",
+      "source_id": "4a534fac-5663-43f4-85c9-81cb110af2ca"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/laptop/f200748a-e131-4258-9245-8d2e91ccd757.jpg",
+      "expected": null,
+      "image_id": "openverse:f200748a-e131-4258-9245-8d2e91ccd757",
+      "kind": "ood",
+      "ood_class": "computer_workstation",
+      "sha256": "7859aeef7a2a5b6e16ac721fe2b6a5cc65567772e3ec1acc119ad3b4c263f9c5",
+      "source": "openverse",
+      "source_id": "f200748a-e131-4258-9245-8d2e91ccd757"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/laptop/801fddc5-e987-48c8-8645-f8c8e084137f.jpg",
+      "expected": null,
+      "image_id": "openverse:801fddc5-e987-48c8-8645-f8c8e084137f",
+      "kind": "ood",
+      "ood_class": "computer_workstation",
+      "sha256": "a64dfbd046df859df4d602731acd13e28f9e2fc58671760ac1b2245eb8a5f83a",
+      "source": "openverse",
+      "source_id": "801fddc5-e987-48c8-8645-f8c8e084137f"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/laptop/3bb9dc47-8537-4fae-a91c-ce5b84b8fd25.jpg",
+      "expected": null,
+      "image_id": "openverse:3bb9dc47-8537-4fae-a91c-ce5b84b8fd25",
+      "kind": "ood",
+      "ood_class": "laptop",
+      "sha256": "8b299900d3036d176e3588dd78d9d6e41c854ecd42a8b89c6d12d4824774505f",
+      "source": "openverse",
+      "source_id": "3bb9dc47-8537-4fae-a91c-ce5b84b8fd25"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/mobile_phone/f5993f86-3b15-4fe7-a7b1-1309ac284aae.jpg",
+      "expected": null,
+      "image_id": "openverse:f5993f86-3b15-4fe7-a7b1-1309ac284aae",
+      "kind": "ood",
+      "ood_class": "mobile_phone",
+      "sha256": "666997c2f1d83ef7d194c54a29e956205f32f889d1f7f3c6a8721e64537a0978",
+      "source": "openverse",
+      "source_id": "f5993f86-3b15-4fe7-a7b1-1309ac284aae"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/chair/43b00feb-26e6-427f-8755-f4ce5f048e76.jpg",
+      "expected": null,
+      "image_id": "openverse:43b00feb-26e6-427f-8755-f4ce5f048e76",
+      "kind": "ood",
+      "ood_class": "chair",
+      "sha256": "244c3b5d897ac402fc85362f18ec835db9bb8a48955ff66506f4e11c98322c87",
+      "source": "openverse",
+      "source_id": "43b00feb-26e6-427f-8755-f4ce5f048e76"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/chair/b3db923b-008d-4c71-823c-aa664161d228.jpg",
+      "expected": null,
+      "image_id": "openverse:b3db923b-008d-4c71-823c-aa664161d228",
+      "kind": "ood",
+      "ood_class": "chair",
+      "sha256": "ff795a85224e573ef17eaf61c4b7736dcdbd1e5aa2116f31daa6c8e7391cb017",
+      "source": "openverse",
+      "source_id": "b3db923b-008d-4c71-823c-aa664161d228"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/chair/a44f8699-5aa0-470d-8fd6-e6713e583637.jpg",
+      "expected": null,
+      "image_id": "openverse:a44f8699-5aa0-470d-8fd6-e6713e583637",
+      "kind": "ood",
+      "ood_class": "chair",
+      "sha256": "fc16fd7ad27d2f5f4808f02cbee438e701b0cd2218e065e95a0b0afbb24550ce",
+      "source": "openverse",
+      "source_id": "a44f8699-5aa0-470d-8fd6-e6713e583637"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/chair/7ba78907-f934-48c0-8c8a-e9d72c57ca86.jpg",
+      "expected": null,
+      "image_id": "openverse:7ba78907-f934-48c0-8c8a-e9d72c57ca86",
+      "kind": "ood",
+      "ood_class": "sofa",
+      "sha256": "6d4684c9343964ef391c5e727e2bd38cf8bda6316c34527d1a70cc48b479bbea",
+      "source": "openverse",
+      "source_id": "7ba78907-f934-48c0-8c8a-e9d72c57ca86"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/chair/69c348e3-b344-4551-81f1-f2b80be7cef6.jpg",
+      "expected": null,
+      "image_id": "openverse:69c348e3-b344-4551-81f1-f2b80be7cef6",
+      "kind": "ood",
+      "ood_class": "chair",
+      "sha256": "60212d561e387b1157f729855f7aa8f5b36dfac644865fb326710f07ac558ce5",
+      "source": "openverse",
+      "source_id": "69c348e3-b344-4551-81f1-f2b80be7cef6"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/chair/5ca8e5fc-c290-4397-89d6-baf53016a9f9.jpg",
+      "expected": null,
+      "image_id": "openverse:5ca8e5fc-c290-4397-89d6-baf53016a9f9",
+      "kind": "ood",
+      "ood_class": "chair",
+      "sha256": "9ee408f074994c3605f7167d702deea074518a20618f24c5b3af9fc96cf4e623",
+      "source": "openverse",
+      "source_id": "5ca8e5fc-c290-4397-89d6-baf53016a9f9"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/sofa/061cdc17-c5ab-4ff6-81c3-657c52cae15f.jpg",
+      "expected": null,
+      "image_id": "openverse:061cdc17-c5ab-4ff6-81c3-657c52cae15f",
+      "kind": "ood",
+      "ood_class": "sofa",
+      "sha256": "afd25c25f41520c9ab708d8b5ba3da5858e9a419fb8eccdf9825baa08a3ddbc1",
+      "source": "openverse",
+      "source_id": "061cdc17-c5ab-4ff6-81c3-657c52cae15f"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/sofa/41158411-7cd3-4b41-b0af-ad08ccff5919.jpg",
+      "expected": null,
+      "image_id": "openverse:41158411-7cd3-4b41-b0af-ad08ccff5919",
+      "kind": "ood",
+      "ood_class": "sofa",
+      "sha256": "c23dea7b96e3a21d0eb782d437daa713403496b81d57d7c7d98f1f7820173432",
+      "source": "openverse",
+      "source_id": "41158411-7cd3-4b41-b0af-ad08ccff5919"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/sofa/3a5cde59-c3e2-44c4-b9e8-bf76b5716fa7.jpg",
+      "expected": null,
+      "image_id": "openverse:3a5cde59-c3e2-44c4-b9e8-bf76b5716fa7",
+      "kind": "ood",
+      "ood_class": "sofa",
+      "sha256": "95e3a0672e30c43982a3af293842cbb563970bc80a84182942c3c2b0a79fdc28",
+      "source": "openverse",
+      "source_id": "3a5cde59-c3e2-44c4-b9e8-bf76b5716fa7"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/sofa/31f07c4d-4a5e-4a0e-8198-a6eab30cd41e.jpg",
+      "expected": null,
+      "image_id": "openverse:31f07c4d-4a5e-4a0e-8198-a6eab30cd41e",
+      "kind": "ood",
+      "ood_class": "sofa",
+      "sha256": "79d9b493b65cf063bbe22c71591912ad5f06984e3980e48308586bbed395de83",
+      "source": "openverse",
+      "source_id": "31f07c4d-4a5e-4a0e-8198-a6eab30cd41e"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/sofa/302a55e3-5ab2-4141-ad9c-96320a4a9dd0.jpg",
+      "expected": null,
+      "image_id": "openverse:302a55e3-5ab2-4141-ad9c-96320a4a9dd0",
+      "kind": "ood",
+      "ood_class": "chair",
+      "sha256": "2fc7c99b6cd2ce52ffabe96d7dcd0b5d4fd3b051d1524e3a5229b8011a698b78",
+      "source": "openverse",
+      "source_id": "302a55e3-5ab2-4141-ad9c-96320a4a9dd0"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/sofa/4d3f1775-f3e8-45ac-9171-fff02953377f.jpg",
+      "expected": null,
+      "image_id": "openverse:4d3f1775-f3e8-45ac-9171-fff02953377f",
+      "kind": "ood",
+      "ood_class": "sofa",
+      "sha256": "19ff7bb029c8842baeac85af4582edef4c878953500c0bf9c28a4b53c647c0e7",
+      "source": "openverse",
+      "source_id": "4d3f1775-f3e8-45ac-9171-fff02953377f"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/sofa/709cf768-b00f-4eb0-905f-ee1570a67a21.jpg",
+      "expected": null,
+      "image_id": "openverse:709cf768-b00f-4eb0-905f-ee1570a67a21",
+      "kind": "ood",
+      "ood_class": "sofa",
+      "sha256": "08629337bbe7ee8776f67fa28069905db98969e2373ec44eb854461aebb962a0",
+      "source": "openverse",
+      "source_id": "709cf768-b00f-4eb0-905f-ee1570a67a21"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/sofa/d87d65ad-8daa-40bf-a9e6-cb828f9bb386.jpg",
+      "expected": null,
+      "image_id": "openverse:d87d65ad-8daa-40bf-a9e6-cb828f9bb386",
+      "kind": "ood",
+      "ood_class": "sofa",
+      "sha256": "e02b13dc41dde704b29584263763b3e149e2298dc0a4ed798fab2a5ef7755ba5",
+      "source": "openverse",
+      "source_id": "d87d65ad-8daa-40bf-a9e6-cb828f9bb386"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/table_lamp/8b955e0b-3612-4737-a1fa-96dc2ee93ad4.jpg",
+      "expected": null,
+      "image_id": "openverse:8b955e0b-3612-4737-a1fa-96dc2ee93ad4",
+      "kind": "ood",
+      "ood_class": "sofa",
+      "sha256": "d57d88e9aac5ee3159a8e472061465fd2c0c3304d219a097db096083a9600261",
+      "source": "openverse",
+      "source_id": "8b955e0b-3612-4737-a1fa-96dc2ee93ad4"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/table_lamp/49573b42-5f89-4d7f-97f2-82fca3aaea9f.jpg",
+      "expected": null,
+      "image_id": "openverse:49573b42-5f89-4d7f-97f2-82fca3aaea9f",
+      "kind": "ood",
+      "ood_class": "sofa",
+      "sha256": "cde377dfd32a898075cc6897e3e869b53e7085a13c856409a0a52647997c482f",
+      "source": "openverse",
+      "source_id": "49573b42-5f89-4d7f-97f2-82fca3aaea9f"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/table_lamp/abf11a6c-6841-4484-b6db-9789a1d7902b.jpg",
+      "expected": null,
+      "image_id": "openverse:abf11a6c-6841-4484-b6db-9789a1d7902b",
+      "kind": "ood",
+      "ood_class": "sofa",
+      "sha256": "40f17a023b604bb1bd20dec40cb59096b8e7bd2fe22599ed0a1e39ad96e0ad91",
+      "source": "openverse",
+      "source_id": "abf11a6c-6841-4484-b6db-9789a1d7902b"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/table_lamp/ebbace51-7c55-43fb-b44c-4d93f844b589.jpg",
+      "expected": null,
+      "image_id": "openverse:ebbace51-7c55-43fb-b44c-4d93f844b589",
+      "kind": "ood",
+      "ood_class": "sofa",
+      "sha256": "7bd230a590f2acc7ace79248bc33d57752d4cf25e3f685ae28c0f28438347d06",
+      "source": "openverse",
+      "source_id": "ebbace51-7c55-43fb-b44c-4d93f844b589"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/table_lamp/753c31cd-a9b8-4dc5-8fe4-9f6d8c96cb28.jpg",
+      "expected": null,
+      "image_id": "openverse:753c31cd-a9b8-4dc5-8fe4-9f6d8c96cb28",
+      "kind": "ood",
+      "ood_class": "table_lamp",
+      "sha256": "6701586708c4fae7a144e1771736f54964656ba070bc9979f24d85fe120b5cf8",
+      "source": "openverse",
+      "source_id": "753c31cd-a9b8-4dc5-8fe4-9f6d8c96cb28"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/clothes_iron/54b007e3-6e9f-440e-94c5-a77c15fd94bb.jpg",
+      "expected": null,
+      "image_id": "openverse:54b007e3-6e9f-440e-94c5-a77c15fd94bb",
+      "kind": "ood",
+      "ood_class": "clothes_iron",
+      "sha256": "855bfd00442e702199b2a11965a3ce4fba6744973b0c788d4ab954e28ae9c40f",
+      "source": "openverse",
+      "source_id": "54b007e3-6e9f-440e-94c5-a77c15fd94bb"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/sewing_machine/424f8422-2f8a-4650-8c9e-8773561f6581.jpg",
+      "expected": null,
+      "image_id": "openverse:424f8422-2f8a-4650-8c9e-8773561f6581",
+      "kind": "ood",
+      "ood_class": "sewing_machine",
+      "sha256": "217fa9bbcb11c4a2621b9da17a7fc374ea16b83aa1b5a518721644ddd0788b2d",
+      "source": "openverse",
+      "source_id": "424f8422-2f8a-4650-8c9e-8773561f6581"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/sewing_machine/20c73d94-c188-4310-b15a-20489278db09.jpg",
+      "expected": null,
+      "image_id": "openverse:20c73d94-c188-4310-b15a-20489278db09",
+      "kind": "ood",
+      "ood_class": "sewing_machine",
+      "sha256": "b4c992cf143d530c11d89d763d10a61507fac87ec01dce752a89de9e738bb055",
+      "source": "openverse",
+      "source_id": "20c73d94-c188-4310-b15a-20489278db09"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/sewing_machine/4818bb01-0497-4029-a3ce-a4528e0a5e9f.jpg",
+      "expected": null,
+      "image_id": "openverse:4818bb01-0497-4029-a3ce-a4528e0a5e9f",
+      "kind": "ood",
+      "ood_class": "sewing_machine",
+      "sha256": "197470338ce258c39dd57485a8a7a14d85305383e7e701d978d8a4bd60bc0acf",
+      "source": "openverse",
+      "source_id": "4818bb01-0497-4029-a3ce-a4528e0a5e9f"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/sewing_machine/a4c337b3-ece8-4fc6-9ea2-33fc78321d6c.jpg",
+      "expected": null,
+      "image_id": "openverse:a4c337b3-ece8-4fc6-9ea2-33fc78321d6c",
+      "kind": "ood",
+      "ood_class": "sewing_machine",
+      "sha256": "f14b5654cdb34e200192efc7f4bfee1c51821c7f8e17e80c12f713c8bc669764",
+      "source": "openverse",
+      "source_id": "a4c337b3-ece8-4fc6-9ea2-33fc78321d6c"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/sewing_machine/44df9a28-d5a5-40cd-b1da-6018ad517f65.jpg",
+      "expected": null,
+      "image_id": "openverse:44df9a28-d5a5-40cd-b1da-6018ad517f65",
+      "kind": "ood",
+      "ood_class": "sewing_machine",
+      "sha256": "c5e04341ce00e84a23821c9b39cf0128beceb8ffae862be322e54952737212c3",
+      "source": "openverse",
+      "source_id": "44df9a28-d5a5-40cd-b1da-6018ad517f65"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/sewing_machine/fbab8c85-815c-4314-925d-77ddb6144299.jpg",
+      "expected": null,
+      "image_id": "openverse:fbab8c85-815c-4314-925d-77ddb6144299",
+      "kind": "ood",
+      "ood_class": "sewing_machine",
+      "sha256": "5d37a67441c9deec00f7db9653dfe671fdc99b70e36118016898e1567fc1df65",
+      "source": "openverse",
+      "source_id": "fbab8c85-815c-4314-925d-77ddb6144299"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/sewing_machine/6ce9f188-a466-48ca-89aa-96cf30495242.jpg",
+      "expected": null,
+      "image_id": "openverse:6ce9f188-a466-48ca-89aa-96cf30495242",
+      "kind": "ood",
+      "ood_class": "sewing_machine",
+      "sha256": "10a7803ec32bdd20ef644b333147d8fef584bf58849be37131d56d5e23a09385",
+      "source": "openverse",
+      "source_id": "6ce9f188-a466-48ca-89aa-96cf30495242"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/power_drill/b25b7099-a19e-44d0-a871-6d918647ebf2.jpg",
+      "expected": null,
+      "image_id": "openverse:b25b7099-a19e-44d0-a871-6d918647ebf2",
+      "kind": "ood",
+      "ood_class": "power_drill",
+      "sha256": "b06be75c42010ed8d8f2a6f3a6b176c5c4d798eb9099f3c49cdab16903a33240",
+      "source": "openverse",
+      "source_id": "b25b7099-a19e-44d0-a871-6d918647ebf2"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/power_drill/33443f20-e257-4bac-9702-6983acb5b2ed.jpg",
+      "expected": null,
+      "image_id": "openverse:33443f20-e257-4bac-9702-6983acb5b2ed",
+      "kind": "ood",
+      "ood_class": "power_drill",
+      "sha256": "dd5b02ae88c10073b50156e71a5fd8d55b206cf58d722707e9d2042d57a21287",
+      "source": "openverse",
+      "source_id": "33443f20-e257-4bac-9702-6983acb5b2ed"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/power_drill/7bf9fae2-1423-41a9-a717-33cfbe3da841.jpg",
+      "expected": null,
+      "image_id": "openverse:7bf9fae2-1423-41a9-a717-33cfbe3da841",
+      "kind": "ood",
+      "ood_class": "woodworking_power_tool",
+      "sha256": "d9b82cd26304981a86041a8409b14a9c9e49ca6c9aaaf6268019aeade3fdda51",
+      "source": "openverse",
+      "source_id": "7bf9fae2-1423-41a9-a717-33cfbe3da841"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/power_drill/dbf368a2-e20c-4743-9eae-c9d49aecf4e6.jpg",
+      "expected": null,
+      "image_id": "openverse:dbf368a2-e20c-4743-9eae-c9d49aecf4e6",
+      "kind": "ood",
+      "ood_class": "power_drill",
+      "sha256": "bc253be792ababdaee4ebf76cfd63cf748247ed34d8d1230104c06854e4b5eca",
+      "source": "openverse",
+      "source_id": "dbf368a2-e20c-4743-9eae-c9d49aecf4e6"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/bicycle/455557db-4ee5-4c9b-9a3e-40ec1c852b17.jpg",
+      "expected": null,
+      "image_id": "openverse:455557db-4ee5-4c9b-9a3e-40ec1c852b17",
+      "kind": "ood",
+      "ood_class": "bicycle",
+      "sha256": "0634c5dbb60d632a9c0b1856d2df8d3ddc5320bf334ba93cf67085d3f8d9878d",
+      "source": "openverse",
+      "source_id": "455557db-4ee5-4c9b-9a3e-40ec1c852b17"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/bicycle/25ee41ea-8f6d-4aaf-bbc4-225cd02d0271.jpg",
+      "expected": null,
+      "image_id": "openverse:25ee41ea-8f6d-4aaf-bbc4-225cd02d0271",
+      "kind": "ood",
+      "ood_class": "bicycle",
+      "sha256": "8e191c605ca8683475969f2a05267b57bcba0a458387cf6b8fdfa21f636cebe5",
+      "source": "openverse",
+      "source_id": "25ee41ea-8f6d-4aaf-bbc4-225cd02d0271"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/bicycle/4043ff44-285c-40f3-90e6-5d4a543c5990.jpg",
+      "expected": null,
+      "image_id": "openverse:4043ff44-285c-40f3-90e6-5d4a543c5990",
+      "kind": "ood",
+      "ood_class": "bicycle",
+      "sha256": "a9d87278e356a28968ce8d416ec6b65de52746d42c9f37dc7490c69b28d8f134",
+      "source": "openverse",
+      "source_id": "4043ff44-285c-40f3-90e6-5d4a543c5990"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/bicycle/1066022b-52b2-4526-9b51-1042c84b788f.jpg",
+      "expected": null,
+      "image_id": "openverse:1066022b-52b2-4526-9b51-1042c84b788f",
+      "kind": "ood",
+      "ood_class": "bicycle",
+      "sha256": "47070b9132ffd77367a6dfad15a62ba37483ce98ea780e4825ad90ae7adbad15",
+      "source": "openverse",
+      "source_id": "1066022b-52b2-4526-9b51-1042c84b788f"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/bicycle/0b12c2ef-2c3e-45e5-b87e-20e9ff8e8b4c.jpg",
+      "expected": null,
+      "image_id": "openverse:0b12c2ef-2c3e-45e5-b87e-20e9ff8e8b4c",
+      "kind": "ood",
+      "ood_class": "bicycle",
+      "sha256": "5f4efc815ee93e979e00be97f5655806173d0629d32a1d96676384a59869f513",
+      "source": "openverse",
+      "source_id": "0b12c2ef-2c3e-45e5-b87e-20e9ff8e8b4c"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/bicycle/9273ef1b-8714-45dc-bbbf-b93a4d5dd0e8.jpg",
+      "expected": null,
+      "image_id": "openverse:9273ef1b-8714-45dc-bbbf-b93a4d5dd0e8",
+      "kind": "ood",
+      "ood_class": "bicycle",
+      "sha256": "5167a0186eaaff7487146d74f57b0be299b334b441b9e3c8d7c5713a96459376",
+      "source": "openverse",
+      "source_id": "9273ef1b-8714-45dc-bbbf-b93a4d5dd0e8"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/bicycle/4c104aff-25a9-49c6-8c0c-50d1eb7c5eff.jpg",
+      "expected": null,
+      "image_id": "openverse:4c104aff-25a9-49c6-8c0c-50d1eb7c5eff",
+      "kind": "ood",
+      "ood_class": "bicycle",
+      "sha256": "3f6295ccac0e10f7ce1e1bcd8f043195424281a3552391327fe68dc45472b521",
+      "source": "openverse",
+      "source_id": "4c104aff-25a9-49c6-8c0c-50d1eb7c5eff"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/car/d3c8ae17-ded9-4bed-962b-3b0f01dd1688.jpg",
+      "expected": null,
+      "image_id": "openverse:d3c8ae17-ded9-4bed-962b-3b0f01dd1688",
+      "kind": "ood",
+      "ood_class": "car",
+      "sha256": "f2e57d19ed3b5ab4f60cb7126c9941abb03dbb51aeea6d041ac9458e80120eb9",
+      "source": "openverse",
+      "source_id": "d3c8ae17-ded9-4bed-962b-3b0f01dd1688"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/car/42333e60-547e-4447-9010-9feda4ac7b1a.jpg",
+      "expected": null,
+      "image_id": "openverse:42333e60-547e-4447-9010-9feda4ac7b1a",
+      "kind": "ood",
+      "ood_class": "car",
+      "sha256": "d82577cb9be1645b02d4517113c8565f44c069f695db3829123eba8e4a6c5cb6",
+      "source": "openverse",
+      "source_id": "42333e60-547e-4447-9010-9feda4ac7b1a"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/car/6d4d883e-f637-4c4f-b579-a6b3fe1bd58e.jpg",
+      "expected": null,
+      "image_id": "openverse:6d4d883e-f637-4c4f-b579-a6b3fe1bd58e",
+      "kind": "ood",
+      "ood_class": "car",
+      "sha256": "9c7ec0aa936eeb376cf42f25c18bcaead76f1bfdd9c5fe6cb16d40ec1c6a9514",
+      "source": "openverse",
+      "source_id": "6d4d883e-f637-4c4f-b579-a6b3fe1bd58e"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/car/c8f1a8b2-3944-49ad-8bf0-87bfdb662163.jpg",
+      "expected": null,
+      "image_id": "openverse:c8f1a8b2-3944-49ad-8bf0-87bfdb662163",
+      "kind": "ood",
+      "ood_class": "car",
+      "sha256": "b7e91cf25ba62c596f89e5db324c02092a9f899931b86de59383f507d797c7aa",
+      "source": "openverse",
+      "source_id": "c8f1a8b2-3944-49ad-8bf0-87bfdb662163"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/car/978514a7-c0a3-4ba2-bdaf-3080c9af1077.jpg",
+      "expected": null,
+      "image_id": "openverse:978514a7-c0a3-4ba2-bdaf-3080c9af1077",
+      "kind": "ood",
+      "ood_class": "car",
+      "sha256": "e436e8f1cbd18af927c3a09c48d59d1d0cf7e01c174421ecaf492ab93d88a19f",
+      "source": "openverse",
+      "source_id": "978514a7-c0a3-4ba2-bdaf-3080c9af1077"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/car/15889847-4eb4-4165-a6d8-c6a798b2c00f.jpg",
+      "expected": null,
+      "image_id": "openverse:15889847-4eb4-4165-a6d8-c6a798b2c00f",
+      "kind": "ood",
+      "ood_class": "car",
+      "sha256": "76e07eedffd4f5c50b68b942af3a8b4ca98c0e5e4bcf1181e9101cac508643de",
+      "source": "openverse",
+      "source_id": "15889847-4eb4-4165-a6d8-c6a798b2c00f"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/car/58cb4374-912a-4ea3-9cc8-14d740fe15c5.jpg",
+      "expected": null,
+      "image_id": "openverse:58cb4374-912a-4ea3-9cc8-14d740fe15c5",
+      "kind": "ood",
+      "ood_class": "car",
+      "sha256": "48e2a340f82eb0b5a77df6dcaa98077b7435dce7ac7e8776c1434e4251cffad8",
+      "source": "openverse",
+      "source_id": "58cb4374-912a-4ea3-9cc8-14d740fe15c5"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/backpack/176a9a47-718d-4478-8385-f8c744543a7b.jpg",
+      "expected": null,
+      "image_id": "openverse:176a9a47-718d-4478-8385-f8c744543a7b",
+      "kind": "ood",
+      "ood_class": "backpack",
+      "sha256": "2377840f2112f140a8c139f33428c06b168d25ad83dd0d8d0f53e9f964a2bac6",
+      "source": "openverse",
+      "source_id": "176a9a47-718d-4478-8385-f8c744543a7b"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/bottle/c205e34d-1d6c-4df5-8c32-2babb63d7b0a.jpg",
+      "expected": null,
+      "image_id": "openverse:c205e34d-1d6c-4df5-8c32-2babb63d7b0a",
+      "kind": "ood",
+      "ood_class": "bottle",
+      "sha256": "6b563348a1ed994cfd2209b7b8b94ff049151bcc7d09d67fd82fe7e4ec0883ee",
+      "source": "openverse",
+      "source_id": "c205e34d-1d6c-4df5-8c32-2babb63d7b0a"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/bowl/0ed6e07b-c597-4fa5-9450-7d831b8451ab.jpg",
+      "expected": null,
+      "image_id": "openverse:0ed6e07b-c597-4fa5-9450-7d831b8451ab",
+      "kind": "ood",
+      "ood_class": "bowl",
+      "sha256": "f20bf976bb674007575acda834adcd5801aef4cdadcaf8c70dc20f396843c2a7",
+      "source": "openverse",
+      "source_id": "0ed6e07b-c597-4fa5-9450-7d831b8451ab"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/bowl/42949d41-708c-4e90-b6c2-d95c24eb87b5.jpg",
+      "expected": null,
+      "image_id": "openverse:42949d41-708c-4e90-b6c2-d95c24eb87b5",
+      "kind": "ood",
+      "ood_class": "ritual_vessel",
+      "sha256": "d742e0931d32e90122b2a763de344e764d27aef0341dc203d45b56707abc3b36",
+      "source": "openverse",
+      "source_id": "42949d41-708c-4e90-b6c2-d95c24eb87b5"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/bowl/5112e68b-0928-44b5-aeff-554369329297.jpg",
+      "expected": null,
+      "image_id": "openverse:5112e68b-0928-44b5-aeff-554369329297",
+      "kind": "ood",
+      "ood_class": "bowl",
+      "sha256": "61fb4a5003cf09d7b24808cdf75a1baeff830d517e11756cb6414ae18974cc22",
+      "source": "openverse",
+      "source_id": "5112e68b-0928-44b5-aeff-554369329297"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/bowl/555e92d1-5faf-4e02-b4c5-bd847a00f5a8.jpg",
+      "expected": null,
+      "image_id": "openverse:555e92d1-5faf-4e02-b4c5-bd847a00f5a8",
+      "kind": "ood",
+      "ood_class": "bowl",
+      "sha256": "31bd1902f363fe4de7c81d54910c27e2f91552efdf071c29bf46be6a14117d06",
+      "source": "openverse",
+      "source_id": "555e92d1-5faf-4e02-b4c5-bd847a00f5a8"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/bowl/ad60eeb8-7f1b-4e03-8045-22e79c7611a1.jpg",
+      "expected": null,
+      "image_id": "openverse:ad60eeb8-7f1b-4e03-8045-22e79c7611a1",
+      "kind": "ood",
+      "ood_class": "bowl",
+      "sha256": "c374d23e933b15bfc9538ab1efd2b956a73a2fc623601a97ce3cb014e9e8f8e3",
+      "source": "openverse",
+      "source_id": "ad60eeb8-7f1b-4e03-8045-22e79c7611a1"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/potted_plant/2220c57f-2d15-43b7-9920-e0f52c46f5f4.jpg",
+      "expected": null,
+      "image_id": "openverse:2220c57f-2d15-43b7-9920-e0f52c46f5f4",
+      "kind": "ood",
+      "ood_class": "potted_plant",
+      "sha256": "07183eb0278eebf7eb8a3646956f27035b56dfa8b624c99d6b476ac267fd3e2f",
+      "source": "openverse",
+      "source_id": "2220c57f-2d15-43b7-9920-e0f52c46f5f4"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/potted_plant/a9614946-6c84-47c3-903a-8a404721d566.jpg",
+      "expected": null,
+      "image_id": "openverse:a9614946-6c84-47c3-903a-8a404721d566",
+      "kind": "ood",
+      "ood_class": "potted_plant",
+      "sha256": "b06fe65df60fe376b1bfc18e6a11326cbfc4c595b201d7e6b0af9c2718ad0cc0",
+      "source": "openverse",
+      "source_id": "a9614946-6c84-47c3-903a-8a404721d566"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/potted_plant/6f0a9daa-cc75-4cca-aa97-27c1da9f1598.jpg",
+      "expected": null,
+      "image_id": "openverse:6f0a9daa-cc75-4cca-aa97-27c1da9f1598",
+      "kind": "ood",
+      "ood_class": "potted_plant",
+      "sha256": "3bf5c705f2751697b76337f1c2ba6a5314954dc3cee96fae8fc3c24c0341f4ed",
+      "source": "openverse",
+      "source_id": "6f0a9daa-cc75-4cca-aa97-27c1da9f1598"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/potted_plant/d5760668-c28c-411b-ac31-154a5bb2ca6e.jpg",
+      "expected": null,
+      "image_id": "openverse:d5760668-c28c-411b-ac31-154a5bb2ca6e",
+      "kind": "ood",
+      "ood_class": "potted_plant",
+      "sha256": "b279a6cd58b91594e2ed6e6e3a773897a78f2936c4167807fbdcb8365ec98ee7",
+      "source": "openverse",
+      "source_id": "d5760668-c28c-411b-ac31-154a5bb2ca6e"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/potted_plant/f9b626aa-4ba4-45bd-ae3b-50ca11e97db1.jpg",
+      "expected": null,
+      "image_id": "openverse:f9b626aa-4ba4-45bd-ae3b-50ca11e97db1",
+      "kind": "ood",
+      "ood_class": "potted_plant",
+      "sha256": "aafff7f35a20f3abd229fd5569823c537ee792d7326d0f919ce2e52f5de59db3",
+      "source": "openverse",
+      "source_id": "f9b626aa-4ba4-45bd-ae3b-50ca11e97db1"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/cat/0fc5bb0b-973f-47cc-952b-925c9003c049.jpg",
+      "expected": null,
+      "image_id": "openverse:0fc5bb0b-973f-47cc-952b-925c9003c049",
+      "kind": "ood",
+      "ood_class": "cat",
+      "sha256": "4d77b1c156a80985cba61c04d2cf468eea7dd7d0cf0cbe8f06274c9401061ab4",
+      "source": "openverse",
+      "source_id": "0fc5bb0b-973f-47cc-952b-925c9003c049"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/cat/c3e817ac-1dfb-4be5-82b5-e1d80a4f8620.jpg",
+      "expected": null,
+      "image_id": "openverse:c3e817ac-1dfb-4be5-82b5-e1d80a4f8620",
+      "kind": "ood",
+      "ood_class": "cat",
+      "sha256": "8fc9915ce2f341d4511fb75c766a697e44a9b4076b7cd0ba290679c8c8ef5bec",
+      "source": "openverse",
+      "source_id": "c3e817ac-1dfb-4be5-82b5-e1d80a4f8620"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/cat/c11cf212-f90f-4952-864d-ec77a0cb931f.jpg",
+      "expected": null,
+      "image_id": "openverse:c11cf212-f90f-4952-864d-ec77a0cb931f",
+      "kind": "ood",
+      "ood_class": "cat",
+      "sha256": "23c4064b6a0e8d81aaa4166144c2bad87ee8c02b0eb0d5b4e8197df2438c604d",
+      "source": "openverse",
+      "source_id": "c11cf212-f90f-4952-864d-ec77a0cb931f"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/cat/abb9af20-1f5f-4db5-815a-bb581b446d99.jpg",
+      "expected": null,
+      "image_id": "openverse:abb9af20-1f5f-4db5-815a-bb581b446d99",
+      "kind": "ood",
+      "ood_class": "cat",
+      "sha256": "0cf14965595fca9ecf5e73805910093a80edbc83eb1445aa573e0bdef4f8f15d",
+      "source": "openverse",
+      "source_id": "abb9af20-1f5f-4db5-815a-bb581b446d99"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/cat/b424a947-0001-4689-b45e-32d91a71fc2d.jpg",
+      "expected": null,
+      "image_id": "openverse:b424a947-0001-4689-b45e-32d91a71fc2d",
+      "kind": "ood",
+      "ood_class": "cat",
+      "sha256": "acaceb37b6b4172e27849ee93cddfd2023d617393daa324633943d63fa33d57a",
+      "source": "openverse",
+      "source_id": "b424a947-0001-4689-b45e-32d91a71fc2d"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/cat/ed0c8051-9626-4a46-8594-d52ae2f003ce.jpg",
+      "expected": null,
+      "image_id": "openverse:ed0c8051-9626-4a46-8594-d52ae2f003ce",
+      "kind": "ood",
+      "ood_class": "cat",
+      "sha256": "40bbcfaac8978c41dc119793452643aabf4d0c9148d1f9aa95e3d78d5fa12d6c",
+      "source": "openverse",
+      "source_id": "ed0c8051-9626-4a46-8594-d52ae2f003ce"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/cat/100b839b-e61b-430d-863d-dcd1259a12ae.jpg",
+      "expected": null,
+      "image_id": "openverse:100b839b-e61b-430d-863d-dcd1259a12ae",
+      "kind": "ood",
+      "ood_class": "cat",
+      "sha256": "221560c466f6b9f4515284c005ec8108e7c263ca1a463170116417216ddcf271",
+      "source": "openverse",
+      "source_id": "100b839b-e61b-430d-863d-dcd1259a12ae"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/cat/1a410e0d-288f-4ae3-9976-70bcd1fe7a1c.jpg",
+      "expected": null,
+      "image_id": "openverse:1a410e0d-288f-4ae3-9976-70bcd1fe7a1c",
+      "kind": "ood",
+      "ood_class": "cat",
+      "sha256": "a47a54cba2887d4519866e0227502995e0a04970e32754c73f885c65f327f312",
+      "source": "openverse",
+      "source_id": "1a410e0d-288f-4ae3-9976-70bcd1fe7a1c"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/dog/154a52a0-dc06-4094-8ee8-bec4f2fe7026.jpg",
+      "expected": null,
+      "image_id": "openverse:154a52a0-dc06-4094-8ee8-bec4f2fe7026",
+      "kind": "ood",
+      "ood_class": "dog",
+      "sha256": "acb09b23cafd5e7e76beb3a473b3816bde4269d119eb09df6917901dfd4b2efd",
+      "source": "openverse",
+      "source_id": "154a52a0-dc06-4094-8ee8-bec4f2fe7026"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/dog/60389144-df8b-4540-ac67-b5761595717a.jpg",
+      "expected": null,
+      "image_id": "openverse:60389144-df8b-4540-ac67-b5761595717a",
+      "kind": "ood",
+      "ood_class": "dog",
+      "sha256": "24621364c71184ab23a8a1d04431297b49288d43b125ec3f86d21f3db827370a",
+      "source": "openverse",
+      "source_id": "60389144-df8b-4540-ac67-b5761595717a"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/dog/391a0909-f658-45f8-8304-ff884811520f.jpg",
+      "expected": null,
+      "image_id": "openverse:391a0909-f658-45f8-8304-ff884811520f",
+      "kind": "ood",
+      "ood_class": "dog",
+      "sha256": "29f2eaf61f6dae3ed4afd2bc2dc5bf0eeb5c81fdf7ff6d08b7898dce6d53c7ae",
+      "source": "openverse",
+      "source_id": "391a0909-f658-45f8-8304-ff884811520f"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/dog/a0519979-1a17-4031-b540-de2c5de63701.jpg",
+      "expected": null,
+      "image_id": "openverse:a0519979-1a17-4031-b540-de2c5de63701",
+      "kind": "ood",
+      "ood_class": "dog",
+      "sha256": "323d764b6beaa8ac4e2ac4845a053dc637abdf90cbc28174a2dfd13126e18c57",
+      "source": "openverse",
+      "source_id": "a0519979-1a17-4031-b540-de2c5de63701"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/dog/779e77c1-a5e5-4bc7-ac52-7a56c4154e0b.jpg",
+      "expected": null,
+      "image_id": "openverse:779e77c1-a5e5-4bc7-ac52-7a56c4154e0b",
+      "kind": "ood",
+      "ood_class": "dog",
+      "sha256": "6e08df65f26217858e9df9cb439a6c112ef04fe830389978509bb81fca37c3dc",
+      "source": "openverse",
+      "source_id": "779e77c1-a5e5-4bc7-ac52-7a56c4154e0b"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/dog/468ebca9-52aa-4aff-bb6f-06dd5ec4e02f.jpg",
+      "expected": null,
+      "image_id": "openverse:468ebca9-52aa-4aff-bb6f-06dd5ec4e02f",
+      "kind": "ood",
+      "ood_class": "dog",
+      "sha256": "5edfbc6eaad9a5e151248ece9f65232ccf73f8bee3bff6e016be7bf1954a233f",
+      "source": "openverse",
+      "source_id": "468ebca9-52aa-4aff-bb6f-06dd5ec4e02f"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/dog/c224007e-7607-4b49-8bd7-10dc81ef42b2.jpg",
+      "expected": null,
+      "image_id": "openverse:c224007e-7607-4b49-8bd7-10dc81ef42b2",
+      "kind": "ood",
+      "ood_class": "dog",
+      "sha256": "e7e20a842ac6351f8afa9615bfd5adb06262bd83192ae021b038c0d68b25477b",
+      "source": "openverse",
+      "source_id": "c224007e-7607-4b49-8bd7-10dc81ef42b2"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/ood/dog/5be4fab0-9ac2-4f9e-9c15-30e890bb941b.jpg",
+      "expected": null,
+      "image_id": "openverse:5be4fab0-9ac2-4f9e-9c15-30e890bb941b",
+      "kind": "ood",
+      "ood_class": "dog",
+      "sha256": "28bf3e370b0cefd14486bd4238a1e32683e10107b7c3ba3be64df028603b2582",
+      "source": "openverse",
+      "source_id": "5be4fab0-9ac2-4f9e-9c15-30e890bb941b"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/positive/portable_ac/37a3121c-7394-4e55-9795-ea0d17af93d6.jpg",
+      "expected": "portable_ac",
+      "image_id": "openverse:37a3121c-7394-4e55-9795-ea0d17af93d6",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "d8764d966e29946b18145294a0291bea3735c7a91b8e8f5c0da44b41936b0675",
+      "source": "openverse",
+      "source_id": "37a3121c-7394-4e55-9795-ea0d17af93d6"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/positive/portable_ac/4adbb987-ae52-4db5-9d2d-6af84ac05a24.jpg",
+      "expected": "portable_ac",
+      "image_id": "openverse:4adbb987-ae52-4db5-9d2d-6af84ac05a24",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "82b15ba93b3a01e8ac23a66cb6ff54029ac40941d9f5bce3fc32e69fc87cc4ff",
+      "source": "openverse",
+      "source_id": "4adbb987-ae52-4db5-9d2d-6af84ac05a24"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/positive/portable_ac/8fc8ec5e-0129-444a-8e33-7d7802974f5d.jpg",
+      "expected": "portable_ac",
+      "image_id": "openverse:8fc8ec5e-0129-444a-8e33-7d7802974f5d",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "af4122746cc96a01f5542dbb100c5fac8a0a9b3b66dfbc639f9319937c116dfd",
+      "source": "openverse",
+      "source_id": "8fc8ec5e-0129-444a-8e33-7d7802974f5d"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/positive/portable_ac/53bd5de5-001b-469b-bcc9-0da7ed13ec6e.jpg",
+      "expected": "portable_ac",
+      "image_id": "openverse:53bd5de5-001b-469b-bcc9-0da7ed13ec6e",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "7a5d3ca75de752c9461b853faa2446ef42fb92c660a63eaa525d7283aa6d6087",
+      "source": "openverse",
+      "source_id": "53bd5de5-001b-469b-bcc9-0da7ed13ec6e"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/positive/portable_ac/90820e89-27cb-42d4-81cd-292f64f363d3.jpg",
+      "expected": "portable_ac",
+      "image_id": "openverse:90820e89-27cb-42d4-81cd-292f64f363d3",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "3293061581be83f1aabcaf22c6c149539ba81b2c2f973701415d3491d1c02199",
+      "source": "openverse",
+      "source_id": "90820e89-27cb-42d4-81cd-292f64f363d3"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/positive/kettle/1c81a0fa-ccf1-4065-a14c-489f92b87be5.jpg",
+      "expected": "kettle",
+      "image_id": "openverse:1c81a0fa-ccf1-4065-a14c-489f92b87be5",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "0d93974a44f83e700bd3ffbaab929a50a8877ebaf73de8f4e735783055f0164f",
+      "source": "openverse",
+      "source_id": "1c81a0fa-ccf1-4065-a14c-489f92b87be5"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/positive/kettle/4f11f380-1665-4c0e-9d71-c2abc2c61056.jpg",
+      "expected": "kettle",
+      "image_id": "openverse:4f11f380-1665-4c0e-9d71-c2abc2c61056",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "fbfafcc2a4d0a9e347fdcfec95fb619a82e4c6276f28ee872e6bfb7534f1978b",
+      "source": "openverse",
+      "source_id": "4f11f380-1665-4c0e-9d71-c2abc2c61056"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/positive/kettle/2a8d8eb7-7b78-43d3-b321-0b120aecc4cf.jpg",
+      "expected": "kettle",
+      "image_id": "openverse:2a8d8eb7-7b78-43d3-b321-0b120aecc4cf",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "7b07cf8db0f907604d006bfcb1b41f1b45a317aa3de9c38af9d68ebc9eaa900a",
+      "source": "openverse",
+      "source_id": "2a8d8eb7-7b78-43d3-b321-0b120aecc4cf"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/positive/kettle/787a55e5-95e2-4bf7-ae3d-69a6fbbb6026.jpg",
+      "expected": "kettle",
+      "image_id": "openverse:787a55e5-95e2-4bf7-ae3d-69a6fbbb6026",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "9233fbdd77ac143d972cba231fb263246b93bfd31a78a36a1850864c6d3ad5e4",
+      "source": "openverse",
+      "source_id": "787a55e5-95e2-4bf7-ae3d-69a6fbbb6026"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/positive/kettle/285409f0-0bef-441b-ab52-2627d45e0869.jpg",
+      "expected": "kettle",
+      "image_id": "openverse:285409f0-0bef-441b-ab52-2627d45e0869",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "f491cc95a2ee7ba1e7968e63b4518c2aee4389d0aa1269f0e7506b8d70704556",
+      "source": "openverse",
+      "source_id": "285409f0-0bef-441b-ab52-2627d45e0869"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/positive/sandwich_press/35f595cc-06e3-4683-8ce5-baa985d3a89a.jpg",
+      "expected": "sandwich_press",
+      "image_id": "openverse:35f595cc-06e3-4683-8ce5-baa985d3a89a",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "bc334ea79f163f67c3bc88561e398ad40a014ccc169c850af2d57d23692fe4dc",
+      "source": "openverse",
+      "source_id": "35f595cc-06e3-4683-8ce5-baa985d3a89a"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/positive/sandwich_press/536b6a1c-f977-4c5f-ad8a-7435e4a5233f.jpg",
+      "expected": "sandwich_press",
+      "image_id": "openverse:536b6a1c-f977-4c5f-ad8a-7435e4a5233f",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "7ea57be5b98d8bfbbdeeb2560339e2c69f0bf09523b5b8a899faffbe9ccdc973",
+      "source": "openverse",
+      "source_id": "536b6a1c-f977-4c5f-ad8a-7435e4a5233f"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/positive/sandwich_press/d4ac9887-bcfa-4a0a-9956-c2c82ab75481.jpg",
+      "expected": "sandwich_press",
+      "image_id": "openverse:d4ac9887-bcfa-4a0a-9956-c2c82ab75481",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "b9c84c37c5ab48d52aaa21dc350518ba8b27bcb7ac1abc533cd5e3ae85033a4c",
+      "source": "openverse",
+      "source_id": "d4ac9887-bcfa-4a0a-9956-c2c82ab75481"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/positive/portable_heater/59e1d8e5-622a-4888-9b68-d83d6cc59cbb.jpg",
+      "expected": "portable_heater",
+      "image_id": "openverse:59e1d8e5-622a-4888-9b68-d83d6cc59cbb",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "0694f29c04a82fc9e59ff8a5f4c3425708ca963886829629d2953e1766e598d0",
+      "source": "openverse",
+      "source_id": "59e1d8e5-622a-4888-9b68-d83d6cc59cbb"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/positive/portable_heater/34829e5b-90a9-4694-8b8a-18a4dcc31512.jpg",
+      "expected": "portable_heater",
+      "image_id": "openverse:34829e5b-90a9-4694-8b8a-18a4dcc31512",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "abb81ec91e67b6b101917168c1c9ad37ab8ecff93b658c425ccdd1c2e31eaa60",
+      "source": "openverse",
+      "source_id": "34829e5b-90a9-4694-8b8a-18a4dcc31512"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/positive/portable_heater/3d2ace8c-8f5a-45f9-a4b0-0a4d663e3fbb.jpg",
+      "expected": "portable_heater",
+      "image_id": "openverse:3d2ace8c-8f5a-45f9-a4b0-0a4d663e3fbb",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "99b24bd877be5d6fa7082ba7c587c64ddb9b2c3f9b249e08b30df5742bfe88c3",
+      "source": "openverse",
+      "source_id": "3d2ace8c-8f5a-45f9-a4b0-0a4d663e3fbb"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/positive/portable_heater/bbc88c3c-5334-496d-ae6f-51e04d521519.jpg",
+      "expected": "portable_heater",
+      "image_id": "openverse:bbc88c3c-5334-496d-ae6f-51e04d521519",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "5923c0eb1ab987a9e5c77cc65377ca39783d19421ffc11aff8d133dfd86afd29",
+      "source": "openverse",
+      "source_id": "bbc88c3c-5334-496d-ae6f-51e04d521519"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/images/positive/portable_heater/d48d3f0d-d471-403e-8179-f14f2a332abb.jpg",
+      "expected": "portable_heater",
+      "image_id": "openverse:d48d3f0d-d471-403e-8179-f14f2a332abb",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "74e5dde3bb50d7cc6d0943e2eec93ac7298a20e4f523a108c0f355df5d1a92bc",
+      "source": "openverse",
+      "source_id": "d48d3f0d-d471-403e-8179-f14f2a332abb"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/air_fryer/AF002.jpg",
+      "expected": "air_fryer",
+      "image_id": "critical:AF002",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "6c7a9c2be3a122f2e1c55662f070baf9e7f2ef4bb6e79aadb0f58eb7a12b26db",
+      "source": "critical",
+      "source_id": "AF002"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/air_fryer/AF008.jpg",
+      "expected": "air_fryer",
+      "image_id": "critical:AF008",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "a779f1980470082e87d07b59f47bca6e1697756695e3e1209e6b5c0f44a02078",
+      "source": "critical",
+      "source_id": "AF008"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/air_fryer/AF009.jpg",
+      "expected": "air_fryer",
+      "image_id": "critical:AF009",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "b2902248c7c86b744cb4e086c2df55bbc8e9a84b681088eb53169b6a8dc29f39",
+      "source": "critical",
+      "source_id": "AF009"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/air_fryer/AF012.jpg",
+      "expected": "air_fryer",
+      "image_id": "critical:AF012",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "ee4f14501caf1fa68c2a28d5ddeeb994cae06f0fe66fbe3577fb470b982f71b8",
+      "source": "critical",
+      "source_id": "AF012"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/air_fryer/AF014.jpg",
+      "expected": "air_fryer",
+      "image_id": "critical:AF014",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "cb3b24707e1737c0fcdba71a9a2d398ee93f7711eb9a7ed64757785c33941a14",
+      "source": "critical",
+      "source_id": "AF014"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/air_fryer/AF016.jpg",
+      "expected": "air_fryer",
+      "image_id": "critical:AF016",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "4fb1ee9c98ac081348fd791eadb7711a7fd0ce692b5d700a9742778016085d6b",
+      "source": "critical",
+      "source_id": "AF016"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/rice_cooker/RC005.jpg",
+      "expected": "rice_cooker",
+      "image_id": "critical:RC005",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "5ccee7f1362574b61d7ead33affa3535004e6f41fc6bcfd2aec9418e42c6c932",
+      "source": "critical",
+      "source_id": "RC005"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/rice_cooker/RC006.jpg",
+      "expected": "rice_cooker",
+      "image_id": "critical:RC006",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "8c66cfac6ed873cb755d38b93465720f3a005014bd5a6c563b6beb2aa732e65d",
+      "source": "critical",
+      "source_id": "RC006"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/rice_cooker/RC009.jpg",
+      "expected": "rice_cooker",
+      "image_id": "critical:RC009",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "a3cacac0949b0ffdbff4b41fbf3c8525a1b22ad36824e7aa9129a80a76b7aaee",
+      "source": "critical",
+      "source_id": "RC009"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/rice_cooker/RC012.jpg",
+      "expected": "rice_cooker",
+      "image_id": "critical:RC012",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "7b779b349dde298744d23ff9ed5637b2851b440b4c4d49aa88eeef9fd6d0da1e",
+      "source": "critical",
+      "source_id": "RC012"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/rice_cooker/RC013.jpg",
+      "expected": "rice_cooker",
+      "image_id": "critical:RC013",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "b7e891f86a1b4e87f71f9c406d4024ebddabc27b19a30f5ce33a850578f5bef4",
+      "source": "critical",
+      "source_id": "RC013"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/rice_cooker/RC014.jpg",
+      "expected": "rice_cooker",
+      "image_id": "critical:RC014",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "9e6446fda6000885345f13f7ec73f3a1d337a29a378e1b684c40b84b857690cf",
+      "source": "critical",
+      "source_id": "RC014"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/rice_cooker/RC017.jpg",
+      "expected": "rice_cooker",
+      "image_id": "critical:RC017",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "280e3d2a52d550660bf95499589ce3339b9477180928885fb5a6d80d2ea69dde",
+      "source": "critical",
+      "source_id": "RC017"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/rice_cooker/RC020.jpg",
+      "expected": "rice_cooker",
+      "image_id": "critical:RC020",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "f84bcafc4faeb337cb981f9a706718bf0a4510196f48f6b69609877f8287bebb",
+      "source": "critical",
+      "source_id": "RC020"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/shaver/SH002.jpg",
+      "expected": "shaver",
+      "image_id": "critical:SH002",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "3c6de28cd106768549b598ae306381db4da92516140a2065d8f77bed88b5f1ac",
+      "source": "critical",
+      "source_id": "SH002"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/shaver/SH005.jpg",
+      "expected": "shaver",
+      "image_id": "critical:SH005",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "758efd0342e5d3d431b2cb430e9d16135aa63d532052a711c2e71e81e109c484",
+      "source": "critical",
+      "source_id": "SH005"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/shaver/SH008.jpg",
+      "expected": "shaver",
+      "image_id": "critical:SH008",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "8c00c850d0bac7e27fb63eed08f42b3ed4dd7f8a81886c8b3d3258ea9adf5575",
+      "source": "critical",
+      "source_id": "SH008"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/shaver/SH009.jpg",
+      "expected": "shaver",
+      "image_id": "critical:SH009",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "945febbc4f69203647305855197a1455084eefd4ef1ddb678dc73f8b2b8f1fe1",
+      "source": "critical",
+      "source_id": "SH009"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/shaver/SH016.jpg",
+      "expected": "shaver",
+      "image_id": "critical:SH016",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "ee1ddd36ad192adc7c417bc8bda4d7896752a17abd793e38a1c8298c7e04640e",
+      "source": "critical",
+      "source_id": "SH016"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/shaver/SH018.jpg",
+      "expected": "shaver",
+      "image_id": "critical:SH018",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "1cd5af8ffbee84786e870c41b8657c3e502caad829d0274cd77e89593e8c99d6",
+      "source": "critical",
+      "source_id": "SH018"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/shaver/SH019.jpg",
+      "expected": "shaver",
+      "image_id": "critical:SH019",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "6c1aad46c2c2b2408cfeb1b1ff90c6e34281e9ba1fd83ab3e9fc7798cc0d669e",
+      "source": "critical",
+      "source_id": "SH019"
+    },
+    {
+      "downloaded_jpeg": "tmp/appliance-model-v2-fresh-validation/critical-supplement/images/selected/shaver/SH020.jpg",
+      "expected": "shaver",
+      "image_id": "critical:SH020",
+      "kind": "positive",
+      "ood_class": null,
+      "sha256": "6b13bd8fac8100d60db25473e69dfbfbc5e6cf4b23a6ea5d5ef5ea2d455842ee",
+      "source": "critical",
+      "source_id": "SH020"
+    }
+  ],
+  "schema_version": 1,
+  "selection_uses_model_predictions": false
+}

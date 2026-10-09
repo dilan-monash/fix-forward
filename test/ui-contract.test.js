@@ -10,7 +10,9 @@ const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
 const css = await readFile(new URL("../styles.css", import.meta.url), "utf8");
 const backendInit = await readFile(new URL("../backend/__init__.py", import.meta.url), "utf8");
 const backendApi = await readFile(new URL("../backend/api.py", import.meta.url), "utf8");
-const classifier = await readFile(new URL("../src/appliance-classifier.js", import.meta.url), "utf8");
+const photoHelper = await readFile(new URL("../src/photo-helper.js", import.meta.url), "utf8");
+const siglipClassifier = await readFile(new URL("../src/siglip-appliance-classifier.js", import.meta.url), "utf8");
+const previewServer = await readFile(new URL("../test_helpers/serve-usability.mjs", import.meta.url), "utf8");
 
 // v1.6 usability-lab contracts: goal-first journeys, complete short safety checks,
 // postcode/suburb autocomplete, repair-hub choice, evidence-led smart cost context,
@@ -31,27 +33,30 @@ test("UX02 repair, compare, recycle and help-me-decide actions are available in 
   assert.doesNotMatch(app, /Start a 3–5 minute assessment/);
 });
 
-test("UX02b adult photo detection routes through the existing safety check", () => {
-  assert.match(app, /id="appliance-photo"/);
-  assert.match(app, /photo-dropzone/);
-  assert.match(app, /dataTransfer\.files/);
-  assert.match(app, /classifyAppliancePhoto/);
-  assert.doesNotMatch(app, /fetch\("\/api\/appliance-detect"/);
-  assert.match(app, /Your photo looks like a/);
-  assert.match(app, /Other possible matches/);
-  assert.match(app, /confirm-photo-appliance/);
-  assert.match(app, /Yes, continue to safety questions/);
+// Confirmation, failure recovery and race behaviour are exercised in photo-helper.test.js.
+// This architecture check protects browser-local processing and the ordinary safety route.
+test("UX02b optional photos stay local and cannot bypass the safety journey", () => {
+  assert.match(app, /mountPhotoHelper/);
+  assert.doesNotMatch(app + photoHelper, /fetch\("\/api\/appliance-detect"/);
+  assert.doesNotMatch(backendApi, /appliance-detect/);
   assert.match(app, /navigate\("check"\)/);
   assert.match(app, /Your check-in summary/);
   assert.match(app, /No immediate warning reported/);
   assert.match(app, /Not a safety certification/);
-  assert.doesNotMatch(backendApi, /appliance-detect/);
-  assert.match(classifier, /tf\.loadLayersModel/);
-  assert.match(classifier, /min_margin/);
-  assert.match(classifier, /The selected image could not be read/);
-  assert.match(classifier, /friendlyRecognitionError/);
-  assert.match(classifier, /current model yet/);
-  assert.match(html, /tensorflow\/tfjs@4\.22\.0/);
+  assert.doesNotMatch(html, /<script[^>]+tensorflow/);
+  assert.match(photoHelper, /availability = siglipClassifierAvailability/);
+  assert.match(photoHelper, /recognise = classifyWithSiglipCandidate/);
+  assert.doesNotMatch(photoHelper + siglipClassifier, /tf\.min\.js|unpkg\.com\/@tensorflow|cdn\.jsdelivr/i);
+  assert.match(siglipClassifier, /env\.allowRemoteModels = false/);
+  assert.match(siglipClassifier, /env\.localModelPath = LOCAL_MODEL_PATH/);
+});
+
+test("UX02c local preview exposes only the pinned SigLIP assets with binary MIME", () => {
+  assert.match(previewServer, /const siglipAssets = new Set/);
+  assert.match(previewServer, /vision_model\.9e82237d9a1d89948502aff9df02129c28698d793e01f15f62e2267682615499_q4\.onnx/);
+  assert.match(previewServer, /"\.f32", "\.onnx", "\.wasm"/);
+  assert.match(previewServer, /extension === "\.wasm" \? "application\/wasm"/);
+  assert.match(previewServer, /\["\.f32", "\.onnx"\].*"application\/octet-stream"/s);
 });
 
 test("UX03 recall language teaches the term instead of assuming users know it", () => {
@@ -175,8 +180,9 @@ test("UX18 browser back, restart confirmation, keyboard focus and live results r
   assert.match(css, /:focus-visible/);
 });
 
-test("UX19 the appliance journey contains no account, upload or password-collection form", () => {
-  assert.doesNotMatch(html + app, /type=["']file["']|type=["']password["']/i);
+test("UX19 optional local photos do not introduce an account or password-collection form", () => {
+  assert.doesNotMatch(html + app + photoHelper, /type=["']password["']/i);
+  assert.doesNotMatch(photoHelper, /new FormData|XMLHttpRequest/);
   assert.doesNotMatch(html + app, /No account needed|Lock website|id="release-label"/);
 });
 
