@@ -1,11 +1,13 @@
-/* Tests for the disabled browser candidate's policy, schema and local loader. */
+/* Policy, dispatch and local-loader tests; synthetic tensors test wiring only. */
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 import {
   canRunSiglipPolicy,
+  SIGLIP_REVIEW_CANDIDATE_ID,
   classifyWithSiglipCandidate,
+  classifyWithSiglipReviewCandidate,
   releaseSiglipModelSession,
   resetSiglipCandidateForTests,
   siglipClassifierAvailability,
@@ -32,6 +34,7 @@ const shippedTextManifest = JSON.parse(await readFile(
 ));
 const textManifestBytes = await readFile(new URL("../model/appliance-siglip/text-embeddings.json", import.meta.url));
 const textVectorBytes = await readFile(new URL("../model/appliance-siglip/text-embeddings.f32", import.meta.url));
+const frozenReviewEvidence = JSON.parse(await readFile(new URL("../docs/appliance-review-v4-evidence.json", import.meta.url), "utf8"));
 
 const clone = (value) => JSON.parse(JSON.stringify(value));
 const arrayBuffer = (buffer) => buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
@@ -68,12 +71,34 @@ function webpHeaderFile() {
   return binaryFile(bytes, "image/webp");
 }
 
+// Historical V3 regression cases read its frozen decision fields, rather than
+// silently changing expected behaviour when the shipped manifest advances.
 function policy(overrides = {}) {
   const value = clone(shippedPolicy);
+  Object.assign(value, {
+    candidate_id: candidateV3.candidate_id,
+    policy_version: candidateV3.policy_version,
+    release_ready: false,
+    recognition_enabled: true,
+    experimental_preview: true,
+    enabled_classes: clone(candidateV3.enabled_classes),
+    manual_only_classes: clone(candidateV3.manual_only_classes),
+    acceptance: clone(candidateV3.acceptance),
+  });
+  delete value.photo_scope;
   for (const [key, replacement] of Object.entries(overrides)) {
     value[key] = replacement && typeof replacement === "object" && !Array.isArray(replacement)
       ? { ...value[key], ...replacement }
       : replacement;
+  }
+  return value;
+}
+
+function v4Policy(overrides = {}) {
+  const value = clone(shippedPolicy);
+  for (const [key, replacement] of Object.entries(overrides)) {
+    value[key] = replacement && typeof replacement === "object" && !Array.isArray(replacement)
+      ? { ...value[key], ...replacement } : replacement;
   }
   return value;
 }
@@ -120,7 +145,7 @@ function vectors() {
   };
 }
 
-test("shipped I3 preview pins v3 thresholds and exact same-origin assets", () => {
+test("archived I3 v3 policy retains its thresholds and exact same-origin assets", () => {
   const value = validateSiglipPolicy(policy());
   assert.equal(value.release_ready, false);
   assert.equal(value.recognition_enabled, true);
@@ -550,4 +575,182 @@ test("a preview on Main never imports the runtime or inspects photo pixels", asy
   });
   assert.equal(result.reason, "recognition_paused");
   assert.equal(imported, false);
+});
+
+// The broader review rules are a local experiment. Even an enabled I3 release
+// must not gain those rules by accidentally importing the new entry point.
+test("v4 review rejects public hosts before fetching policy or importing a model", async () => {
+  for (const hostname of ["fixforward.me", "fix-forward-iteration-3-r4sh.onrender.com", "example.com", undefined]) {
+    let fetches = 0;
+    let imports = 0;
+    await assert.rejects(classifyWithSiglipReviewCandidate(pngFile(), {
+      hostname,
+      fetcher: async () => { fetches += 1; throw new Error("Unexpected network request"); },
+      importer: async () => { imports += 1; throw new Error("Unexpected model import"); },
+    }), error => error.code === "recognition_paused");
+    assert.equal(fetches, 0);
+    assert.equal(imports, 0);
+  }
+});
+
+test("local v4 review still obeys a disabled recognition kill switch", async () => {
+  resetSiglipCandidateForTests();
+  let imports = 0;
+  const result = await classifyWithSiglipReviewCandidate(pngFile(), {
+    hostname: "127.0.0.1",
+    fetcher: async () => ({ ok: true, json: async () => policy({ recognition_enabled: false }) }),
+    importer: async () => { imports += 1; throw new Error("Unexpected model import"); },
+  });
+  assert.equal(result.reason, "recognition_paused");
+  assert.equal(result.accepted, false);
+  assert.equal(imports, 0);
+});
+
+// The following tensors are existing text-vector rows used as deterministic
+// fake image embeddings. They test dispatch and gates, never photo accuracy.
+const fakeImageVectors = new Float32Array(arrayBuffer(textVectorBytes));
+function embeddingFor(label) {
+  const row = shippedTextManifest.labels.indexOf(label);
+  assert.ok(row >= 0);
+  const vector = fakeImageVectors.slice(row * 768, (row + 1) * 768);
+  // Avoid a perfect self-dot whose float32 text norm can round above 1. The
+  // perturbation keeps a clear fake winner while respecting cosine boundaries.
+  vector[767] += 0.25;
+  return vector;
+}
+
+function reviewHarness({ currentPolicy = () => v4Policy(), embedding = () => embeddingFor("blender") } = {}) {
+  const counts = { policyReads: 0, modelCalls: 0, imports: 0 };
+  const fetcher = async (url) => {
+    if (url.endsWith("model_manifest.json")) {
+      counts.policyReads += 1;
+      return { ok: true, json: async () => currentPolicy(counts.policyReads) };
+    }
+    if (url.endsWith("text-embeddings.json")) return { ok: true, arrayBuffer: async () => arrayBuffer(textManifestBytes) };
+    if (url.endsWith("text-embeddings.f32")) return { ok: true, arrayBuffer: async () => arrayBuffer(textVectorBytes) };
+    throw new Error(`Unexpected URL: ${url}`);
+  };
+  const runtime = {
+    env: { backends: { onnx: { wasm: {} } } },
+    AutoProcessor: { from_pretrained: async () => async () => ({}) },
+    SiglipVisionModel: { from_pretrained: async () => async () => {
+      counts.modelCalls += 1;
+      return { pooler_output: { dims: [1, 768], data: embedding() } };
+    } },
+    RawImage: { read: async () => ({}) },
+  };
+  return {
+    counts,
+    options: {
+      hostname: "fix-forward-iteration-3-r4sh.onrender.com", fetcher,
+      importer: async () => { counts.imports += 1; return runtime; },
+    },
+  };
+}
+
+test("shipped v4 manifest pins all 19 types, single-photo scope and the frozen rule", () => {
+  const current = validateSiglipPolicy(v4Policy());
+  const evidence = frozenReviewEvidence;
+  assert.equal(current.candidate_id, SIGLIP_REVIEW_CANDIDATE_ID);
+  assert.equal(current.policy_version, 4);
+  assert.equal(current.release_ready, false);
+  assert.equal(current.photo_scope, "single_appliance");
+  assert.deepEqual(current.enabled_classes, shippedTextManifest.labels.slice(0, 19));
+  assert.deepEqual(current.manual_only_classes, []);
+  assert.equal(current.acceptance.min_similarity, evidence.frozen_policy.min_similarity);
+  assert.equal(current.acceptance.min_ood_margin, evidence.frozen_policy.min_ood_margin);
+  assert.equal(current.acceptance.max_choice_gap, evidence.frozen_policy.max_choice_gap);
+  assert.equal(current.acceptance.max_choices, 3);
+  assert.equal(current.vision_model.sha256, candidateV3.artifact_hashes.vision_model.sha256);
+  assert.equal(current.text_embeddings.vectors_sha256, candidateV3.artifact_hashes.text_vectors.sha256);
+});
+
+test("v4 fails closed on altered thresholds, scope, class ordering and release flags", () => {
+  const variants = [
+    v4Policy({ candidate_id: "retuned-v4" }), v4Policy({ policy_version: 3 }),
+    v4Policy({ acceptance: { min_similarity: 0 } }),
+    v4Policy({ acceptance: { min_ood_margin: 0 } }),
+    v4Policy({ acceptance: { max_choice_gap: 1 } }),
+    v4Policy({ acceptance: { max_choices: 19 } }),
+    v4Policy({ acceptance: { class_thresholds: {} } }),
+    v4Policy({ enabled_classes: [...shippedPolicy.enabled_classes].reverse() }),
+    v4Policy({ manual_only_classes: ["dehumidifier"] }),
+    v4Policy({ photo_scope: "multiple_appliances" }),
+    v4Policy({ experimental_preview: false }), v4Policy({ release_ready: true }),
+    v4Policy({ requires_user_confirmation: false }),
+  ];
+  for (const value of variants) assert.throws(() => validateSiglipPolicy(value), /unavailable/i);
+});
+
+test("v4 preview is available only on canonical I3 and loopback, never Main or I2", async () => {
+  for (const hostname of ["fix-forward-iteration-3-r4sh.onrender.com", "localhost", "127.0.0.1", "[::1]"]) {
+    const available = await siglipClassifierAvailability(async () => ({ ok: true, json: async () => v4Policy() }), { hostname });
+    assert.deepEqual(available, { enabled: true, experimental: true, reason: "", message: "" });
+  }
+  for (const hostname of ["fixforward.me", "fix-forward-main.onrender.com", "fix-forward-iteration-2.onrender.com", "fix-forward-iteration-3.onrender.com", "example.com"]) {
+    resetSiglipCandidateForTests();
+    const harness = reviewHarness();
+    const result = await classifyWithSiglipCandidate(pngFile(), { ...harness.options, hostname });
+    assert.equal(result.reason, "recognition_paused");
+    assert.equal(harness.counts.imports, 0);
+  }
+});
+
+test("normal entry dispatches v4 for all 19 types without auto-selecting or counting", async () => {
+  resetSiglipCandidateForTests();
+  let label;
+  const harness = reviewHarness({ embedding: () => embeddingFor(label) });
+  for (label of shippedPolicy.enabled_classes) {
+    const result = await classifyWithSiglipCandidate(pngFile(), harness.options);
+    assert.equal(result.accepted, true, label);
+    assert.equal(result.requiresConfirmation, true);
+    assert.equal(result.reviewMode, "choose_type");
+    assert.equal(result.objectCount, null);
+    assert.equal(result.alternatives[0].slug, label);
+    assert.equal(Object.hasOwn(result.alternatives[0], "similarity"), false);
+    assert.equal(Object.hasOwn(result, "objects"), false);
+  }
+  assert.equal(harness.counts.modelCalls, 19);
+  assert.equal(harness.counts.policyReads, 38);
+});
+
+test("an arbitrary caller option cannot make a valid v3 manifest use v4 scoring", async () => {
+  resetSiglipCandidateForTests();
+  const harness = reviewHarness({ currentPolicy: () => policy() });
+  const result = await classifyWithSiglipCandidate(pngFile(), { ...harness.options, review: true });
+  assert.equal(result.accepted, false);
+  assert.equal(result.reason, "class_disabled");
+  assert.equal(result.reviewMode, undefined);
+});
+
+test("v4 unrelated-content competition rejects a fake OOD embedding", async () => {
+  resetSiglipCandidateForTests();
+  const harness = reviewHarness({ embedding: () => embeddingFor("other_object") });
+  const result = await classifyWithSiglipCandidate(pngFile(), harness.options);
+  assert.equal(result.accepted, false);
+  assert.deepEqual(result.alternatives, []);
+});
+
+test("v4 kill switch is enforced before loading and again after inference", async () => {
+  resetSiglipCandidateForTests();
+  const disabled = reviewHarness({ currentPolicy: () => v4Policy({ recognition_enabled: false }) });
+  const early = await classifyWithSiglipCandidate(pngFile(), disabled.options);
+  assert.equal(early.reason, "recognition_paused");
+  assert.equal(disabled.counts.imports, 0);
+  const revoked = reviewHarness({ currentPolicy: reads => v4Policy({ recognition_enabled: reads === 1 }) });
+  const late = await classifyWithSiglipCandidate(pngFile(), revoked.options);
+  assert.equal(late.reason, "recognition_paused");
+  assert.equal(late.accepted, false);
+  assert.equal(revoked.counts.modelCalls, 1);
+});
+
+test("switching to another valid enabled candidate suppresses the in-flight v4 result", async () => {
+  resetSiglipCandidateForTests();
+  const harness = reviewHarness({ currentPolicy: reads => reads === 1 ? v4Policy() : policy() });
+  const result = await classifyWithSiglipCandidate(pngFile(), harness.options);
+  assert.equal(harness.counts.modelCalls, 1);
+  assert.equal(harness.counts.policyReads, 2);
+  assert.equal(result.reason, "recognition_paused");
+  assert.equal(result.accepted, false);
+  assert.deepEqual(result.alternatives, []);
 });

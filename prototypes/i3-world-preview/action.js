@@ -7,7 +7,7 @@ import { matchRecall, findSuburbSuggestions, resolveAreaInput, getNearbyLocation
 import { productSuggestions } from '../../src/product-suggestions.js';
 import { SUBURB_POSTCODES } from '../../src/suburb-index.js';
 import { PRICE_SNAPSHOT } from '../../src/price-snapshot.js';
-import { mountPhotoHelper } from '../../src/photo-helper.js?v=i3-photo-feedback-1';
+import { mountPhotoHelper } from '../../src/photo-helper.js?v=i3-photo-review-v4';
 
 const RECALL_SOURCE = 'https://www.productsafety.gov.au/recalls';
 const RECYCLE_SOURCE = 'https://www.environment.vic.gov.au/household-waste-recycling/ewaste';

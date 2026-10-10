@@ -152,7 +152,7 @@ async function renderRoute() {
     if(name==='home') { mountHome(token); }
     else if(name==='explore'||name==='action'||name==='sort') {
       host.innerHTML='<section class="page-width route-loading" role="status"><span class="loading-orbit"></span><p>Opening your next step…</p></section>';
-      const module=await import(name==='explore'?'./explore.js':name==='action'?'./action.js':'../i3-family-preview/sorting.js');
+      const module=await import(name==='explore'?'./explore.js':name==='action'?'./action.js?v=i3-photo-review-v4':'../i3-family-preview/sorting.js');
       if(token!==generation)return;
       const mounted=await (name==='explore'?module.mountExplore(host,context):name==='action'?module.mountAction(host,context):module.mountSorting(host,context));
       if(token!==generation){mounted?.();return;}

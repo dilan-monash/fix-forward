@@ -8,7 +8,7 @@ import {
   releaseSiglipModelSession,
   siglipClassifierAvailability,
   validateSiglipPhotoContent,
-} from "./siglip-appliance-classifier.js?v=i3-photo-feedback-1";
+} from "./siglip-appliance-classifier.js?v=i3-photo-review-v4";
 
 const FIRST_USE_DOWNLOAD = "about 92 MB";
 
@@ -57,6 +57,7 @@ export function mountPhotoHelper(container, {
   let feedbackTitle;
   let feedbackIcon;
   let progressBar;
+  let downloadSize = FIRST_USE_DOWNLOAD;
 
   // Keep titles, icons and colours in sync. Words carry the meaning even when
   // someone cannot see colour or has animation disabled. The live region stays
@@ -130,6 +131,126 @@ export function mountPhotoHelper(container, {
     suggestion = null;
     result?.replaceChildren();
   };
+
+  // A list of close category matches describes ONE item. Only a localisation
+  // result with real image boxes can produce the separate-item chooser below.
+  const approvedChoices = (payload) => {
+    if (!payload?.accepted || !payload.requiresConfirmation) return [];
+    const candidates = payload.reviewMode === "choose_type"
+      ? payload.alternatives?.slice(0, 3) : payload.alternatives?.slice(0, 1);
+    const seen = new Set();
+    return (candidates || []).flatMap((candidate) => {
+      const item = APPLIANCE_CLASSES.find((known) => known.slug === candidate.slug && known.category === candidate.category);
+      if (!item || seen.has(item.slug)) return [];
+      seen.add(item.slug);
+      return [item];
+    });
+  };
+
+  // Selecting a category is an explicit confirmation, even when the model only
+  // offers one answer. No score is presented as an accuracy percentage.
+  const showTypeReview = (payload, isCurrent, onBack) => {
+    const choices = approvedChoices(payload);
+    if (!choices.length) return false;
+    suggestion = choices[0];
+    result.innerHTML = `<section class="photo-confirm-card" aria-labelledby="photo-result-title">
+      <p class="eyebrow">Please check this suggestion</p><h2 id="photo-result-title" tabindex="-1"></h2>
+      <p class="photo-review-explanation"></p><div class="photo-confirm-actions"></div>
+    </section>`;
+    const title = result.querySelector("h2");
+    title.textContent = choices.length > 1
+      ? "Which type matches your appliance?"
+      : `Could this be ${/^[aeiou]/i.test(suggestion.label) ? "an" : "a"} ${suggestion.label.toLowerCase()}?`;
+    result.querySelector(".photo-review-explanation").textContent = choices.length > 1
+      ? "These types look similar in this photo. Choose the one you recognise, or choose manually. This does not tell us whether the appliance is safe."
+      : "This may be wrong. Confirm only if it matches your appliance. A photo cannot check its safety or diagnose a fault.";
+    const actions = result.querySelector(".photo-confirm-actions");
+    choices.forEach((item, index) => {
+      const button = container.ownerDocument.createElement("button");
+      button.type = "button";
+      button.className = choices.length === 1 ? "button primary" : "button secondary photo-type-choice";
+      button.id = index === 0 ? "confirm-photo-appliance" : `confirm-photo-appliance-${index + 1}`;
+      button.textContent = choices.length === 1 ? `Yes, select ${item.label}` : `Select ${item.label}`;
+      button.addEventListener("click", () => {
+        if (!isCurrent()) return;
+        ++generation;
+        clearSuggestion();
+        clearInputs();
+        feedback("confirmed", `${item.label} selected`, "Add the brand and model below if you know them.");
+        onConfirm(item);
+      });
+      actions.append(button);
+    });
+    const action = (id, text, listener) => {
+      const button = container.ownerDocument.createElement("button");
+      button.type = "button";
+      button.id = id;
+      button.className = "text-button";
+      button.textContent = text;
+      button.addEventListener("click", listener);
+      actions.append(button);
+    };
+    action("reject-photo-appliance", "No, choose manually", manualChoice);
+    if (onBack) action("back-photo-items", "Back to the items in my photo", onBack);
+    action("change-photo-appliance", "Try another photo", () => {
+      ++generation;
+      clearSuggestion();
+      clearPreview();
+      feedback("ready", "Choose another photo", "Choose another photo, take a new one, or select your appliance below.");
+      fileInput.click();
+    });
+    feedback("needs-confirmation", choices.length > 1 ? "A few possible matches" : "Suggestion ready · please check",
+      "Check the suggestion. Your appliance selection has not changed.");
+    title.focus({ preventScroll: true });
+    return true;
+  };
+
+  // Each object comes from a detector box and a separately checked crop. Reject
+  // malformed boxes/remote thumbnail URLs; neither model labels nor filenames
+  // become HTML. Merely choosing a pictured item never changes the adult form.
+  const showObjectReview = (payload, isCurrent) => {
+    if (payload?.localisation !== "image_boxes" || !Array.isArray(payload.objects)) return false;
+    const items = payload.objects.slice(0, 6).filter((item) => {
+      const box = item?.box;
+      return Array.isArray(box) && box.length === 4 && box.every((value) => Number.isFinite(value) && value >= 0 && value <= 1)
+        && box[2] > box[0] && box[3] > box[1] && approvedChoices(item).length
+        && typeof item.thumbnail === "string" && /^data:image\/(?:png|jpeg|webp);base64,/.test(item.thumbnail);
+    });
+    if (!items.length) return false;
+    // Even one accepted crop may come from a larger multi-item photo. Show its
+    // picture first so the user knows which region the category refers to.
+    const renderItems = () => {
+      if (!isCurrent()) return;
+      suggestion = null;
+      result.innerHTML = `<section class="photo-confirm-card" aria-labelledby="photo-result-title">
+        <p class="eyebrow">Choose an item first</p><h2 id="photo-result-title" tabindex="-1">Which item do you want to check?</h2>
+        <p class="photo-items-summary"></p><div class="photo-item-choices"></div>
+        <button class="text-button" id="reject-photo-appliance" type="button">My item is missing · choose manually</button>
+      </section>`;
+      // Detection can include packaging pictures or duplicate parts. Do not
+      // turn a number of candidate boxes into a claim about physical item count.
+      result.querySelector(".photo-items-summary").textContent = "Choose the picture of your appliance, then confirm its type. Some matches may be parts or pictures on packaging. Your item may be missing.";
+      const list = result.querySelector(".photo-item-choices");
+      items.forEach((item, index) => {
+        const button = container.ownerDocument.createElement("button");
+        button.type = "button";
+        button.className = "photo-item-choice";
+        const img = container.ownerDocument.createElement("img");
+        img.src = item.thumbnail;
+        img.alt = `Item ${index + 1} from your photo`;
+        const label = container.ownerDocument.createElement("span");
+        label.textContent = `Item ${index + 1} · ${approvedChoices(item)[0].label}`;
+        button.append(img, label);
+        button.addEventListener("click", () => { if (isCurrent()) showTypeReview(item, isCurrent, renderItems); });
+        list.append(button);
+      });
+      result.querySelector("#reject-photo-appliance").addEventListener("click", manualChoice);
+      feedback("needs-confirmation", "Choose an item from your photo", "Your appliance selection has not changed. Choose a picture to continue.");
+      result.querySelector("h2").focus({ preventScroll: true });
+    };
+    renderItems();
+    return true;
+  };
   const manualChoice = () => {
     cancelActiveRequest();
     ++generation;
@@ -149,6 +270,9 @@ export function mountPhotoHelper(container, {
       container.dataset.photoHelperStatus = policy.reason || "unavailable";
       return;
     }
+    // Larger multi-item models are opt-in in the local experiment. Never tell
+    // someone it is the smaller download when the detector is also required.
+    downloadSize = policy.multiItem === true ? "about 247 MB" : FIRST_USE_DOWNLOAD;
     // Load one small shared stylesheet for both adult entry points; no new font
     // downloads or UI library are needed for the preview and status hierarchy.
     const document = container.ownerDocument;
@@ -156,13 +280,13 @@ export function mountPhotoHelper(container, {
       const link = document.createElement("link");
       link.id = "photo-helper-styles";
       link.rel = "stylesheet";
-      link.href = new URL("./photo-helper.css?v=i3-photo-feedback-1", import.meta.url).href;
+      link.href = new URL("./photo-helper.css?v=i3-photo-review-v4", import.meta.url).href;
       document.head.append(link);
     }
     container.innerHTML = `<section class="photo-detect-card" aria-labelledby="photo-detect-title">
       <div><p class="eyebrow">${policy.experimental ? "Experimental photo helper" : "Optional photo helper"}</p><h2 id="photo-detect-title">Identify an appliance from a photo</h2>
-      <p>Try one clear photo of the whole appliance. This preview may be wrong or unable to suggest a type. It cannot identify faults, check recalls or confirm safety.</p>
-      <p class="photo-download-note">First use downloads ${FIRST_USE_DOWNLOAD}. Wi-Fi is recommended.</p>
+      <p>${policy.multiItem === true ? "Include the whole appliances with some space between them." : "Try one clear photo of the whole appliance."} This preview may be wrong or unable to suggest a type. It cannot identify faults, check recalls or confirm safety.</p>
+      <p class="photo-download-note">First use downloads ${downloadSize}. Wi-Fi is recommended.</p>
       </div><figure class="photo-selected-preview" id="photo-selected-preview" hidden></figure>
       <div id="photo-detect-status" class="photo-feedback" role="status" aria-live="polite" aria-atomic="true">
         <span class="photo-feedback-icon" aria-hidden="true"></span><div><strong class="photo-feedback-title"></strong><p class="photo-feedback-message"></p></div>
@@ -194,6 +318,11 @@ export function mountPhotoHelper(container, {
     // events omit a percentage, so the UI still reports that preparation is active.
     const showProgress = (event, isCurrent) => {
       if (!isCurrent()) return;
+      if (event?.stage === "detecting" || event?.status === "reviewing_regions") {
+        feedback("busy", event?.status === "reviewing_regions" ? "Checking the pictured items…" : "Finding possible items…",
+          event?.status === "reviewing_regions" ? `Checking picture ${event.current} of ${event.total}. You can still choose manually.` : "This experimental step may take a little longer. Your photo stays on this device.");
+        return;
+      }
       if (event?.status === "analysing") {
         feedback("busy", "Checking your photo…", "Looking for the appliance type. You can still choose manually.");
         progressBar.hidden = true;
@@ -228,52 +357,21 @@ export function mountPhotoHelper(container, {
       }
       const requestController = new AbortController();
       activeController = requestController;
-      feedback("busy", "Photo selected · preparing the helper…", `First use downloads ${FIRST_USE_DOWNLOAD}. You can still choose manually.`);
+      feedback("busy", "Photo selected · preparing the helper…", `First use downloads ${downloadSize}. You can still choose manually.`);
       try {
         const payload = await recognise(file, {
           onProgress: (event) => showProgress(event, isCurrent),
           signal: requestController.signal,
         });
         if (!isCurrent()) return;
+        if (showObjectReview(payload, isCurrent)) return;
         if (!payload.accepted || !payload.requiresConfirmation) {
           feedback("no-suggestion", "No suggestion this time", payload.reason === "recognition_paused"
             ? "Photo suggestions are temporarily unavailable. Choose your appliance below."
             : "We could not suggest an appliance from this photo. Try another photo or choose manually.");
           return;
         }
-        const candidate = payload.alternatives?.[0];
-        suggestion = APPLIANCE_CLASSES.find((item) => item.slug === candidate?.slug && item.category === candidate?.category);
-        if (!suggestion) throw new Error("Unrecognised suggestion");
-        // Fixed markup plus textContent prevents a model label becoming HTML.
-        result.innerHTML = `<section class="photo-confirm-card" aria-labelledby="photo-result-title">
-          <p class="eyebrow">Please check this suggestion</p><h2 id="photo-result-title" tabindex="-1"></h2>
-          <p>This may be wrong. Confirm only if it matches your appliance. A photo cannot check its safety or diagnose a fault.</p>
-          <div class="photo-confirm-actions"><button class="button primary" id="confirm-photo-appliance" type="button"></button>
-          <button class="button secondary" id="reject-photo-appliance" type="button">No, choose manually</button>
-          <button class="text-button" id="change-photo-appliance" type="button">Try another photo</button></div>
-        </section>`;
-        result.querySelector("h2").textContent = `Could this be a ${suggestion.label.toLowerCase()}?`;
-        const confirm = result.querySelector("#confirm-photo-appliance");
-        confirm.textContent = `Yes, select ${suggestion.label}`;
-        confirm.addEventListener("click", () => {
-          if (!isCurrent() || !suggestion) return;
-          const confirmed = suggestion;
-          ++generation;
-          clearSuggestion();
-          clearInputs();
-          feedback("confirmed", `${confirmed.label} selected`, "Add the brand and model below if you know them.");
-          onConfirm(confirmed);
-        });
-        result.querySelector("#reject-photo-appliance").addEventListener("click", manualChoice);
-        result.querySelector("#change-photo-appliance").addEventListener("click", () => {
-          ++generation;
-          clearSuggestion();
-          clearPreview();
-          feedback("ready", "Choose another photo", "Choose another photo, take a new one, or select your appliance below.");
-          fileInput.click();
-        });
-        feedback("needs-confirmation", "Suggestion ready · please check", "Check the suggestion. Your appliance selection has not changed.");
-        result.querySelector("h2").focus({ preventScroll: true });
+        if (!showTypeReview(payload, isCurrent)) throw new Error("Unrecognised suggestion");
       } catch (error) {
         if (isCurrent()) {
           feedback("error", error?.code === "invalid_image_content" ? "We couldn’t read this photo" : "Photo check couldn’t finish", formatError(error));

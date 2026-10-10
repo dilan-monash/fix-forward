@@ -93,6 +93,19 @@ class AppTests(unittest.TestCase):
         self.assertEqual(response.json["service"], "available")
         self.assertEqual(response.headers["Cache-Control"], "no-store")
 
+    # The shipped entry point must be able to load its new pure review policy.
+    # The unvalidated multi-item detector and research models are not released.
+    def test_single_photo_review_assets_are_served_without_multi_item_models(self):
+        for path in ("/src/photo-helper.js?v=i3-photo-review-v4",
+                     "/src/siglip-appliance-classifier.js?v=i3-photo-review-v4",
+                     "/src/appliance-review-policy.js?v=i3-photo-review-v4"):
+            with self.subTest(path=path), self.client.get(path) as response:
+                self.assertEqual(response.status_code, 200)
+                self.assertIn(response.mimetype, ("text/javascript", "application/javascript"))
+        for path in ("/src/appliance-object-detector.js", "/models/owlvit/onnx/model_quantized.onnx"):
+            with self.subTest(path=path), self.client.get(path) as response:
+                self.assertEqual(response.status_code, 404)
+
     @patch("backend.api.repository.health_check", return_value={"ok": 1})
     def test_ready_contract(self, _health_check):
         response = self.client.get("/api/ready")

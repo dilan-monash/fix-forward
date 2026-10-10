@@ -118,7 +118,9 @@ class QuestRouteTests(unittest.TestCase):
                         self.assertNotIn('id="quest-app"', text)
                     if path == "/legacy":
                         text = response.get_data(as_text=True)
-                        self.assertIn('src="src/app.js"', text)
+                        # A release may version the module URL to refresh caches;
+                        # the adult document must still use its own controller.
+                        self.assertRegex(text, r'src="src/app\.js(?:\?[^\"]+)?"')
                         self.assertIn('href="/quest"', text)
                         self.assertNotIn('id="quest-app"', text)
 

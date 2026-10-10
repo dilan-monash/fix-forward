@@ -11,6 +11,11 @@ import {
   friendlyRecognitionError,
   validatePhotoFile,
 } from "./appliance-classifier.js?v=i3-photo-review-2";
+import {
+  APPLIANCE_REVIEW_POLICY,
+  APPLIANCE_REVIEW_LABELS,
+  reviewApplianceScores,
+} from "./appliance-review-policy.js?v=i3-photo-review-v4";
 
 export const SIGLIP_POLICY_URL = "/model/appliance-siglip/model_manifest.json";
 export const TRANSFORMERS_JS_URL = "/vendor/transformers/transformers.min.js";
@@ -101,6 +106,7 @@ const V2_CLASS_THRESHOLDS = Object.freeze({
 // V3 keeps its frozen class thresholds. The preview does not claim that its
 // failed/incomplete validation became a production release approval.
 const V3_CANDIDATE_ID = "fixforward-siglip2-selective-class-threshold-candidate-v3";
+export const SIGLIP_REVIEW_CANDIDATE_ID = "fixforward-siglip2-confirmation-review-preview-v4";
 const V3_ENABLED_CLASSES = Object.freeze([
   "air_fryer", "coffee_machine", "fan", "hair_dryer", "kettle", "microwave",
   "portable_ac", "portable_heater", "rice_cooker", "sandwich_press", "straightener",
@@ -115,7 +121,7 @@ const PREVIEW_HOSTS = new Set(["fix-forward-iteration-3-r4sh.onrender.com", "loc
 // stays false; the recognition switch still cancels a running preview remotely.
 export function canRunSiglipPolicy(policy, hostname = globalThis.location?.hostname) {
   if (!policy?.recognition_enabled) return false;
-  if (policy.candidate_id === V3_CANDIDATE_ID) {
+  if (policy.candidate_id === V3_CANDIDATE_ID || policy.candidate_id === SIGLIP_REVIEW_CANDIDATE_ID) {
     return policy.release_ready === false && policy.experimental_preview === true && PREVIEW_HOSTS.has(hostname);
   }
   return policy.release_ready === true;
@@ -123,6 +129,19 @@ export function canRunSiglipPolicy(policy, hostname = globalThis.location?.hostn
 
 const V2_ACCEPTANCE_RULE = "The top appliance label must be enabled and both thresholds for that winning label must pass. Never fall through to a lower-ranked enabled label.";
 const V2_SCORE_NOTICE = "Cosine margins are internal rejection evidence, not a user-facing confidence percentage.";
+
+// Publishing this I3 preview changes which frozen rule is used, not the image
+// model or its text vectors. Exact values prevent a manifest-only threshold edit
+// from silently bypassing the evaluated confirmation-first behaviour.
+const V4_ACCEPTANCE = Object.freeze({
+  rule: "The strongest supported type must pass the frozen similarity and unrelated-content margin; offer at most three close types for explicit user confirmation.",
+  comparison: "greater_than_or_equal",
+  min_similarity: APPLIANCE_REVIEW_POLICY.minSimilarity,
+  min_ood_margin: APPLIANCE_REVIEW_POLICY.minOodMargin,
+  max_choice_gap: APPLIANCE_REVIEW_POLICY.maxChoiceGap,
+  max_choices: APPLIANCE_REVIEW_POLICY.maxChoices,
+  score_notice: V2_SCORE_NOTICE,
+});
 
 const FIXED_MESSAGES = Object.freeze({
   recognition_paused: "Photo suggestions are still being checked. Choose your appliance manually below.",
@@ -195,6 +214,15 @@ function matchesPinnedThresholds(classThresholds, enabledClasses = V2_ENABLED_CL
 
 function matchesVersionedAcceptance(policy, acceptance, enabledClasses) {
   if (!acceptance || typeof acceptance !== "object" || Array.isArray(acceptance)) return false;
+  if (policy.policy_version === 4) {
+    return policy.candidate_id === SIGLIP_REVIEW_CANDIDATE_ID &&
+      policy.release_ready === false && policy.experimental_preview === true &&
+      policy.photo_scope === "single_appliance" &&
+      equalArray(enabledClasses, APPLIANCE_REVIEW_LABELS) &&
+      equalArray(policy.manual_only_classes, []) &&
+      hasExactKeys(acceptance, Object.keys(V4_ACCEPTANCE)) &&
+      Object.entries(V4_ACCEPTANCE).every(([key, value]) => acceptance[key] === value);
+  }
   if (policy.policy_version === 1) {
     // Version 1 is retained only as disabled failed-test evidence. It must not
     // become runnable by changing its two release flags.
@@ -236,7 +264,7 @@ export function validateSiglipPolicy(policy) {
   const enabledClasses = policy?.enabled_classes;
   const knownSlugs = new Set(APPLIANCE_CLASSES.map(({ slug }) => slug));
   const valid = policy && typeof policy === "object" &&
-    (policy.policy_version === 1 || policy.policy_version === 2) &&
+    [1, 2, 4].includes(policy.policy_version) &&
     policy.photo_processing === "browser-local" &&
     policy.requires_user_confirmation === true &&
     typeof policy.release_ready === "boolean" &&
@@ -541,7 +569,9 @@ async function loadRuntime(importer = (url) => import(url)) {
       runtime.env.allowRemoteModels = false;
       runtime.env.allowLocalModels = true;
       runtime.env.localModelPath = LOCAL_MODEL_PATH;
-      runtime.env.useBrowserCache = true;
+      // Local experiments may load several large candidates. Avoid persisting
+      // those temporary model copies in the user's browser profile.
+      runtime.env.useBrowserCache = !["localhost", "127.0.0.1", "[::1]"].includes(globalThis.location?.hostname);
       const wasm = runtime.env.backends?.onnx?.wasm;
       if (!wasm) throw fixedError("runtime_unavailable");
       wasm.wasmPaths = TRANSFORMERS_WASM_PATH;
@@ -673,13 +703,29 @@ export function releaseSiglipModelSession() {
   });
 }
 
-export async function classifyWithSiglipCandidate(file, {
+// The normal UI uses only the validated server manifest to select its scoring
+// rule. Copying a local caller flag cannot enable a new rule on another website.
+export function classifyWithSiglipCandidate(file, options = {}) {
+  return runSiglipClassification(file, options, false);
+}
+
+// Keep an explicit local entry point for crop experiments. The publicly hosted
+// single-photo preview uses the normal manifest-selected entry point above.
+export function classifyWithSiglipReviewCandidate(file, options = {}) {
+  const hostname = options.hostname ?? globalThis.location?.hostname;
+  if (!["localhost", "127.0.0.1", "[::1]"].includes(hostname)) {
+    return Promise.reject(fixedError("recognition_paused"));
+  }
+  return runSiglipClassification(file, options, true);
+}
+
+async function runSiglipClassification(file, {
   fetcher = fetch,
   importer,
   onProgress = () => {},
   signal,
   hostname = globalThis.location?.hostname,
-} = {}) {
+} = {}, review = false) {
   const validation = validatePhotoFile(file);
   if (!validation.ok) throw fixedError("prediction_failed");
   // Queue before the first asynchronous policy fetch. Cleanup requested by a
@@ -693,6 +739,9 @@ export async function classifyWithSiglipCandidate(file, {
       if (!canRunSiglipPolicy(policy, hostname)) {
         return { accepted: false, requiresConfirmation: false, alternatives: [], reason: "recognition_paused", message: FIXED_MESSAGES.recognition_paused };
       }
+      // Snapshot before asynchronous work: both a kill switch and a switch to
+      // another valid candidate invalidate an in-flight result from the old rule.
+      const policyIdentity = scoringPolicyIdentity(policy);
       // Reject spoofed or decode-bomb-like files before importing the runtime,
       // fetching vectors or constructing a model session.
       await validateSiglipPhotoContent(file);
@@ -720,15 +769,41 @@ export async function classifyWithSiglipCandidate(file, {
       // load. A policy revoked during download or inference cannot show a result.
       const latestPolicy = await loadPolicy(fetcher);
       assertNotAborted(signal);
-      if (!canRunSiglipPolicy(latestPolicy, hostname)) {
+      if (!canRunSiglipPolicy(latestPolicy, hostname) ||
+          scoringPolicyIdentity(latestPolicy) !== policyIdentity) {
         return { accepted: false, requiresConfirmation: false, alternatives: [], reason: "recognition_paused", message: FIXED_MESSAGES.recognition_paused };
       }
-      return suggestionFromSiglipScores(cosineScores(tensor.data, vectors), vectors, policy);
+      const scores = cosineScores(tensor.data, vectors);
+      if (!review && policy.candidate_id !== SIGLIP_REVIEW_CANDIDATE_ID) {
+        return suggestionFromSiglipScores(scores, vectors, policy);
+      }
+      const checked = reviewApplianceScores(scores, vectors.labels);
+      if (checked.reason === "invalid_scores") throw fixedError("invalid_result");
+      const alternatives = checked.choices.map(({ label }) => {
+        const appliance = APPLIANCE_CLASSES.find(({ slug }) => slug === label);
+        if (!appliance) throw fixedError("invalid_result");
+        return appliance;
+      });
+      return {
+        accepted: checked.status === "suggestions", requiresConfirmation: true,
+        reviewMode: "choose_type", objectCount: null, alternatives, reason: checked.reason,
+      };
     } catch (error) {
       if (error?.code) throw error;
       throw fixedError("prediction_failed");
     }
   });
+}
+
+// Metadata prose may change independently, but every field defining the model,
+// class surface or scoring rule must remain identical while a photo is checked.
+function scoringPolicyIdentity(policy) {
+  return JSON.stringify([
+    policy.candidate_id, policy.policy_version, policy.enabled_classes,
+    policy.manual_only_classes, policy.photo_scope, policy.acceptance,
+    policy.vision_model.sha256, policy.text_embeddings.manifest_sha256,
+    policy.text_embeddings.vectors_sha256,
+  ]);
 }
 
 export function resetSiglipCandidateForTests() {

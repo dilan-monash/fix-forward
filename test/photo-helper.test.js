@@ -11,6 +11,84 @@ const suggestion = {
   alternatives: [{ slug: "portable_heater", category: "Portable heater" }],
 };
 
+const blender = { slug: "blender", category: "Blender" };
+const toaster = { slug: "toaster", category: "Toaster" };
+const thumbnail = "data:image/png;base64,dGVzdA==";
+
+test("close category alternatives are one item and require choosing the type", async (t) => {
+  const ui = await setup(t, { recognise: async () => ({
+    accepted: true, requiresConfirmation: true, reviewMode: "choose_type", alternatives: [blender, toaster],
+  }) });
+  ui.choose(); await settle();
+  assert.match(ui.query("h2#photo-result-title").textContent, /Which type/);
+  assert.equal(ui.query(".photo-item-choices"), null);
+  assert.deepEqual(ui.confirmed, []);
+  ui.query("#confirm-photo-appliance-2").click();
+  assert.equal(ui.confirmed[0].slug, "toaster");
+});
+
+test("localized items need a picture choice and then a separate type confirmation", async (t) => {
+  const ui = await setup(t, { recognise: async () => ({
+    localisation: "image_boxes", objects: [
+      { ...suggestion, box: [0, 0, 0.4, 1], thumbnail, alternatives: [blender] },
+      { ...suggestion, box: [0.6, 0, 1, 1], thumbnail, alternatives: [toaster] },
+    ],
+  }) });
+  ui.choose(); await settle();
+  assert.match(ui.container.textContent, /Some matches may be parts or pictures on packaging/);
+  assert.doesNotMatch(ui.container.textContent, /\d+ (?:possible )?items found/);
+  assert.deepEqual(ui.confirmed, []);
+  ui.container.querySelectorAll(".photo-item-choice")[1].click();
+  assert.deepEqual(ui.confirmed, []);
+  assert.match(ui.query("h2#photo-result-title").textContent, /toaster/i);
+  ui.query("#back-photo-items").click();
+  assert.match(ui.container.textContent, /Which item do you want to check/);
+  ui.container.querySelectorAll(".photo-item-choice")[0].click();
+  ui.query("#confirm-photo-appliance").click();
+  assert.equal(ui.confirmed[0].slug, "blender");
+});
+
+test("unlocalized alternatives cannot masquerade as a count of appliances", async (t) => {
+  const ui = await setup(t, { recognise: async () => ({
+    accepted: false, objects: [{ ...suggestion, box: [0, 0, 1, 1], thumbnail }],
+  }) });
+  ui.choose(); await settle();
+  assert.equal(ui.query(".photo-item-choices"), null);
+  assert.deepEqual(ui.confirmed, []);
+});
+
+// A detector may find only one of several appliances. The thumbnail still
+// matters: confirming a category must refer to the region the person selected.
+test("one accepted crop still requires choosing its picture before confirmation", async (t) => {
+  const ui = await setup(t, { recognise: async () => ({
+    localisation: "image_boxes", objects: [{
+      ...suggestion, box: [0.1, 0.2, 0.45, 0.8], thumbnail,
+      alternatives: [{ slug: "air_fryer", category: "Air fryer" }],
+    }],
+  }) });
+  ui.choose(); await settle();
+  assert.equal(ui.container.querySelectorAll(".photo-item-choice").length, 1);
+  assert.equal(ui.query("#confirm-photo-appliance"), null);
+  assert.deepEqual(ui.confirmed, []);
+  ui.query(".photo-item-choice").click();
+  assert.equal(ui.query("h2#photo-result-title").textContent, "Could this be an air fryer?");
+  ui.query("#confirm-photo-appliance").click();
+  assert.equal(ui.confirmed[0].slug, "air_fryer");
+});
+
+test("invalid crop coordinates and external thumbnail URLs never render as detected items", async (t) => {
+  const ui = await setup(t, { recognise: async () => ({
+    localisation: "image_boxes", accepted: false, objects: [
+      { ...suggestion, box: [0, 0, Infinity, 1], thumbnail },
+      { ...suggestion, box: [0, 0, 1, 1], thumbnail: "https://untrusted.example/photo" },
+    ],
+  }) });
+  ui.choose(); await settle();
+  assert.equal(ui.query(".photo-item-choices"), null);
+  assert.equal(ui.query('img[src^="https:"]'), null);
+  assert.deepEqual(ui.confirmed, []);
+});
+
 // Each test owns a DOM and callbacks. No production model, server or database is used.
 async function setup(t, options = {}) {
   const dom = new JSDOM('<main><div id="helper"></div><button id="manual">Manual picker</button></main>');

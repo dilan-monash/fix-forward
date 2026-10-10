@@ -55,7 +55,8 @@ class WorldRoutesTests(unittest.TestCase):
                 self.assertEqual(response.headers["Cache-Control"], "private, no-store")
                 self.assertIn("xr-spatial-tracking=(self)", response.headers["Permissions-Policy"])
         with self.client.get("/legacy") as response:
-            self.assertIn(b'src="src/app.js"', response.data)
+            # Cache-versioned entry URLs still load the same legacy controller.
+            self.assertRegex(response.data, rb'src="src/app\.js(?:\?[^\"]+)?"')
         with self.client.get("/legacy/") as response:
             self.assertEqual(response.headers["Location"], "/legacy")
         with self.client.get("/quest") as response:

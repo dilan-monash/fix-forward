@@ -22,3 +22,12 @@
 @keyframes photo-working { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .photo-feedback[data-state="busy"] .photo-feedback-icon { animation: none; } }
 @media (max-width: 420px) { .photo-detect-card .photo-selected-preview { gap: 10px; } .photo-detect-card .photo-selected-preview img { width: 80px; height: 80px; flex-basis: 80px; } }
+/* Region thumbnails are real local crops, large enough to choose by touch.
+   Ambiguous category choices stay equal in weight; the first is not selected. */
+.photo-item-choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-block: 16px; }
+.photo-item-choice { display: grid; gap: 8px; padding: 12px; border: 2px solid #b7c8dc; border-radius: 14px; background: #fff; color: #112858; font: inherit; text-align: left; cursor: pointer; }
+.photo-item-choice img { display: block; width: 100%; height: 145px; object-fit: contain; background: #f4f7fa; border-radius: 8px; }
+.photo-item-choice span { font-weight: 700; }
+.photo-item-choice:hover { border-color: #226bb0; background: #f2f7fc; }
+.photo-item-choice:focus-visible { outline: 3px solid #226bb0; outline-offset: 3px; }
+.photo-type-choice { min-height: 48px; }
