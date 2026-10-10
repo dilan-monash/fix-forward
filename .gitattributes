@@ -9,3 +9,8 @@ model/appliance-siglip/upstream/**/onnx/*.onnx -text -diff
 vendor/transformers/transformers.min.js -text -whitespace
 model/appliance-siglip/upstream/**/*.json -text
 model/appliance-siglip/text-embeddings.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+
+# Explore has its own pinned policy and text vectors. Preserve their exact bytes
+# between this Windows checkout and Render so integrity checks remain meaningful.
+model/explore-siglip/*.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+model/explore-siglip/*.f32 -text -diff

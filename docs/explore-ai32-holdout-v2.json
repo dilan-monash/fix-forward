@@ -1,0 +1,2440 @@
+{
+  "purpose": "Explore local development evidence; limited reviewed images, not population accuracy",
+  "mode": "evaluate",
+  "split": "holdout",
+  "acceptance": {
+    "min_similarity": 0,
+    "min_ood_margin": 0.022335919226660474,
+    "max_choice_gap": 0.018,
+    "max_choices": 3
+  },
+  "active_count": 32,
+  "active_labels": [
+    "kettle",
+    "toaster",
+    "fan",
+    "microwave",
+    "blender",
+    "rice_cooker",
+    "air_fryer",
+    "coffee_machine",
+    "mixer",
+    "vacuum_cleaner",
+    "hair_dryer",
+    "laptop",
+    "smartphone",
+    "tablet",
+    "television",
+    "washing_machine",
+    "refrigerator",
+    "food_processor",
+    "sandwich_press",
+    "portable_heater",
+    "portable_ac",
+    "dehumidifier",
+    "headphones",
+    "games_console",
+    "printer",
+    "steam_cleaner",
+    "clothes_dryer",
+    "straightener",
+    "shaver",
+    "electric_toothbrush",
+    "cordless_drill",
+    "sewing_machine"
+  ],
+  "source_manifest_sha256": "ac70b21e9a64f9058562190355133701d03266e91f01dba305d9ab40e7eaae67",
+  "features_sha256": "5ea43179e386938dd5bb2ae464477945978f6bdf71a10cb0debe99907acc8148",
+  "model_sha256": "9e82237d9a1d89948502aff9df02129c28698d793e01f15f62e2267682615499",
+  "text_manifest_sha256": "60c91d0d3ee7f2b8864b4a1a517907daf48e42bc9644beadbed17f59fe46f6f2",
+  "text_vectors_sha256": "9e0cb396c21d7b40540aa3af20ca60322f4d4ec266db94a5722ba127463021d3",
+  "selection": "Frozen acceptance values; no refitting from this partition.",
+  "totals": {
+    "supported": 120,
+    "correct_offers": 114,
+    "wrong_offers": 3,
+    "rejected_supported": 3,
+    "negative": 15,
+    "negative_offers": 0,
+    "extra_choices": 26,
+    "raw_top1_correct": 114
+  },
+  "per_class": {
+    "air_fryer": {
+      "total": 4,
+      "correct_offers": 4,
+      "wrong_offers": 0,
+      "rejected": 0,
+      "raw_top1_correct": 4
+    },
+    "mixer": {
+      "total": 4,
+      "correct_offers": 4,
+      "wrong_offers": 0,
+      "rejected": 0,
+      "raw_top1_correct": 4
+    },
+    "kettle": {
+      "total": 4,
+      "correct_offers": 4,
+      "wrong_offers": 0,
+      "rejected": 0,
+      "raw_top1_correct": 4
+    },
+    "blender": {
+      "total": 4,
+      "correct_offers": 4,
+      "wrong_offers": 0,
+      "rejected": 0,
+      "raw_top1_correct": 4
+    },
+    "rice_cooker": {
+      "total": 4,
+      "correct_offers": 4,
+      "wrong_offers": 0,
+      "rejected": 0,
+      "raw_top1_correct": 4
+    },
+    "hair_dryer": {
+      "total": 4,
+      "correct_offers": 2,
+      "wrong_offers": 1,
+      "rejected": 1,
+      "raw_top1_correct": 2
+    },
+    "microwave": {
+      "total": 4,
+      "correct_offers": 4,
+      "wrong_offers": 0,
+      "rejected": 0,
+      "raw_top1_correct": 4
+    },
+    "coffee_machine": {
+      "total": 4,
+      "correct_offers": 4,
+      "wrong_offers": 0,
+      "rejected": 0,
+      "raw_top1_correct": 4
+    },
+    "fan": {
+      "total": 4,
+      "correct_offers": 4,
+      "wrong_offers": 0,
+      "rejected": 0,
+      "raw_top1_correct": 4
+    },
+    "vacuum_cleaner": {
+      "total": 4,
+      "correct_offers": 4,
+      "wrong_offers": 0,
+      "rejected": 0,
+      "raw_top1_correct": 4
+    },
+    "toaster": {
+      "total": 4,
+      "correct_offers": 4,
+      "wrong_offers": 0,
+      "rejected": 0,
+      "raw_top1_correct": 4
+    },
+    "laptop": {
+      "total": 4,
+      "correct_offers": 3,
+      "wrong_offers": 0,
+      "rejected": 1,
+      "raw_top1_correct": 4
+    },
+    "smartphone": {
+      "total": 4,
+      "correct_offers": 4,
+      "wrong_offers": 0,
+      "rejected": 0,
+      "raw_top1_correct": 4
+    },
+    "tablet": {
+      "total": 4,
+      "correct_offers": 3,
+      "wrong_offers": 0,
+      "rejected": 1,
+      "raw_top1_correct": 4
+    },
+    "television": {
+      "total": 4,
+      "correct_offers": 4,
+      "wrong_offers": 0,
+      "rejected": 0,
+      "raw_top1_correct": 4
+    },
+    "washing_machine": {
+      "total": 4,
+      "correct_offers": 4,
+      "wrong_offers": 0,
+      "rejected": 0,
+      "raw_top1_correct": 4
+    },
+    "portable_heater": {
+      "total": 4,
+      "correct_offers": 4,
+      "wrong_offers": 0,
+      "rejected": 0,
+      "raw_top1_correct": 4
+    },
+    "food_processor": {
+      "total": 4,
+      "correct_offers": 4,
+      "wrong_offers": 0,
+      "rejected": 0,
+      "raw_top1_correct": 4
+    },
+    "shaver": {
+      "total": 4,
+      "correct_offers": 4,
+      "wrong_offers": 0,
+      "rejected": 0,
+      "raw_top1_correct": 4
+    },
+    "dehumidifier": {
+      "total": 4,
+      "correct_offers": 3,
+      "wrong_offers": 1,
+      "rejected": 0,
+      "raw_top1_correct": 1
+    },
+    "portable_ac": {
+      "total": 4,
+      "correct_offers": 4,
+      "wrong_offers": 0,
+      "rejected": 0,
+      "raw_top1_correct": 4
+    },
+    "straightener": {
+      "total": 4,
+      "correct_offers": 4,
+      "wrong_offers": 0,
+      "rejected": 0,
+      "raw_top1_correct": 4
+    },
+    "sandwich_press": {
+      "total": 4,
+      "correct_offers": 4,
+      "wrong_offers": 0,
+      "rejected": 0,
+      "raw_top1_correct": 4
+    },
+    "steam_cleaner": {
+      "total": 1,
+      "correct_offers": 1,
+      "wrong_offers": 0,
+      "rejected": 0,
+      "raw_top1_correct": 1
+    },
+    "refrigerator": {
+      "total": 4,
+      "correct_offers": 4,
+      "wrong_offers": 0,
+      "rejected": 0,
+      "raw_top1_correct": 4
+    },
+    "headphones": {
+      "total": 4,
+      "correct_offers": 4,
+      "wrong_offers": 0,
+      "rejected": 0,
+      "raw_top1_correct": 4
+    },
+    "games_console": {
+      "total": 4,
+      "correct_offers": 4,
+      "wrong_offers": 0,
+      "rejected": 0,
+      "raw_top1_correct": 4
+    },
+    "clothes_dryer": {
+      "total": 3,
+      "correct_offers": 2,
+      "wrong_offers": 1,
+      "rejected": 0,
+      "raw_top1_correct": 2
+    },
+    "electric_toothbrush": {
+      "total": 4,
+      "correct_offers": 4,
+      "wrong_offers": 0,
+      "rejected": 0,
+      "raw_top1_correct": 4
+    },
+    "cordless_drill": {
+      "total": 4,
+      "correct_offers": 4,
+      "wrong_offers": 0,
+      "rejected": 0,
+      "raw_top1_correct": 4
+    },
+    "sewing_machine": {
+      "total": 3,
+      "correct_offers": 3,
+      "wrong_offers": 0,
+      "rejected": 0,
+      "raw_top1_correct": 3
+    },
+    "printer": {
+      "total": 1,
+      "correct_offers": 1,
+      "wrong_offers": 0,
+      "rejected": 0,
+      "raw_top1_correct": 1
+    }
+  },
+  "results": [
+    {
+      "id": "v1-air_fryer-commons-04",
+      "source_group": "commons-page-78351293",
+      "kind": "supported",
+      "expected": "air_fryer",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "air_fryer"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "air_fryer",
+      "strongest": 0.1446814512626682,
+      "margin": 0.06503844873260738
+    },
+    {
+      "id": "v1-backpack-01",
+      "source_group": "amazon_berkeley_objects|source_item_id|B06Y6LRWZQ",
+      "kind": "unrelated",
+      "expected": null,
+      "reused_development": true,
+      "accepted": false,
+      "choices": [],
+      "correct": false,
+      "reason": "not_sure",
+      "raw_top1": "vacuum_cleaner",
+      "strongest": 0.027648614609364075,
+      "margin": -0.011887702542765007
+    },
+    {
+      "id": "v1-mixer-01",
+      "source_group": "ABO-family-amazonbasics-multi-speed-stand-mixer",
+      "kind": "supported",
+      "expected": "mixer",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "mixer",
+        "food_processor"
+      ],
+      "correct": true,
+      "reason": "similar_types",
+      "raw_top1": "mixer",
+      "strongest": 0.12996068798166396,
+      "margin": 0.05584664900875963
+    },
+    {
+      "id": "v1-kettle-01",
+      "source_group": "amazon_berkeley_objects|source_item_id|B07XWGP7C5",
+      "kind": "supported",
+      "expected": "kettle",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "kettle"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "kettle",
+      "strongest": 0.14048909003233417,
+      "margin": 0.05183334328404107
+    },
+    {
+      "id": "v1-blender-01",
+      "source_group": "amazon_berkeley_objects|source_item_id|B071GKY7HV",
+      "kind": "supported",
+      "expected": "blender",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "blender",
+        "mixer"
+      ],
+      "correct": true,
+      "reason": "similar_types",
+      "raw_top1": "blender",
+      "strongest": 0.11822714419364112,
+      "margin": 0.04195083173118026
+    },
+    {
+      "id": "v1-rice_cooker-04",
+      "source_group": "flickr|landing_url|https://www.flickr.com/photos/37996588780@N01/264130245",
+      "kind": "supported",
+      "expected": "rice_cooker",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "rice_cooker"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "rice_cooker",
+      "strongest": 0.13836838045009153,
+      "margin": 0.054613951140749434
+    },
+    {
+      "id": "v1-hair_dryer-01",
+      "source_group": "wikimedia|landing_url|https://commons.wikimedia.org/w/index.php?curid=55481104",
+      "kind": "supported",
+      "expected": "hair_dryer",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "hair_dryer"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "hair_dryer",
+      "strongest": 0.13055511069852205,
+      "margin": 0.036621980584808284
+    },
+    {
+      "id": "v1-microwave-05",
+      "source_group": "wikimedia|landing_url|https://commons.wikimedia.org/w/index.php?curid=166070443",
+      "kind": "supported",
+      "expected": "microwave",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "microwave"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "microwave",
+      "strongest": 0.1334908160939908,
+      "margin": 0.04422598511991903
+    },
+    {
+      "id": "v1-blender-04",
+      "source_group": "dhash|blender|40a0b0a690d29228",
+      "kind": "supported",
+      "expected": "blender",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "blender",
+        "mixer"
+      ],
+      "correct": true,
+      "reason": "similar_types",
+      "raw_top1": "blender",
+      "strongest": 0.12046585512779423,
+      "margin": 0.05126773815187681
+    },
+    {
+      "id": "v1-kettle-05",
+      "source_group": "amazon_berkeley_objects|source_item_id|B07KB9BQ6C",
+      "kind": "supported",
+      "expected": "kettle",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "kettle"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "kettle",
+      "strongest": 0.13326622851690276,
+      "margin": 0.05655479655295198
+    },
+    {
+      "id": "v1-shoes-02",
+      "source_group": "amazon_berkeley_objects|source_item_id|B01N5XROXR",
+      "kind": "unrelated",
+      "expected": null,
+      "reused_development": true,
+      "accepted": false,
+      "choices": [],
+      "correct": false,
+      "reason": "not_sure",
+      "raw_top1": "shaver",
+      "strongest": 0.05714025669465276,
+      "margin": 0.00756451124063777
+    },
+    {
+      "id": "v1-coffee_machine-03",
+      "source_group": "wikimedia|landing_url|https://commons.wikimedia.org/w/index.php?curid=35172289",
+      "kind": "supported",
+      "expected": "coffee_machine",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "coffee_machine"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "coffee_machine",
+      "strongest": 0.10742225979043668,
+      "margin": 0.03921799660171019
+    },
+    {
+      "id": "v1-chair-03",
+      "source_group": "amazon_berkeley_objects|source_item_id|B07QFRSLZB",
+      "kind": "unrelated",
+      "expected": null,
+      "reused_development": true,
+      "accepted": false,
+      "choices": [],
+      "correct": false,
+      "reason": "not_sure",
+      "raw_top1": "refrigerator",
+      "strongest": 0.010651660579307217,
+      "margin": -0.058138084682017005
+    },
+    {
+      "id": "v1-fan-07",
+      "source_group": "dhash|fan|30b2b2b2b2b2b230",
+      "kind": "supported",
+      "expected": "fan",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "fan",
+        "portable_heater"
+      ],
+      "correct": true,
+      "reason": "similar_types",
+      "raw_top1": "fan",
+      "strongest": 0.12683431558261007,
+      "margin": 0.04697146071917532
+    },
+    {
+      "id": "v1-microwave-06",
+      "source_group": "amazon_berkeley_objects|source_item_id|B07RTC8WSD",
+      "kind": "supported",
+      "expected": "microwave",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "microwave"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "microwave",
+      "strongest": 0.14172466101065856,
+      "margin": 0.06998995801519114
+    },
+    {
+      "id": "v1-mixer-06",
+      "source_group": "wikimedia|landing_url|https://commons.wikimedia.org/w/index.php?curid=140748645",
+      "kind": "supported",
+      "expected": "mixer",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "mixer",
+        "food_processor"
+      ],
+      "correct": true,
+      "reason": "similar_types",
+      "raw_top1": "mixer",
+      "strongest": 0.13573166114152488,
+      "margin": 0.04754441373269301
+    },
+    {
+      "id": "v1-microwave-07",
+      "source_group": "flickr|landing_url|https://www.flickr.com/photos/34621580@N00/4047915319",
+      "kind": "supported",
+      "expected": "microwave",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "microwave"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "microwave",
+      "strongest": 0.1533092726029127,
+      "margin": 0.059744659872868186
+    },
+    {
+      "id": "v1-coffee_machine-05",
+      "source_group": "flickr|landing_url|https://www.flickr.com/photos/29482491@N00/121745646",
+      "kind": "supported",
+      "expected": "coffee_machine",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "coffee_machine"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "coffee_machine",
+      "strongest": 0.11587204452219953,
+      "margin": 0.058812961934217686
+    },
+    {
+      "id": "v1-kettle-08",
+      "source_group": "flickr|landing_url|https://www.flickr.com/photos/147592390@N06/47586759531",
+      "kind": "supported",
+      "expected": "kettle",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "kettle",
+        "coffee_machine",
+        "blender"
+      ],
+      "correct": true,
+      "reason": "similar_types",
+      "raw_top1": "kettle",
+      "strongest": 0.1260936953166073,
+      "margin": 0.05300029043850753
+    },
+    {
+      "id": "v1-rice_cooker-07",
+      "source_group": "flickr|landing_url|https://www.flickr.com/photos/98288842@N00/40716143",
+      "kind": "supported",
+      "expected": "rice_cooker",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "rice_cooker"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "rice_cooker",
+      "strongest": 0.1441767315002378,
+      "margin": 0.04995053943258039
+    },
+    {
+      "id": "v1-hair_dryer-03",
+      "source_group": "flickr|landing_url|https://www.flickr.com/photos/121935927@N06/13690923044",
+      "kind": "supported",
+      "expected": "hair_dryer",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "hair_dryer"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "hair_dryer",
+      "strongest": 0.1731024847161221,
+      "margin": 0.05436290376935474
+    },
+    {
+      "id": "v1-fan-09",
+      "source_group": "dhash|fan|0018b0d8ccc48108",
+      "kind": "supported",
+      "expected": "fan",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "fan"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "fan",
+      "strongest": 0.1324879207072938,
+      "margin": 0.0689145121247617
+    },
+    {
+      "id": "v1-vacuum_cleaner-05",
+      "source_group": "dhash|vaccum_cleaner|2959a56dcc85c45c",
+      "kind": "supported",
+      "expected": "vacuum_cleaner",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "vacuum_cleaner"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "vacuum_cleaner",
+      "strongest": 0.13633239820152493,
+      "margin": 0.06153892445024173
+    },
+    {
+      "id": "v1-mixer-07",
+      "source_group": "ABO-family-amazonbasics-multi-speed-stand-mixer",
+      "kind": "supported",
+      "expected": "mixer",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "mixer",
+        "food_processor"
+      ],
+      "correct": true,
+      "reason": "similar_types",
+      "raw_top1": "mixer",
+      "strongest": 0.11730192206240153,
+      "margin": 0.04758908865404733
+    },
+    {
+      "id": "v1-coffee_machine-09",
+      "source_group": "flickr|landing_url|https://www.flickr.com/photos/35034348080@N01/3092648336",
+      "kind": "supported",
+      "expected": "coffee_machine",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "coffee_machine"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "coffee_machine",
+      "strongest": 0.12114533105885338,
+      "margin": 0.06524478469698516
+    },
+    {
+      "id": "v1-fan-12",
+      "source_group": "flickr|landing_url|https://www.flickr.com/photos/59594757@N00/5807076488",
+      "kind": "supported",
+      "expected": "fan",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "fan"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "fan",
+      "strongest": 0.1476807436792308,
+      "margin": 0.04302446927235644
+    },
+    {
+      "id": "v1-kettle-16",
+      "source_group": "dhash|kettle|f8aaa9a9a8e4e8e1",
+      "kind": "supported",
+      "expected": "kettle",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "kettle"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "kettle",
+      "strongest": 0.13283452359695985,
+      "margin": 0.0582932796122862
+    },
+    {
+      "id": "v1-rice_cooker-09",
+      "source_group": "amazon_berkeley_objects|source_item_id|B089NCTQ9M",
+      "kind": "supported",
+      "expected": "rice_cooker",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "rice_cooker"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "rice_cooker",
+      "strongest": 0.14779344482077186,
+      "margin": 0.06980061799884876
+    },
+    {
+      "id": "v1-mixer-10",
+      "source_group": "flickr|landing_url|https://www.flickr.com/photos/67337737@N00/3059519833",
+      "kind": "supported",
+      "expected": "mixer",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "mixer",
+        "food_processor"
+      ],
+      "correct": true,
+      "reason": "similar_types",
+      "raw_top1": "mixer",
+      "strongest": 0.10740880956352837,
+      "margin": 0.025659321375620617
+    },
+    {
+      "id": "v1-blender-08",
+      "source_group": "flickr|landing_url|https://www.flickr.com/photos/46857557@N00/63762918",
+      "kind": "supported",
+      "expected": "blender",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "blender"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "blender",
+      "strongest": 0.13954174095921307,
+      "margin": 0.05342906158136307
+    },
+    {
+      "id": "v1-air_fryer-05",
+      "source_group": "wikimedia|landing_url|https://commons.wikimedia.org/w/index.php?curid=157132048",
+      "kind": "supported",
+      "expected": "air_fryer",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "air_fryer"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "air_fryer",
+      "strongest": 0.14942007045389963,
+      "margin": 0.053860088330119765
+    },
+    {
+      "id": "v1-rice_cooker-10",
+      "source_group": "flickr|landing_url|https://www.flickr.com/photos/25606832@N02/3189801213",
+      "kind": "supported",
+      "expected": "rice_cooker",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "rice_cooker"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "rice_cooker",
+      "strongest": 0.1466310304848254,
+      "margin": 0.05536710652300253
+    },
+    {
+      "id": "v1-dishware_bowl-03",
+      "source_group": "amazon_berkeley_objects|source_item_id|B07PBBW45W",
+      "kind": "unrelated",
+      "expected": null,
+      "reused_development": true,
+      "accepted": false,
+      "choices": [],
+      "correct": false,
+      "reason": "not_sure",
+      "raw_top1": "washing_machine",
+      "strongest": 0.026891968395660056,
+      "margin": -0.03799162584129508
+    },
+    {
+      "id": "v1-vacuum_cleaner-08",
+      "source_group": "wikimedia|landing_url|https://commons.wikimedia.org/w/index.php?curid=28235149",
+      "kind": "supported",
+      "expected": "vacuum_cleaner",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "vacuum_cleaner"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "vacuum_cleaner",
+      "strongest": 0.14623494059763786,
+      "margin": 0.051401302510267366
+    },
+    {
+      "id": "v1-blender-11",
+      "source_group": "flickr|landing_url|https://www.flickr.com/photos/47036348@N02/5940569067",
+      "kind": "supported",
+      "expected": "blender",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "blender"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "blender",
+      "strongest": 0.14424958500725402,
+      "margin": 0.05852256265838425
+    },
+    {
+      "id": "v1-vacuum_cleaner-11",
+      "source_group": "wikimedia|landing_url|https://commons.wikimedia.org/w/index.php?curid=10404469",
+      "kind": "supported",
+      "expected": "vacuum_cleaner",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "vacuum_cleaner"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "vacuum_cleaner",
+      "strongest": 0.13593332999061913,
+      "margin": 0.04900893600759862
+    },
+    {
+      "id": "v1-toaster-08",
+      "source_group": "flickr|landing_url|https://www.flickr.com/photos/73882906@N00/170741150",
+      "kind": "supported",
+      "expected": "toaster",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "toaster"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "toaster",
+      "strongest": 0.14310392738309427,
+      "margin": 0.03983168739052764
+    },
+    {
+      "id": "v1-fan-16",
+      "source_group": "amazon_berkeley_objects|source_item_id|B07HKF5F8P",
+      "kind": "supported",
+      "expected": "fan",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "fan"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "fan",
+      "strongest": 0.082670540340081,
+      "margin": 0.025181651461169553
+    },
+    {
+      "id": "v1-vacuum_cleaner-14",
+      "source_group": "flickr|landing_url|https://www.flickr.com/photos/67466210@N00/271369716",
+      "kind": "supported",
+      "expected": "vacuum_cleaner",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "vacuum_cleaner",
+        "steam_cleaner"
+      ],
+      "correct": true,
+      "reason": "similar_types",
+      "raw_top1": "vacuum_cleaner",
+      "strongest": 0.12823208495939445,
+      "margin": 0.029523969956599783
+    },
+    {
+      "id": "v1-microwave-11",
+      "source_group": "flickr|landing_url|https://www.flickr.com/photos/97719890@N00/5255007874",
+      "kind": "supported",
+      "expected": "microwave",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "microwave"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "microwave",
+      "strongest": 0.1466123488471389,
+      "margin": 0.06787897115449042
+    },
+    {
+      "id": "v1-coffee_machine-16",
+      "source_group": "flickr|landing_url|https://www.flickr.com/photos/12508217@N08/9285842196",
+      "kind": "supported",
+      "expected": "coffee_machine",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "coffee_machine"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "coffee_machine",
+      "strongest": 0.1223348456432455,
+      "margin": 0.06705323465239438
+    },
+    {
+      "id": "v1-toy_figure-03",
+      "source_group": "amazon_berkeley_objects|source_item_id|B081ZK4C26",
+      "kind": "unrelated",
+      "expected": null,
+      "reused_development": true,
+      "accepted": false,
+      "choices": [],
+      "correct": false,
+      "reason": "not_sure",
+      "raw_top1": "electric_toothbrush",
+      "strongest": 0.025944865209357883,
+      "margin": -0.02521552027796522
+    },
+    {
+      "id": "v1-hair_dryer-16",
+      "source_group": "flickr|landing_url|https://www.flickr.com/photos/39435232@N00/4126127272",
+      "kind": "supported",
+      "expected": "hair_dryer",
+      "reused_development": true,
+      "accepted": false,
+      "choices": [],
+      "correct": false,
+      "reason": "not_sure",
+      "raw_top1": "shaver",
+      "strongest": 0.0920764528679685,
+      "margin": -0.01972402832392367
+    },
+    {
+      "id": "v1-bottle-03",
+      "source_group": "amazon_berkeley_objects|source_item_id|B07H2SZGHV",
+      "kind": "unrelated",
+      "expected": null,
+      "reused_development": true,
+      "accepted": false,
+      "choices": [],
+      "correct": false,
+      "reason": "not_sure",
+      "raw_top1": "smartphone",
+      "strongest": 0.030599761902484583,
+      "margin": -0.019275538678185884
+    },
+    {
+      "id": "v1-toaster-18",
+      "source_group": "flickr|landing_url|https://www.flickr.com/photos/50930734@N05/4813310085",
+      "kind": "supported",
+      "expected": "toaster",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "toaster"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "toaster",
+      "strongest": 0.12614395760058103,
+      "margin": 0.03778198021360192
+    },
+    {
+      "id": "v1-hair_dryer-26",
+      "source_group": "flickr|landing_url|https://www.flickr.com/photos/7852439@N07/2897216478",
+      "kind": "supported",
+      "expected": "hair_dryer",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "mixer",
+        "food_processor",
+        "blender"
+      ],
+      "correct": false,
+      "reason": "similar_types",
+      "raw_top1": "mixer",
+      "strongest": 0.1061239047747875,
+      "margin": 0.036768162004361477
+    },
+    {
+      "id": "v1-air_fryer-09",
+      "source_group": "wikimedia|landing_url|https://commons.wikimedia.org/w/index.php?curid=132812349",
+      "kind": "supported",
+      "expected": "air_fryer",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "air_fryer"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "air_fryer",
+      "strongest": 0.1499394233242406,
+      "margin": 0.07459289553813077
+    },
+    {
+      "id": "v1-toaster-25",
+      "source_group": "flickr|landing_url|https://www.flickr.com/photos/36521957624@N01/33710880",
+      "kind": "supported",
+      "expected": "toaster",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "toaster"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "toaster",
+      "strongest": 0.1418750776993848,
+      "margin": 0.034860497565634266
+    },
+    {
+      "id": "v1-toaster-27",
+      "source_group": "amazon_berkeley_objects|source_item_id|B072P11H8L",
+      "kind": "supported",
+      "expected": "toaster",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "toaster"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "toaster",
+      "strongest": 0.153244332656591,
+      "margin": 0.06772329988988678
+    },
+    {
+      "id": "v1-air_fryer-15",
+      "source_group": "wikimedia|landing_url|https://commons.wikimedia.org/w/index.php?curid=144156410",
+      "kind": "supported",
+      "expected": "air_fryer",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "air_fryer"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "air_fryer",
+      "strongest": 0.13763398330684762,
+      "margin": 0.06916209352176363
+    },
+    {
+      "id": "v1-laptop-new-05",
+      "source_group": "flickr|https://www.flickr.com/photos/12438331@N02/2104253867",
+      "kind": "supported",
+      "expected": "laptop",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "laptop"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "laptop",
+      "strongest": 0.1472612022238185,
+      "margin": 0.04730861251124441
+    },
+    {
+      "id": "v1-laptop-new-15",
+      "source_group": "stocksnap|https://stocksnap.io/photo/laptop-computer-4O4FZUVSIU",
+      "kind": "supported",
+      "expected": "laptop",
+      "reused_development": true,
+      "accepted": false,
+      "choices": [],
+      "correct": false,
+      "reason": "not_sure",
+      "raw_top1": "laptop",
+      "strongest": 0.11660988838389516,
+      "margin": 0.0048632443401170344
+    },
+    {
+      "id": "v1-laptop-new-17",
+      "source_group": "flickr|https://www.flickr.com/photos/21051491@N02/23570504174",
+      "kind": "supported",
+      "expected": "laptop",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "laptop"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "laptop",
+      "strongest": 0.13664245100102823,
+      "margin": 0.04993950662353719
+    },
+    {
+      "id": "v1-laptop-new-21",
+      "source_group": "flickr|https://www.flickr.com/photos/12967790@N00/4285638187",
+      "kind": "supported",
+      "expected": "laptop",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "laptop"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "laptop",
+      "strongest": 0.12774666740298982,
+      "margin": 0.023620470555644923
+    },
+    {
+      "id": "v1-smartphone-new-01",
+      "source_group": "flickr|https://www.flickr.com/photos/147592390@N06/32808231707",
+      "kind": "supported",
+      "expected": "smartphone",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "smartphone"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "smartphone",
+      "strongest": 0.11971272415866563,
+      "margin": 0.03215501958664582
+    },
+    {
+      "id": "v1-smartphone-new-02",
+      "source_group": "flickr|https://www.flickr.com/photos/34353636@N00/5368269021",
+      "kind": "supported",
+      "expected": "smartphone",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "smartphone"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "smartphone",
+      "strongest": 0.11101668785378901,
+      "margin": 0.05436648022943799
+    },
+    {
+      "id": "v1-smartphone-new-12",
+      "source_group": "flickr|https://www.flickr.com/photos/33634811@N07/10271018616",
+      "kind": "supported",
+      "expected": "smartphone",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "smartphone"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "smartphone",
+      "strongest": 0.11496337546811737,
+      "margin": 0.04092970200483627
+    },
+    {
+      "id": "v1-smartphone-new-13",
+      "source_group": "flickr|https://www.flickr.com/photos/38305415@N00/4368595436",
+      "kind": "supported",
+      "expected": "smartphone",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "smartphone"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "smartphone",
+      "strongest": 0.12492184236333545,
+      "margin": 0.04504902903723322
+    },
+    {
+      "id": "v1-tablet-new-02",
+      "source_group": "flickr|https://www.flickr.com/photos/132795455@N08/21179904858",
+      "kind": "supported",
+      "expected": "tablet",
+      "reused_development": true,
+      "accepted": false,
+      "choices": [],
+      "correct": false,
+      "reason": "not_sure",
+      "raw_top1": "tablet",
+      "strongest": 0.07491507574544506,
+      "margin": 0.021660610566118052
+    },
+    {
+      "id": "v1-tablet-new-09",
+      "source_group": "stocksnap|https://stocksnap.io/photo/ipad-tablet-4SGERWWL1U",
+      "kind": "supported",
+      "expected": "tablet",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "tablet"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "tablet",
+      "strongest": 0.12037341050483294,
+      "margin": 0.06146972534173449
+    },
+    {
+      "id": "v1-tablet-new-14",
+      "source_group": "stocksnap|https://stocksnap.io/photo/ipad-tablet-TKLGCM6J7A",
+      "kind": "supported",
+      "expected": "tablet",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "tablet"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "tablet",
+      "strongest": 0.13820754851077777,
+      "margin": 0.05422397278876276
+    },
+    {
+      "id": "v1-tablet-new-15",
+      "source_group": "stocksnap|https://stocksnap.io/photo/ipad-tablet-57W1HVXW2X",
+      "kind": "supported",
+      "expected": "tablet",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "tablet"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "tablet",
+      "strongest": 0.12892132702830184,
+      "margin": 0.024117788244113383
+    },
+    {
+      "id": "v1-television-new-02",
+      "source_group": "flickr|https://www.flickr.com/photos/72105154@N00/2300379755",
+      "kind": "supported",
+      "expected": "television",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "television"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "television",
+      "strongest": 0.14584718120519752,
+      "margin": 0.04228016408778322
+    },
+    {
+      "id": "v1-television-new-09",
+      "source_group": "flickr|https://www.flickr.com/photos/56619626@N05/5591601846",
+      "kind": "supported",
+      "expected": "television",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "television"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "television",
+      "strongest": 0.13621446080638416,
+      "margin": 0.038461066414553935
+    },
+    {
+      "id": "v1-television-new-11",
+      "source_group": "flickr|https://www.flickr.com/photos/8399025@N07/5956762228",
+      "kind": "supported",
+      "expected": "television",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "television"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "television",
+      "strongest": 0.13451709070645762,
+      "margin": 0.04712554734045894
+    },
+    {
+      "id": "v1-television-new-18",
+      "source_group": "flickr|https://www.flickr.com/photos/32985045@N08/3810270838",
+      "kind": "supported",
+      "expected": "television",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "television"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "television",
+      "strongest": 0.13621616523972738,
+      "margin": 0.028204249061706127
+    },
+    {
+      "id": "v1-washing_machine-commons-05",
+      "source_group": "commons-page-27270718",
+      "kind": "supported",
+      "expected": "washing_machine",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "washing_machine",
+        "clothes_dryer"
+      ],
+      "correct": true,
+      "reason": "similar_types",
+      "raw_top1": "washing_machine",
+      "strongest": 0.12542259965869787,
+      "margin": 0.05449957514938422
+    },
+    {
+      "id": "v1-washing_machine-commons-06",
+      "source_group": "commons-page-30832941",
+      "kind": "supported",
+      "expected": "washing_machine",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "washing_machine",
+        "clothes_dryer"
+      ],
+      "correct": true,
+      "reason": "similar_types",
+      "raw_top1": "washing_machine",
+      "strongest": 0.1374914982511437,
+      "margin": 0.05083493194339904
+    },
+    {
+      "id": "v1-washing_machine-commons-08",
+      "source_group": "commons-page-67057296",
+      "kind": "supported",
+      "expected": "washing_machine",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "washing_machine",
+        "clothes_dryer"
+      ],
+      "correct": true,
+      "reason": "similar_types",
+      "raw_top1": "washing_machine",
+      "strongest": 0.13467315708505478,
+      "margin": 0.048656929001947805
+    },
+    {
+      "id": "v1-washing_machine-commons-09",
+      "source_group": "commons-page-86343117",
+      "kind": "supported",
+      "expected": "washing_machine",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "washing_machine",
+        "clothes_dryer"
+      ],
+      "correct": true,
+      "reason": "similar_types",
+      "raw_top1": "washing_machine",
+      "strongest": 0.1295468879224008,
+      "margin": 0.06341743344374166
+    },
+    {
+      "id": "v1-synthetic-black",
+      "source_group": "synthetic-black-20261010",
+      "kind": "synthetic",
+      "expected": null,
+      "reused_development": true,
+      "accepted": false,
+      "choices": [],
+      "correct": false,
+      "reason": "not_sure",
+      "raw_top1": "smartphone",
+      "strongest": 0.06753645791270989,
+      "margin": -0.004914354378250788
+    },
+    {
+      "id": "v1-synthetic-gray",
+      "source_group": "synthetic-gray-20261010",
+      "kind": "synthetic",
+      "expected": null,
+      "reused_development": true,
+      "accepted": false,
+      "choices": [],
+      "correct": false,
+      "reason": "not_sure",
+      "raw_top1": "smartphone",
+      "strongest": 0.05980056230639186,
+      "margin": -0.010103989316144937
+    },
+    {
+      "id": "v1-synthetic-white",
+      "source_group": "synthetic-white-20261010",
+      "kind": "synthetic",
+      "expected": null,
+      "reused_development": true,
+      "accepted": false,
+      "choices": [],
+      "correct": false,
+      "reason": "not_sure",
+      "raw_top1": "refrigerator",
+      "strongest": 0.06693005639089117,
+      "margin": -0.008223553348832457
+    },
+    {
+      "id": "v1-synthetic-noise",
+      "source_group": "synthetic-noise-20261010",
+      "kind": "synthetic",
+      "expected": null,
+      "reused_development": true,
+      "accepted": false,
+      "choices": [],
+      "correct": false,
+      "reason": "not_sure",
+      "raw_top1": "television",
+      "strongest": 0.052516377326952156,
+      "margin": -0.0011671484294669895
+    },
+    {
+      "id": "portable_heater-old-01",
+      "source_group": "amazon_berkeley_objects|source_item_id|B07JW4C7BJ",
+      "kind": "supported",
+      "expected": "portable_heater",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "portable_heater"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "portable_heater",
+      "strongest": 0.15851182995249904,
+      "margin": 0.08014120125788933
+    },
+    {
+      "id": "food_processor-old-04",
+      "source_group": "flickr|landing_url|https://www.flickr.com/photos/8271947@N05/4894259477",
+      "kind": "supported",
+      "expected": "food_processor",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "food_processor"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "food_processor",
+      "strongest": 0.15370689665871162,
+      "margin": 0.07020552722298902
+    },
+    {
+      "id": "shaver-old-06",
+      "source_group": "wikimedia|landing_url|https://commons.wikimedia.org/w/index.php?curid=324004",
+      "kind": "supported",
+      "expected": "shaver",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "shaver"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "shaver",
+      "strongest": 0.15203449385363307,
+      "margin": 0.06867331874017556
+    },
+    {
+      "id": "shaver-old-07",
+      "source_group": "wikimedia|landing_url|https://commons.wikimedia.org/w/index.php?curid=47349214",
+      "kind": "supported",
+      "expected": "shaver",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "shaver"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "shaver",
+      "strongest": 0.1514582139364258,
+      "margin": 0.08740066421012709
+    },
+    {
+      "id": "portable_heater-old-08",
+      "source_group": "amazon_berkeley_objects|source_item_id|B07HGFB3FQ",
+      "kind": "supported",
+      "expected": "portable_heater",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "portable_heater"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "portable_heater",
+      "strongest": 0.14827995596373725,
+      "margin": 0.06803291628320236
+    },
+    {
+      "id": "shaver-old-09",
+      "source_group": "philishave s3552 shaver",
+      "kind": "supported",
+      "expected": "shaver",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "shaver"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "shaver",
+      "strongest": 0.15124616569357352,
+      "margin": 0.05374926254218265
+    },
+    {
+      "id": "dehumidifier-old-10",
+      "source_group": "flickr|landing_url|https://www.flickr.com/photos/10581108@N00/7154730084",
+      "kind": "supported",
+      "expected": "dehumidifier",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "clothes_dryer",
+        "portable_ac",
+        "washing_machine"
+      ],
+      "correct": false,
+      "reason": "similar_types",
+      "raw_top1": "clothes_dryer",
+      "strongest": 0.12508118391258896,
+      "margin": 0.048258403526954013
+    },
+    {
+      "id": "portable_ac-old-08",
+      "source_group": "wikimedia|landing_url|https://commons.wikimedia.org/w/index.php?curid=193568236",
+      "kind": "supported",
+      "expected": "portable_ac",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "portable_ac"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "portable_ac",
+      "strongest": 0.1602246760604903,
+      "margin": 0.07084420463376878
+    },
+    {
+      "id": "food_processor-old-11",
+      "source_group": "flickr|landing_url|https://www.flickr.com/photos/93178668@N00/48924725401",
+      "kind": "supported",
+      "expected": "food_processor",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "food_processor"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "food_processor",
+      "strongest": 0.14202972697643268,
+      "margin": 0.07599108120267169
+    },
+    {
+      "id": "shaver-old-12",
+      "source_group": "wikimedia|landing_url|https://commons.wikimedia.org/w/index.php?curid=176885665",
+      "kind": "supported",
+      "expected": "shaver",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "shaver"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "shaver",
+      "strongest": 0.15006722618835627,
+      "margin": 0.07168179662764623
+    },
+    {
+      "id": "straightener-old-02",
+      "source_group": "wikimedia|landing_url|https://commons.wikimedia.org/w/index.php?curid=133877442",
+      "kind": "supported",
+      "expected": "straightener",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "straightener"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "straightener",
+      "strongest": 0.12840013611655302,
+      "margin": 0.08144004755347001
+    },
+    {
+      "id": "portable_heater-old-09",
+      "source_group": "amazon_berkeley_objects|source_item_id|B07DCJ8NSV",
+      "kind": "supported",
+      "expected": "portable_heater",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "portable_heater"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "portable_heater",
+      "strongest": 0.1632077015317851,
+      "margin": 0.07666073304860488
+    },
+    {
+      "id": "sandwich_press-old-08",
+      "source_group": "https://commons.wikimedia.org/w/index.php?curid=198191921",
+      "kind": "supported",
+      "expected": "sandwich_press",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "sandwich_press"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "sandwich_press",
+      "strongest": 0.15975341444807942,
+      "margin": 0.07291780170420474
+    },
+    {
+      "id": "straightener-old-04",
+      "source_group": "amazon_berkeley_objects|source_item_id|B07ZTVWSNG",
+      "kind": "supported",
+      "expected": "straightener",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "straightener"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "straightener",
+      "strongest": 0.14510541332083587,
+      "margin": 0.09141476167259452
+    },
+    {
+      "id": "dehumidifier-old-16",
+      "source_group": "wikimedia|landing_url|https://commons.wikimedia.org/w/index.php?curid=140455249",
+      "kind": "supported",
+      "expected": "dehumidifier",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "dehumidifier"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "dehumidifier",
+      "strongest": 0.13857214503605986,
+      "margin": 0.03869342711057143
+    },
+    {
+      "id": "steam_cleaner-old-06",
+      "source_group": "dampfreiniger betrieb",
+      "kind": "supported",
+      "expected": "steam_cleaner",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "steam_cleaner",
+        "vacuum_cleaner"
+      ],
+      "correct": true,
+      "reason": "similar_types",
+      "raw_top1": "steam_cleaner",
+      "strongest": 0.14395154020323475,
+      "margin": 0.05828595283441819
+    },
+    {
+      "id": "dehumidifier-old-21",
+      "source_group": "wikimedia|landing_url|https://commons.wikimedia.org/w/index.php?curid=136381994",
+      "kind": "supported",
+      "expected": "dehumidifier",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "portable_ac",
+        "dehumidifier"
+      ],
+      "correct": true,
+      "reason": "similar_types",
+      "raw_top1": "portable_ac",
+      "strongest": 0.14604462591793926,
+      "margin": 0.046152958436166666
+    },
+    {
+      "id": "dehumidifier-old-23",
+      "source_group": "raumentfeuchter wd18",
+      "kind": "supported",
+      "expected": "dehumidifier",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "portable_ac",
+        "dehumidifier",
+        "portable_heater"
+      ],
+      "correct": true,
+      "reason": "similar_types",
+      "raw_top1": "portable_ac",
+      "strongest": 0.15712380648888136,
+      "margin": 0.08433693122270891
+    },
+    {
+      "id": "portable_heater-old-16",
+      "source_group": "https://commons.wikimedia.org/w/index.php?curid=799736",
+      "kind": "supported",
+      "expected": "portable_heater",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "portable_heater"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "portable_heater",
+      "strongest": 0.13441986572582681,
+      "margin": 0.04588189147272263
+    },
+    {
+      "id": "food_processor-old-22",
+      "source_group": "flickr|landing_url|https://www.flickr.com/photos/27887748@N00/14845606007",
+      "kind": "supported",
+      "expected": "food_processor",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "food_processor",
+        "blender"
+      ],
+      "correct": true,
+      "reason": "similar_types",
+      "raw_top1": "food_processor",
+      "strongest": 0.11922986150435876,
+      "margin": 0.034361671539216945
+    },
+    {
+      "id": "portable_ac-old-17",
+      "source_group": "flickr|landing_url|https://www.flickr.com/photos/28958738@N06/7002031177",
+      "kind": "supported",
+      "expected": "portable_ac",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "portable_ac",
+        "dehumidifier"
+      ],
+      "correct": true,
+      "reason": "similar_types",
+      "raw_top1": "portable_ac",
+      "strongest": 0.15469220201927458,
+      "margin": 0.05407603735847055
+    },
+    {
+      "id": "portable_ac-old-19",
+      "source_group": "flickr|landing_url|https://www.flickr.com/photos/18362614@N00/18511068729",
+      "kind": "supported",
+      "expected": "portable_ac",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "portable_ac"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "portable_ac",
+      "strongest": 0.1616884688061469,
+      "margin": 0.09486378523738245
+    },
+    {
+      "id": "straightener-old-17",
+      "source_group": "wikimedia|landing_url|https://commons.wikimedia.org/w/index.php?curid=21961759",
+      "kind": "supported",
+      "expected": "straightener",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "straightener"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "straightener",
+      "strongest": 0.13299200320471083,
+      "margin": 0.06389280041031709
+    },
+    {
+      "id": "sandwich_press-old-15",
+      "source_group": "https://commons.wikimedia.org/w/index.php?curid=81140345",
+      "kind": "supported",
+      "expected": "sandwich_press",
+      "reused_development": true,
+      "accepted": true,
+      "choices": [
+        "sandwich_press"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "sandwich_press",
+      "strongest": 0.1259223525083484,
+      "margin": 0.03901616763057336
+    },
+    {
+      "id": "refrigerator-commons-02",
+      "source_group": "commons-page-21183276",
+      "kind": "supported",
+      "expected": "refrigerator",
+      "reused_development": false,
+      "accepted": true,
+      "choices": [
+        "refrigerator"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "refrigerator",
+      "strongest": 0.13100499595752527,
+      "margin": 0.07438308641149086
+    },
+    {
+      "id": "refrigerator-commons-03",
+      "source_group": "commons-page-24759004",
+      "kind": "supported",
+      "expected": "refrigerator",
+      "reused_development": false,
+      "accepted": true,
+      "choices": [
+        "refrigerator"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "refrigerator",
+      "strongest": 0.11827800862449207,
+      "margin": 0.05300921283989833
+    },
+    {
+      "id": "refrigerator-commons-07",
+      "source_group": "commons-page-84039768",
+      "kind": "supported",
+      "expected": "refrigerator",
+      "reused_development": false,
+      "accepted": true,
+      "choices": [
+        "refrigerator"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "refrigerator",
+      "strongest": 0.14181188507077908,
+      "margin": 0.05005345947142151
+    },
+    {
+      "id": "refrigerator-commons-11",
+      "source_group": "commons-page-145191615",
+      "kind": "supported",
+      "expected": "refrigerator",
+      "reused_development": false,
+      "accepted": true,
+      "choices": [
+        "refrigerator"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "refrigerator",
+      "strongest": 0.13455874160569822,
+      "margin": 0.05045285053244403
+    },
+    {
+      "id": "food_processor-commons-14",
+      "source_group": "commons-page-142538144",
+      "kind": "supported",
+      "expected": "food_processor",
+      "reused_development": false,
+      "accepted": true,
+      "choices": [
+        "food_processor"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "food_processor",
+      "strongest": 0.1300168323647815,
+      "margin": 0.05640378873107926
+    },
+    {
+      "id": "sandwich_press-commons-03",
+      "source_group": "commons-page-21484453",
+      "kind": "supported",
+      "expected": "sandwich_press",
+      "reused_development": false,
+      "accepted": true,
+      "choices": [
+        "sandwich_press"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "sandwich_press",
+      "strongest": 0.14747864443485348,
+      "margin": 0.08227876880187587
+    },
+    {
+      "id": "portable_ac-commons-16",
+      "source_group": "commons-page-195458708",
+      "kind": "supported",
+      "expected": "portable_ac",
+      "reused_development": false,
+      "accepted": true,
+      "choices": [
+        "portable_ac"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "portable_ac",
+      "strongest": 0.15508421105335243,
+      "margin": 0.07263843048911052
+    },
+    {
+      "id": "headphones-commons-04",
+      "source_group": "commons-page-48773653",
+      "kind": "supported",
+      "expected": "headphones",
+      "reused_development": false,
+      "accepted": true,
+      "choices": [
+        "headphones"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "headphones",
+      "strongest": 0.09844962637107102,
+      "margin": 0.04194236553573098
+    },
+    {
+      "id": "headphones-commons-06",
+      "source_group": "commons-page-61888742",
+      "kind": "supported",
+      "expected": "headphones",
+      "reused_development": false,
+      "accepted": true,
+      "choices": [
+        "headphones"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "headphones",
+      "strongest": 0.10542707991384583,
+      "margin": 0.04726688751742019
+    },
+    {
+      "id": "headphones-commons-11",
+      "source_group": "commons-page-115847308",
+      "kind": "supported",
+      "expected": "headphones",
+      "reused_development": false,
+      "accepted": true,
+      "choices": [
+        "headphones"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "headphones",
+      "strongest": 0.12332618664801166,
+      "margin": 0.060363712665678845
+    },
+    {
+      "id": "games_console-commons-05",
+      "source_group": "commons-page-17288445",
+      "kind": "supported",
+      "expected": "games_console",
+      "reused_development": false,
+      "accepted": true,
+      "choices": [
+        "games_console"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "games_console",
+      "strongest": 0.1409659049850919,
+      "margin": 0.07123443532929402
+    },
+    {
+      "id": "games_console-commons-09",
+      "source_group": "commons-page-18370417",
+      "kind": "supported",
+      "expected": "games_console",
+      "reused_development": false,
+      "accepted": true,
+      "choices": [
+        "games_console"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "games_console",
+      "strongest": 0.135988137594086,
+      "margin": 0.06930152519460522
+    },
+    {
+      "id": "games_console-commons-10",
+      "source_group": "visual-family-games-console-evan-amos-ps4-ds4",
+      "kind": "supported",
+      "expected": "games_console",
+      "reused_development": false,
+      "accepted": true,
+      "choices": [
+        "games_console"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "games_console",
+      "strongest": 0.13408994135187824,
+      "margin": 0.060714084043729674
+    },
+    {
+      "id": "games_console-commons-14",
+      "source_group": "commons-page-50627789",
+      "kind": "supported",
+      "expected": "games_console",
+      "reused_development": false,
+      "accepted": true,
+      "choices": [
+        "games_console"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "games_console",
+      "strongest": 0.1380813348641112,
+      "margin": 0.062244815907501416
+    },
+    {
+      "id": "clothes_dryer-commons-04",
+      "source_group": "commons-page-19239179",
+      "kind": "supported",
+      "expected": "clothes_dryer",
+      "reused_development": false,
+      "accepted": true,
+      "choices": [
+        "clothes_dryer",
+        "washing_machine"
+      ],
+      "correct": true,
+      "reason": "similar_types",
+      "raw_top1": "clothes_dryer",
+      "strongest": 0.14610775325685105,
+      "margin": 0.0664841058426594
+    },
+    {
+      "id": "clothes_dryer-commons-13",
+      "source_group": "commons-page-146905476",
+      "kind": "supported",
+      "expected": "clothes_dryer",
+      "reused_development": false,
+      "accepted": true,
+      "choices": [
+        "washing_machine"
+      ],
+      "correct": false,
+      "reason": "needs_confirmation",
+      "raw_top1": "washing_machine",
+      "strongest": 0.13488229839490534,
+      "margin": 0.07267828284510938
+    },
+    {
+      "id": "clothes_dryer-commons-16",
+      "source_group": "commons-page-193983525",
+      "kind": "supported",
+      "expected": "clothes_dryer",
+      "reused_development": false,
+      "accepted": true,
+      "choices": [
+        "clothes_dryer",
+        "washing_machine"
+      ],
+      "correct": true,
+      "reason": "similar_types",
+      "raw_top1": "clothes_dryer",
+      "strongest": 0.1390144262810143,
+      "margin": 0.06255414502897942
+    },
+    {
+      "id": "straightener-commons-02",
+      "source_group": "commons-page-10311053",
+      "kind": "supported",
+      "expected": "straightener",
+      "reused_development": false,
+      "accepted": true,
+      "choices": [
+        "straightener"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "straightener",
+      "strongest": 0.15294981638850447,
+      "margin": 0.06006751854835579
+    },
+    {
+      "id": "electric_toothbrush-commons-03",
+      "source_group": "commons-page-87590162",
+      "kind": "supported",
+      "expected": "electric_toothbrush",
+      "reused_development": false,
+      "accepted": true,
+      "choices": [
+        "electric_toothbrush"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "electric_toothbrush",
+      "strongest": 0.1501096028643685,
+      "margin": 0.07090852170446493
+    },
+    {
+      "id": "electric_toothbrush-commons-16",
+      "source_group": "commons-page-148028029",
+      "kind": "supported",
+      "expected": "electric_toothbrush",
+      "reused_development": false,
+      "accepted": true,
+      "choices": [
+        "electric_toothbrush"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "electric_toothbrush",
+      "strongest": 0.14178840369144632,
+      "margin": 0.065560757374017
+    },
+    {
+      "id": "cordless_drill-commons-05",
+      "source_group": "commons-page-59305765",
+      "kind": "supported",
+      "expected": "cordless_drill",
+      "reused_development": false,
+      "accepted": true,
+      "choices": [
+        "cordless_drill"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "cordless_drill",
+      "strongest": 0.14379437714028062,
+      "margin": 0.05631027750188082
+    },
+    {
+      "id": "cordless_drill-commons-07",
+      "source_group": "commons-page-69031623",
+      "kind": "supported",
+      "expected": "cordless_drill",
+      "reused_development": false,
+      "accepted": true,
+      "choices": [
+        "cordless_drill"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "cordless_drill",
+      "strongest": 0.14737439010127687,
+      "margin": 0.06317198812449518
+    },
+    {
+      "id": "cordless_drill-commons-15",
+      "source_group": "commons-page-162885317",
+      "kind": "supported",
+      "expected": "cordless_drill",
+      "reused_development": false,
+      "accepted": true,
+      "choices": [
+        "cordless_drill"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "cordless_drill",
+      "strongest": 0.1565520703859179,
+      "margin": 0.05099398909840838
+    },
+    {
+      "id": "cordless_drill-commons-16",
+      "source_group": "commons-page-173841952",
+      "kind": "supported",
+      "expected": "cordless_drill",
+      "reused_development": false,
+      "accepted": true,
+      "choices": [
+        "cordless_drill"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "cordless_drill",
+      "strongest": 0.147426524538194,
+      "margin": 0.052404603713512146
+    },
+    {
+      "id": "sewing_machine-commons-12",
+      "source_group": "visual-family-sewing-singer-most-craft",
+      "kind": "supported",
+      "expected": "sewing_machine",
+      "reused_development": false,
+      "accepted": true,
+      "choices": [
+        "sewing_machine"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "sewing_machine",
+      "strongest": 0.1519964206886311,
+      "margin": 0.06796244965277937
+    },
+    {
+      "id": "sewing_machine-commons-15",
+      "source_group": "commons-page-149276450",
+      "kind": "supported",
+      "expected": "sewing_machine",
+      "reused_development": false,
+      "accepted": true,
+      "choices": [
+        "sewing_machine"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "sewing_machine",
+      "strongest": 0.14820785094174907,
+      "margin": 0.06809268361594845
+    },
+    {
+      "id": "sewing_machine-commons-16",
+      "source_group": "commons-page-175189794",
+      "kind": "supported",
+      "expected": "sewing_machine",
+      "reused_development": false,
+      "accepted": true,
+      "choices": [
+        "sewing_machine"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "sewing_machine",
+      "strongest": 0.1520336864944235,
+      "margin": 0.07256865865902404
+    },
+    {
+      "id": "sandwich_press-extra-commons-06",
+      "source_group": "commons-page-55047014",
+      "kind": "supported",
+      "expected": "sandwich_press",
+      "reused_development": false,
+      "accepted": true,
+      "choices": [
+        "sandwich_press"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "sandwich_press",
+      "strongest": 0.1414111224162171,
+      "margin": 0.08242605817258286
+    },
+    {
+      "id": "electric_toothbrush-extra-commons-02",
+      "source_group": "commons-page-87599882",
+      "kind": "supported",
+      "expected": "electric_toothbrush",
+      "reused_development": false,
+      "accepted": true,
+      "choices": [
+        "electric_toothbrush"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "electric_toothbrush",
+      "strongest": 0.1607561855974816,
+      "margin": 0.08680014686068108
+    },
+    {
+      "id": "electric_toothbrush-extra-commons-07",
+      "source_group": "commons-page-120325129",
+      "kind": "supported",
+      "expected": "electric_toothbrush",
+      "reused_development": false,
+      "accepted": true,
+      "choices": [
+        "electric_toothbrush"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "electric_toothbrush",
+      "strongest": 0.16065977318256897,
+      "margin": 0.08499861202971365
+    },
+    {
+      "id": "headphones-extra-commons-02",
+      "source_group": "commons-page-7170618",
+      "kind": "supported",
+      "expected": "headphones",
+      "reused_development": false,
+      "accepted": true,
+      "choices": [
+        "headphones"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "headphones",
+      "strongest": 0.10619490109068619,
+      "margin": 0.030235004190008102
+    },
+    {
+      "id": "printer-extra-commons-09",
+      "source_group": "commons-page-84102357",
+      "kind": "supported",
+      "expected": "printer",
+      "reused_development": false,
+      "accepted": true,
+      "choices": [
+        "printer"
+      ],
+      "correct": true,
+      "reason": "needs_confirmation",
+      "raw_top1": "printer",
+      "strongest": 0.13828222726881895,
+      "margin": 0.05934128411063916
+    },
+    {
+      "id": "computer_monitor-commons-05",
+      "source_group": "commons-page-42177567",
+      "kind": "unrelated",
+      "expected": null,
+      "reused_development": false,
+      "accepted": false,
+      "choices": [],
+      "correct": false,
+      "reason": "not_sure",
+      "raw_top1": "television",
+      "strongest": 0.13224490730304714,
+      "margin": 0.019851308534252765
+    },
+    {
+      "id": "remote_control-commons-01",
+      "source_group": "commons-page-100645",
+      "kind": "unrelated",
+      "expected": null,
+      "reused_development": false,
+      "accepted": false,
+      "choices": [],
+      "correct": false,
+      "reason": "not_sure",
+      "raw_top1": "television",
+      "strongest": 0.0940249306355726,
+      "margin": -0.05169776920008795
+    },
+    {
+      "id": "remote_control-commons-07",
+      "source_group": "commons-page-67417971",
+      "kind": "unrelated",
+      "expected": null,
+      "reused_development": false,
+      "accepted": false,
+      "choices": [],
+      "correct": false,
+      "reason": "not_sure",
+      "raw_top1": "television",
+      "strongest": 0.07968754475342314,
+      "margin": -0.05438807275211642
+    },
+    {
+      "id": "keyboard_or_mouse-commons-05",
+      "source_group": "commons-page-39981764",
+      "kind": "unrelated",
+      "expected": null,
+      "reused_development": false,
+      "accepted": false,
+      "choices": [],
+      "correct": false,
+      "reason": "not_sure",
+      "raw_top1": "printer",
+      "strongest": 0.07432533881295578,
+      "margin": -0.06790150427742972
+    },
+    {
+      "id": "keyboard_or_mouse-commons-10",
+      "source_group": "commons-page-94670104",
+      "kind": "unrelated",
+      "expected": null,
+      "reused_development": false,
+      "accepted": false,
+      "choices": [],
+      "correct": false,
+      "reason": "not_sure",
+      "raw_top1": "printer",
+      "strongest": 0.06951812068792645,
+      "margin": -0.0770022889652549
+    }
+  ]
+}

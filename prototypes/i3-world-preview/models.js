@@ -4,8 +4,11 @@
  * Shapes are teaching illustrations, not manufacturer models or repair diagrams.
  */
 import * as THREE from './vendor/three.module.js';
+import { EXPANDED_PARTS_LARGE, createExpandedLargeBuilders } from './models-expanded-large.js';
+import { EXPANDED_PARTS_DEVICES, createExpandedDeviceBuilders } from './models-expanded-devices.js';
 
 export const MODEL_PARTS = Object.freeze({
+  ...EXPANDED_PARTS_LARGE, ...EXPANDED_PARTS_DEVICES,
   kettle: ['body', 'lid', 'handle', 'heater', 'base'],
   fan: ['grille', 'blades', 'motor', 'base'],
   toaster: ['body', 'slots', 'lever', 'crumb-tray'],
@@ -362,7 +365,9 @@ function mixer(root) {
   for (const x of [-.53, .65]) for (const z of [-.36, .36]) cylinder(base, .055, .055, .04, 'ink', [x, .025, z]);
 }
 
-const builders = { kettle, fan, toaster, blender, microwave, vacuum, hairdryer, laptop,
+// Inject the same helpers so all 32 models share highlighting, disposal and AR.
+const kit = { part, piece, box, cylinder, ring, tube, roundedBox };
+const builders = { ...createExpandedLargeBuilders(kit), ...createExpandedDeviceBuilders(kit), kettle, fan, toaster, blender, microwave, vacuum, hairdryer, laptop,
   ricecooker, airfryer, coffeemachine, mixer };
 
 /** Public factory returns a model with stable semantic groups and no network calls. */

@@ -1,0 +1,8 @@
+<!doctype html>
+<!-- Local development evidence only. Flask does not serve this test page. -->
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Explore AI · local browser check</title>
+<style>
+/* Compact evidence grid: pictures and expected labels remain visible beside results. */
+body{font:16px system-ui;margin:30px;background:#f3f7fb;color:#132d43}main{max-width:1250px;margin:auto}button{padding:12px 20px;font:inherit;border:0;border-radius:12px;background:#176e66;color:white;cursor:pointer}button:disabled{opacity:.55}#cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:22px}article{padding:16px;background:white;border:1px solid #ccdbe3;border-radius:15px}img{height:135px;width:100%;object-fit:contain}h2{font-size:18px}p{line-height:1.5}a{color:#176e66}small{display:block}article[data-result="correct"]{border:3px solid #2c8561}article[data-result="rejected"]{border:3px solid #a07a30}article[data-result="wrong"]{border:3px solid #b14f4b}
+</style><script type="module" src="/__explore-test/runner.js"></script></head>
+<body><main><h1>Explore AI · browser check</h1><p>This local test uses public licensed photos and labelled synthetic controls with the real browser model. These limited development samples are not an independent population accuracy test. No acceptance threshold changes during this check.</p><button id="run" disabled>Check sample photos</button> <a href="/prototypes/i3-world-preview/#explore">Open the Explore preview</a><p id="status" role="status">Loading the public samples…</p><details><summary>Evidence report</summary><pre id="report"></pre></details><div id="cards"></div></main></body></html>

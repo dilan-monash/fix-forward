@@ -6,10 +6,11 @@ import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import { CATALOGUE, calculateImpact, findAppliance, GRID_FACTORS } from './catalogue.js';
 import { MODEL_PARTS } from './models.js';
-import { mountExplore, layoutHotspots } from './explore.js';
+import { mountExplore, layoutHotspots, productIcon } from './explore.js';
+import { EXPLORE_ACTIVE_ITEMS } from '../../src/explore-catalogue.js';
 
 /** One fixture per test avoids global DOM state and reproduces route disposal. */
-async function fixture(route = 'explore', supported = false) {
+async function fixture(route = 'explore', supported = false, photoHelperOptions = {}) {
   const dom = new JSDOM('<main><div id="host"></div></main>', { url: 'http://127.0.0.1:5524/#explore' });
   const host = dom.window.document.querySelector('#host');
   const calls = [], awards = [], lessons = [];
@@ -18,8 +19,9 @@ async function fixture(route = 'explore', supported = false) {
   engine.isARSupported = supported;
   engine.enterAR = async () => { calls.push(['enterAR']); };
   const cleanup = await mountExplore(host, {
-    route, worldFactory: async (canvas, options) => { callbacks = options; return engine; },
+    route, worldFactory: async (canvas, options) => { calls.push(['createWorld', options.appliance]); callbacks = options; return engine; },
     onAward: (...args) => awards.push(args), onLearn: lesson => lessons.push(lesson),
+    photoHelperOptions: { availability: async () => ({ available: false }), releaseModel: () => {}, validateContent: async () => ({ width: 1, height: 1 }), ...photoHelperOptions },
   });
   const click = selector => { const item = host.querySelector(selector); assert.ok(item, `Control exists: ${selector}`); item.click(); return item; };
   const edit = (name, value) => {
@@ -45,7 +47,7 @@ test('zero use is valid but missing, nonfinite, negative and unreasonable entrie
 });
 
 test('every catalogue part maps to a real selectable mesh rather than a dead hotspot', () => {
-  assert.equal(CATALOGUE.length, 12);
+  assert.equal(CATALOGUE.length, 32);
   for (const product of CATALOGUE) assert.deepEqual(product.parts.map(part => part.id).sort(), [...MODEL_PARTS[product.id]].sort());
   assert.equal(findAppliance('Vacuum cleaner').id, 'vacuum');
   assert.equal(findAppliance('Kettle').id, 'kettle');
@@ -161,7 +163,7 @@ test('tab keys activate the next panel without trapping keyboard navigation', as
 test('prominent selector exposes all products and synchronises the 3D view and cards', async () => {
   const f = await fixture();
   const picker = f.host.querySelector('[data-product-picker]');
-  assert.equal(picker.options.length, CATALOGUE.length);
+  assert.equal(picker.options.length, EXPLORE_ACTIVE_ITEMS.length);
   assert.equal(f.host.querySelector('[data-world="enter-room"]'), null);
   picker.value = 'laptop';
   picker.dispatchEvent(new f.dom.window.Event('change', { bubbles: true }));
@@ -190,7 +192,7 @@ test('navigating away during asynchronous engine startup never overwrites the ne
   let finishEngine;
   let disposals = 0;
   const pendingEngine = new Promise(resolve => { finishEngine = resolve; });
-  const mounting = mountExplore(host, { route: 'explore', signal: navigation.signal, worldFactory: () => pendingEngine });
+  const mounting = mountExplore(host, { route: 'explore', signal: navigation.signal, worldFactory: () => pendingEngine, photoHelperOptions: { availability: async () => ({ available: false }), releaseModel: () => {} } });
   navigation.abort();
   host.innerHTML = '<h1>The next page</h1>';
   finishEngine({ dispose: () => { disposals++; } });
@@ -249,4 +251,239 @@ test('nearby 3D anchors produce separate finger targets and retain connector end
       for (const other of placed.slice(index + 1)) assert.ok(Math.hypot(point.pixelX - other.pixelX, point.pixelY - other.pixelY) >= 48);
     });
   }
+});
+
+/** These assertions deliberately inspect the real scene API calls. A matching
+ * title alone would miss the old findAppliance fallback drawing a kettle. */
+test('all 32 manual items select their own real geometry and keep parts, care and impact available', async () => {
+  const f = await fixture();
+  assert.equal(EXPLORE_ACTIVE_ITEMS.length, 32);
+  for (const item of EXPLORE_ACTIVE_ITEMS) {
+    // First choose another item, so a missing renderer call cannot pass just
+    // because this is the same model that was already displayed on entry.
+    f.click(`[data-product="${item.worldId === 'fan' ? 'kettle' : 'fan'}"]`);
+    f.click(`[data-product="${item.worldId}"]`);
+    const product = findAppliance(item.worldId);
+    assert.equal(f.calls.filter(call => call[0] === 'setAppliance').at(-1)[1], item.worldId, item.slug);
+    assert.equal(f.host.querySelector('#appliance-title').textContent, product.name);
+    assert.equal(f.host.querySelector('.explore-workspace').hidden, false);
+    assert.equal(f.host.querySelector('.explore-to-action').hidden, false);
+    assert.equal(f.host.querySelector('[data-product-picker]').value, item.worldId);
+    assert.equal(f.host.querySelectorAll('.explore-part-list button').length, product.parts.length);
+    assert.equal(f.host.querySelector('.explore-pending-model'), null);
+  }
+  f.cleanup(); f.dom.window.close();
+});
+
+test('every direct recognition-slug route starts the matching 3D engine, including the 20 added lessons', async () => {
+  for (const item of EXPLORE_ACTIVE_ITEMS) {
+    const f = await fixture(`explore?appliance=${item.slug}`);
+    assert.deepEqual(f.calls.find(call => call[0] === 'createWorld'), ['createWorld', item.worldId], item.slug);
+    assert.equal(f.host.querySelector('#appliance-title').textContent, findAppliance(item.worldId).name);
+    assert.equal(f.host.querySelector('.explore-pending-model'), null);
+    f.cleanup(); f.dom.window.close();
+  }
+});
+
+test('photo suggestions change no scene before confirmation and map recognition slugs to existing world IDs', async () => {
+  let candidate = 'vacuum_cleaner';
+  const f = await fixture('explore', false, {
+    availability: async () => ({ available: true, experimental: true, downloadSizeMb: 92 }),
+    classify: async () => ({ accepted: true, requiresConfirmation: true, alternatives: [{ slug: candidate }] }),
+    readPreview: async () => 'data:image/jpeg;base64,ZmFrZQ==',
+  });
+  for (const [slug, worldId] of [['vacuum_cleaner', 'vacuum'], ['hair_dryer', 'hairdryer'], ['rice_cooker', 'ricecooker'], ['air_fryer', 'airfryer'], ['coffee_machine', 'coffeemachine']]) {
+    candidate = slug;
+    const input = f.host.querySelector('[data-explore-photo-input]');
+    Object.defineProperty(input, 'files', { configurable: true, value: [new f.dom.window.File(['pixels'], 'local.jpg', { type: 'image/jpeg' })] });
+    input.dispatchEvent(new f.dom.window.Event('change', { bubbles: true }));
+    await new Promise(resolve => setImmediate(resolve));
+    const callsBefore = f.calls.length;
+    f.click('[data-explore-photo-check]');
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(f.calls.length, callsBefore, 'A photo prediction itself must never change the world');
+    f.click('[data-explore-photo-confirm]');
+    assert.equal(f.calls.filter(call => call[0] === 'setAppliance').at(-1)[1], worldId);
+    assert.equal(f.host.querySelector('[data-product-picker]').value, worldId);
+  }
+  f.cleanup(); f.dom.window.close();
+});
+
+test('manual selection cancels a pending photo guess and prevents late confirmation choices', async () => {
+  let finish, inferenceSignal;
+  const f = await fixture('explore', false, {
+    availability: async () => ({ available: true }),
+    classify: (file, { signal }) => { inferenceSignal = signal; return new Promise(resolve => { finish = resolve; }); },
+    readPreview: async () => 'data:image/jpeg;base64,ZmFrZQ==',
+  });
+  const input = f.host.querySelector('[data-explore-photo-input]');
+  Object.defineProperty(input, 'files', { configurable: true, value: [new f.dom.window.File(['pixels'], 'local.jpg', { type: 'image/jpeg' })] });
+  input.dispatchEvent(new f.dom.window.Event('change', { bubbles: true }));
+  await new Promise(resolve => setImmediate(resolve));
+  f.click('[data-explore-photo-check]');
+  f.click('[data-product="fan"]');
+  assert.equal(inferenceSignal.aborted, true);
+  finish({ accepted: true, alternatives: [{ slug: 'kettle' }] });
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(f.host.querySelector('#appliance-title').textContent, 'Fan');
+  assert.equal(f.host.querySelector('[data-explore-photo-confirm]'), null);
+  f.cleanup(); f.dom.window.close();
+});
+
+test('all 32 photo suggestions require confirmation before selecting their matching 3D lesson', async () => {
+  let candidate = 'smartphone';
+  const f = await fixture('explore', false, {
+    availability: async () => ({ available: true }),
+    classify: async () => ({ accepted: true, alternatives: [{ slug: candidate }] }),
+    readPreview: async () => 'data:image/jpeg;base64,ZmFrZQ==',
+  });
+  assert.equal(EXPLORE_ACTIVE_ITEMS.length, 32);
+  for (const item of EXPLORE_ACTIVE_ITEMS) {
+    candidate = item.slug;
+    const previous = item.worldId === 'fan' ? 'kettle' : 'fan';
+    f.click(`[data-product="${previous}"]`);
+    const input = f.host.querySelector('[data-explore-photo-input]');
+    Object.defineProperty(input, 'files', { configurable: true, value: [new f.dom.window.File(['pixels'], 'local.jpg', { type: 'image/jpeg' })] });
+    input.dispatchEvent(new f.dom.window.Event('change', { bubbles: true }));
+    await new Promise(resolve => setImmediate(resolve));
+    const callsBefore = f.calls.filter(call => call[0] === 'setAppliance').length;
+    f.click('[data-explore-photo-check]');
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(f.host.querySelector('.explore-workspace').hidden, false);
+    assert.equal(f.host.querySelector('#appliance-title').textContent, findAppliance(previous).name, 'The current model remains until confirmation');
+    assert.equal(f.calls.filter(call => call[0] === 'setAppliance').length, callsBefore, 'No 3D model call before confirmation');
+    f.click('[data-explore-photo-confirm]');
+    assert.equal(f.host.querySelector('.explore-workspace').hidden, false);
+    assert.equal(f.host.querySelector('#appliance-title').textContent, findAppliance(item.worldId).name);
+    assert.equal(f.host.querySelector('.explore-help-link').hidden, false);
+    assert.equal(f.calls.filter(call => call[0] === 'setAppliance').length, callsBefore + 1);
+    assert.equal(f.calls.filter(call => call[0] === 'setAppliance').at(-1)[1], item.worldId, item.slug);
+    assert.equal(f.host.querySelector('.explore-pending-model'), null);
+  }
+  f.cleanup(); f.dom.window.close();
+});
+
+test('all 32 items have individual icons, five native groups and a real matching model', async () => {
+  assert.equal(EXPLORE_ACTIVE_ITEMS.length, 32);
+  const withModels = EXPLORE_ACTIVE_ITEMS.filter(item => item.worldId);
+  assert.equal(withModels.length, 32);
+  assert.deepEqual(withModels.map(item => item.worldId).sort(), CATALOGUE.map(item => item.id).sort());
+  const icons = EXPLORE_ACTIVE_ITEMS.map(item => productIcon(item.worldId || item.slug));
+  assert.equal(new Set(icons).size, 32, 'Each item has its own recognisable navigation drawing');
+  for (const icon of icons) assert.notEqual(icon, productIcon('unknown'), 'No item should use the generic unknown icon');
+  const f = await fixture();
+  const picker = f.host.querySelector('[data-product-picker]');
+  assert.equal(picker.options.length, 32);
+  assert.equal(picker.querySelectorAll('optgroup').length, 5);
+  assert.equal(f.host.querySelectorAll('[data-product]').length, 32);
+  assert.equal([...picker.options].filter(option => /3D coming next/.test(option.textContent)).length, 0);
+  assert.match(f.host.querySelector('.explore-product-picker').textContent, /32 items.*32 available in 3D/);
+  for (const item of EXPLORE_ACTIVE_ITEMS) {
+    picker.value = item.worldId;
+    picker.dispatchEvent(new f.dom.window.Event('change', { bubbles: true }));
+    assert.equal(f.host.querySelector('#appliance-title').textContent, findAppliance(item.worldId).name);
+    assert.equal(f.host.querySelector(`[data-product="${item.worldId}"]`).getAttribute('aria-pressed'), 'true');
+  }
+  f.cleanup(); f.dom.window.close();
+});
+
+test('group filtering narrows cards without changing the scene and an outside selection reveals its card', async () => {
+  const f = await fixture();
+  const group = f.host.querySelector('[data-product-group]');
+  const visibleCards = () => [...f.host.querySelectorAll('[data-product]')].filter(button => !button.hidden);
+  const callsBefore = f.calls.length;
+  group.value = 'Workshop';
+  group.dispatchEvent(new f.dom.window.Event('change', { bubbles: true }));
+  assert.deepEqual(visibleCards().map(button => button.dataset.product), ['cordless_drill', 'sewing_machine']);
+  assert.match(f.host.querySelector('[data-product-count]').textContent, /2 items.*Workshop/);
+  assert.equal(f.calls.length, callsBefore, 'Filtering is navigation, not a model change');
+  assert.equal(f.host.querySelector('[data-product-picker]').options.length, 32, 'All items remain in the top picker');
+  const picker = f.host.querySelector('[data-product-picker]');
+  picker.value = 'refrigerator';
+  picker.dispatchEvent(new f.dom.window.Event('change', { bubbles: true }));
+  assert.equal(group.value, 'all');
+  assert.equal(visibleCards().length, 32);
+  assert.equal(f.host.querySelector('[data-product="refrigerator"]').getAttribute('aria-pressed'), 'true');
+  assert.equal(f.host.querySelector('#appliance-title').textContent, 'Refrigerator');
+  assert.equal(f.calls.filter(call => call[0] === 'setAppliance').at(-1)[1], 'refrigerator');
+  f.cleanup(); f.dom.window.close();
+});
+
+/** Every selected part must explain both its material connection and a useful
+ * care observation; testing the rendered text catches forgotten template wiring. */
+test('every part in all 32 lessons renders its own job, material, care and planet connection', async () => {
+  const f = await fixture();
+  for (const product of CATALOGUE) {
+    f.click(`[data-product="${product.id}"]`);
+    for (const part of product.parts) {
+      for (const field of ['job', 'material', 'care', 'impact'])
+        assert.ok(typeof part[field] === 'string' && part[field].trim().length > 15, `${product.id}/${part.id}: ${field}`);
+      f.click(`.explore-part-list [data-part="${part.id}"]`);
+      const detail = f.host.querySelector('.explore-part-detail');
+      const context = f.host.querySelector('.explore-part-context');
+      assert.ok(detail.textContent.includes(part.job), `${product.id}/${part.id}: job visible`);
+      assert.ok(detail.textContent.includes(part.material), `${product.id}/${part.id}: material visible`);
+      assert.ok(context.textContent.includes(part.care), `${product.id}/${part.id}: care visible`);
+      assert.ok(context.textContent.includes(part.impact), `${product.id}/${part.id}: planet connection visible`);
+      assert.equal(f.calls.filter(call => call[0] === 'setSelectedPart').at(-1)[1], part.id);
+    }
+  }
+  f.cleanup(); f.dom.window.close();
+});
+
+test('all 32 care and impact lessons keep their appliance in adult links and calculate finite example emissions', async () => {
+  const f = await fixture('explore?tab=care');
+  for (const product of CATALOGUE) {
+    f.click(`[data-product="${product.id}"]`);
+    f.click('[data-tab="care"]');
+    const care = f.host.querySelector('.explore-care-list');
+    assert.ok(care.querySelectorAll('li').length >= 3, `${product.id}: practical care steps`);
+    for (const [title, detail] of product.care) {
+      assert.ok(care.textContent.includes(title));
+      assert.ok(care.textContent.includes(detail));
+    }
+    assert.ok(f.host.querySelector('.explore-care-boundary').textContent.includes('Children explore the digital model'));
+    const links = [...f.host.querySelectorAll('.explore-action-links a'), f.host.querySelector('.explore-care-next')];
+    for (const link of links) {
+      const params = new URLSearchParams(link.hash.split('?')[1]);
+      assert.equal(params.get('appliance'), product.category, `${product.id}: adult category is retained`);
+      assert.ok(['repair', 'recall', 'recycle'].includes(params.get('kind')));
+    }
+    f.click('[data-tab="impact"]');
+    const values = Object.fromEntries(['watts', 'minutes', 'days', 'factor'].map(name => [name, Number(f.host.querySelector(`[name="${name}"]`).value)]));
+    const result = calculateImpact(values);
+    assert.ok(Number.isFinite(result?.kgCO2e) && Number.isFinite(result?.kwh), `${product.id}: finite calculation`);
+    const displayed = f.host.querySelector('[data-impact-result]').textContent;
+    assert.match(displayed, /kg CO₂e/);
+    assert.doesNotMatch(displayed, /NaN|undefined|Infinity/);
+    assert.equal(f.host.querySelector('[data-impact-error]').textContent, '');
+    assert.ok(f.host.querySelector('.explore-impact-tip').textContent.includes(product.energyTip));
+    assert.match(f.host.querySelector('.explore-impact-limits').textContent, /excludes making, transporting and disposing/i);
+  }
+  f.cleanup(); f.dom.window.close();
+});
+
+test('charging and continuous appliances explain different power and time assumptions', async () => {
+  const f = await fixture('explore?tab=impact');
+  const modes = new Set();
+  for (const product of CATALOGUE) {
+    f.click(`[data-product="${product.id}"]`);
+    f.click('[data-tab="impact"]');
+    const powerLabel = f.host.querySelector('[name="watts"]').closest('label').textContent;
+    const timeLabel = f.host.querySelector('[name="minutes"]').closest('label').textContent;
+    modes.add(product.energyMode || 'active');
+    if (product.energyMode === 'charging') {
+      assert.match(powerLabel, /Charging power/);
+      assert.match(timeLabel, /Daily charging time/);
+      assert.doesNotMatch(timeLabel, /active time/);
+    } else if (product.energyMode === 'continuous-average') {
+      assert.match(powerLabel, /Average power/);
+      assert.match(timeLabel, /Daily plugged-in time/);
+    } else {
+      assert.match(powerLabel, /Power/);
+      assert.match(timeLabel, /Daily active time/);
+    }
+  }
+  assert.ok(modes.has('charging') && modes.has('continuous-average') && modes.has('active'));
+  f.cleanup(); f.dom.window.close();
 });

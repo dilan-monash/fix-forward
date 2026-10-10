@@ -1,0 +1,1501 @@
+{
+  "scope": "Actual Chrome model run; limited development photos",
+  "candidate_id": "fixforward-explore-confirmation-preview-v2",
+  "active_count": 32,
+  "acceptance": {
+    "min_similarity": 0,
+    "min_ood_margin": 0.022335919226660474,
+    "max_choice_gap": 0.018,
+    "max_choices": 3
+  },
+  "text_manifest_sha256": "60c91d0d3ee7f2b8864b4a1a517907daf48e42bc9644beadbed17f59fe46f6f2",
+  "totals": {
+    "correct": 116,
+    "wrong": 2,
+    "rejected": 2,
+    "negativeRejected": 15,
+    "negativeOffered": 0
+  },
+  "cases": [
+    {
+      "id": "v1-air_fryer-commons-04",
+      "expected": "air_fryer",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "air_fryer"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-backpack-01",
+      "expected": null,
+      "kind": "unrelated",
+      "split": "holdout",
+      "accepted": false,
+      "choices": [],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-mixer-01",
+      "expected": "mixer",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "mixer",
+        "food_processor"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-kettle-01",
+      "expected": "kettle",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "kettle"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-blender-01",
+      "expected": "blender",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "blender",
+        "mixer"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-rice_cooker-04",
+      "expected": "rice_cooker",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "rice_cooker"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-hair_dryer-01",
+      "expected": "hair_dryer",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "hair_dryer"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-microwave-05",
+      "expected": "microwave",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "microwave"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-blender-04",
+      "expected": "blender",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "blender",
+        "mixer"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-kettle-05",
+      "expected": "kettle",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "kettle"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-shoes-02",
+      "expected": null,
+      "kind": "unrelated",
+      "split": "holdout",
+      "accepted": false,
+      "choices": [],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-coffee_machine-03",
+      "expected": "coffee_machine",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "coffee_machine"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-chair-03",
+      "expected": null,
+      "kind": "unrelated",
+      "split": "holdout",
+      "accepted": false,
+      "choices": [],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-fan-07",
+      "expected": "fan",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "fan",
+        "portable_heater"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-microwave-06",
+      "expected": "microwave",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "microwave"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-mixer-06",
+      "expected": "mixer",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "mixer",
+        "food_processor"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-microwave-07",
+      "expected": "microwave",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "microwave"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-coffee_machine-05",
+      "expected": "coffee_machine",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "coffee_machine"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-kettle-08",
+      "expected": "kettle",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "kettle",
+        "coffee_machine",
+        "blender"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-rice_cooker-07",
+      "expected": "rice_cooker",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "rice_cooker"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-hair_dryer-03",
+      "expected": "hair_dryer",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "hair_dryer"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-fan-09",
+      "expected": "fan",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "fan"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-vacuum_cleaner-05",
+      "expected": "vacuum_cleaner",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "vacuum_cleaner"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-mixer-07",
+      "expected": "mixer",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "mixer",
+        "food_processor"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-coffee_machine-09",
+      "expected": "coffee_machine",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "coffee_machine"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-fan-12",
+      "expected": "fan",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "fan"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-kettle-16",
+      "expected": "kettle",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "kettle"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-rice_cooker-09",
+      "expected": "rice_cooker",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "rice_cooker"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-mixer-10",
+      "expected": "mixer",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "mixer",
+        "food_processor"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-blender-08",
+      "expected": "blender",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "blender"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-air_fryer-05",
+      "expected": "air_fryer",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "air_fryer"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-rice_cooker-10",
+      "expected": "rice_cooker",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "rice_cooker"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-dishware_bowl-03",
+      "expected": null,
+      "kind": "unrelated",
+      "split": "holdout",
+      "accepted": false,
+      "choices": [],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-vacuum_cleaner-08",
+      "expected": "vacuum_cleaner",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "vacuum_cleaner"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-blender-11",
+      "expected": "blender",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "blender"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-vacuum_cleaner-11",
+      "expected": "vacuum_cleaner",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "vacuum_cleaner"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-toaster-08",
+      "expected": "toaster",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "toaster"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-fan-16",
+      "expected": "fan",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "fan"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-vacuum_cleaner-14",
+      "expected": "vacuum_cleaner",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "vacuum_cleaner",
+        "steam_cleaner"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-microwave-11",
+      "expected": "microwave",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "microwave"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-coffee_machine-16",
+      "expected": "coffee_machine",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "coffee_machine"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-toy_figure-03",
+      "expected": null,
+      "kind": "unrelated",
+      "split": "holdout",
+      "accepted": false,
+      "choices": [],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-hair_dryer-16",
+      "expected": "hair_dryer",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": false,
+      "choices": [],
+      "outcome": "rejected"
+    },
+    {
+      "id": "v1-bottle-03",
+      "expected": null,
+      "kind": "unrelated",
+      "split": "holdout",
+      "accepted": false,
+      "choices": [],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-toaster-18",
+      "expected": "toaster",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "toaster"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-hair_dryer-26",
+      "expected": "hair_dryer",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "food_processor",
+        "mixer",
+        "hair_dryer"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-air_fryer-09",
+      "expected": "air_fryer",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "air_fryer"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-toaster-25",
+      "expected": "toaster",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "toaster"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-toaster-27",
+      "expected": "toaster",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "toaster"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-air_fryer-15",
+      "expected": "air_fryer",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "air_fryer"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-laptop-new-05",
+      "expected": "laptop",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "laptop"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-laptop-new-15",
+      "expected": "laptop",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": false,
+      "choices": [],
+      "outcome": "rejected"
+    },
+    {
+      "id": "v1-laptop-new-17",
+      "expected": "laptop",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "laptop"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-laptop-new-21",
+      "expected": "laptop",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "laptop"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-smartphone-new-01",
+      "expected": "smartphone",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "smartphone"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-smartphone-new-02",
+      "expected": "smartphone",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "smartphone"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-smartphone-new-12",
+      "expected": "smartphone",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "smartphone"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-smartphone-new-13",
+      "expected": "smartphone",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "smartphone"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-tablet-new-02",
+      "expected": "tablet",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "tablet",
+        "laptop",
+        "headphones"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-tablet-new-09",
+      "expected": "tablet",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "tablet"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-tablet-new-14",
+      "expected": "tablet",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "tablet",
+        "smartphone"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-tablet-new-15",
+      "expected": "tablet",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "tablet"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-television-new-02",
+      "expected": "television",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "television"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-television-new-09",
+      "expected": "television",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "television"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-television-new-11",
+      "expected": "television",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "television"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-television-new-18",
+      "expected": "television",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "television"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-washing_machine-commons-05",
+      "expected": "washing_machine",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "washing_machine",
+        "clothes_dryer"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-washing_machine-commons-06",
+      "expected": "washing_machine",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "washing_machine",
+        "clothes_dryer"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-washing_machine-commons-08",
+      "expected": "washing_machine",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "washing_machine",
+        "clothes_dryer"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-washing_machine-commons-09",
+      "expected": "washing_machine",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "washing_machine",
+        "clothes_dryer"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-synthetic-black",
+      "expected": null,
+      "kind": "synthetic",
+      "split": "holdout",
+      "accepted": false,
+      "choices": [],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-synthetic-gray",
+      "expected": null,
+      "kind": "synthetic",
+      "split": "holdout",
+      "accepted": false,
+      "choices": [],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-synthetic-white",
+      "expected": null,
+      "kind": "synthetic",
+      "split": "holdout",
+      "accepted": false,
+      "choices": [],
+      "outcome": "correct"
+    },
+    {
+      "id": "v1-synthetic-noise",
+      "expected": null,
+      "kind": "synthetic",
+      "split": "holdout",
+      "accepted": false,
+      "choices": [],
+      "outcome": "correct"
+    },
+    {
+      "id": "portable_heater-old-01",
+      "expected": "portable_heater",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "portable_heater"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "food_processor-old-04",
+      "expected": "food_processor",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "food_processor"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "shaver-old-06",
+      "expected": "shaver",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "shaver"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "shaver-old-07",
+      "expected": "shaver",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "shaver"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "portable_heater-old-08",
+      "expected": "portable_heater",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "portable_heater"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "shaver-old-09",
+      "expected": "shaver",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "shaver"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "dehumidifier-old-10",
+      "expected": "dehumidifier",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "clothes_dryer",
+        "portable_ac",
+        "washing_machine"
+      ],
+      "outcome": "wrong"
+    },
+    {
+      "id": "portable_ac-old-08",
+      "expected": "portable_ac",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "portable_ac"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "food_processor-old-11",
+      "expected": "food_processor",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "food_processor"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "shaver-old-12",
+      "expected": "shaver",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "shaver"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "straightener-old-02",
+      "expected": "straightener",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "straightener"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "portable_heater-old-09",
+      "expected": "portable_heater",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "portable_heater"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "sandwich_press-old-08",
+      "expected": "sandwich_press",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "sandwich_press"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "straightener-old-04",
+      "expected": "straightener",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "straightener"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "dehumidifier-old-16",
+      "expected": "dehumidifier",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "dehumidifier"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "steam_cleaner-old-06",
+      "expected": "steam_cleaner",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "steam_cleaner"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "dehumidifier-old-21",
+      "expected": "dehumidifier",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "dehumidifier",
+        "portable_ac"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "dehumidifier-old-23",
+      "expected": "dehumidifier",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "portable_ac",
+        "dehumidifier",
+        "portable_heater"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "portable_heater-old-16",
+      "expected": "portable_heater",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "portable_heater"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "food_processor-old-22",
+      "expected": "food_processor",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "food_processor",
+        "blender"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "portable_ac-old-17",
+      "expected": "portable_ac",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "portable_ac",
+        "dehumidifier"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "portable_ac-old-19",
+      "expected": "portable_ac",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "portable_ac"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "straightener-old-17",
+      "expected": "straightener",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "straightener"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "sandwich_press-old-15",
+      "expected": "sandwich_press",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "sandwich_press",
+        "toaster"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "refrigerator-commons-02",
+      "expected": "refrigerator",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "refrigerator"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "refrigerator-commons-03",
+      "expected": "refrigerator",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "refrigerator"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "refrigerator-commons-07",
+      "expected": "refrigerator",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "refrigerator"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "refrigerator-commons-11",
+      "expected": "refrigerator",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "refrigerator"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "food_processor-commons-14",
+      "expected": "food_processor",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "food_processor"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "sandwich_press-commons-03",
+      "expected": "sandwich_press",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "sandwich_press"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "portable_ac-commons-16",
+      "expected": "portable_ac",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "portable_ac"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "headphones-commons-04",
+      "expected": "headphones",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "headphones"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "headphones-commons-06",
+      "expected": "headphones",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "headphones"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "headphones-commons-11",
+      "expected": "headphones",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "headphones"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "games_console-commons-05",
+      "expected": "games_console",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "games_console"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "games_console-commons-09",
+      "expected": "games_console",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "games_console"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "games_console-commons-10",
+      "expected": "games_console",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "games_console"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "games_console-commons-14",
+      "expected": "games_console",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "games_console"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "clothes_dryer-commons-04",
+      "expected": "clothes_dryer",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "clothes_dryer",
+        "washing_machine"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "clothes_dryer-commons-13",
+      "expected": "clothes_dryer",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "washing_machine"
+      ],
+      "outcome": "wrong"
+    },
+    {
+      "id": "clothes_dryer-commons-16",
+      "expected": "clothes_dryer",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "clothes_dryer",
+        "washing_machine"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "straightener-commons-02",
+      "expected": "straightener",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "straightener"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "electric_toothbrush-commons-03",
+      "expected": "electric_toothbrush",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "electric_toothbrush"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "electric_toothbrush-commons-16",
+      "expected": "electric_toothbrush",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "electric_toothbrush"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "cordless_drill-commons-05",
+      "expected": "cordless_drill",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "cordless_drill"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "cordless_drill-commons-07",
+      "expected": "cordless_drill",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "cordless_drill"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "cordless_drill-commons-15",
+      "expected": "cordless_drill",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "cordless_drill"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "cordless_drill-commons-16",
+      "expected": "cordless_drill",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "cordless_drill"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "sewing_machine-commons-12",
+      "expected": "sewing_machine",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "sewing_machine"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "sewing_machine-commons-15",
+      "expected": "sewing_machine",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "sewing_machine"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "sewing_machine-commons-16",
+      "expected": "sewing_machine",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "sewing_machine"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "sandwich_press-extra-commons-06",
+      "expected": "sandwich_press",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "sandwich_press"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "electric_toothbrush-extra-commons-02",
+      "expected": "electric_toothbrush",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "electric_toothbrush"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "electric_toothbrush-extra-commons-07",
+      "expected": "electric_toothbrush",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "electric_toothbrush"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "headphones-extra-commons-02",
+      "expected": "headphones",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "headphones"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "printer-extra-commons-09",
+      "expected": "printer",
+      "kind": "supported",
+      "split": "holdout",
+      "accepted": true,
+      "choices": [
+        "printer"
+      ],
+      "outcome": "correct"
+    },
+    {
+      "id": "computer_monitor-commons-05",
+      "expected": null,
+      "kind": "unrelated",
+      "split": "holdout",
+      "accepted": false,
+      "choices": [],
+      "outcome": "correct"
+    },
+    {
+      "id": "remote_control-commons-01",
+      "expected": null,
+      "kind": "unrelated",
+      "split": "holdout",
+      "accepted": false,
+      "choices": [],
+      "outcome": "correct"
+    },
+    {
+      "id": "remote_control-commons-07",
+      "expected": null,
+      "kind": "unrelated",
+      "split": "holdout",
+      "accepted": false,
+      "choices": [],
+      "outcome": "correct"
+    },
+    {
+      "id": "keyboard_or_mouse-commons-05",
+      "expected": null,
+      "kind": "unrelated",
+      "split": "holdout",
+      "accepted": false,
+      "choices": [],
+      "outcome": "correct"
+    },
+    {
+      "id": "keyboard_or_mouse-commons-10",
+      "expected": null,
+      "kind": "unrelated",
+      "split": "holdout",
+      "accepted": false,
+      "choices": [],
+      "outcome": "correct"
+    }
+  ]
+}

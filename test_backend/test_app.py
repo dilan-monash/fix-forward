@@ -38,6 +38,10 @@ class AppTests(unittest.TestCase):
             "model/appliance-siglip/model_manifest.json": "application/json",
             "model/appliance-siglip/text-embeddings.json": "application/json",
             "model/appliance-siglip/text-embeddings.f32": "application/octet-stream",
+            # Explore adds its own small policy/vector files, not another encoder.
+            "model/explore-siglip/model_manifest.json": "application/json",
+            "model/explore-siglip/text-embeddings.json": "application/json",
+            "model/explore-siglip/text-embeddings.f32": "application/octet-stream",
             "vendor/transformers/transformers.min.js": "application/javascript",
             "vendor/transformers/ort-wasm-simd-threaded.jsep.mjs": "text/javascript",
             "vendor/transformers/ort-wasm-simd-threaded.jsep.wasm": "application/wasm",
@@ -75,7 +79,10 @@ class AppTests(unittest.TestCase):
     # This build check binds the reviewed policy sizes and digests to the files.
     def test_vendored_siglip_runtime_and_model_match_frozen_size_and_sha256(self):
         self.assertEqual(set(SIGLIP_ASSET_INTEGRITY), SIGLIP_PUBLIC_ASSETS - {
+            # These mutable kill switches are strictly validated by each helper;
+            # immutable runtime/model/vector files must all retain byte hashes.
             "model/appliance-siglip/model_manifest.json",
+            "model/explore-siglip/model_manifest.json",
         })
         for relative_path, (size, digest) in SIGLIP_ASSET_INTEGRITY.items():
             with self.subTest(relative_path=relative_path):

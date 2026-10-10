@@ -20,7 +20,12 @@ class WorldRoutesTests(unittest.TestCase):
         return self.client.post("/login", data={"csrf_token": token, "password": password})
 
     def test_world_assets_and_legacy_are_protected(self):
-        for path in ("/", "/legacy", "/prototypes/i3-world-preview/app.js", "/prototypes/i3-world-preview/vendor/three.core.js"):
+        for path in ("/", "/legacy", "/prototypes/i3-world-preview/app.js", "/prototypes/i3-world-preview/vendor/three.core.js",
+                     "/prototypes/i3-world-preview/models-expanded-large.js",
+                     "/prototypes/i3-world-preview/models-expanded-devices.js",
+                     "/prototypes/i3-world-preview/catalogue-expanded.js",
+                     "/prototypes/i3-world-preview/catalogue-part-context.js",
+                     "/src/explore-photo-helper.css"):
             with self.client.get(path) as response:
                 self.assertEqual(response.status_code, 303)
         with self.client.get("/api/recalls") as response:
@@ -69,7 +74,10 @@ class WorldRoutesTests(unittest.TestCase):
             with self.client.head("/" + asset) as response:
                 self.assertEqual(response.status_code, 200, asset)
                 self.assertEqual(response.headers["X-Content-Type-Options"], "nosniff")
+        # Developer contact sheets and recovered source must remain local-only.
         for path in ("/prototypes/i3-world-preview/serve.mjs", "/prototypes/i3-world-preview/action.test.js",
+                     "/prototypes/i3-world-preview/models-gallery.html", "/prototypes/i3-world-preview/models-gallery.js",
+                     "/tmp/explore-3d/reference-source/web/lab/devices.js",
                      "/prototypes/i3-world-preview/README.md", "/prototypes/i3-world-preview/vendor/README.md",
                      "/src/../prototypes/i3-world-preview/action.test.js",
                      "/src/%2e%2e/prototypes/i3-world-preview/action.test.js",

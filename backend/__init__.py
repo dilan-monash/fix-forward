@@ -12,7 +12,8 @@ from .config import Settings
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 # This shared stylesheet is an exact public asset, not a wildcard for source files.
-FRONTEND_FILES = {"index.html", "styles.css", "favicon.svg", "404.html", "500.html", "src/photo-helper.css"}
+FRONTEND_FILES = {"index.html", "styles.css", "favicon.svg", "404.html", "500.html",
+                  "src/photo-helper.css", "src/explore-photo-helper.css"}
 
 # The I3 family world is a reviewed entry point, not an open prototype directory.
 # Exact names keep tests, local servers, documentation and future experiments private.
@@ -20,17 +21,24 @@ WORLD_FRONTEND_ASSETS = {
     f"prototypes/i3-world-preview/{name}" for name in (
         "index.html", "app.js", "world.css", "world-engine.js", "models.js",
         "explore.js", "explore.css", "catalogue.js", "action.js", "action.css",
+        # Complete the 32-item runtime without exposing the local gallery or source archives.
+        "models-expanded-large.js", "models-expanded-devices.js",
+        "catalogue-expanded.js", "catalogue-part-context.js",
         "progress.js", "vendor/three.module.js", "vendor/three.core.js",
         "vendor/OrbitControls.js",
     )
 } | {"prototypes/i3-family-preview/sorting.js", "prototypes/i3-family-preview/sorting.css"}
 
-# The disabled SigLIP candidate may serve only these reviewed, same-origin files.
+# The I3 SigLIP review helpers may serve only these reviewed, same-origin files.
 # Keeping exact names here prevents the model folders becoming directory servers.
 SIGLIP_PUBLIC_ASSETS = {
     "model/appliance-siglip/model_manifest.json",
     "model/appliance-siglip/text-embeddings.json",
     "model/appliance-siglip/text-embeddings.f32",
+    # Explore owns separate labels, vectors and a kill switch; the encoder is shared.
+    "model/explore-siglip/model_manifest.json",
+    "model/explore-siglip/text-embeddings.json",
+    "model/explore-siglip/text-embeddings.f32",
     "vendor/transformers/transformers.min.js",
     "vendor/transformers/ort-wasm-simd-threaded.jsep.mjs",
     "vendor/transformers/ort-wasm-simd-threaded.jsep.wasm",
@@ -52,6 +60,8 @@ SIGLIP_ASSET_MIME = {
 # hash it. Flask therefore verifies each executable/model artifact once per file
 # version before serving it, then reuses the result while size and mtime match.
 SIGLIP_ASSET_INTEGRITY = {
+    "model/explore-siglip/text-embeddings.json": (4835, "60c91d0d3ee7f2b8864b4a1a517907daf48e42bc9644beadbed17f59fe46f6f2"),
+    "model/explore-siglip/text-embeddings.f32": (129024, "9e0cb396c21d7b40540aa3af20ca60322f4d4ec266db94a5722ba127463021d3"),
     "model/appliance-siglip/text-embeddings.json": (3037, "4b01be52acad78dae1783978e1bc191d50532dc63781a5cd7b96e24f3a390093"),
     "model/appliance-siglip/text-embeddings.f32": (89088, "2e63f55601cf3f011bf13b3c347bd456111c1b8132f9d8164105fff0a29877f2"),
     "vendor/transformers/transformers.min.js": (888173, "aa5002b70e789798da263f5f99c62bd3e8fcd0c119258a493c40c180648365fa"),

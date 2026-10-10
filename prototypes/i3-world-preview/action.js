@@ -1,6 +1,7 @@
 // Action centre: adult owners get practical tools without entering a children's game.
 // This file renders only its host. It never changes the existing app, deployment or database.
 // Click -> route -> mountAction -> form event -> pure matching -> visible evidence is the flow.
+import { CATALOGUE } from './catalogue.js';
 import { FAMILIES, CATEGORY_CODE_BY_NAME } from '../../src/data.js';
 import { loadPublicData, getStaticSnapshot } from '../../src/data-service.js';
 import { matchRecall, findSuburbSuggestions, resolveAreaInput, getNearbyLocations } from '../../src/logic.js';
@@ -15,11 +16,7 @@ const REPAIR_SOURCE = 'https://www.repaircafe.org/en/visit/';
 const CATEGORIES = FAMILIES.flatMap((family) => family.categories);
 // The world includes items outside our existing reference dataset. Preserve them by
 // name and disclose coverage, instead of changing a laptop into a kettle silently.
-const WORLD_ITEMS = {
-  kettle: 'Kettle', fan: 'Fan', toaster: 'Toaster', blender: 'Blender', microwave: 'Microwave',
-  vacuum: 'Vacuum cleaner', hairdryer: 'Hair dryer', laptop: 'Laptop',
-  ricecooker: 'Rice cooker', airfryer: 'Air fryer', coffeemachine: 'Coffee machine', mixer: 'Mixer',
-};
+const WORLD_ITEMS = Object.fromEntries(CATALOGUE.map(item => [item.id, item.category]));
 const PLAN_KEY = 'fixforward-world-adult-plan-v1';
 // The adult's unfinished identity/location form lives only in this tab's memory.
 // The separate optional planner saves only its task, item name and date.

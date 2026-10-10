@@ -1,0 +1,58 @@
+/* Explore-only disclosure. No styles target the Take action photo helper or
+   shared page controls. The scene remains the main activity until this is opened. */
+.explore-photo-helper { margin: 0 0 18px; border: 1px solid #cbded6; border-radius: 14px; background: #f7fcf9; color: var(--ink, #123b36); }
+.explore-photo-helper > summary { display: flex; align-items: center; gap: 11px; padding: 12px 16px; min-height: 52px; cursor: pointer; list-style: none; }
+.explore-photo-helper > summary::-webkit-details-marker { display: none; }
+.explore-photo-helper > summary strong, .explore-photo-helper > summary small { display: block; }
+.explore-photo-helper > summary strong { font-size: 14px; font-weight: 650; }
+.explore-photo-helper > summary small { margin-top: 3px; color: #63796f; font-size: 12px; }
+.explore-photo-mark { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px; background: #e2f2eb; font-size: 26px; }
+.explore-photo-chevron { margin-left: auto; font-size: 22px; }
+.explore-photo-helper[open] .explore-photo-chevron { transform: rotate(45deg); }
+.explore-photo-body { padding: 0 16px 16px; border-top: 1px solid #deebe5; }
+.explore-photo-intro { margin: 14px 0 7px; font-size: 14px; line-height: 1.6; }
+.explore-photo-boundary, .explore-photo-note, .explore-photo-download { font-size: 12px; line-height: 1.6; color: #5d7267; }
+.explore-photo-boundary { max-width: 82ch; margin: 0 0 13px; }
+/* One obvious drop target on desktop; the native picker stays usable by touch
+   and keyboard. Feedback changes both wording and border, not colour alone. */
+.explore-photo-dropzone { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; padding: 20px; margin-bottom: 12px; min-height: 104px; border: 2px dashed #86ad9d; border-radius: 12px; background: #fff; }
+.explore-photo-drop-icon { flex: 0 0 40px; width: 40px; height: 40px; stroke: #276c55; stroke-width: 1.7; }
+.explore-photo-drop-copy { flex: 1 1 170px; }
+.explore-photo-drop-copy strong { display: block; font-size: 16px; }
+.explore-photo-drop-copy span { display: block; margin-top: 5px; font-size: 13px; color: #526d60; }
+.explore-photo-dropzone.is-dragover { border-style: solid; border-color: #226c52; background: #e2f4e9; box-shadow: 0 0 0 3px #226c5224; }
+.explore-photo-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.explore-photo-controls button, .explore-photo-upload, .explore-photo-confirm, .explore-photo-manual { box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px; padding: 10px 14px; border: 1px solid #a8cbbd; border-radius: 9px; background: white; color: var(--ink, #123b36); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.explore-photo-upload { position: relative; overflow: hidden; }
+.explore-photo-upload input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+.explore-photo-upload:focus-within { outline: 3px solid var(--blue, #4463d5); outline-offset: 3px; }
+.explore-photo-controls [data-explore-photo-check], .explore-photo-confirm { background: #164b3e; color: white; border-color: #164b3e; }
+.explore-photo-controls button:disabled, .explore-photo-confirm:disabled { background: #e6ece8; border-color: #cdd8d1; color: #617168; cursor: default; }
+.explore-photo-helper [hidden] { display: none !important; }
+.explore-photo-download { margin: 9px 0 12px; padding: 9px 11px; border-radius: 8px; background: #eaf3ee; }
+.explore-photo-work { display: flex; align-items: flex-start; gap: 16px; }
+.explore-photo-preview { flex: 0 0 160px; margin: 0; }
+.explore-photo-preview img { display: block; width: 160px; height: 130px; object-fit: contain; background: white; border: 1px solid #d5e5dc; border-radius: 10px; }
+.explore-photo-preview figcaption { padding: 6px 0; font-size: 11px; color: #60776b; }
+.explore-photo-response { flex: 1; min-width: 0; }
+.explore-photo-status { margin: 0 0 10px; font-size: 14px; line-height: 1.6; }
+.explore-photo-response progress { width: min(100%, 400px); height: 8px; accent-color: #39795e; }
+.explore-photo-choices { margin: 12px 0; padding: 0; border: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.explore-photo-choices legend { padding: 0 0 8px; font-size: 13px; font-weight: 600; }
+.explore-photo-choices label { display: flex; align-items: center; gap: 8px; min-height: 46px; padding: 9px 12px; border: 1px solid #a9cbbc; border-radius: 9px; background: white; cursor: pointer; font-size: 13px; }
+.explore-photo-choices input { width: 18px; height: 18px; margin: 0; accent-color: #215b46; }
+.explore-photo-choices small { display: block; margin-top: 3px; font-size: 11px; color: #62776d; }
+.explore-photo-support { margin-top: 12px; }
+.explore-photo-support summary { min-height: 44px; padding-block: 10px; font-size: 12px; cursor: pointer; }
+.explore-photo-support p { font-size: 12px; line-height: 1.7; color: #5c7266; }
+.explore-photo-manual { margin-top: 7px; background: transparent; }
+@media (max-width: 540px) {
+  .explore-photo-dropzone { padding: 15px; gap: 10px; }
+  .explore-photo-dropzone .explore-photo-upload { flex: 1 1 100%; }
+  .explore-photo-work { flex-direction: column; gap: 10px; }
+  .explore-photo-preview { flex-basis: auto; }
+  .explore-photo-preview img { width: 130px; height: 100px; }
+  .explore-photo-controls { gap: 7px; }
+  .explore-photo-controls button, .explore-photo-upload { flex: 1 1 auto; }
+  .explore-photo-body { padding-inline: 13px; }
+}
