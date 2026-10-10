@@ -34,6 +34,18 @@ class WorldRoutesTests(unittest.TestCase):
         with self.client.get("/") as response:
             self.assertEqual(response.status_code, 303)
 
+    def test_photo_feedback_stylesheet_keeps_the_same_access_gate(self):
+        # The thumbnail/status styles must load after login without opening other files.
+        with self.client.get("/src/photo-helper.css") as response:
+            self.assertEqual(response.status_code, 303)
+        self.login().close()
+        with self.client.get("/src/photo-helper.css") as response:
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.mimetype, "text/css")
+            self.assertIn(b".photo-feedback", response.data)
+        with self.client.get("/src/private.css") as response:
+            self.assertEqual(response.status_code, 404)
+
     def test_login_opens_new_world_and_preserves_previous_entries(self):
         self.login().close()
         for path in ("/", "/index.html"):

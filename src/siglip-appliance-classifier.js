@@ -706,6 +706,8 @@ export async function classifyWithSiglipCandidate(file, {
         if (!signal?.aborted) onProgress(event);
       });
       assertNotAborted(signal);
+      // Distinguish actual photo analysis from the first-use model download.
+      onProgress({ status: "analysing" });
       const image = await runtime.RawImage.read(file);
       assertNotAborted(signal);
       const output = await model(await processor(image));

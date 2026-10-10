@@ -13,6 +13,15 @@ It discloses a roughly 92 MB first-use download before a file is chosen.
 JPG, PNG and WebP are supported, up to 10 MB and 30 megapixels. Image content is
 checked before model loading. Photos are processed in the browser, not uploaded.
 
+The selected photo now appears as a local thumbnail with its filename. A bold
+status panel distinguishes preparation/download, photo analysis, a suggestion
+awaiting confirmation, confirmation and errors using words, icons and colour.
+Unreadable files retain their filename but show no broken thumbnail. The real
+header/dimensions are checked before preview decoding; replacing the photo,
+choosing manually or leaving the page clears its image data. No photo is stored.
+The shared styles live in `src/photo-helper.css`; the backend serves only this
+named stylesheet, behind the same login gate as the adult form.
+
 A rejected/ambiguous photo offers another photo or manual selection. An accepted
 result asks **Could this be a fan?** (or the suggested category). Only **Yes,
 select ...** changes the category. Brand, model and recall checks remain separate
@@ -42,10 +51,10 @@ accuracy evidence is overwritten by this authorisation.
 
 ## Verification and limits
 
-- 54 focused JavaScript checks cover policy scope, frozen thresholds, input
+- 59 focused JavaScript checks cover policy scope, frozen thresholds, input
   validation, lazy local-only loading, stale replies, cancellation and explicit
   confirmation, plus the adult action centre.
-- 53 backend checks cover authenticated routes, exact model/runtime bytes,
+- 54 backend checks cover authenticated routes, exact model/runtime bytes,
   asset MIME types and adult/Quest entry points without shared database writes.
 - A Chrome loopback test ran the actual model on a licensed fan fixture and a
   noise image through the real photo-input handler. The fan required confirmation;

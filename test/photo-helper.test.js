@@ -26,6 +26,9 @@ async function setup(t, options = {}) {
     onConfirm: (value) => confirmed.push(value),
     onChooseManually: () => { manual += 1; },
     releaseSession: async () => { releases += 1; },
+    // Unit tests fake only preview decoding; a browser smoke check covers the
+    // actual FileReader/image path without changing the selected appliance.
+    createPreview: async () => "data:image/png;base64,dGVzdA==",
     ...options,
     // Keep the counter around custom recognisers as well.
     ...(options.recognise ? { recognise: async (...args) => {
@@ -225,4 +228,83 @@ test("experimental preview is labelled and leaves confirmation mandatory", async
   ui.query("#confirm-photo-appliance").click();
   assert.equal(ui.confirmed.length, 1);
   assert.match(ui.query("#photo-detect-status").textContent, /selected/);
+});
+
+test("selected photo shows its filename and thumbnail while recognition is running", async (t) => {
+  let finish;
+  const ui = await setup(t, { recognise: () => new Promise(resolve => { finish = resolve; }) });
+  ui.choose({ type: "image/png", size: 100, name: "kitchen-fan.png" });
+  await settle();
+  const image = ui.query(".photo-selected-preview img");
+  image.dispatchEvent(new ui.dom.window.Event("load"));
+  assert.equal(image.hidden, false);
+  assert.match(image.src, /^data:image\/png/);
+  assert.equal(ui.query(".photo-file-name").textContent, "kitchen-fan.png");
+  assert.equal(ui.query("#photo-detect-status").dataset.state, "busy");
+  assert.equal(ui.container.hasAttribute("aria-busy"), false, "live feedback must not be silenced by a busy ancestor");
+  finish(suggestion); await settle();
+  assert.equal(ui.query("#photo-detect-status").dataset.state, "needs-confirmation");
+  assert.equal(ui.query(".photo-progress").hidden, true);
+  assert.deepEqual(ui.confirmed, []);
+});
+
+test("analysis replaces download percentage with a clear checking message", async (t) => {
+  let progress;
+  const ui = await setup(t, { recognise: (_file, options) => {
+    progress = options.onProgress;
+    return new Promise(() => {});
+  } });
+  ui.choose(); await settle();
+  progress({ progress: 60 });
+  assert.equal(ui.query(".photo-progress").value, 60);
+  progress({ status: "analysing" });
+  assert.match(ui.query(".photo-feedback-title").textContent, /Checking your photo/);
+  assert.doesNotMatch(ui.query("#photo-detect-status").textContent, /60%/);
+  assert.equal(ui.query(".photo-progress").hidden, true);
+});
+
+test("invalid image content has a distinct error and remains easy to replace", async (t) => {
+  const ui = await setup(t, { recognise: async () => {
+    throw Object.assign(new Error("internal"), { code: "invalid_image_content" });
+  }, createPreview: async () => { throw new Error("decode failed"); } });
+  ui.choose({ type: "image/png", size: 100, name: "broken.png" }); await settle();
+  assert.equal(ui.query("#photo-detect-status").dataset.state, "error");
+  assert.match(ui.query(".photo-feedback-title").textContent, /couldn’t read this photo/);
+  assert.match(ui.query(".photo-feedback-message").textContent, /not a valid JPG, PNG or WebP/);
+  assert.match(ui.query(".photo-preview-note").textContent, /Preview unavailable/);
+  assert.equal(ui.query(".photo-selected-preview img").hasAttribute("src"), false);
+  assert.equal(ui.query(".photo-progress").hidden, true);
+  assert.ok(ui.query("#appliance-photo"));
+});
+
+test("replacing, clearing and disposing photos cannot restore an older preview", async (t) => {
+  const pending = [];
+  const ui = await setup(t, { createPreview: (_file, signal) => new Promise(resolve => pending.push({ resolve, signal })) });
+  ui.choose({ type: "image/png", size: 100, name: "old.png" }); await settle();
+  ui.choose({ type: "image/png", size: 100, name: "new.png" }); await settle();
+  assert.equal(pending[0].signal.aborted, true);
+  pending[1].resolve("data:image/png;base64,bmV3"); await settle();
+  pending[0].resolve("data:image/png;base64,b2xk"); await settle();
+  assert.match(ui.query(".photo-selected-preview img").src, /bmV3$/);
+  ui.query("#photo-choose-manually").click();
+  assert.equal(ui.query("#photo-selected-preview").hidden, true);
+  assert.equal(ui.query(".photo-selected-preview img"), null);
+  ui.choose(); await settle();
+  ui.dispose();
+  assert.equal(pending[2].signal.aborted, true);
+  pending[2].resolve("data:image/png;base64,bGF0ZQ=="); await settle();
+  assert.equal(ui.query(".photo-selected-preview img"), null);
+});
+
+test("filenames are plain text and only one shared stylesheet is mounted", async (t) => {
+  const ui = await setup(t);
+  ui.choose({ type: "image/png", size: 100, name: '<img src=x onerror="alert(1)">.png' }); await settle();
+  assert.equal(ui.query(".photo-file-name").children.length, 0);
+  assert.match(ui.query(".photo-file-name").textContent, /<img/);
+  const second = ui.dom.window.document.createElement("div");
+  ui.dom.window.document.body.append(second);
+  const dispose = mountPhotoHelper(second, { availability: async () => ({ enabled: true }), releaseSession: async () => {} });
+  await settle();
+  assert.equal(ui.dom.window.document.querySelectorAll("#photo-helper-styles").length, 1);
+  dispose();
 });

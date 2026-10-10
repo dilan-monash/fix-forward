@@ -34,7 +34,7 @@ import { automaticCostContext, loadPriceCatalogue, matchPriceExamples, problemQu
 import { productSuggestions } from "./product-suggestions.js";
 import { createLearningState, transitionLearning, renderLearning } from "./learning.js";
 // Versioned import prevents a browser from reusing the retired TensorFlow helper.
-import { mountPhotoHelper } from "./photo-helper.js?v=i3-photo-preview-3";
+import { mountPhotoHelper } from "./photo-helper.js?v=i3-photo-feedback-1";
 
 const app = document.querySelector("#app");
 const main = document.querySelector("#main");

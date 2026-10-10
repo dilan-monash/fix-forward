@@ -1,0 +1,24 @@
+/* Shared photo feedback: scoped selectors keep Quest and the surrounding adult
+   design unchanged. Titles/icons carry meaning independently of the colours. */
+.photo-detect-card .photo-selected-preview { display: flex; align-items: center; gap: 16px; margin: 18px 0; padding: 12px; width: 100%; box-sizing: border-box; border: 1px solid #cbd8df; border-radius: 12px; background: #fff; }
+.photo-detect-card .photo-selected-preview img { width: 112px; height: 112px; flex: 0 0 112px; object-fit: contain; border-radius: 8px; background: #f1f5f8; }
+.photo-selected-preview figcaption { display: grid; gap: 6px; min-width: 0; color: #17394c; }
+.photo-file-name { overflow-wrap: anywhere; font-weight: 650; font-size: .9rem; }
+.photo-preview-note { font-size: .8rem; color: #506574; line-height: 1.4; }
+.photo-detect-card .photo-feedback { display: flex; gap: 12px; align-items: flex-start; width: 100%; box-sizing: border-box; padding: 16px; margin: 16px 0 8px; border: 1px solid #b9cee2; border-left: 4px solid #2864a0; border-radius: 10px; background: #edf5ff; color: #163b63; }
+.photo-feedback .photo-feedback-title { display: block; font-size: 1.08rem; font-weight: 750; line-height: 1.4; letter-spacing: 0; }
+.photo-detect-card .photo-feedback .photo-feedback-message { margin: 5px 0 0; font-size: .94rem; line-height: 1.5; color: inherit; }
+.photo-feedback-icon { display: grid; place-items: center; flex: 0 0 26px; width: 26px; height: 26px; border: 1px solid currentColor; border-radius: 50%; font-weight: 800; line-height: 1; }
+.photo-feedback[data-state="busy"] .photo-feedback-icon { border: 3px solid #b9cee2; border-top-color: #2864a0; font-size: 0; box-sizing: border-box; animation: photo-working 1s linear infinite; }
+.photo-detect-card .photo-feedback[data-state="error"] { color: #812e24; background: #fff0ec; border-color: #d58d7b; }
+.photo-detect-card .photo-feedback[data-state="no-suggestion"], .photo-detect-card .photo-feedback[data-state="needs-confirmation"] { color: #674814; background: #fff6df; border-color: #c6a45a; }
+.photo-detect-card .photo-feedback[data-state="confirmed"] { color: #175140; background: #eaf7f0; border-color: #73a18d; }
+.photo-detect-card .photo-progress { display: block; width: 100%; height: 8px; accent-color: #2864a0; margin: 0 0 16px; }
+/* Results are a separate, prominent card rather than another paragraph in the form. */
+#photo-result .photo-confirm-card { border: 2px solid #8cae9d; border-radius: 12px; background: #f1faf5; padding: 22px; margin: 16px 0; }
+#photo-result .photo-confirm-card h2 { font-size: clamp(1.45rem, 4vw, 1.85rem); font-weight: 750; letter-spacing: -.02em; line-height: 1.2; color: #173f35; margin: 6px 0 12px; }
+.photo-confirm-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.photo-detect-card [hidden] { display: none; }
+@keyframes photo-working { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .photo-feedback[data-state="busy"] .photo-feedback-icon { animation: none; } }
+@media (max-width: 420px) { .photo-detect-card .photo-selected-preview { gap: 10px; } .photo-detect-card .photo-selected-preview img { width: 80px; height: 80px; flex-basis: 80px; } }

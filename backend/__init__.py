@@ -11,7 +11,8 @@ from .config import Settings
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-FRONTEND_FILES = {"index.html", "styles.css", "favicon.svg", "404.html", "500.html"}
+# This shared stylesheet is an exact public asset, not a wildcard for source files.
+FRONTEND_FILES = {"index.html", "styles.css", "favicon.svg", "404.html", "500.html", "src/photo-helper.css"}
 
 # The I3 family world is a reviewed entry point, not an open prototype directory.
 # Exact names keep tests, local servers, documentation and future experiments private.
