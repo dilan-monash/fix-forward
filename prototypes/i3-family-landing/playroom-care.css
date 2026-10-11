@@ -1,0 +1,97 @@
+/* Care Crew uses movable room objects and spatial destinations. The shared
+   playroom owns all gestures and feedback; these styles never hide a target. */
+.pr-care{--care-ink:#254c38;--care-green:#397950;--care-paper:#fffbed;width:100%;height:100%;min-height:320px;min-width:0;color:var(--care-ink);font-family:Manrope,system-ui,sans-serif;position:relative;isolation:isolate;box-sizing:border-box}
+.pr-care *{box-sizing:border-box}.pr-care button{font-family:inherit;-webkit-tap-highlight-color:transparent}.pr-care svg{display:block;width:100%;height:100%;max-width:none;pointer-events:none}.pr-care button:focus-visible{outline:3px solid #a05b20;outline-offset:4px}
+.pr-care-scene{height:100%;width:100%;min-height:320px;position:relative;isolation:isolate;overflow:visible;border:1px solid #c9d9bc;border-radius:20px;background:radial-gradient(ellipse at 47% 52%,#fffdf5 0,#f0f4e4 64%,#e4eedb 100%);box-shadow:inset 0 2px 0 #fff8,0 4px 0 #dbe6ce}
+.pr-care-kitchen .pr-care-scene{background:radial-gradient(ellipse at 49% 52%,#fffdf1 0,#ecf3e6 64%,#deebdc 100%)}
+.pr-care-family .pr-care-scene{background:radial-gradient(ellipse at 49% 52%,#fff6e8 0,#f1eddf 64%,#e5e8d7 100%)}
+.pr-care .pr-care-scenery{position:absolute;inset:0;width:100%;height:100%;z-index:0;filter:drop-shadow(0 7px 8px #3d57330b)}
+.pr-care-room-tab{position:absolute;left:16px;top:13px;display:flex;align-items:center;gap:8px;max-width:42%;z-index:1;border:1px solid #cbd8bf;background:#fffff0d9;border-radius:20px;padding:5px 11px;font-size:13px;font-weight:800;line-height:1.4;color:#486d44;pointer-events:none}
+.pr-care-room-dot{width:7px;height:7px;background:#78a668;border-radius:50%;box-shadow:0 0 0 3px #83a86e18}
+.pr-care-piece,.pr-care-clear-space,.pr-care-target{position:absolute;left:var(--cx);top:var(--cy);transform:translate(-50%,-50%)}
+.pr-care-piece{display:flex;flex-direction:column;align-items:center;justify-content:center;width:144px;min-height:100px;padding:0 5px 3px;border:0;border-radius:16px;background:transparent;color:var(--care-ink);z-index:4;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;transition:filter .18s,background .18s}
+.pr-care-piece-lift{position:relative;display:block;width:112px;height:90px;transform:rotate(-4deg);transform-origin:50% 82%;transition:transform .2s;filter:drop-shadow(0 6px 3px #244b3322)}
+.pr-care-piece:nth-of-type(2n) .pr-care-piece-lift{transform:rotate(4deg)}
+.pr-care-piece-label{display:block;position:relative;padding:5px 9px 6px;max-width:100%;font-size:14px;font-weight:800;line-height:1.3;text-align:center;background:#fffdf0;border:1px solid #c0d0b2;border-radius:9px;box-shadow:0 3px 0 #bed1af66}
+.pr-care-pick-cue{font-size:11px;line-height:1.3;margin-top:4px;font-weight:750;color:#476d42;background:#f4fae8e8;border-radius:10px;padding:1px 7px;white-space:nowrap}
+.pr-care-piece:hover .pr-care-piece-lift{transform:translateY(-5px) rotate(-3deg)}
+.pr-care-piece:active{cursor:grabbing}
+.pr-care-piece.is-selected{background:#f9ffe1b3;box-shadow:0 0 0 3px #6f9b4f44}
+.pr-care-piece.is-selected .pr-care-piece-lift{transform:translateY(-7px) rotate(-5deg)}
+.pr-care-piece.is-selected .pr-care-piece-label{background:#e6f2ce;border:2px solid #589548;padding:4px 8px 5px}
+.pr-care-piece.is-selected .pr-care-pick-cue{color:#fff;background:#437d3b}
+.pr-care-target{z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;width:156px;min-height:108px;padding:4px 7px 8px;border:2px solid #a9c196;border-radius:17px;background:#f6fae6dc;color:#345333;cursor:pointer;touch-action:manipulation;box-shadow:0 5px 0 #bdcfa866,0 9px 13px #34523409;transition:background .18s,border-color .18s,box-shadow .18s}
+.pr-care-target::before{content:'';position:absolute;inset:5px;border:1px dashed #9db78566;border-radius:12px;pointer-events:none}
+.pr-care-destination{position:relative;display:block;width:122px;height:81px;flex-shrink:0}
+.pr-care-target .pr-care-target-art{position:absolute;inset:0;width:100%;height:100%;filter:drop-shadow(0 3px 1px #3b60311a)}
+.pr-care-target-label{position:relative;display:block;max-width:100%;padding:3px 3px 0;font-size:14px;font-weight:800;line-height:1.3;text-align:center}
+.pr-care-place-cue{position:absolute;right:8px;top:6px;display:grid;place-items:center;width:24px;height:24px;line-height:1;border-radius:50%;border:1px solid #b2c897;background:#fffce7;color:#58824a;font-size:20px;font-weight:800}
+.pr-care-drop-ring{position:absolute;left:24%;right:24%;bottom:5px;height:16px;border:2px dashed #81a960;border-radius:50%;background:#d7e9b82e;transform:rotate(-9deg)}
+.pr-care-target:hover,.pr-care-target.is-drop-over,.pr-care-target.is-over,.pr-care-target[data-drop-active=true]{background:#e7f4d1;border-color:#538c3f;box-shadow:0 0 0 3px #77a15624,0 5px 0 #adc993}
+.pr-care-target:hover .pr-care-drop-ring,.pr-care-target.is-drop-over .pr-care-drop-ring{border-style:solid;background:#bedb9438}
+.pr-care-target.is-complete{background:#e4efd6e8;border-color:#8bae75}
+.pr-care-target.is-complete::before{border-style:solid;border-color:#aac59466}
+.pr-care-target.is-complete .pr-care-drop-ring{display:none}
+.pr-care-done-mark{position:absolute;right:-6px;top:-6px;display:grid;place-items:center;width:27px;height:27px;border-radius:50%;background:#57904b;border:3px solid #f6f9e9;color:white;font-size:16px;font-weight:800;line-height:1}
+.pr-care-placed-object{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%) rotate(-7deg);display:block;width:77px;height:67px;filter:drop-shadow(0 5px 2px #34553333);z-index:2;animation:pr-care-arrive .32s ease-out}
+.pr-care-placed-object .pr-care-object-art{width:100%;height:100%}
+.pr-care-clear-space{z-index:1;width:118px;display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none;text-align:center;color:#6a9761}
+.pr-care-clear-space>i{font-style:normal;font-size:37px;line-height:1;color:#afbd67;text-shadow:0 1px 0 white}
+.pr-care-clear-space>span{font-size:12px;font-weight:800;line-height:1.4;white-space:nowrap;background:#f8fbecb3;padding:2px 6px;border-radius:8px}
+.pr-care-room-progress{position:absolute;left:16px;bottom:10px;display:flex;align-items:center;gap:9px;padding:5px 8px 5px 10px;border:1px solid #ccdaba;background:#fffdf1e8;border-radius:15px;font-size:12px;font-weight:750;line-height:1.3;z-index:1;pointer-events:none;max-width:48%}
+.pr-care-room-progress>b{font-size:15px;font-weight:800;line-height:1.1;color:#5b8b42;white-space:nowrap}
+.pr-care-room-progress i{font-style:normal;color:#8da47a;font-size:12px;margin-inline:2px}
+.pr-care-room-spark{position:absolute;pointer-events:none;z-index:0;color:#d4b965;font-size:22px;opacity:0;transition:opacity .3s}
+.pr-care-spark-one{left:25%;top:23%;transform:rotate(-10deg)}.pr-care-spark-two{left:69%;top:71%;font-size:31px;transform:rotate(8deg)}
+.pr-care.is-room-ready .pr-care-room-spark{opacity:1;animation:pr-care-twinkle 1s ease-out 2}
+.pr-care.is-room-ready .pr-care-room-progress{background:#e4efd6;border-color:#9bb780}
+.pr-care-hub-art{display:block;position:relative;width:100%;height:100%;min-height:100px;overflow:hidden}
+.pr-care-hub-art .pr-care-scenery{width:100%;height:100%;display:block;filter:drop-shadow(0 7px 3px #2951361a)}
+@keyframes pr-care-arrive{from{opacity:.4;transform:translate(-50%,-70%) rotate(-12deg) scale(.7)}to{opacity:1;transform:translate(-50%,-50%) rotate(-7deg) scale(1)}}
+@keyframes pr-care-twinkle{0%,100%{filter:brightness(1);scale:1}45%{filter:brightness(1.15);scale:1.15}}
+
+/* Portrait room positions spread out vertically. All targets remain visible;
+   this is still the same puzzle, with the same authored labels and outcomes. */
+@media(max-width:899px) and (orientation:portrait){
+ .pr-care-piece{width:145px}.pr-care-piece-lift{width:117px;height:99px}.pr-care-piece-label{font-size:15px}
+ .pr-care-target{width:153px}.pr-care-destination{width:120px;height:85px}.pr-care-target-label{font-size:15px}
+ .pr-care-desk [data-care-piece="0"]{--cx:32%!important;--cy:40%!important}.pr-care-desk [data-care-piece="1"]{--cx:51%!important;--cy:57%!important}.pr-care-desk [data-care-piece="2"]{--cx:51%!important;--cy:82%!important}
+ .pr-care-desk [data-care-target="0"]{--cx:16%!important;--cy:76%!important}.pr-care-desk [data-care-target="1"]{--cx:83%!important;--cy:24%!important}.pr-care-desk [data-care-target="2"]{--cx:84%!important;--cy:78%!important}
+ .pr-care-kitchen [data-care-piece="0"]{--cx:34%!important;--cy:50%!important}.pr-care-kitchen [data-care-piece="1"]{--cx:51%!important;--cy:82%!important}.pr-care-kitchen [data-care-piece="2"]{--cx:38%!important;--cy:22%!important}
+ .pr-care-kitchen [data-care-target="0"]{--cx:83%!important;--cy:50%!important}.pr-care-kitchen [data-care-target="1"]{--cx:16%!important;--cy:78%!important}.pr-care-kitchen [data-care-target="2"]{--cx:84%!important;--cy:20%!important}
+ .pr-care-family [data-care-piece="0"]{--cx:36%!important;--cy:53%!important}.pr-care-family [data-care-piece="1"]{--cx:42%!important;--cy:25%!important}.pr-care-family [data-care-piece="2"]{--cx:50%!important;--cy:83%!important}
+ .pr-care-family [data-care-target="0"]{--cx:16%!important;--cy:79%!important}.pr-care-family [data-care-target="1"]{--cx:84%!important;--cy:80%!important}.pr-care-family [data-care-target="2"]{--cx:84%!important;--cy:25%!important}
+}
+@media(max-width:599px){
+ .pr-care,.pr-care-scene{min-height:340px}.pr-care-scene{border-radius:15px}
+ .pr-care-room-tab{left:9px;top:9px;padding:4px 8px;gap:6px;font-size:11px;max-width:45%}
+ .pr-care-piece{width:91px;padding:0 2px 2px;border-radius:12px}.pr-care-piece-lift{width:82px;height:69px}
+ .pr-care-piece-label{font-size:13px;line-height:1.2;padding:4px 5px;border-radius:7px}.pr-care-piece.is-selected .pr-care-piece-label{padding:3px 4px}
+ /* The persistent play instruction already explains movement. Removing its
+    tiny duplicate gives phone labels room without shrinking touch targets. */
+ .pr-care-pick-cue{display:none}
+ .pr-care-target{width:99px;min-height:93px;padding:4px 5px 6px;border-radius:13px}
+ .pr-care-destination{width:83px;height:61px}.pr-care-target-label{font-size:13px;line-height:1.2;padding:3px 1px 0}
+ .pr-care-target::before{inset:4px;border-radius:9px}.pr-care-place-cue{width:19px;height:19px;font-size:16px;top:4px;right:4px}
+ .pr-care-done-mark{width:23px;height:23px;font-size:13px;top:-5px;right:-5px}
+ .pr-care-placed-object{width:55px;height:51px}.pr-care-drop-ring{height:13px;bottom:2px}
+ .pr-care-clear-space{width:86px}.pr-care-clear-space>i{font-size:28px}.pr-care-clear-space>span{font-size:10px}
+ .pr-care-room-progress{left:9px;bottom:7px;padding:4px 7px;font-size:10px;gap:6px;max-width:68%}.pr-care-room-progress>b{font-size:13px}
+ .pr-care-desk [data-care-piece="0"]{--cx:23%!important;--cy:39%!important}.pr-care-desk [data-care-piece="1"]{--cx:50%!important;--cy:53%!important}.pr-care-desk [data-care-piece="2"]{--cx:50%!important;--cy:81%!important}
+ .pr-care-desk [data-care-target="0"]{--cx:16%!important;--cy:77%!important}.pr-care-desk [data-care-target="1"]{--cx:83%!important;--cy:23%!important}.pr-care-desk [data-care-target="2"]{--cx:84%!important;--cy:78%!important}
+ .pr-care-kitchen [data-care-piece="0"]{--cx:34%!important;--cy:48%!important}.pr-care-kitchen [data-care-piece="1"]{--cx:50%!important;--cy:79%!important}.pr-care-kitchen [data-care-piece="2"]{--cx:36%!important;--cy:20%!important}
+ .pr-care-kitchen [data-care-target="0"]{--cx:83%!important;--cy:49%!important}.pr-care-kitchen [data-care-target="1"]{--cx:16%!important;--cy:78%!important}.pr-care-kitchen [data-care-target="2"]{--cx:84%!important;--cy:20%!important}
+ .pr-care-family [data-care-piece="0"]{--cx:37%!important;--cy:52%!important}.pr-care-family [data-care-piece="1"]{--cx:40%!important;--cy:25%!important}.pr-care-family [data-care-piece="2"]{--cx:50%!important;--cy:79%!important}
+ .pr-care-family [data-care-target="0"]{--cx:16%!important;--cy:78%!important}.pr-care-family [data-care-target="1"]{--cx:84%!important;--cy:79%!important}.pr-care-family [data-care-target="2"]{--cx:84%!important;--cy:24%!important}
+}
+@media(min-width:600px) and (orientation:landscape) and (max-height:720px){
+ .pr-care-piece{width:134px}.pr-care-piece-lift{width:98px;height:75px}.pr-care-piece-label{font-size:14px;line-height:1.25}
+ .pr-care-target{width:145px;padding-top:3px;padding-bottom:6px}.pr-care-destination{width:111px;height:72px}.pr-care-target-label{font-size:14px;line-height:1.25}
+ .pr-care-pick-cue{font-size:10px;margin-top:2px}
+ /* Long care labels need breathing room above the room-progress badge. */
+ .pr-care-kitchen [data-care-piece="1"]{--cy:73%!important}.pr-care-kitchen [data-care-target="1"]{--cy:70%!important}
+ .pr-care-family [data-care-piece="2"]{--cy:74%!important}.pr-care-family [data-care-target="0"]{--cy:68%!important}
+}
+@media(prefers-reduced-motion:reduce){.pr-care *{animation:none!important;transition:none!important}.pr-care-piece:hover .pr-care-piece-lift,.pr-care-piece.is-selected .pr-care-piece-lift{transform:none}}
+body.playroom-motion-paused .pr-care *{animation:none!important;transition:none!important}
+body.playroom-motion-paused .pr-care-piece:hover .pr-care-piece-lift,body.playroom-motion-paused .pr-care-piece.is-selected .pr-care-piece-lift{transform:none}

@@ -1,0 +1,38 @@
+/* The 5535 reference owns the public-page palette. These scoped rules adapt
+   the reused learning and 3D modules without recolouring game feedback. */
+:root{--ink:#16283c;--paper:#fff;--accent:#176dc4;--blue:#176dc4;--muted:#4a5a6b;--line:#dfe6ee;--surface:#fff;--navy:#16283c;--gold:#f4c431}
+html{scroll-padding-top:24px}body{background:#fff;color:var(--ink)}
+h1,h2,h3,strong,b{font-weight:700}::selection{background:#dcecff;color:#16283c}
+.eyebrow{color:#4a5a6b}
+.ff-header nav a:hover{color:#176dc4}.ff-header{background:#fff}.ff-footer{border-color:#dfe6ee}.ff-footer a:hover{color:#176dc4}
+.fg-explore{--fgx-ink:#16283c;--fgx-muted:#4a5a6b;--fgx-line:#d8e3ef;--fgx-blue:#176dc4;--fgx-mint:#e3f5eb;font-size:17px}
+.fgx-heading h1{font-weight:700}.fgx-heading h1 em{font-family:inherit;font-weight:700;color:#176dc4}
+.fgx-eyebrow{color:#4a5a6b!important;font-size:12px!important}.fgx-entry{box-shadow:none}.fgx-entry-photo{background:#e1f0ff}.fgx-entry-manual{background:#e3f5eb}
+.fgx-entry:hover,.fgx-device:hover{border-color:#9ebbd9;box-shadow:0 12px 26px #16283c0c}.fgx-entry-manual:hover{background:#e3f5eb}.fgx-entry-photo:hover{background:#e1f0ff}
+.fgx-camera-art>svg{background:#fff;color:#176dc4;stroke:#176dc4;box-shadow:4px 9px 0 #c7def5}.fgx-mini-device{background:#f4f8fc}.fgx-scan-corner,.fgx-scan-corner:after{border-color:#176dc4}
+.fgx-card-index{color:#4a5a6b;font-size:12px}.fgx-card-link{color:#176dc4;font-size:17px}.fgx-card-link>span{color:inherit}.fgx-device-art svg{color:#176dc4}
+.fgx-world-card:hover{background:#f4f8fc;border-color:#9ebbd9}.fgx-together-note{font-size:15px}.fgx-notice{background:#f4f8fc;color:#4a5a6b}
+.fgx-searchbar input,.fgx-searchbar select{border-color:#c8d7e7}.fgx-searchbar input::placeholder{color:#536579}.fgx-searchbar label{font-size:15px}.fgx-count{font-size:15px}
+.fgx-device:hover{background:#f4f8fc}.fgx-device-icon,.fgx-confirm-icon{background:#eaf3fd}.fgx-device-icon svg,.fgx-confirm-icon svg{color:#176dc4}.fgx-device strong{font-size:17px}.fgx-device>span:last-child{font-size:13px}
+.fgx-button{border-color:#bdcfe3;font-size:16px!important;border-radius:14px}.fgx-button:hover:not(:disabled){background:#eaf3fd}.fgx-primary{background:#176dc4;border-color:#176dc4;color:white}.fgx-primary:hover:not(:disabled){background:#0f4f91;color:#fff}
+.fgx-text-link{color:#176dc4;font-size:15px!important}.fgx-photo-surface{background:#f4f8fc;border-color:#bdcfe3}.fgx-photo-placeholder svg{stroke:#176dc4}
+.fgx-photo-panel>p:not(.fgx-eyebrow),.fgx-confirm-device p:not(.fgx-eyebrow){font-size:16px}.fgx-photo-panel .fgx-photo-privacy{font-size:13px}.fgx-photo-preview figcaption{font-size:13px}.fgx-confirm-photo{background:#f4f8fc}
+.fgx-empty{border-color:#bdcfe3}.fgx-detail .explore-page{color:#16283c}.explore-heading p:not(.eyebrow),.explore-inspector p{color:#4a5a6b}
+.explore-stage{border-color:#d8e3ef}.explore-help-link{border-color:#bdcfe3}.explore-hotspots button span{background:#176dc4}
+.explore-page .button.lime{background:#176dc4;color:#fff}.explore-page .button.secondary{border-color:#bdcfe3;color:#16283c}
+.ffa-page,.fft-page{color:#16283c}.ffa-kicker{color:#4a5a6b}.ffa-heading h1 span{color:#176dc4}.ffa-heading>p:last-child{color:#4a5a6b}
+.ffa-first{background:#eaf3fd;border-color:#c8daee}.ffa-first-symbol{background:#f4c431;color:#16283c}.ffa-first p,.ffa-filters label,.ffa-results-top p,.ffa-meta,.ffa-card-body>p,.ffa-lesson,.ffa-parent-note p:not(.ffa-kicker){color:#4a5a6b}
+.ffa-first a,.ffa-reset,.ffa-howto,.ffa-results-top .ffa-result-count{color:#176dc4}.ffa-first a{border-color:#9ebbd9}.ffa-filters select{color:#16283c;border-color:#c8d7e7}.ffa-filter-panel{border-color:#dfe6ee}.ffa-filter-panel>summary{color:#16283c}.ffa-filter-panel>summary>span{color:#4a5a6b}
+.ffa-page .ffa-card{border-color:#dfe6ee}.ffa-page .ffa-card:hover{border-color:#9ebbd9;box-shadow:0 16px 30px #16283c10}.ffa-page .ffa-card-art{background:#f4f8fc}.ffa-page .ffa-card:first-child .ffa-card-label{background:#fff3bf;border-color:#f4c431}
+.ffa-page .ffa-play{background:#176dc4;border-color:#176dc4;color:#fff}.ffa-page .ffa-play:hover{background:#0f4f91}.ffa-page .ffa-lesson p{background:#f4f8fc}.ffa-parent-note{border-color:#dfe6ee}
+/* Appliance help uses a simple device drawing, not a mascot or speech bubble. */
+.dc-page .dc-kicker{color:#176dc4}.dc-page .dc-hero{background:#f4f8fc;border-color:#dfe6ee;grid-template-columns:1fr 260px}
+.dc-page .dc-hero-art::before{display:none}.dc-page .dc-device-symbol{display:grid;place-items:center;width:132px;height:132px;border-radius:28px;background:#fff;border:1px solid #d8e3ef;color:#176dc4;box-shadow:0 12px 30px #16283c08}
+.dc-page .dc-device-symbol .dc-art{width:92px;height:92px}.dc-page .dc-bubble{border:0;background:none;border-radius:0;color:#4a5a6b;font-weight:500;animation:none}.dc-page .dc-bubble::before{display:none}
+.dc-page .dc-orbit{box-shadow:none;border:1px solid #d8e3ef}.dc-page .dc-orbit-0,.dc-page .dc-orbit-2{color:#176dc4}
+.dc-page:not([data-step="identify"]) .dc-hero{grid-template-columns:1fr}.dc-page:not([data-step="identify"]) .dc-hero-art{display:none}
+.dc-page .dc-teach{border-width:1px}.dc-page .dc-moment-symbol{display:grid;place-items:center;width:64px;height:64px;flex:0 0 auto;border-radius:18px;background:white;color:#176dc4}.dc-page .dc-moment-symbol .dc-icon{width:34px;height:34px}
+@media(max-width:700px){.dc-page .dc-hero{grid-template-columns:1fr;padding:24px}.dc-page .dc-hero-art{display:none}.fgx-device strong{font-size:15px}.fgx-device>span:last-child{font-size:12px}.fgx-card-link{font-size:16px}.fgx-heading>p:not(.fgx-eyebrow){font-size:17px}.fgx-entry>span:not(.fgx-entry-art,.fgx-card-index,.fgx-card-link){font-size:15px}.fgx-photo-panel>p:not(.fgx-eyebrow){font-size:16px}}
+/* Motion stays on without a site toggle, while the system preference remains
+   authoritative for every decorative transition and smooth scroll. */
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}

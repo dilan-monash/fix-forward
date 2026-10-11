@@ -46,7 +46,7 @@ class WorldRoutesTests(unittest.TestCase):
                 expected = {"text/css"} if name.endswith(".css") else {"text/javascript", "application/javascript"}
                 self.assertIn(response.mimetype, expected, name)
         with self.client.get("/") as response:
-            self.assertIn(b"/prototypes/i3-world-preview/fixit.css", response.data)
+            self.assertIn(b"/prototypes/i3-five-games/reference/fixit.css", response.data)
 
     def test_wrong_password_and_missing_csrf_cannot_open_world(self):
         with self.login("wrong") as response:

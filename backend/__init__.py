@@ -8,6 +8,10 @@ import hashlib
 import re
 
 from .config import Settings
+from .family_frontend import (
+    FAMILY_ASSET_MIME, FAMILY_ENTRY, FAMILY_FILM,
+    FAMILY_FRONTEND_ALIASES, FAMILY_FRONTEND_ASSETS,
+)
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -147,10 +151,16 @@ def create_app(test_config=None):
 
     @app.get("/")
     @app.get("/index.html")
-    # The same access gate now opens the unified I3 world. Its API calls remain
+    # The same access gate now opens the reviewed family site. Its API calls remain
     # same-origin GET requests to the existing read-only Flask routes below.
     def index():
-        return send_from_directory(PROJECT_ROOT / "prototypes/i3-world-preview", "index.html")
+        return send_from_directory(PROJECT_ROOT, FAMILY_ENTRY)
+
+    @app.get("/film.html")
+    # A shareable film entry uses the same session and external-script CSP as
+    # the site. Flask's file response preserves native byte-range seeking.
+    def family_film():
+        return send_from_directory(PROJECT_ROOT, FAMILY_FILM)
 
     @app.get("/legacy")
     # Keep the approved earlier adult journey available without copying or changing it.
@@ -174,7 +184,8 @@ def create_app(test_config=None):
     def frontend_asset(asset_path):
         # Only public frontend assets are served. Backend code, migrations and
         # environment templates must never be downloadable from the website.
-        allowed = asset_path in FRONTEND_FILES or asset_path in WORLD_FRONTEND_ASSETS or (
+        family_asset = asset_path in FAMILY_FRONTEND_ASSETS or asset_path in FAMILY_FRONTEND_ALIASES
+        allowed = family_asset or asset_path in FRONTEND_FILES or asset_path in WORLD_FRONTEND_ASSETS or (
             # Only direct app modules are public; src/../prototype tests must
             # not bypass the exact world allowlist through an alternate path.
             re.fullmatch(r"src/[A-Za-z0-9_-]+\.js", asset_path) is not None
@@ -212,8 +223,10 @@ def create_app(test_config=None):
             # A generic unavailable response keeps corrupt model details out of
             # the UI; the photo helper converts this into its manual fallback.
             return "Asset unavailable", 503
-        response = send_from_directory(PROJECT_ROOT, asset_path)
-        explicit_mime = SIGLIP_ASSET_MIME.get(Path(asset_path).suffix.lower())
+        served_path = FAMILY_FRONTEND_ALIASES.get(asset_path, asset_path)
+        response = send_from_directory(PROJECT_ROOT, served_path)
+        mime_types = FAMILY_ASSET_MIME if family_asset else SIGLIP_ASSET_MIME
+        explicit_mime = mime_types.get(Path(served_path).suffix.lower())
         if explicit_mime:
             response.headers["Content-Type"] = explicit_mime
         return response

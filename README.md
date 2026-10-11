@@ -4,6 +4,12 @@
 
 **Where to work:** Ordinary changes happen on `iteration-3`, in the `FixForward-Iteration-3-From-Iteration-2` checkout. Older local folders (for example `tmp/child-quest-prototype` and `tmp/github-update` inside the v1.6 workspace) are earlier I2 and Main checkouts; leave them unchanged. In another clone, choose the intended branch and check the working tree before editing. Authored source files contain nearby explanations of functions and important rules. See the [agent working agreement](AGENTS.md) and [technology stack and source links](docs/TECH_STACK.md).
 
+## Current family site
+
+The protected `/` entry serves `prototypes/i3-five-games/index.html`: Home, Learn together, Explore and Decide. The original navy/cyan FixForward logo appears in the header and footer. Learn contains Fix-it Station, Materials Rescue, Care Crew, Scrapworks and Circular Choices, with on-screen practice and parent learning records. Explore retains the confirmed photo/manual selection and rotatable device world; photo results in Explore and Decide reveal themselves automatically.
+
+The runtime and score map is in [the family frontend README](prototypes/i3-five-games/README.md). Flask exposes only the exact assets in `backend/family_frontend.py`; its existing authentication, read-only APIs, model integrity rules, `/legacy` and `/quest` routes remain in place. The optional narrated film is available at `/film.html`. `npm run check` includes the family tests as well as the earlier repository suite.
+
 ## Branches and websites
 
 | Website | GitHub branch | Website address | Role |

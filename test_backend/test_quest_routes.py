@@ -114,7 +114,7 @@ class QuestRouteTests(unittest.TestCase):
                     if path in ("/", "/index.html"):
                         text = response.get_data(as_text=True)
                         self.assertIn('id="preview-app"', text)
-                        self.assertIn('Explore in 3D', text)
+                        self.assertIn('/prototypes/i3-five-games/app.js', text)
                         self.assertNotIn('id="quest-app"', text)
                     if path == "/legacy":
                         text = response.get_data(as_text=True)

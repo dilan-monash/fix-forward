@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" fill="none">
+  <!-- Pip keeps the blue toaster identity from the earlier family prototype. -->
+  <defs><linearGradient id="body" x1="120" y1="66" x2="120" y2="205" gradientUnits="userSpaceOnUse"><stop stop-color="#d9eeff"/><stop offset="1" stop-color="#a9d2f5"/></linearGradient></defs>
+  <ellipse cx="120" cy="214" rx="82" ry="10" fill="#143f37" opacity=".1"/>
+  <path d="m63 204-5 12m125-12 5 12" stroke="#183e44" stroke-width="7" stroke-linecap="round"/>
+  <rect x="34" y="69" width="174" height="139" rx="40" fill="url(#body)" stroke="#183e44" stroke-width="5"/>
+  <rect x="64" y="58" width="46" height="19" rx="9" fill="#183e44"/><rect x="136" y="58" width="46" height="19" rx="9" fill="#183e44"/>
+  <path d="M72 63V44c-12-5-6-21 14-21s26 16 14 21v19" fill="#eeb675" stroke="#183e44" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M208 125h15v22" stroke="#183e44" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="90" cy="132" r="10" fill="#183e44"/><circle cx="151" cy="132" r="10" fill="#183e44"/>
+  <circle cx="93" cy="129" r="3" fill="white"/><circle cx="154" cy="129" r="3" fill="white"/>
+  <path d="M102 163q19 17 37 0" stroke="#183e44" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="72" cy="158" r="9" fill="#ec9bab"/><circle cx="170" cy="158" r="9" fill="#ec9bab"/>
+  <path d="m196 28 3 8 9 3-9 3-3 9-3-9-8-3 8-3Z" fill="#c78941"/>
+</svg>
