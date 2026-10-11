@@ -1,0 +1,71 @@
+/* Learn hub layout for Iteration 3: the challenge rules taken from the Figma
+   reference stylesheet, so the live Learn page matches the reviewed design
+   without loading the reference home page's styles. */
+.challenge-page {max-width:1440px; padding:54px 72px 72px;}
+.challenge-hub-heading {text-align:left; max-width:820px; margin:0 0 44px;}
+.challenge-hub-heading h1 {margin:0 0 14px; font-size:48px;}
+.challenge-hub-heading>p:last-child {margin:0; font-size:22px; line-height:1.45;}
+.challenge-grid {gap:48px;}
+.challenge-card {border:1px solid #dce2e6; border-radius:32px;}
+.challenge-card.yellow {background:#faf6e3;}
+.challenge-card.blue {background:#e3f3ff;}
+.challenge-card.mint {background:#e5f7ed;}
+.challenge-card-art {margin:24px 24px 0; height:190px; border-radius:26px;}
+.challenge-card-art>svg {width:100%; max-width:none;}
+.challenge-card-content {padding:22px 24px 28px;}
+.challenge-card .challenge-eyebrow {font-size:12px; letter-spacing:.4px;}
+.challenge-card.yellow .challenge-eyebrow {color:#ba591b!important;}
+.challenge-card.blue .challenge-eyebrow {color:#1971d0!important;}
+.challenge-card.mint .challenge-eyebrow {color:#148e7b!important;}
+.challenge-card h2 {font-size:30px;}
+.challenge-card-content>p:not(.challenge-eyebrow) {font-size:18px; min-height:108px;}
+.challenge-card.yellow .challenge-button {background:#fa7e2c;}
+.challenge-card.blue .challenge-button {background:#1570df;}
+.challenge-card.mint .challenge-button {background:#148e7b;}
+.challenge-game:has(.challenge-play-card.blue) {display:grid; grid-template-columns:minmax(0,1fr) 390px; gap:0 30px;}
+.challenge-game:has(.challenge-play-card.blue) .challenge-top {grid-column:1 / -1; margin-bottom:25px;}
+.challenge-game:has(.challenge-play-card.blue) .challenge-heading {text-align:left; margin:0 0 34px;}
+.challenge-game:has(.challenge-play-card.blue) .challenge-heading h1 {font-size:48px;}
+.challenge-game:has(.challenge-play-card.blue) .challenge-heading>p {color:#1971d0; font-size:18px; margin:10px 0 0;}
+.challenge-game:has(.challenge-play-card.blue) .challenge-progress {align-self:start; gap:14px; font-size:14px;}
+.challenge-game:has(.challenge-play-card.blue)>.challenge-note {grid-column:1 / -1;}
+.challenge-play-card.blue {grid-column:1 / -1; background:transparent; padding:0;}
+.challenge-play-card.blue .challenge-question {padding:34px 36px; background:#e3f3ff; border-radius:32px;}
+.challenge-play-card.blue .challenge-question h2 {max-width:1120px; font-size:26px; letter-spacing:-.4px; line-height:1.35; margin:0 0 15px;}
+.challenge-play-card.blue .challenge-question p {margin:0; font-size:18px;}
+.challenge-play-card.blue .challenge-eyebrow {display:none;}
+.challenge-play-card.blue .challenge-options {gap:24px; margin-top:24px;}
+.challenge-play-card.blue .challenge-options button {border:1px solid #dbe2e8; border-radius:28px; padding:26px; min-height:190px;}
+.challenge-play-card.blue .answer-letter {width:40px; height:40px;}
+.challenge-play-card.blue .answer-choose {background:#148e7b; color:white; padding:9px 24px;}
+.challenge-play-card.blue button:nth-child(2) .answer-choose {background:#1570df;}
+.challenge-play-card.blue button:nth-child(3) .answer-choose {background:#e98233;}
+.challenge-play-card.blue button:nth-child(4) .answer-choose {background:#7954bd;}
+@media(max-width:1000px) {
+  .challenge-page {padding:40px 28px 55px;}
+  .challenge-grid {gap:22px;}
+  .challenge-card-art {margin:18px 18px 0; height:170px;}
+  .challenge-card-content {padding:20px;}
+  .challenge-card h2 {font-size:25px;}
+  .challenge-card-content>p:not(.challenge-eyebrow) {font-size:17px; min-height:128px;}
+  .challenge-game:has(.challenge-play-card.blue) {grid-template-columns:minmax(0,1fr) 330px; gap:0 20px;}
+  .challenge-game:has(.challenge-play-card.blue) .challenge-heading h1 {font-size:38px;}
+}
+@media(max-width:760px) {
+  .challenge-page {padding:35px 22px 48px;}
+  .challenge-hub-heading {margin-bottom:30px;}
+  .challenge-hub-heading h1 {font-size:36px;}
+  .challenge-hub-heading>p:last-child {font-size:18px;}
+  .challenge-grid {grid-template-columns:1fr; gap:24px;}
+  .challenge-card {display:block; padding:0;}
+  .challenge-card-art {height:190px; margin:22px 22px 0;}
+  .challenge-card-content {padding:22px;}
+  .challenge-card h2 {font-size:28px;}
+  .challenge-card-content>p:not(.challenge-eyebrow) {min-height:0; font-size:18px;}
+  .challenge-game:has(.challenge-play-card.blue) {display:block;}
+  .challenge-game:has(.challenge-play-card.blue) .challenge-heading {margin-bottom:22px;}
+  .challenge-play-card.blue .challenge-question {padding:26px 24px; border-radius:26px;}
+  .challenge-play-card.blue .challenge-question h2 {font-size:23px;}
+  .challenge-play-card.blue .challenge-options {grid-template-columns:1fr; gap:16px;}
+  .challenge-play-card.blue .challenge-options button {padding:22px; border-radius:24px;}
+}

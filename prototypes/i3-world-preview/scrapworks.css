@@ -1,0 +1,93 @@
+/* Scrapworks: one task on screen at a time. Status sits on top, the item in the
+   centre, four large destinations below and the town at the side. Motion only
+   decorates a result and is removed for visitors who prefer reduced motion. */
+.sw-page{max-width:1280px;margin:auto;padding:40px 48px 64px;color:#142439;font-family:Arial,Helvetica,sans-serif}
+.sw-page h1,.sw-page h2{color:#142439;letter-spacing:-1px;line-height:1.15;margin:6px 0 12px}
+.sw-page h1{font-size:48px}.sw-page h2{font-size:30px}
+.sw-page p{color:#566476;line-height:1.5}
+.sw-small{font-size:14px}
+.sw-link{background:none;border:0;padding:0;font:inherit;color:#176dc4;cursor:pointer}
+.sw-hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:40px;align-items:center;margin:20px 0 36px}
+.sw-rules{list-style:none;padding:0;margin:18px 0;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sw-rules li{background:#f4f7fa;border-radius:12px;padding:12px 14px;font-size:15px;color:#344b62}
+.sw-rules strong{display:block;color:#142439}
+.sw-town-frame{margin:0;background:#fff;border:1px solid #e3e6e9;border-radius:20px;padding:12px;box-shadow:0 15px 45px #183d6310}
+.sw-town{display:block;width:100%;height:auto;border-radius:12px}
+.sw-town-frame figcaption{font-size:14px;color:#566476;text-align:center;padding-top:8px}
+.sw-town-part.is-new{animation:sw-grow .9s ease-out both;transform-box:fill-box;transform-origin:50% 100%}
+.sw-section-title{font-size:26px!important}
+.sw-levels{list-style:none;padding:0;margin:0 0 30px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.sw-level{width:100%;min-height:150px;text-align:left;display:flex;flex-direction:column;gap:6px;padding:18px;border-radius:16px;border:1px solid #d6e3d0;background:#e5f7ec;color:#142439;font:inherit;cursor:pointer;transition:transform .2s,box-shadow .2s}
+.sw-level:hover:not(:disabled){transform:translateY(-3px);box-shadow:0 8px 20px #16344e18}
+.sw-level strong{font-size:19px}.sw-level>span{font-size:14px;color:#465a6e}
+.sw-level-number{font-size:12px!important;font-weight:700;letter-spacing:1.4px;text-transform:uppercase}
+.sw-level.is-locked{background:#f2f3f5;border-color:#e1e4e8;color:#6b7580;cursor:not-allowed}
+.sw-lock{font-size:13px!important}
+.sw-stars{font-size:22px;letter-spacing:2px;color:#c9cfd6}.sw-stars .on{color:#e1a628}
+.sw-reset{border-top:1px solid #e3e6e9;padding-top:20px;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.sw-reset p{margin:0;flex-basis:100%}
+.sw-layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:28px;align-items:start;margin-top:16px}
+.sw-side{position:sticky;top:20px}
+.sw-hud{display:grid;grid-template-columns:1.6fr 1fr 1.2fr 1fr;gap:10px;margin-bottom:14px}
+.sw-hud>span{background:#f4f7fa;border-radius:12px;padding:10px 14px;display:flex;flex-direction:column;gap:2px}
+.sw-hud small{font-size:12px;color:#566476;text-transform:uppercase;letter-spacing:1px}
+.sw-hud strong{font-size:18px}
+.sw-tokens{display:flex;align-items:center;gap:5px}
+.sw-tokens span{width:14px;height:14px;border-radius:50%;border:2px solid #e1a628;background:transparent}
+.sw-tokens span.on{background:#f4d873}
+.sw-tokens em{font-style:normal;margin-left:4px}
+.sw-score.is-bumped{animation:sw-bump .5s ease-out}
+.sw-intro{background:#fbf4d9;border-radius:12px;padding:10px 14px;margin:0 0 14px;color:#4d4326!important}
+.sw-item{display:grid;grid-template-columns:220px minmax(0,1fr);gap:24px;align-items:center;background:#fff;border:2px solid #e3e6e9;border-radius:22px;padding:22px;min-height:260px}
+.sw-item.is-hazard{border-color:#e07a4f;background:#fff8f3}
+.sw-drag{background:#f4f7fa;border-radius:18px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;touch-action:none;user-select:none}
+.sw-drag[data-draggable]{cursor:grab}
+.sw-drag svg{width:78%;height:78%}
+.sw-drag.is-dragging{opacity:.35}
+.sw-ghost{position:fixed;z-index:50;width:110px;height:110px;margin:-55px 0 0 -55px;pointer-events:none;background:#fff;border-radius:18px;box-shadow:0 12px 30px #16344e40;display:flex;align-items:center;justify-content:center}
+.sw-ghost svg{width:80%;height:80%}
+.sw-item.is-sent .sw-drag svg{animation:sw-send .7s ease-in both}
+.sw-hint{font-size:16px}
+.sw-clues{list-style:none;padding:0;margin:12px 0 8px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sw-clues li{background:#f4f7fa;border-radius:10px;padding:8px 12px;display:flex;flex-direction:column;font-size:15px}
+.sw-clues li span{font-size:12px;color:#566476;text-transform:uppercase;letter-spacing:1px}
+.sw-clues li.is-warning{background:#ffe3d6;color:#8a2e0b}
+.sw-clues li.is-data{background:#e7e0f5;color:#47336d}
+.sw-clues li.is-cleared{background:#dff3e3;color:#24663a}
+.sw-clue-text{margin:6px 0}
+.sw-adult{font:inherit;font-weight:700;border:2px solid #7a5fa8;background:#f0e9fc;color:#47336d;border-radius:12px;padding:12px 16px;cursor:pointer;margin-top:6px}
+.sw-outcome strong{display:block;color:#142439;font-size:19px;margin-bottom:4px}
+.sw-feedback{min-height:24px;margin:12px 0;font-size:16px;border-radius:12px}
+.sw-feedback:not(:empty){padding:12px 16px}
+.sw-feedback.is-retry{background:#fff3d6;color:#5c4510}
+.sw-feedback.is-stop{background:#ffe3d6;color:#8a2e0b}
+.sw-feedback.is-ok{background:#dff3e3;color:#24663a}
+.sw-destinations{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.sw-destinations:has(.sw-dest-bin){grid-template-columns:repeat(5,minmax(0,1fr))}
+.sw-dest{font:inherit;min-height:120px;border-radius:16px;border:2px solid transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:12px 8px;cursor:pointer;color:#142439;transition:transform .15s,box-shadow .15s;text-align:center}
+.sw-dest strong{font-size:17px}.sw-dest small{font-size:13px;color:#465a6e}
+.sw-dest-icon{font-size:28px;line-height:1}
+.sw-dest:hover:not(:disabled),.sw-dest.is-drop-target{transform:translateY(-3px);box-shadow:0 8px 20px #16344e20;border-color:#176dc4}
+.sw-dest:disabled{opacity:.55;cursor:default}
+.sw-dest-reuse{background:#dceffa}.sw-dest-repair{background:#d9efd8}.sw-dest-recycle{background:#e7e0f5}
+.sw-dest-hold{background:#ffe3c2;border-color:#e9a46b}
+.sw-dest-bin{background:#eceef0;border-style:dashed;border-color:#a7b0b9}
+.sw-keys{margin-top:14px}
+kbd{font-family:inherit;font-size:12px;border:1px solid #cbd5df;border-bottom-width:2px;border-radius:5px;padding:1px 6px;background:#fff}
+.sw-result-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px;align-items:center;margin-top:20px}
+.sw-results .sw-stars{font-size:44px}
+.sw-results .challenge-result-actions{justify-content:flex-start}
+.sw-result-score{font-size:46px;font-weight:700;color:#142439!important;margin:8px 0}
+.sw-result-score span{font-size:18px;font-weight:400;color:#566476}
+@keyframes sw-bump{40%{transform:scale(1.35);color:#24663a}}
+@keyframes sw-send{to{transform:translateY(60px) scale(.3);opacity:0}}
+@keyframes sw-grow{from{transform:scaleY(0);opacity:0}}
+@media(max-width:1000px){.sw-page{padding:30px 28px 45px}.sw-layout{grid-template-columns:1fr}.sw-side{position:static;order:-1;max-width:420px}.sw-levels{grid-template-columns:repeat(2,minmax(0,1fr))}.sw-hero{grid-template-columns:1fr}}
+@media(max-width:700px){.sw-page{padding:24px 16px 40px}.sw-page h1{font-size:36px}.sw-page h2{font-size:24px}.sw-hud{grid-template-columns:1fr 1fr}.sw-item{grid-template-columns:1fr;padding:16px}.sw-drag{max-width:170px;margin:auto;width:100%}.sw-destinations,.sw-destinations:has(.sw-dest-bin){grid-template-columns:1fr 1fr}.sw-dest{min-height:96px}.sw-rules,.sw-clues{grid-template-columns:1fr}.sw-levels{grid-template-columns:1fr}.sw-level{min-height:0}.sw-result-grid{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.sw-page *{transition:none!important;animation:none!important}.sw-level:hover,.sw-dest:hover{transform:none!important}}
+/* Learn hub entry card for Scrapworks, shown below the three challenge modes. */
+.scrapworks-feature{display:grid;gap:8px;justify-items:start;margin:22px 0 0;padding:26px 28px;border-radius:22px;background:linear-gradient(120deg,#e5f7ec,#dceffa);border:1px solid #cfe3d6;color:#142439;text-decoration:none}
+.scrapworks-feature strong{font-size:30px;letter-spacing:-1px}
+.scrapworks-feature>span:not(.challenge-button){color:#465a6e;font-size:17px;max-width:720px}
+.scrapworks-feature .scrapworks-feature-badge{font-size:12px!important;font-weight:700;letter-spacing:1.4px;color:#24663a!important}
+.scrapworks-feature:hover{box-shadow:0 8px 20px #16344e18}

@@ -59,15 +59,9 @@ async function mountHome(token) {
   }
 }
 
-/** A short learning menu keeps the game out of the adult workflow, while each
- * activity feeds the same product understanding and real-world action centre. */
-function learnMarkup() {
-  return `<section class="page-width learn-page"><div class="section-heading"><div><p class="eyebrow">CURIOUS MINDS. USEFUL DISCOVERIES.</p><h1>Learn something<br>you can <em>use.</em></h1></div><p>For children aged 7–12 and a curious person beside them.<br>No rush. No streaks. Just a better question.</p></div><div class="learning-options"><a href="#explore" class="learning-option"><span class="activity-type">01 / EXPLORE TOGETHER</span><div class="activity-art activity-orbit">${icon('cube')}<i></i><i></i></div><h2>What’s inside the everyday?</h2><p>Turn a 3D appliance, meet its parts and discover a care habit to talk about.</p><b>Enter the 3D world ↗</b></a><a href="#sort" class="learning-option sorting-option"><span class="activity-type">02 / TRY A SHORT CHALLENGE</span><div class="activity-art activity-paths"><span>${icon('heart')}</span><i>→</i><span>${icon('repair')}</span><i>→</i><span>${icon('recycle')}</span></div><h2>Same object. Different next step.</h2><p>Practise one move together. Then use each story’s clue to sort with confidence.</p><b>Open the sorting station ↗</b></a></div><div class="teach-back"><span>${icon('heart')}</span><div><h2>“What helped you make that choice?”</h2><p>That question matters more than a score. Saved discoveries give you something to discuss at home.</p></div><a href="#journal" class="button secondary">My discoveries →</a></div></section>`;
-}
-
 /** This is the parent purpose view, not a separate branded application. */
 function parentsMarkup() {
-  return `<section class="page-width parents-page"><p class="eyebrow">FOR PARENTS AND CURIOUS FAMILIES</p><h1>Useful for your home.<br><em>Meaningful for their future.</em></h1><p class="lead">“Throw it away” is only one possible ending. FixForward helps your family understand the other possibilities, and gives adults a practical place to begin.</p><div class="parent-two"><article><span class="large-index">01</span><h2>When you have an appliance problem.</h2><p>Start in Take action. Enter the item’s details for a recall check, explore repair and recycling sources, or save a next-step plan. No game is required.</p><a class="button primary" href="#action">Get practical help →</a></article><article><span class="large-index">02</span><h2>When a child wants to know why.</h2><p>Explore a digital appliance together. See how parts work and compare energy use. In sorting, the story changes the decision: working, repairable and beyond repair are different situations.</p><a class="button secondary" href="#learn">Choose a shared activity →</a></article></div><blockquote>“What could we find out before deciding?”<cite>A question for an eight-year-old. A useful habit for all of us.</cite></blockquote><div class="parent-faq"><h2>A few things you may want to know.</h2><details><summary>What do children actually learn?</summary><p>They connect parts to jobs, use clues rather than appearances, and learn that reuse, repair and specialist recycling have different purposes. Short questions ask them to apply what they noticed.</p></details><details><summary>Does this teach children to repair appliances?</summary><p>No. Parts separate only in the digital model. Real appliances stay closed. Children can explain an idea; an adult handles care, recalls and contact with a qualified repairer.</p></details><details><summary>Are the carbon numbers measured?</summary><p>No. The impact view calculates an illustrative use-phase estimate from power, time, frequency and a visible electricity factor. It does not claim to know an appliance’s manufacturing footprint or count a verified emissions saving.</p></details><details><summary>What does AR need?</summary><p>A compatible phone or tablet browser, a secure connection and the device’s permission. The 3D view remains available where AR is unsupported.</p></details><details><summary>Is there automatic sound or a child account?</summary><p>No automatic sound. Optional activity sounds start after a tap. Discoveries stay in this browser, without names, child accounts or a public leaderboard.</p></details></div></section>`;
+  return `<section class="page-width parents-page"><p class="eyebrow">FOR PARENTS AND CURIOUS FAMILIES</p><h1>Useful for your home.<br><em>Meaningful for their future.</em></h1><p class="lead">“Throw it away” is only one possible ending. FixForward helps your family understand the other possibilities, and gives adults a practical place to begin.</p><div class="parent-two"><article><span class="large-index">01</span><h2>When you have an appliance problem.</h2><p>Start in Take action. Enter the item’s details for a recall check, explore repair and recycling sources, or save a next-step plan. No game is required.</p><a class="button primary" href="#action">Get practical help →</a></article><article><span class="large-index">02</span><h2>When a child wants to know why.</h2><p>Explore a digital appliance together. See how parts work and compare energy use. In sorting, the story changes the decision: working, repairable and beyond repair are different situations.</p><a class="button secondary" href="#learn">Choose a shared activity →</a></article></div><blockquote>“What could we find out before deciding?”<cite>A question for an eight-year-old. A useful habit for all of us.</cite></blockquote><div class="parent-faq"><h2>A few things you may want to know.</h2><details><summary>What do children actually learn?</summary><p>They connect parts to jobs, use clues rather than appearances, and learn that reuse, repair and specialist recycling have different purposes. Short questions ask them to apply what they noticed.</p></details><details><summary>Does this teach children to repair appliances?</summary><p>No. Parts separate only in the digital model. Real appliances stay closed. Children can explain an idea; an adult handles care, recalls and contact with a qualified repairer.</p></details><details><summary>Are the carbon numbers measured?</summary><p>No. The impact view calculates an illustrative use-phase estimate from power, time, frequency and a visible electricity factor. It does not claim to know an appliance’s manufacturing footprint or count a verified emissions saving.</p></details><details><summary>What does AR need?</summary><p>A compatible phone or tablet browser, a secure connection and the device’s permission. The 3D view remains available where AR is unsupported.</p></details><details><summary>Is there automatic sound or a child account?</summary><p>No automatic sound. Optional activity sounds start after a tap. Fix-it Station has its own music and sounds, which also wait for a tap and have Music and Sounds buttons to turn them off. Discoveries stay in this browser, without names, child accounts or a public leaderboard.</p></details></div></section>`;
 }
 
 /** Learning is recorded as ideas rather than claimed environmental outcomes. */
@@ -124,7 +118,7 @@ function onNavigate(value) {
   if(name==='recall'){name='action';params.set('kind','recall');}
   if(name==='lens')name='explore';
   const route=name+(params.size?'?'+params.toString():'');
-  if (!/^(home|explore|action|learn|sort|parents|journal|sources)(\?|$)/.test(route)) return;
+  if (!/^(home|explore|action|learn|sort|scrapworks|parents|journal|sources)(\?|$)/.test(route)) return;
   if (location.hash.slice(1)===route) renderRoute(); else location.hash=route;
 }
 
@@ -144,20 +138,24 @@ async function renderRoute() {
   cleanup=()=>routeController.abort();
   const route=location.hash.slice(1).replace(/^\//,'')||'home', name=route.split('?')[0];
   document.body.dataset.route=name;
-  const nav=name==='sort'?'learn':name;
+  const nav=['sort','scrapworks'].includes(name)?'learn':name;
   document.querySelectorAll('[data-nav]').forEach(a=>a.dataset.nav===nav?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current'));
-  document.title=`${({home:'Give good things a longer life.',explore:'Explore in 3D',action:'Take action',learn:'Learn together',sort:'Sorting station',parents:'For families',journal:'My space',sources:'Sources & approach'})[name]||'Home'} | FixForward`;
+  document.title=`${({home:'Give good things a longer life.',explore:'Explore in 3D',action:'Take action',learn:'Learn together',sort:'Sorting station',scrapworks:'Scrapworks',parents:'For families',journal:'My space',sources:'Sources & approach'})[name]||'Home'} | FixForward`;
   const context={route,onNavigate,onLearn,onAward,playSound,signal:routeController.signal};
   try {
     if(name==='home') { mountHome(token); }
-    else if(name==='explore'||name==='action'||name==='sort') {
+    else if(['explore','action','sort','learn','scrapworks'].includes(name)) {
       host.innerHTML='<section class="page-width route-loading" role="status"><span class="loading-orbit"></span><p>Opening your next step…</p></section>';
-      const module=await import(name==='explore'?'./explore.js':name==='action'?'./action.js?v=i3-photo-review-v4':'../i3-family-preview/sorting.js');
+      // Learn opens the challenge hub; its Fix-it Station address (learn?game=fix-it)
+      // opens the 3D workshop game, and Scrapworks is the strategy game for older children.
+      const fixit=name==='learn'&&new URLSearchParams(route.split('?')[1]||'').get('game')==='fix-it';
+      if(fixit)document.title='Fix-it Station | FixForward';
+      const module=await import(fixit?'./fixit.js':name==='explore'?'./explore.js':name==='action'?'./action.js?v=i3-photo-review-v4':name==='learn'?'./learning.js':name==='scrapworks'?'./scrapworks.js':'../i3-family-preview/sorting.js');
       if(token!==generation)return;
-      const mounted=await (name==='explore'?module.mountExplore(host,context):name==='action'?module.mountAction(host,context):module.mountSorting(host,context));
+      const mounted=await (fixit?module.mountFixit(host,context):name==='explore'?module.mountExplore(host,context):name==='action'?module.mountAction(host,context):name==='learn'?module.mountLearning(host,context):name==='scrapworks'?module.mountScrapworks(host,context):module.mountSorting(host,context));
       if(token!==generation){mounted?.();return;}
       cleanup=()=>{routeController.abort();mounted?.();};
-    } else host.innerHTML=name==='learn'?learnMarkup():name==='parents'?parentsMarkup():name==='journal'?journalMarkup():name==='sources'?sourcesMarkup():notFoundMarkup();
+    } else host.innerHTML=name==='parents'?parentsMarkup():name==='journal'?journalMarkup():name==='sources'?sourcesMarkup():notFoundMarkup();
   } catch(error) {
     if(token!==generation)return;
     console.error('Preview route could not open',error);

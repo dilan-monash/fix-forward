@@ -26,6 +26,12 @@ WORLD_FRONTEND_ASSETS = {
         "catalogue-expanded.js", "catalogue-part-context.js",
         "progress.js", "vendor/three.module.js", "vendor/three.core.js",
         "vendor/OrbitControls.js",
+        # Learn together: the challenge hub, the 3D Fix-it Station game (with its
+        # everyday-waste models, celebrations and on-device sounds) and Scrapworks.
+        "learning.js", "learning.css", "learning-reference.css",
+        "fixit.js", "fixit-engine.js", "fixit-3d.js", "fixit-party.js", "fixit-sound.js",
+        "fixit.css", "waste-models.js",
+        "scrapworks.js", "scrapworks-engine.js", "scrapworks.css",
     )
 } | {"prototypes/i3-family-preview/sorting.js", "prototypes/i3-family-preview/sorting.css"}
 

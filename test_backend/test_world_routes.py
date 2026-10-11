@@ -31,6 +31,23 @@ class WorldRoutesTests(unittest.TestCase):
         with self.client.get("/api/recalls") as response:
             self.assertEqual(response.status_code, 401)
 
+    def test_learn_games_load_only_after_login(self):
+        # The Learn hub, Fix-it Station and Scrapworks use the same gate as the rest of the world.
+        learn = ("learning.js", "learning-reference.css", "fixit.js", "fixit-3d.js", "fixit-sound.js",
+                 "fixit-party.js", "waste-models.js", "fixit.css", "scrapworks.js")
+        for name in learn:
+            with self.client.get(f"/prototypes/i3-world-preview/{name}") as response:
+                self.assertEqual(response.status_code, 303, name)
+        self.login().close()
+        for name in learn:
+            with self.client.get(f"/prototypes/i3-world-preview/{name}") as response:
+                self.assertEqual(response.status_code, 200, name)
+                # The JavaScript media type name depends on the server's platform tables.
+                expected = {"text/css"} if name.endswith(".css") else {"text/javascript", "application/javascript"}
+                self.assertIn(response.mimetype, expected, name)
+        with self.client.get("/") as response:
+            self.assertIn(b"/prototypes/i3-world-preview/fixit.css", response.data)
+
     def test_wrong_password_and_missing_csrf_cannot_open_world(self):
         with self.login("wrong") as response:
             self.assertEqual(response.status_code, 401)
@@ -76,6 +93,8 @@ class WorldRoutesTests(unittest.TestCase):
                 self.assertEqual(response.headers["X-Content-Type-Options"], "nosniff")
         # Developer contact sheets and recovered source must remain local-only.
         for path in ("/prototypes/i3-world-preview/serve.mjs", "/prototypes/i3-world-preview/action.test.js",
+                     "/prototypes/i3-world-preview/fixit.test.js", "/prototypes/i3-world-preview/learning.test.js",
+                     "/prototypes/i3-world-preview/scrapworks.test.js",
                      "/prototypes/i3-world-preview/models-gallery.html", "/prototypes/i3-world-preview/models-gallery.js",
                      "/tmp/explore-3d/reference-source/web/lab/devices.js",
                      "/prototypes/i3-world-preview/README.md", "/prototypes/i3-world-preview/vendor/README.md",
