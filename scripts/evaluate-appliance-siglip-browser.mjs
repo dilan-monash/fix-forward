@@ -11,7 +11,7 @@ import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { validateCohortLock } from "./evaluate-appliance-siglip-candidate-policy.mjs";
+import { summariseClassThresholdEvaluation, validateCohortLock } from "./evaluate-appliance-siglip-candidate-policy.mjs";
 
 const DEFAULT_MODEL = "onnx-community/siglip2-base-patch32-256-ONNX";
 const DEFAULT_REVISION = "7efccb86b5b6601bfe9e14326e1c11b40b68d44c";
@@ -438,8 +438,24 @@ export function summariseEvaluation(rows, audit, semanticAudit, options, enabled
   };
 }
 
+/** Keep an older artifact-validation policy from becoming the candidate result. */
+export function buildPolicySummaries(rows, audit, semanticAudit, options, enabledClasses, candidatePolicy = null) {
+  const legacySummary = summariseEvaluation(rows, audit, semanticAudit, options, enabledClasses);
+  return candidatePolicy
+    ? { summary: summariseClassThresholdEvaluation(rows, audit, candidatePolicy), diagnostic_legacy_policy_summary: legacySummary }
+    : { summary: legacySummary };
+}
+
 async function main() {
   const options = parseArgs(process.argv.slice(2));
+  // Refuse to spend time running a model when the requested evidence already
+  // exists. The exclusive final write also protects against a concurrent run.
+  try {
+    await fs.access(options.output);
+    throw new Error(`Evidence already exists: ${options.output}. Choose a new output path.`);
+  } catch (error) {
+    if (error.code !== "ENOENT") throw error;
+  }
   if (![options.minOodMargin, options.minPositiveMargin].every(Number.isFinite) ||
       !Number.isInteger(options.batchSize) || options.batchSize < 1) {
     throw new Error("Thresholds must be finite and batch size must be a positive integer.");
@@ -512,6 +528,7 @@ async function main() {
 
   const predictions = [];
   const started = performance.now();
+  console.log(`Scoring ${manifest.samples.length} locked photos with the pinned q4 model.`);
   for (let start = 0; start < manifest.samples.length; start += options.batchSize) {
     const group = manifest.samples.slice(start, start + options.batchSize);
     const images = [];
@@ -530,17 +547,27 @@ async function main() {
       const scores = scoreVector(tensor.data, index * vectorSize, vectorSize, textData, textRows);
       predictions.push(predictionFor(group[index], scores, textManifest.labels, textManifest.class_count));
     }
+    // Progress reports contain counts and elapsed time, never photo pixels or
+    // interim scores. Auditors must finish their labels before this command.
+    console.log(`Scored ${predictions.length}/${manifest.samples.length} photos in ${Math.round((performance.now() - started) / 1000)}s.`);
   }
   const elapsedMs = performance.now() - started;
-  const summary = summariseEvaluation(
+  const summaries = buildPolicySummaries(
     predictions,
     audit,
     semanticAudit,
     options,
     validatedPolicy.enabledClasses,
+    candidatePolicy,
   );
+  // The saved v1 manifest pins the same model/text bytes but has an obsolete
+  // acceptance rule. For a locked newer candidate, use its actual per-class
+  // rule in the primary summary; keep v1 only as explicitly labelled context.
   const report = {
-    evaluation: "fixforward-siglip2-quantized-browser-candidate-v1",
+    evaluation: "fixforward-siglip2-quantized-node-parity",
+    candidate_id: candidatePolicy?.candidate_id ?? null,
+    cohort_scope: manifest.scope ?? "see input manifest",
+    cohort_minimums_met: audit.summary?.minimums_met ?? null,
     release_ready: false,
     scope: "Node parity harness for the proposed browser weights; not a device/browser release result.",
     model: options.model,
@@ -558,13 +585,13 @@ async function main() {
       ...(cohortLockSha256 ? { cohort_lock_sha256: cohortLockSha256 } : {}),
     },
     timing: { evaluated_images: predictions.length, total_ms: elapsedMs, mean_ms: elapsedMs / predictions.length },
-    summary,
+    ...summaries,
     rows: predictions,
   };
   await fs.mkdir(path.dirname(options.output), { recursive: true });
-  await fs.writeFile(options.output, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+  await fs.writeFile(options.output, `${JSON.stringify(report, null, 2)}\n`, { encoding: "utf8", flag: "wx" });
   await model.dispose();
-  console.log(JSON.stringify(summary, null, 2));
+  console.log(JSON.stringify(summaries.summary, null, 2));
 }
 
 // Importing the module for a synthetic policy test must never start model

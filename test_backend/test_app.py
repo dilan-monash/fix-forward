@@ -38,6 +38,10 @@ class AppTests(unittest.TestCase):
             "model/appliance-siglip/model_manifest.json": "application/json",
             "model/appliance-siglip/text-embeddings.json": "application/json",
             "model/appliance-siglip/text-embeddings.f32": "application/octet-stream",
+            # Explore adds its own small policy/vector files, not another encoder.
+            "model/explore-siglip/model_manifest.json": "application/json",
+            "model/explore-siglip/text-embeddings.json": "application/json",
+            "model/explore-siglip/text-embeddings.f32": "application/octet-stream",
             "vendor/transformers/transformers.min.js": "application/javascript",
             "vendor/transformers/ort-wasm-simd-threaded.jsep.mjs": "text/javascript",
             "vendor/transformers/ort-wasm-simd-threaded.jsep.wasm": "application/wasm",
@@ -75,7 +79,10 @@ class AppTests(unittest.TestCase):
     # This build check binds the reviewed policy sizes and digests to the files.
     def test_vendored_siglip_runtime_and_model_match_frozen_size_and_sha256(self):
         self.assertEqual(set(SIGLIP_ASSET_INTEGRITY), SIGLIP_PUBLIC_ASSETS - {
+            # These mutable kill switches are strictly validated by each helper;
+            # immutable runtime/model/vector files must all retain byte hashes.
             "model/appliance-siglip/model_manifest.json",
+            "model/explore-siglip/model_manifest.json",
         })
         for relative_path, (size, digest) in SIGLIP_ASSET_INTEGRITY.items():
             with self.subTest(relative_path=relative_path):
@@ -92,6 +99,19 @@ class AppTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json["service"], "available")
         self.assertEqual(response.headers["Cache-Control"], "no-store")
+
+    # The shipped entry point must be able to load its new pure review policy.
+    # The unvalidated multi-item detector and research models are not released.
+    def test_single_photo_review_assets_are_served_without_multi_item_models(self):
+        for path in ("/prototypes/i3-five-games/support/photo-helper.js?v=i3-photo-review-v4",
+                     "/prototypes/i3-five-games/support/siglip-appliance-classifier.js?v=i3-photo-review-v4",
+                     "/prototypes/i3-five-games/support/appliance-review-policy.js?v=i3-photo-review-v4"):
+            with self.subTest(path=path), self.client.get(path) as response:
+                self.assertEqual(response.status_code, 200)
+                self.assertIn(response.mimetype, ("text/javascript", "application/javascript"))
+        for path in ("/src/appliance-object-detector.js", "/models/owlvit/onnx/model_quantized.onnx"):
+            with self.subTest(path=path), self.client.get(path) as response:
+                self.assertEqual(response.status_code, 404)
 
     @patch("backend.api.repository.health_check", return_value={"ok": 1})
     def test_ready_contract(self, _health_check):

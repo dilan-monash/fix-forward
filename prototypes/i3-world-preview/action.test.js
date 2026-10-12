@@ -6,6 +6,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import { mountAction, readActionPlan, saveActionPlan } from './action.js';
+import { CATALOGUE, findAppliance } from './catalogue.js';
+import { EXPLORE_ACTIVE_ITEMS } from '../../src/explore-catalogue.js';
+import { APPLIANCE_CLASSES } from '../../src/appliance-classifier.js';
+import { FAMILIES } from '../../src/data.js';
 
 const settle = () => new Promise(resolve => setImmediate(resolve));
 
@@ -70,33 +74,77 @@ test('known engine alias maps to its actual adult category and returns to the sa
   assert.equal(ui.routes[1], 'explore?appliance=vacuum');
 });
 
-test('adult categories without a 3D model offer an explicit collection link and retain identity', async t => {
-  const ui = await makeAction(t, { appliance: 'Sandwich press' });
-  assert.equal(ui.query('#action-category').value, 'Sandwich press');
+test('an item outside the 32-model collection offers a collection link and retains its exact identity', async t => {
+  const ui = await makeAction(t, { appliance: 'Commercial freezer' });
+  assert.equal(ui.query('#action-category').value, 'Commercial freezer');
   assert.match(ui.query('[data-bridge-title]').textContent, /not in the 3D collection yet/i);
-  assert.match(ui.query('[data-bridge-description]').textContent, /Sandwich press.*stays selected/s);
+  assert.match(ui.query('[data-bridge-description]').textContent, /Commercial freezer.*stays selected/s);
   assert.match(ui.query('[data-family-lens]').textContent, /browse the 3D collection/i);
   ui.query('[data-family-lens]').click();
   assert.equal(ui.routes[0], 'explore', 'Collection navigation must not pretend a kettle is the selected item');
-  assert.equal(ui.query('#action-category').value, 'Sandwich press');
+  assert.equal(ui.query('#action-category').value, 'Commercial freezer');
   ui.query('[data-action-kind="repair"]').click();
-  assert.equal(ui.routes[1], 'action?kind=repair&appliance=Sandwich%20press');
+  assert.equal(ui.routes[1], 'action?kind=repair&appliance=Commercial%20freezer');
 });
 
-test('changing between modeled and unmodeled adult categories refreshes the bridge', async t => {
-  const ui = await makeAction(t, { appliance: 'kettle' });
+test('changing between a known model and an item outside the collection refreshes the bridge', async t => {
+  const ui = await makeAction(t, { appliance: 'Commercial freezer' });
   const category = ui.query('#action-category');
   category.value = 'Portable heater';
   category.dispatchEvent(new ui.dom.window.Event('change', { bubbles: true }));
-  assert.match(ui.query('[data-family-lens]').textContent, /browse the 3D collection/i);
-  ui.query('[data-family-lens]').click();
-  assert.equal(ui.routes[0], 'explore');
-  category.value = 'Kettle';
-  category.dispatchEvent(new ui.dom.window.Event('change', { bubbles: true }));
   assert.match(ui.query('[data-family-lens]').textContent, /explore this item/i);
   ui.query('[data-family-lens]').click();
-  assert.equal(ui.routes[1], 'explore?appliance=kettle');
+  assert.equal(ui.routes[0], 'explore?appliance=portable_heater');
+  category.value = 'Commercial freezer';
+  category.dispatchEvent(new ui.dom.window.Event('change', { bubbles: true }));
+  assert.match(ui.query('[data-family-lens]').textContent, /browse the 3D collection/i);
+  ui.query('[data-family-lens]').click();
+  assert.equal(ui.routes[1], 'explore');
 });
+
+/** Navigation may grow to 32 models without widening the reviewed 19-item AI
+ * and recall scope. In particular, display names must not break existing aliases. */
+test('Explore preserves all 19 adult category names and does not expand the adult classifier or recall list', () => {
+  assert.equal(CATALOGUE.length, 32);
+  assert.equal(APPLIANCE_CLASSES.length, 19);
+  const categories = FAMILIES.flatMap(family => family.categories);
+  assert.equal(categories.length, 19);
+  assert.deepEqual(APPLIANCE_CLASSES.map(item => item.category).sort(), [...categories].sort());
+  for (const adult of APPLIANCE_CLASSES) {
+    // The historical adult model uses the misspelled slug; do not relabel it
+    // during an unrelated geometry change. Explore's reviewed mapping is correct.
+    const slug = adult.slug === 'vaccum_cleaner' ? 'vacuum_cleaner' : adult.slug;
+    const explore = EXPLORE_ACTIVE_ITEMS.find(item => item.slug === slug);
+    assert.ok(explore?.worldId, `${adult.category} has a matching 3D model`);
+    assert.equal(findAppliance(explore.worldId).category, adult.category, `${slug}: exact adult category`);
+  }
+});
+
+// Exercise the real route handler, coverage message and return navigation for
+// every model, including those that need the official external recall register.
+for (const product of CATALOGUE) {
+  test(`${product.name}: adult handoff retains category, honest coverage and the same return model`, async t => {
+    const ui = await makeAction(t, { appliance: product.id, available: true });
+    const supported = FAMILIES.some(family => family.categories.includes(product.category));
+    assert.equal(ui.query('#action-category').value, product.category);
+    assert.equal(ui.query('[data-coverage-note]').hidden, supported);
+    assert.match(ui.query('[data-family-lens]').textContent, /explore this item/i);
+    assert.ok(ui.query('[data-bridge-description]').textContent.includes(product.category));
+    if (!supported) {
+      type(ui, '#action-brand', 'Synthetic Brand'); type(ui, '#action-model', 'TEST-NOT-A-REAL-PRODUCT');
+      submit(ui, '#action-recall-form');
+      assert.match(ui.query('#action-recall-result').textContent, /do not cover this item/i);
+      assert.doesNotMatch(ui.query('#action-recall-result').textContent, /no exact match|not recalled/i);
+      assert.ok(ui.query('#action-recall-result a[href="https://www.productsafety.gov.au/recalls"]'));
+    }
+    ui.query('[data-action-kind="repair"]').click();
+    assert.equal(ui.routes[0], `action?kind=repair&appliance=${encodeURIComponent(product.category)}`);
+    ui.query('[data-family-lens]').click();
+    assert.equal(ui.routes[1], `explore?appliance=${product.id}`);
+    assert.ok(ui.requests.every(request => request.method === 'GET'));
+    assert.ok(ui.requests.every(request => !/\.onnx|\.wasm/.test(request.path)), 'Navigation does not download either AI model');
+  });
+}
 
 // The expanded world must preserve identity both through an adult task and back
 // to its 3D model. A display label is not necessarily the engine's shorter ID.

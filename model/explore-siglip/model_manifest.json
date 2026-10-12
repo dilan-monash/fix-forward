@@ -1,0 +1,196 @@
+{
+  "_comment": "Separate Explore all32 experiment authorised for the Iteration 3 review service and loopback previews. Reuses exact v1 prompts and immutable encoder/vector bytes. V2 calibration values were frozen before v2 held-out predictions. All suggestions require explicit confirmation; no Take action settings change and the general release flag stays false.",
+  "candidate_id": "fixforward-explore-confirmation-preview-v2",
+  "policy_version": 2,
+  "scope": "iteration_3_preview",
+  "release_ready": false,
+  "experimental": true,
+  "recognition_enabled": true,
+  "requires_user_confirmation": true,
+  "photo_scope": "single_item",
+  "active_labels": [
+    "kettle",
+    "toaster",
+    "fan",
+    "microwave",
+    "blender",
+    "rice_cooker",
+    "air_fryer",
+    "coffee_machine",
+    "mixer",
+    "vacuum_cleaner",
+    "hair_dryer",
+    "laptop",
+    "smartphone",
+    "tablet",
+    "television",
+    "washing_machine",
+    "refrigerator",
+    "food_processor",
+    "sandwich_press",
+    "portable_heater",
+    "portable_ac",
+    "dehumidifier",
+    "headphones",
+    "games_console",
+    "printer",
+    "steam_cleaner",
+    "clothes_dryer",
+    "straightener",
+    "shaver",
+    "electric_toothbrush",
+    "cordless_drill",
+    "sewing_machine"
+  ],
+  "inactive_labels": [],
+  "vision_model": {
+    "repository": "siglip2-base-patch32-256",
+    "revision": "7efccb86b5b6601bfe9e14326e1c11b40b68d44c",
+    "model_file_name": "vision_model.9e82237d9a1d89948502aff9df02129c28698d793e01f15f62e2267682615499",
+    "file": "onnx/vision_model.9e82237d9a1d89948502aff9df02129c28698d793e01f15f62e2267682615499_q4.onnx",
+    "dtype": "q4",
+    "bytes": 69938403,
+    "sha256": "9e82237d9a1d89948502aff9df02129c28698d793e01f15f62e2267682615499",
+    "base_model": "google/siglip2-base-patch32-256",
+    "base_model_revision": "94dffa8cb1179de3e03f091dbc3917e5d5a9ae84",
+    "license": "Apache-2.0"
+  },
+  "runtime": {
+    "library": "@huggingface/transformers",
+    "version": "3.8.1",
+    "module_url": "/vendor/transformers/transformers.min.js",
+    "wasm_path": "/vendor/transformers/",
+    "local_model_path": "/model/appliance-siglip/upstream/",
+    "wasm_threads": 1,
+    "first_use_asset_bytes": 92601979,
+    "first_use_asset_note": "About 92.6 MB of pinned same-origin runtime, image encoder, processor and separate Explore text artifacts. No photo is uploaded.",
+    "assets": {
+      "transformers_js": {
+        "url": "/vendor/transformers/transformers.min.js",
+        "bytes": 888173,
+        "sha256": "aa5002b70e789798da263f5f99c62bd3e8fcd0c119258a493c40c180648365fa"
+      },
+      "ort_wasm_module": {
+        "url": "/vendor/transformers/ort-wasm-simd-threaded.jsep.mjs",
+        "bytes": 44484,
+        "sha256": "08fb86ec433c78bfb032c5d84a68b8e8e5a8d81268fa39e24314179a5767a5b9"
+      },
+      "ort_wasm_binary": {
+        "url": "/vendor/transformers/ort-wasm-simd-threaded.jsep.wasm",
+        "bytes": 21596019,
+        "sha256": "c46655e8a94afc45338d4cb2b840475f88e5012d524509916e505079c00bfa39"
+      }
+    },
+    "load_policy": "Explore only: load after a valid photo is chosen and the frozen Iteration 3 review policy is enabled. Only the exact I3 review hostname and loopbacks may run it. Never upload photo pixels."
+  },
+  "text_embeddings": {
+    "manifest_url": "/model/explore-siglip/text-embeddings.json",
+    "manifest_bytes": 4835,
+    "manifest_sha256": "60c91d0d3ee7f2b8864b4a1a517907daf48e42bc9644beadbed17f59fe46f6f2",
+    "vectors_url": "/model/explore-siglip/text-embeddings.f32",
+    "vectors_bytes": 129024,
+    "vectors_sha256": "9e0cb396c21d7b40540aa3af20ca60322f4d4ec266db94a5722ba127463021d3"
+  },
+  "acceptance": {
+    "min_similarity": 0,
+    "min_ood_margin": 0.022335919226660474,
+    "max_choice_gap": 0.018,
+    "max_choices": 3
+  },
+  "validation": {
+    "status": "local_v2_limited_node_and_browser_evaluation_complete",
+    "heldout_opened": true,
+    "calibration_frozen_before_holdout": true,
+    "calibration_frozen_at_utc": "2026-10-10T07:47:44.690Z",
+    "accuracy_claim": null,
+    "calibration_evidence": "docs/explore-ai32-calibration-v2.json",
+    "calibration_evidence_sha256": "1a7fd74d4618ad6ae7db9036ff30c54851b8bf0d9b5b470b6ad1cf81dd35ef2e",
+    "dataset_sha256": "ac70b21e9a64f9058562190355133701d03266e91f01dba305d9ab40e7eaae67",
+    "calibration_positive_count": 124,
+    "calibration_correct_offers": 109,
+    "calibration_rejected_positives": 15,
+    "calibration_wrong_offers": 0,
+    "calibration_negative_count": 15,
+    "calibration_negative_offers": 0,
+    "calibration_choice_gap_candidates": [
+      0.012,
+      0.018,
+      0.024
+    ],
+    "calibration_other_trial_evidence": [
+      "docs/explore-ai32-calibration-gap012-v2.json",
+      "docs/explore-ai32-calibration-gap024-v2.json"
+    ],
+    "holdout_evidence": "docs/explore-ai32-holdout-v2.json",
+    "holdout_evidence_sha256": "5509c2649c2bcc46fcdc5240dd6ba2e267aa0f6dfcd66ace77ada0e18c00d32b",
+    "limitation": "Small source-grouped convenience sample with assistant visual review, including previously opened development images; results are not general accuracy. Correct offers count choice sets containing the true type, not top1 accuracy. Chrome still made two wrong offers (dehumidifier and clothes dryer); Node made three. Steam cleaner and printer each have only three reviewed families and one held-out photo. No physical tablet validation has been completed. Thresholds and prompts were frozen before holdout and were not retuned from these outcomes.",
+    "holdout_positive_count": 120,
+    "holdout_correct_offers": 114,
+    "holdout_wrong_offers": 3,
+    "holdout_rejected_positives": 3,
+    "holdout_negative_count": 15,
+    "holdout_negative_offers": 0,
+    "holdout_wrong_examples": [
+      {
+        "id": "v1-hair_dryer-26",
+        "expected": "hair_dryer",
+        "choices": [
+          "mixer",
+          "food_processor",
+          "blender"
+        ]
+      },
+      {
+        "id": "dehumidifier-old-10",
+        "expected": "dehumidifier",
+        "choices": [
+          "clothes_dryer",
+          "portable_ac",
+          "washing_machine"
+        ]
+      },
+      {
+        "id": "clothes_dryer-commons-13",
+        "expected": "clothes_dryer",
+        "choices": [
+          "washing_machine"
+        ]
+      }
+    ],
+    "browser_holdout_evidence": "docs/explore-ai32-browser-holdout-v2.json",
+    "browser_holdout_evidence_sha256": "29477b31739adc49d547eba0fc40da38be540ca7e990a8f7df96b8e4272e31cd",
+    "browser_holdout_verified_case_ids": 135,
+    "browser_holdout_positive_count": 120,
+    "browser_holdout_correct_offers": 116,
+    "browser_holdout_wrong_offers": 2,
+    "browser_holdout_rejected_positives": 2,
+    "browser_holdout_negative_count": 15,
+    "browser_holdout_negative_offers": 0,
+    "browser_holdout_wrong_examples": [
+      {
+        "id": "dehumidifier-old-10",
+        "expected": "dehumidifier",
+        "choices": [
+          "clothes_dryer",
+          "portable_ac",
+          "washing_machine"
+        ]
+      },
+      {
+        "id": "clothes_dryer-commons-13",
+        "expected": "clothes_dryer",
+        "choices": [
+          "washing_machine"
+        ]
+      }
+    ],
+    "negative_holdout_real_count": 11,
+    "negative_holdout_synthetic_count": 4
+  },
+  "limitations": [
+    "Not an item counter.",
+    "Suggestions need explicit confirmation.",
+    "All32 catalogue types are candidates; ten controls compete to reject unrelated photos.",
+    "Photos do not identify a brand/model, fault, recall or safe repair."
+  ]
+}

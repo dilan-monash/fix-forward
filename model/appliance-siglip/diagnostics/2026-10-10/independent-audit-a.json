@@ -1,0 +1,2288 @@
+{
+  "schema_version": 1,
+  "audit_id": "v3-independent-a",
+  "auditor_id": "v3_blind_audit_a",
+  "audit_type": "prediction_blind_independent_visual_audit",
+  "frozen_at_utc": "2026-10-09T15:16:53Z",
+  "model_outputs_opened": false,
+  "prediction_scores_opened": false,
+  "policy_gate_or_thresholds_opened": false,
+  "source_manifest_hashes": {
+    "positives": "7e02b5e7a4439791195cd64f44b703033d1e8f28724de4c0270b5c4785acdb6c",
+    "ood": "c5e1658430349282542c16ddf15e110d4f05d834ced0726b1078cfcccc7d5a76"
+  },
+  "reviewed_row_keys": [
+    "positives:P001",
+    "positives:P002",
+    "positives:P003",
+    "positives:P004",
+    "positives:P005",
+    "positives:P006",
+    "positives:P007",
+    "positives:P008",
+    "positives:P009",
+    "positives:P010",
+    "positives:P011",
+    "positives:P012",
+    "positives:P013",
+    "positives:P014",
+    "positives:P015",
+    "positives:P016",
+    "positives:P017",
+    "positives:P018",
+    "positives:P019",
+    "positives:P020",
+    "positives:P021",
+    "positives:P022",
+    "positives:P023",
+    "positives:P024",
+    "positives:P025",
+    "positives:P026",
+    "positives:P027",
+    "positives:P028",
+    "positives:P029",
+    "positives:P030",
+    "positives:P031",
+    "positives:P032",
+    "positives:P033",
+    "positives:P034",
+    "positives:P035",
+    "positives:P036",
+    "positives:P037",
+    "positives:P038",
+    "positives:P039",
+    "positives:P040",
+    "positives:P041",
+    "positives:P042",
+    "positives:P043",
+    "positives:P044",
+    "positives:P045",
+    "positives:P046",
+    "positives:P047",
+    "positives:P048",
+    "positives:P049",
+    "positives:P050",
+    "positives:P051",
+    "positives:P052",
+    "positives:P053",
+    "positives:P054",
+    "positives:P055",
+    "positives:P056",
+    "positives:P057",
+    "positives:P058",
+    "positives:P059",
+    "positives:P060",
+    "positives:P061",
+    "positives:P062",
+    "positives:P063",
+    "positives:P064",
+    "positives:P065",
+    "positives:P066",
+    "positives:P067",
+    "positives:P068",
+    "positives:P069",
+    "positives:P070",
+    "positives:P071",
+    "positives:P072",
+    "positives:P073",
+    "positives:P074",
+    "positives:P075",
+    "positives:P076",
+    "positives:P077",
+    "positives:P078",
+    "positives:P079",
+    "positives:P080",
+    "positives:P081",
+    "positives:P082",
+    "positives:P083",
+    "positives:P084",
+    "positives:P085",
+    "positives:P086",
+    "positives:P087",
+    "positives:P088",
+    "positives:P089",
+    "positives:P090",
+    "positives:P091",
+    "positives:P092",
+    "positives:P093",
+    "positives:P094",
+    "positives:P095",
+    "positives:P096",
+    "positives:P097",
+    "positives:P098",
+    "positives:P099",
+    "positives:P100",
+    "positives:P101",
+    "positives:P102",
+    "positives:P103",
+    "positives:P104",
+    "positives:P105",
+    "positives:P106",
+    "positives:P107",
+    "positives:P108",
+    "positives:P109",
+    "ood:O001",
+    "ood:O002",
+    "ood:O003",
+    "ood:O004",
+    "ood:O005",
+    "ood:O006",
+    "ood:O007",
+    "ood:O008",
+    "ood:O009",
+    "ood:O010",
+    "ood:O011",
+    "ood:O012",
+    "ood:O013",
+    "ood:O014",
+    "ood:O015",
+    "ood:O016",
+    "ood:O017",
+    "ood:O018",
+    "ood:O019",
+    "ood:O020",
+    "ood:O021",
+    "ood:O022",
+    "ood:O023",
+    "ood:O024",
+    "ood:O025",
+    "ood:O026",
+    "ood:O027",
+    "ood:O028",
+    "ood:O029",
+    "ood:O030",
+    "ood:O031",
+    "ood:O032",
+    "ood:O033",
+    "ood:O034",
+    "ood:O035",
+    "ood:O036",
+    "ood:O037",
+    "ood:O038",
+    "ood:O039",
+    "ood:O040",
+    "ood:O041",
+    "ood:O042",
+    "ood:O043",
+    "ood:O044",
+    "ood:O045",
+    "ood:O046",
+    "ood:O047",
+    "ood:O048",
+    "ood:O049",
+    "ood:O050",
+    "ood:O051",
+    "ood:O052",
+    "ood:O053",
+    "ood:O054",
+    "ood:O055",
+    "ood:O056",
+    "ood:O057",
+    "ood:O058",
+    "ood:O059",
+    "ood:O060",
+    "ood:O061",
+    "ood:O062",
+    "ood:O063",
+    "ood:O064",
+    "ood:O065",
+    "ood:O066",
+    "ood:O067",
+    "ood:O068",
+    "ood:O069",
+    "ood:O070",
+    "ood:O071",
+    "ood:O072",
+    "ood:O073",
+    "ood:O074",
+    "ood:O075",
+    "ood:O076",
+    "ood:O077",
+    "ood:O078",
+    "ood:O079",
+    "ood:O080",
+    "ood:O081",
+    "ood:O082",
+    "ood:O083",
+    "ood:O084",
+    "ood:O085",
+    "ood:O086",
+    "ood:O087",
+    "ood:O088",
+    "ood:O089",
+    "ood:O090",
+    "ood:O091",
+    "ood:O092",
+    "ood:O093",
+    "ood:O094",
+    "ood:O095",
+    "ood:O096",
+    "ood:O097",
+    "ood:O098",
+    "ood:O099",
+    "ood:O100",
+    "ood:O101",
+    "ood:O102",
+    "ood:O103",
+    "ood:O104",
+    "ood:O105",
+    "ood:O106",
+    "ood:O107",
+    "ood:O108",
+    "ood:O109",
+    "ood:O110",
+    "ood:O111",
+    "ood:O112",
+    "ood:O113",
+    "ood:O114",
+    "ood:O115",
+    "ood:O116",
+    "ood:O117",
+    "ood:O118",
+    "ood:O119",
+    "ood:O120",
+    "ood:O121",
+    "ood:O122",
+    "ood:O123",
+    "ood:O124",
+    "ood:O125",
+    "ood:O126",
+    "ood:O127",
+    "ood:O128",
+    "ood:O129",
+    "ood:O130",
+    "ood:O131",
+    "ood:O132",
+    "ood:O133",
+    "ood:O134",
+    "ood:O135",
+    "ood:O136",
+    "ood:O137",
+    "ood:O138",
+    "ood:O139",
+    "ood:O140",
+    "ood:O141",
+    "ood:O142",
+    "ood:O143",
+    "ood:O144"
+  ],
+  "rows": [
+    {
+      "row_key": "positives:P001",
+      "assignment": "operational_positive",
+      "class_label": "air_fryer",
+      "true_ood_source_group": null,
+      "reason": "Two countertop air fryers with transparent lids and controls; the central unit is clearly visible."
+    },
+    {
+      "row_key": "positives:P002",
+      "assignment": "operational_positive",
+      "class_label": "air_fryer",
+      "true_ood_source_group": null,
+      "reason": "Open countertop air fryer with a visible circular fan heater in its lid and a cooking bowl."
+    },
+    {
+      "row_key": "positives:P003",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "food",
+      "reason": "Plate of cooked chicken pieces; no appliance is visible."
+    },
+    {
+      "row_key": "positives:P004",
+      "assignment": "operational_positive",
+      "class_label": "air_fryer",
+      "true_ood_source_group": null,
+      "reason": "Shop display of several complete basket-style air fryers with handles and front controls."
+    },
+    {
+      "row_key": "positives:P005",
+      "assignment": "operational_positive",
+      "class_label": "air_fryer",
+      "true_ood_source_group": null,
+      "reason": "Two complete basket-style air fryers on a shop shelf."
+    },
+    {
+      "row_key": "positives:P006",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Large ornate metal beverage urn; brewing mechanism and fit to an ordinary coffee-machine class are unclear."
+    },
+    {
+      "row_key": "positives:P007",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Wide room view containing the same ornate beverage urn; coffee-machine identity is not visually secure."
+    },
+    {
+      "row_key": "positives:P008",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Ornate beverage urn in a wide architectural scene; ordinary coffee-machine class fit is unclear."
+    },
+    {
+      "row_key": "positives:P009",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Coffee dispensing machine is identifiable, but the image crops its upper housing rather than showing a complete appliance."
+    },
+    {
+      "row_key": "positives:P010",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "A cup is the sharp foreground subject; the coffee machine behind it is blurred and obscured."
+    },
+    {
+      "row_key": "positives:P011",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Large fixed ventilation fan built into a roof structure; household appliance scope is uncertain."
+    },
+    {
+      "row_key": "positives:P012",
+      "assignment": "operational_positive",
+      "class_label": "fan",
+      "true_ood_source_group": null,
+      "reason": "Complete pedestal fan with circular guard, green blades, stand and control base."
+    },
+    {
+      "row_key": "positives:P013",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Flat fan icon on a turquoise background rather than a visible physical appliance."
+    },
+    {
+      "row_key": "positives:P014",
+      "assignment": "operational_positive",
+      "class_label": "fan",
+      "true_ood_source_group": null,
+      "reason": "Wall-mounted electric fan with complete guarded head and attached control housing."
+    },
+    {
+      "row_key": "positives:P015",
+      "assignment": "operational_positive",
+      "class_label": "fan",
+      "true_ood_source_group": null,
+      "reason": "Complete portable box fan with circular grille, carry handle and feet."
+    },
+    {
+      "row_key": "positives:P016",
+      "assignment": "operational_positive",
+      "class_label": "hair_dryer",
+      "true_ood_source_group": null,
+      "reason": "Complete handheld electric hair dryer with nozzle, handle and cord."
+    },
+    {
+      "row_key": "positives:P017",
+      "assignment": "operational_positive",
+      "class_label": "hair_dryer",
+      "true_ood_source_group": null,
+      "reason": "Handheld hair dryer seated in a wall cradle; nozzle, motor grille and handle are clearly visible."
+    },
+    {
+      "row_key": "positives:P018",
+      "assignment": "operational_positive",
+      "class_label": "hair_dryer",
+      "true_ood_source_group": null,
+      "reason": "Complete wall-mounted hair drying unit with flexible hose and hand-held air outlet."
+    },
+    {
+      "row_key": "positives:P019",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Old comb-equipped electric styling device; its unusual form does not securely establish the hair-dryer class."
+    },
+    {
+      "row_key": "positives:P020",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Historical barber scene with an old dryer partly obscured by the operator's hand and cropped at the left."
+    },
+    {
+      "row_key": "positives:P021",
+      "assignment": "operational_positive",
+      "class_label": "kettle",
+      "true_ood_source_group": null,
+      "reason": "Complete electric kettle with spout, handle, lid, water window, base and power cord."
+    },
+    {
+      "row_key": "positives:P022",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Annotated exposed electromechanical component rather than a complete appliance."
+    },
+    {
+      "row_key": "positives:P023",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Exposed electromechanical component alone; no complete appliance body is visible."
+    },
+    {
+      "row_key": "positives:P024",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Annotated reverse side of an exposed switch or control assembly; part only."
+    },
+    {
+      "row_key": "positives:P025",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Reverse side of an exposed control assembly; part only."
+    },
+    {
+      "row_key": "positives:P026",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "aquarium",
+      "reason": "Fish, plants and gravel occupy a repurposed microwave-shaped housing; the visible object is an aquarium."
+    },
+    {
+      "row_key": "positives:P027",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Underside or rear surface of an appliance with vents and cord; the normal identifying face is absent."
+    },
+    {
+      "row_key": "positives:P028",
+      "assignment": "operational_positive",
+      "class_label": "microwave",
+      "true_ood_source_group": null,
+      "reason": "Complete stainless microwave mounted above a stove, with door, handle and side control area."
+    },
+    {
+      "row_key": "positives:P029",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "mailbox",
+      "reason": "Yellow microwave-shaped housing outdoors bears a postal horn and appears repurposed as a mailbox."
+    },
+    {
+      "row_key": "positives:P030",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Dark distorted view inside a cooking cavity; no complete exterior appliance is shown."
+    },
+    {
+      "row_key": "positives:P031",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Close crop of a heater grille and indicator; most of the appliance body is outside the image."
+    },
+    {
+      "row_key": "positives:P032",
+      "assignment": "operational_positive",
+      "class_label": "portable_heater",
+      "true_ood_source_group": null,
+      "reason": "Complete compact electric radiant heater with front grille, heating elements and two top controls."
+    },
+    {
+      "row_key": "positives:P033",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "fixed_stove",
+      "reason": "Large iron stove with a permanent flue inside a church; not a portable electric heater."
+    },
+    {
+      "row_key": "positives:P034",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "electrical_meter",
+      "reason": "Plug-in electricity usage meter with LCD, buttons and mains socket."
+    },
+    {
+      "row_key": "positives:P035",
+      "assignment": "operational_positive",
+      "class_label": "portable_heater",
+      "true_ood_source_group": null,
+      "reason": "Complete wheeled oil-filled electric radiator with fins and side controls."
+    },
+    {
+      "row_key": "positives:P036",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Close crop of a cooker control panel; the complete cooking appliance is absent."
+    },
+    {
+      "row_key": "positives:P037",
+      "assignment": "operational_positive",
+      "class_label": "rice_cooker",
+      "true_ood_source_group": null,
+      "reason": "Complete small electric rice cooker with its circular lid open, cooking pot, front switch and cord."
+    },
+    {
+      "row_key": "positives:P038",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Wide dining-kitchen scene with a small partly obscured cooker in the background."
+    },
+    {
+      "row_key": "positives:P039",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Close-up of rice-cooker controls; lid and much of the appliance are cropped."
+    },
+    {
+      "row_key": "positives:P040",
+      "assignment": "operational_positive",
+      "class_label": "rice_cooker",
+      "true_ood_source_group": null,
+      "reason": "Two complete electric rice cookers with hinged lids and front digital controls in a display."
+    },
+    {
+      "row_key": "positives:P041",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Sandwich on an open grill plate; the upper plate and much of the appliance housing are cropped."
+    },
+    {
+      "row_key": "positives:P042",
+      "assignment": "operational_positive",
+      "class_label": "sandwich_press",
+      "true_ood_source_group": null,
+      "reason": "Complete hinged electric sandwich press with broad handle, cord and heat control."
+    },
+    {
+      "row_key": "positives:P043",
+      "assignment": "operational_positive",
+      "class_label": "sandwich_press",
+      "true_ood_source_group": null,
+      "reason": "Open electric sandwich press with two opposing cooking plates, hinge, handles and power lead."
+    },
+    {
+      "row_key": "positives:P044",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Underside of a red appliance with feet and vents; cooking faces are not visible."
+    },
+    {
+      "row_key": "positives:P045",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Close underside view of a red appliance; normal identifying cooking faces are hidden."
+    },
+    {
+      "row_key": "positives:P046",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "architecture",
+      "reason": "Waterfront buildings and bridge; no appliance is visible."
+    },
+    {
+      "row_key": "positives:P047",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "architecture",
+      "reason": "Street view of a large corner building; no appliance is visible."
+    },
+    {
+      "row_key": "positives:P048",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "architecture",
+      "reason": "Waterfront buildings and bridge; no appliance is visible."
+    },
+    {
+      "row_key": "positives:P049",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "kitchen_utensil",
+      "reason": "Historical metal bread-toasting stand with exposed bread holders; no modern electric toaster housing."
+    },
+    {
+      "row_key": "positives:P050",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "architecture",
+      "reason": "Tall corner building beside a street; no appliance is visible."
+    },
+    {
+      "row_key": "positives:P051",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Detached blade assembly; no complete blender is shown."
+    },
+    {
+      "row_key": "positives:P052",
+      "assignment": "operational_positive",
+      "class_label": "blender",
+      "true_ood_source_group": null,
+      "reason": "Complete upright jug blender with handle, lid, motor base and rotary control."
+    },
+    {
+      "row_key": "positives:P053",
+      "assignment": "operational_positive",
+      "class_label": "blender",
+      "true_ood_source_group": null,
+      "reason": "Complete glass-jug blender on a metal motor base with front control dial."
+    },
+    {
+      "row_key": "positives:P054",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Old stand-mounted spindle drink mixer without its cup; unusual historical form and incomplete setup."
+    },
+    {
+      "row_key": "positives:P055",
+      "assignment": "operational_positive",
+      "class_label": "blender",
+      "true_ood_source_group": null,
+      "reason": "Two complete countertop jug blenders with lids and motor bases in a shop display."
+    },
+    {
+      "row_key": "positives:P056",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Collage shows a multifunction bowl mixer and a grating configuration; no single secure target class."
+    },
+    {
+      "row_key": "positives:P057",
+      "assignment": "operational_positive",
+      "class_label": "food_processor",
+      "true_ood_source_group": null,
+      "reason": "Complete food processor with broad processing bowl, feed tube and powered base beside attachments."
+    },
+    {
+      "row_key": "positives:P058",
+      "assignment": "operational_positive",
+      "class_label": "food_processor",
+      "true_ood_source_group": null,
+      "reason": "Complete food processor with bowl, lid, tall feed chute and base switch beside cutting discs."
+    },
+    {
+      "row_key": "positives:P059",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "agricultural_equipment",
+      "reason": "Old carts and large hand-cranked farm processing machinery under an open shelter."
+    },
+    {
+      "row_key": "positives:P060",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Close view inside a spice-filled processor bowl; only a bowl and spindle are shown."
+    },
+    {
+      "row_key": "positives:P061",
+      "assignment": "operational_positive",
+      "class_label": "mixer",
+      "true_ood_source_group": null,
+      "reason": "Complete handheld electric mixer with handle, power lead and attached twin beaters."
+    },
+    {
+      "row_key": "positives:P062",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Only two beaters and batter are visible; mixer body is outside the frame."
+    },
+    {
+      "row_key": "positives:P063",
+      "assignment": "operational_positive",
+      "class_label": "mixer",
+      "true_ood_source_group": null,
+      "reason": "Complete black handheld mixer with two beaters, handle and coiled power cord."
+    },
+    {
+      "row_key": "positives:P064",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Mixer in use is obscured by hands, arms and bowl; beaters and complete body are not visible."
+    },
+    {
+      "row_key": "positives:P065",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "industrial_equipment",
+      "reason": "Tall spherical apparatus on metal legs with tubes and collection vessel; not an ordinary kitchen mixer."
+    },
+    {
+      "row_key": "positives:P066",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "manual_grooming_tool",
+      "reason": "Manual cartridge razor with narrow handle; no electric motor housing."
+    },
+    {
+      "row_key": "positives:P067",
+      "assignment": "operational_positive",
+      "class_label": "shaver",
+      "true_ood_source_group": null,
+      "reason": "Two views of a complete electric rotary shaver with three round shaving heads."
+    },
+    {
+      "row_key": "positives:P068",
+      "assignment": "operational_positive",
+      "class_label": "shaver",
+      "true_ood_source_group": null,
+      "reason": "Complete handheld electric shaver with broad shaving head and power button."
+    },
+    {
+      "row_key": "positives:P069",
+      "assignment": "operational_positive",
+      "class_label": "shaver",
+      "true_ood_source_group": null,
+      "reason": "Complete corded handheld shaver with a circular metal shaving foil."
+    },
+    {
+      "row_key": "positives:P070",
+      "assignment": "operational_positive",
+      "class_label": "shaver",
+      "true_ood_source_group": null,
+      "reason": "Complete handheld electric shaver with a circular shaving head and front controls."
+    },
+    {
+      "row_key": "positives:P071",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Unusual old vented metal heating appliance; exterior does not securely distinguish toaster from heater."
+    },
+    {
+      "row_key": "positives:P072",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Historical open-frame heating or toasting apparatus; ordinary toaster class fit is unclear."
+    },
+    {
+      "row_key": "positives:P073",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Toaster among dense outdoor vegetation; lower body and base are obscured."
+    },
+    {
+      "row_key": "positives:P074",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Small countertop oven with front door and cooking tray; fit to toaster class is ambiguous."
+    },
+    {
+      "row_key": "positives:P075",
+      "assignment": "operational_positive",
+      "class_label": "toaster",
+      "true_ood_source_group": null,
+      "reason": "Complete electric slot toaster on a counter with two bread slots and a side lever."
+    },
+    {
+      "row_key": "positives:P076",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Historical vacuum cleaners in a display with tall handles cropped; no clear complete contemporary appliance."
+    },
+    {
+      "row_key": "positives:P077",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Detached vacuum dust bag alone; complete vacuum is absent."
+    },
+    {
+      "row_key": "positives:P078",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Open vacuum compartment and dust bag with much of outer appliance and hose cropped."
+    },
+    {
+      "row_key": "positives:P079",
+      "assignment": "operational_positive",
+      "class_label": "vaccum_cleaner",
+      "true_ood_source_group": null,
+      "reason": "Canister vacuum with wheeled body, corrugated hose, wand and floor head."
+    },
+    {
+      "row_key": "positives:P080",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Old bagged floor-cleaning appliance with much of its handle cropped and unclear historical class fit."
+    },
+    {
+      "row_key": "positives:P081",
+      "assignment": "operational_positive",
+      "class_label": "dehumidifier",
+      "true_ood_source_group": null,
+      "reason": "Complete wheeled grille-front unit with visible hygrostat control and fan setting."
+    },
+    {
+      "row_key": "positives:P082",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "diagram",
+      "reason": "House ventilation schematic with arrows and text; no photographed appliance."
+    },
+    {
+      "row_key": "positives:P083",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "industrial_hvac",
+      "reason": "Large open industrial air-handling cabinet with multiple blowers, pipework, filters and duct fittings."
+    },
+    {
+      "row_key": "positives:P084",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "industrial_hvac",
+      "reason": "Long fixed industrial ventilation cabinet with multiple service doors and control panels."
+    },
+    {
+      "row_key": "positives:P085",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "diagram",
+      "reason": "Technical ventilation and humidity schematic with graph and labels."
+    },
+    {
+      "row_key": "positives:P086",
+      "assignment": "operational_positive",
+      "class_label": "steam_cleaner",
+      "true_ood_source_group": null,
+      "reason": "Complete yellow wheeled steam-cleaning canister with filler cap, hose outlet and nearby cleaning wand."
+    },
+    {
+      "row_key": "positives:P087",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "fixed_air_conditioner",
+      "reason": "Window air conditioner with front grille and large rear metal casing; not a portable floor unit."
+    },
+    {
+      "row_key": "positives:P088",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "industrial_pipework",
+      "reason": "Close view of industrial pipes, flanges and lever valves."
+    },
+    {
+      "row_key": "positives:P089",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "fixed_air_conditioner",
+      "reason": "Outdoor split-system condenser fixed beside a wall with connected refrigerant pipes."
+    },
+    {
+      "row_key": "positives:P090",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "people_group",
+      "reason": "Group portrait in a classroom; only fixed wall air conditioners appear in the background."
+    },
+    {
+      "row_key": "positives:P091",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "people_group",
+      "reason": "Group portrait in a meeting room with fixed wall air conditioner behind them."
+    },
+    {
+      "row_key": "positives:P092",
+      "assignment": "operational_positive",
+      "class_label": "portable_ac",
+      "true_ood_source_group": null,
+      "reason": "Complete freestanding cooling unit with front louvres, top controls and large exhaust ducting nearby."
+    },
+    {
+      "row_key": "positives:P093",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Portable cooling appliance and exhaust hose are visible, but lower body and base are cropped."
+    },
+    {
+      "row_key": "positives:P094",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Distant partly obstructed floor climate unit; hose and distinguishing cooling or dehumidifying details are unclear."
+    },
+    {
+      "row_key": "positives:P095",
+      "assignment": "operational_positive",
+      "class_label": "portable_ac",
+      "true_ood_source_group": null,
+      "reason": "Complete freestanding air conditioner with front outlet and large exhaust hose to an open window."
+    },
+    {
+      "row_key": "positives:P096",
+      "assignment": "operational_positive",
+      "class_label": "portable_ac",
+      "true_ood_source_group": null,
+      "reason": "Complete wheeled floor air conditioner with outlet grille and large exhaust hose to a window."
+    },
+    {
+      "row_key": "positives:P097",
+      "assignment": "operational_positive",
+      "class_label": "portable_ac",
+      "true_ood_source_group": null,
+      "reason": "Complete freestanding air conditioner with top controls and large black exhaust hose to window."
+    },
+    {
+      "row_key": "positives:P098",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Motor base, bowls, jug and blades laid out separately; no assembled appliance or single secure class."
+    },
+    {
+      "row_key": "positives:P099",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "people_portrait",
+      "reason": "Portrait of two people, one wearing headphones; no target appliance."
+    },
+    {
+      "row_key": "positives:P100",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Two detached cutting blade assemblies without appliance body."
+    },
+    {
+      "row_key": "positives:P101",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "underwater_scene",
+      "reason": "Underwater scene of fish, rocks and a wreck; no household appliance."
+    },
+    {
+      "row_key": "positives:P102",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "juicer",
+      "reason": "Centrifugal juicer with tall feed tube, side pulp container and liquid collecting in a jug."
+    },
+    {
+      "row_key": "positives:P103",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Processor motor housing and detached open bowl are separated with loose handle piece; incomplete assembly."
+    },
+    {
+      "row_key": "positives:P104",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Processor bowl containing chopped peppers and spindle; powered base and complete appliance absent."
+    },
+    {
+      "row_key": "positives:P105",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Historical multifunction motor with grinder attachments and loose beaters; no single assembled target class."
+    },
+    {
+      "row_key": "positives:P106",
+      "assignment": "operational_positive",
+      "class_label": "food_processor",
+      "true_ood_source_group": null,
+      "reason": "Complete food processor with clear bowl, tall feed chute and metal motor base."
+    },
+    {
+      "row_key": "positives:P107",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "manual_food_preparation",
+      "reason": "Person manually processing grains with stone implement; no electric food processor."
+    },
+    {
+      "row_key": "positives:P108",
+      "assignment": "exclude_uncertain",
+      "class_label": null,
+      "true_ood_source_group": null,
+      "reason": "Close crop of handheld mixer with lower housing and some beaters cut off."
+    },
+    {
+      "row_key": "positives:P109",
+      "assignment": "operational_positive",
+      "class_label": "mixer",
+      "true_ood_source_group": null,
+      "reason": "Complete white handheld electric mixer standing on its rear with twin beaters attached."
+    },
+    {
+      "row_key": "ood:O001",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "waterfalls",
+      "reason": "Water cascades down a rocky cliff amid trees."
+    },
+    {
+      "row_key": "ood:O002",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "waterfalls",
+      "reason": "Foaming river rapids pass rocks and green riverbanks."
+    },
+    {
+      "row_key": "ood:O003",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "waterfalls",
+      "reason": "Broad rocky waterfall and river beneath a cloudy sky."
+    },
+    {
+      "row_key": "ood:O004",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "waterfalls",
+      "reason": "Waterfall drops beside lush green vegetation."
+    },
+    {
+      "row_key": "ood:O005",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "waterfalls",
+      "reason": "Fast water flows around large rocks in a natural river."
+    },
+    {
+      "row_key": "ood:O006",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "waterfalls",
+      "reason": "Large indoor waterfall beneath a glass roof with surrounding plants."
+    },
+    {
+      "row_key": "ood:O007",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "mountains",
+      "reason": "Rocky mountain ridges and forested valley under blue sky."
+    },
+    {
+      "row_key": "ood:O008",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "mountains",
+      "reason": "Grassy hillside, trees and distant industrial skyline."
+    },
+    {
+      "row_key": "ood:O009",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "mountains",
+      "reason": "Mountainous island surrounded by blue sea."
+    },
+    {
+      "row_key": "ood:O010",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "mountains",
+      "reason": "Steep mountain valley with exposed slopes and vegetation."
+    },
+    {
+      "row_key": "ood:O011",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "mountains",
+      "reason": "Bare rocky hill with a flat-topped outcrop."
+    },
+    {
+      "row_key": "ood:O012",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "mountains",
+      "reason": "Dry rocky ridge with scattered low vegetation."
+    },
+    {
+      "row_key": "ood:O013",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "forests",
+      "reason": "Woodland path beneath a dense canopy of trees."
+    },
+    {
+      "row_key": "ood:O014",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "forests",
+      "reason": "Birch-like trees with autumn leaves on grassy ground."
+    },
+    {
+      "row_key": "ood:O015",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "forests",
+      "reason": "Tree trunks and dry undergrowth along a forest edge."
+    },
+    {
+      "row_key": "ood:O016",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "forests",
+      "reason": "Snow-covered woodland with bare branches."
+    },
+    {
+      "row_key": "ood:O017",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "forests",
+      "reason": "Rocky track through trees with autumn foliage."
+    },
+    {
+      "row_key": "ood:O018",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "forests",
+      "reason": "Narrow dirt path through green and yellow woodland."
+    },
+    {
+      "row_key": "ood:O019",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "beaches",
+      "reason": "Beach with rows of umbrellas beside turquoise sea."
+    },
+    {
+      "row_key": "ood:O020",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "beaches",
+      "reason": "Sandy shoreline under large sunset-lit clouds."
+    },
+    {
+      "row_key": "ood:O021",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "beaches",
+      "reason": "People wading beside a busy sandy beach."
+    },
+    {
+      "row_key": "ood:O022",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "beaches",
+      "reason": "People on an open field with high-rise buildings behind."
+    },
+    {
+      "row_key": "ood:O023",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "beaches",
+      "reason": "Small sheltered sandy bay approached by a footpath."
+    },
+    {
+      "row_key": "ood:O024",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "beaches",
+      "reason": "Urban waterfront with sandy foreground and tall buildings."
+    },
+    {
+      "row_key": "ood:O025",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "caves",
+      "reason": "Wooden benches and tables inside a rocky cave shelter."
+    },
+    {
+      "row_key": "ood:O026",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "caves",
+      "reason": "Rock opening with a metal gate and nearby vegetation."
+    },
+    {
+      "row_key": "ood:O027",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "caves",
+      "reason": "Helmeted person beside delicate mineral formations in a cave."
+    },
+    {
+      "row_key": "ood:O028",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "caves",
+      "reason": "Dense hanging mineral formations on a cave wall."
+    },
+    {
+      "row_key": "ood:O029",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "caves",
+      "reason": "Small dark cave opening in a rocky hillside."
+    },
+    {
+      "row_key": "ood:O030",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "caves",
+      "reason": "Cave entrance in orange rock beneath ruined stone walls."
+    },
+    {
+      "row_key": "ood:O031",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "glaciers",
+      "reason": "Mountain glacier descending into a valley above trees."
+    },
+    {
+      "row_key": "ood:O032",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "glaciers",
+      "reason": "Large sculpted iceberg floating in grey water."
+    },
+    {
+      "row_key": "ood:O033",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "glaciers",
+      "reason": "Sightseeing boat passing icebergs on open water."
+    },
+    {
+      "row_key": "ood:O034",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "glaciers",
+      "reason": "Dark gravel-covered glacier with a winding crevasse."
+    },
+    {
+      "row_key": "ood:O035",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "glaciers",
+      "reason": "Close glacier ice and debris with cliffs behind."
+    },
+    {
+      "row_key": "ood:O036",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "glaciers",
+      "reason": "Blue-white icebergs floating beneath a cloudy sky."
+    },
+    {
+      "row_key": "ood:O037",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "mugs",
+      "reason": "White ceramic drinking mug with printed lettering."
+    },
+    {
+      "row_key": "ood:O038",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "mugs",
+      "reason": "Cardboard promotional figure carrying an illustrated drinking mug."
+    },
+    {
+      "row_key": "ood:O039",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "mugs",
+      "reason": "Historic ceramic drinking vessel with lettering and a date."
+    },
+    {
+      "row_key": "ood:O040",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "mugs",
+      "reason": "Ceramic cups, serving pot and lidded vessels without electrical parts."
+    },
+    {
+      "row_key": "ood:O041",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "mugs",
+      "reason": "Row of patterned drinking mugs on a shelf."
+    },
+    {
+      "row_key": "ood:O042",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "mugs",
+      "reason": "Ceramic coffee mug with spoon on a wooden tabletop."
+    },
+    {
+      "row_key": "ood:O043",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "bowls",
+      "reason": "Two small open ceramic bowls on a plain background."
+    },
+    {
+      "row_key": "ood:O044",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "bowls",
+      "reason": "Five ribbed ceramic bowls of different sizes."
+    },
+    {
+      "row_key": "ood:O045",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "bowls",
+      "reason": "Unfinished clay bowl resting in a mould on a work surface."
+    },
+    {
+      "row_key": "ood:O046",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "bowls",
+      "reason": "Decorated historic ceramic plate displayed upright."
+    },
+    {
+      "row_key": "ood:O047",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "bowls",
+      "reason": "Large pottery bowl holding pieces of food."
+    },
+    {
+      "row_key": "ood:O048",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "bowls",
+      "reason": "Two small ceramic handled serving bowls."
+    },
+    {
+      "row_key": "ood:O049",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "bottles",
+      "reason": "Assorted glass bottles lined along a window."
+    },
+    {
+      "row_key": "ood:O050",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "bottles",
+      "reason": "Single empty amber glass bottle against a dark backdrop."
+    },
+    {
+      "row_key": "ood:O051",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "bottles",
+      "reason": "Dark glass flask and a museum identification card."
+    },
+    {
+      "row_key": "ood:O052",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "bottles",
+      "reason": "Small labelled glass ampoule with sealed neck."
+    },
+    {
+      "row_key": "ood:O053",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "bottles",
+      "reason": "Amber glass bottle containing folded material."
+    },
+    {
+      "row_key": "ood:O054",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "bottles",
+      "reason": "Old medicine bottles and small containers on a table."
+    },
+    {
+      "row_key": "ood:O055",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "buckets",
+      "reason": "Outdoor scene with people, buckets, water containers and a vehicle tyre."
+    },
+    {
+      "row_key": "ood:O056",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "buckets",
+      "reason": "Several used buckets outside a weathered barn door."
+    },
+    {
+      "row_key": "ood:O057",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "buckets",
+      "reason": "Person beside a tyre and rows of plastic buckets and cans."
+    },
+    {
+      "row_key": "ood:O058",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "buckets",
+      "reason": "Black-and-white photograph of a metal bucket with arched handle."
+    },
+    {
+      "row_key": "ood:O059",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "buckets",
+      "reason": "Person standing near buckets, water containers and a large tyre."
+    },
+    {
+      "row_key": "ood:O060",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "buckets",
+      "reason": "White plastic bucket hanging from a fence outdoors."
+    },
+    {
+      "row_key": "ood:O061",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "watering_cans",
+      "reason": "Green plastic watering can on a low garden wall."
+    },
+    {
+      "row_key": "ood:O062",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "watering_cans",
+      "reason": "Several colourful watering cans hanging from an outdoor rack."
+    },
+    {
+      "row_key": "ood:O063",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "watering_cans",
+      "reason": "Two people tending soil in an outdoor garden."
+    },
+    {
+      "row_key": "ood:O064",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "watering_cans",
+      "reason": "Two old metal pouring cans with long spouts and no electrical fittings."
+    },
+    {
+      "row_key": "ood:O065",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "watering_cans",
+      "reason": "Watering cans beside a stone trough and flowering plants."
+    },
+    {
+      "row_key": "ood:O066",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "watering_cans",
+      "reason": "Person pouring water from a red watering can onto soil."
+    },
+    {
+      "row_key": "ood:O067",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "brooms",
+      "reason": "Close-up of a manual broom head with bristles and handle."
+    },
+    {
+      "row_key": "ood:O068",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "brooms",
+      "reason": "Bundles of natural broom bristles tied with white cord."
+    },
+    {
+      "row_key": "ood:O069",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "brooms",
+      "reason": "Railway tracks with a broom-like object mounted beside a sign."
+    },
+    {
+      "row_key": "ood:O070",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "brooms",
+      "reason": "Traditional straw broom leaning against a wooden wall."
+    },
+    {
+      "row_key": "ood:O071",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "brooms",
+      "reason": "Rows of handmade straw brooms for sale."
+    },
+    {
+      "row_key": "ood:O072",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "brooms",
+      "reason": "Colourful handled straw brooms hanging at a market stall."
+    },
+    {
+      "row_key": "ood:O073",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "colanders",
+      "reason": "Shellfish being rinsed in a perforated metal colander."
+    },
+    {
+      "row_key": "ood:O074",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "colanders",
+      "reason": "Person holding a plastic colander and showing its patterned shadow."
+    },
+    {
+      "row_key": "ood:O075",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "colanders",
+      "reason": "Person manually straining liquid through a cloth into a pot."
+    },
+    {
+      "row_key": "ood:O076",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "colanders",
+      "reason": "Another view of a person manually straining liquid into a pot."
+    },
+    {
+      "row_key": "ood:O077",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "colanders",
+      "reason": "Grain or food being poured into a plain metal pot."
+    },
+    {
+      "row_key": "ood:O078",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "colanders",
+      "reason": "Person outdoors demonstrating a perforated utensil's shadow."
+    },
+    {
+      "row_key": "ood:O079",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "frying_pans",
+      "reason": "Loose cooking pans and a lidded pot on a gas hob; no listed target appliance."
+    },
+    {
+      "row_key": "ood:O080",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "frying_pans",
+      "reason": "Outdoor bench decorated with oversized frying-pan and egg motifs."
+    },
+    {
+      "row_key": "ood:O081",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "frying_pans",
+      "reason": "Broken historic shallow pottery vessel with a handle."
+    },
+    {
+      "row_key": "ood:O082",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "frying_pans",
+      "reason": "Frying pans suspended from a retail display."
+    },
+    {
+      "row_key": "ood:O083",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "frying_pans",
+      "reason": "Old pans, hooks, chains and hand utensils on a museum wall."
+    },
+    {
+      "row_key": "ood:O084",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "frying_pans",
+      "reason": "Shop shelves displaying unpowered frying pans."
+    },
+    {
+      "row_key": "ood:O085",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "mortars_pestles",
+      "reason": "Plated meal, rice, soup and small manual grinding bowl with pestle."
+    },
+    {
+      "row_key": "ood:O086",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "mortars_pestles",
+      "reason": "Person lifting a long wooden pestle over a large outdoor mortar."
+    },
+    {
+      "row_key": "ood:O087",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "mortars_pestles",
+      "reason": "Decorated historic handled vessel in a museum display."
+    },
+    {
+      "row_key": "ood:O088",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "mortars_pestles",
+      "reason": "Person manually pounding food in a large wooden mortar."
+    },
+    {
+      "row_key": "ood:O089",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "mortars_pestles",
+      "reason": "Long wooden pestle standing in a narrow mortar beside a wall."
+    },
+    {
+      "row_key": "ood:O090",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "mortars_pestles",
+      "reason": "Natural rock with shallow depressions among fallen leaves."
+    },
+    {
+      "row_key": "ood:O091",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "hand_tools",
+      "reason": "Hand hammer or mallet on bare earth beside a small round emblem."
+    },
+    {
+      "row_key": "ood:O092",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "hand_tools",
+      "reason": "Stone memorial with painted markings and small hand tools at its base."
+    },
+    {
+      "row_key": "ood:O093",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "hand_tools",
+      "reason": "Metal hammer with wooden handle resting on textured stone."
+    },
+    {
+      "row_key": "ood:O094",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "hand_tools",
+      "reason": "Collection of hand hammers and mallets mounted on a wall."
+    },
+    {
+      "row_key": "ood:O095",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "hand_tools",
+      "reason": "People manually pounding food with wooden mallets in a wooden mortar."
+    },
+    {
+      "row_key": "ood:O096",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "hand_tools",
+      "reason": "Close view of a hand mallet and small round emblem on earth."
+    },
+    {
+      "row_key": "ood:O097",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "baskets",
+      "reason": "Market stall displaying baskets, wooden utensils, mortars and metal cookware."
+    },
+    {
+      "row_key": "ood:O098",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "baskets",
+      "reason": "Dried gourds and bowls nestled in woven baskets."
+    },
+    {
+      "row_key": "ood:O099",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "baskets",
+      "reason": "Outdoor group carrying baskets and a community event banner."
+    },
+    {
+      "row_key": "ood:O100",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "baskets",
+      "reason": "Picnic basket filled with cups, fabric and decorative items."
+    },
+    {
+      "row_key": "ood:O101",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "baskets",
+      "reason": "Shopfront marked Basket Room with baskets visible inside."
+    },
+    {
+      "row_key": "ood:O102",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "baskets",
+      "reason": "Woven outdoor compost basket in a small planted bed."
+    },
+    {
+      "row_key": "ood:O103",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "bridges",
+      "reason": "Small green footbridge over a stream in a wooded park."
+    },
+    {
+      "row_key": "ood:O104",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "bridges",
+      "reason": "Train crossing a railway bridge above a busy road."
+    },
+    {
+      "row_key": "ood:O105",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "bridges",
+      "reason": "Narrow suspension footbridge across a river."
+    },
+    {
+      "row_key": "ood:O106",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "bridges",
+      "reason": "Stone arched footbridge over green water."
+    },
+    {
+      "row_key": "ood:O107",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "bridges",
+      "reason": "Bridge pillars and beams reflected in water beneath the structure."
+    },
+    {
+      "row_key": "ood:O108",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "bridges",
+      "reason": "Large decorative arched bridge spanning a river."
+    },
+    {
+      "row_key": "ood:O109",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "castles",
+      "reason": "Stone castle walls climbing a rocky, tree-covered hillside."
+    },
+    {
+      "row_key": "ood:O110",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "castles",
+      "reason": "View from castle battlements over a town and surrounding countryside."
+    },
+    {
+      "row_key": "ood:O111",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "castles",
+      "reason": "Long roofless stone ruin in an open grassy field."
+    },
+    {
+      "row_key": "ood:O112",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "castles",
+      "reason": "Stone castle wall and towers along the same rocky wooded ridge."
+    },
+    {
+      "row_key": "ood:O113",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "castles",
+      "reason": "Castle-like building with towers reflected in a pond."
+    },
+    {
+      "row_key": "ood:O114",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "castles",
+      "reason": "Low fortified stone structure beside modern architecture and the sea."
+    },
+    {
+      "row_key": "ood:O115",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "lighthouses",
+      "reason": "White lighthouse standing on exposed coastal sand."
+    },
+    {
+      "row_key": "ood:O116",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "lighthouses",
+      "reason": "Coastal lighthouse beside a large house on a rocky shoreline."
+    },
+    {
+      "row_key": "ood:O117",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "lighthouses",
+      "reason": "White lighthouse tower among palm trees."
+    },
+    {
+      "row_key": "ood:O118",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "lighthouses",
+      "reason": "Close view of a lighthouse lantern and white masonry tower."
+    },
+    {
+      "row_key": "ood:O119",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "lighthouses",
+      "reason": "Red lighthouse on a harbour breakwater with city towers behind."
+    },
+    {
+      "row_key": "ood:O120",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "lighthouses",
+      "reason": "Distant lighthouse across calm water beside a pedestrian structure."
+    },
+    {
+      "row_key": "ood:O121",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "bicycles",
+      "reason": "Person cycling with large metal containers on the front carrier."
+    },
+    {
+      "row_key": "ood:O122",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "bicycles",
+      "reason": "Close view of a bicycle's saddle, frame and rear wheel."
+    },
+    {
+      "row_key": "ood:O123",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "bicycles",
+      "reason": "Cargo bicycle with a covered passenger compartment."
+    },
+    {
+      "row_key": "ood:O124",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "bicycles",
+      "reason": "Town square with a bicycle beside railings."
+    },
+    {
+      "row_key": "ood:O125",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "bicycles",
+      "reason": "Person pedalling a cargo cycle carrying a very large stack of foam blocks."
+    },
+    {
+      "row_key": "ood:O126",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "bicycles",
+      "reason": "White bicycle parked beside a canal with baskets and flowers."
+    },
+    {
+      "row_key": "ood:O127",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "horses",
+      "reason": "Rider on a brown horse jumping a bright yellow obstacle."
+    },
+    {
+      "row_key": "ood:O128",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "horses",
+      "reason": "Mounted rider on a grey horse in a sandy arena."
+    },
+    {
+      "row_key": "ood:O129",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "horses",
+      "reason": "Horse and rider clearing a red-and-white showjumping obstacle."
+    },
+    {
+      "row_key": "ood:O130",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "horses",
+      "reason": "Horse and rider landing beside a showjumping obstacle."
+    },
+    {
+      "row_key": "ood:O131",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "horses",
+      "reason": "Grey horse and rider jumping behind an arena barrier."
+    },
+    {
+      "row_key": "ood:O132",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "horses",
+      "reason": "Grey horse and rider moving through a showjumping arena."
+    },
+    {
+      "row_key": "ood:O133",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "flowers",
+      "reason": "Flowering tree canopy against blue sky."
+    },
+    {
+      "row_key": "ood:O134",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "flowers",
+      "reason": "White butterfly perched on a purple flower."
+    },
+    {
+      "row_key": "ood:O135",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "flowers",
+      "reason": "Yellow daisy-like flower on a green stem."
+    },
+    {
+      "row_key": "ood:O136",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "flowers",
+      "reason": "Red-and-white blossom with green leaves."
+    },
+    {
+      "row_key": "ood:O137",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "flowers",
+      "reason": "Close-up of a yellow cone-shaped flower head."
+    },
+    {
+      "row_key": "ood:O138",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "flowers",
+      "reason": "Close-up of a yellow daisy-like flower."
+    },
+    {
+      "row_key": "ood:O139",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "rivers",
+      "reason": "Riverside buildings and palm trees across brown water."
+    },
+    {
+      "row_key": "ood:O140",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "rivers",
+      "reason": "Shallow rippling water over sand."
+    },
+    {
+      "row_key": "ood:O141",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "rivers",
+      "reason": "Riverside village with palm trees and a small boat."
+    },
+    {
+      "row_key": "ood:O142",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "rivers",
+      "reason": "Many wooden boats floating on still water."
+    },
+    {
+      "row_key": "ood:O143",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "rivers",
+      "reason": "Rock formations protruding from a broad river."
+    },
+    {
+      "row_key": "ood:O144",
+      "assignment": "true_ood",
+      "class_label": null,
+      "true_ood_source_group": "rivers",
+      "reason": "Decorative pedestrian bridge over a narrow waterway."
+    }
+  ],
+  "blindness_attestations": {
+    "image_only_classification": true,
+    "neutral_manifest_read": true,
+    "all_five_contact_sheets_visually_inspected": true,
+    "individual_images_visually_inspected": [
+      "P001",
+      "P002",
+      "P006",
+      "P009",
+      "P010",
+      "P011",
+      "P014",
+      "P017",
+      "P018",
+      "P019",
+      "P020",
+      "P026",
+      "P028",
+      "P030",
+      "P038",
+      "P039",
+      "P040",
+      "P041",
+      "P042",
+      "P043",
+      "P049"
+    ],
+    "collector_provenance_opened": false,
+    "source_label_metadata_opened": false,
+    "model_policies_opened": false,
+    "thresholds_opened": false,
+    "model_predictions_opened": false,
+    "other_audits_opened": false,
+    "context_limitation": "The task supplied candidate cohort role and the allowed class list. The neutral manifest exposed source dataset, asset IDs and hashes but no class labels. No source URLs were opened. Visible text within photographs was available as pixels.",
+    "cohort_scope": "All 253 frozen candidates reviewed: P001-P109 and O001-O144. Initial P001-P050 hashes matched their final neutral manifest and labels were retained. All 109 positive-batch rows were retained unchanged for this final audit.",
+    "initial_50_hashes_compared_to_final_manifest": true,
+    "initial_50_hash_mismatches": 0,
+    "initial_50_labels_retained_exactly": true,
+    "all_final_positive_rows_visually_inspected": true,
+    "final_positive_contact_sheets_inspected_for_added_rows": [
+      "positives-sheet-05.jpg",
+      "positives-sheet-06.jpg",
+      "positives-sheet-07.jpg",
+      "positives-sheet-08.jpg",
+      "positives-sheet-09.jpg",
+      "positives-sheet-10.jpg"
+    ],
+    "additional_individual_images_visually_inspected": [
+      "P054",
+      "P056",
+      "P058",
+      "P064",
+      "P069",
+      "P071",
+      "P072",
+      "P073",
+      "P074",
+      "P076",
+      "P080",
+      "P081",
+      "P083",
+      "P086",
+      "P092",
+      "P093",
+      "P094",
+      "P095",
+      "P096",
+      "P097",
+      "P098",
+      "P102",
+      "P103",
+      "P105",
+      "P108"
+    ],
+    "positive_109_rows_retained_exactly": true,
+    "all_12_ood_contact_sheets_visually_inspected": true,
+    "ood_individual_images_visually_inspected": [
+      "O040",
+      "O064",
+      "O079",
+      "O085",
+      "O097"
+    ],
+    "ood_retrieval_groups_read": true,
+    "ood_retrieval_group_context": "Frozen retrieval group names were visible before image review and were not treated as ground truth. Visual content determined assignments; confirmed true OOD rows then received the supplied row-key group.",
+    "source_group_hash_fields": "The supplied map was clarified to distinguish collector and neutral manifest hashes. The re-read neutral_manifest_sha256 matches the bound OOD neutral manifest. Group assignments did not change."
+  },
+  "image_family_or_product_near_duplicate_suspicions": [
+    {
+      "row_keys": [
+        "positives:P001",
+        "positives:P002"
+      ],
+      "reason": "Same white and black cooker in the same kitchen demonstration with matching food and counter."
+    },
+    {
+      "row_keys": [
+        "positives:P004",
+        "positives:P005"
+      ],
+      "reason": "Overlapping white and black air-fryer models and shelf labels suggest the same retail display."
+    },
+    {
+      "row_keys": [
+        "positives:P006",
+        "positives:P007",
+        "positives:P008"
+      ],
+      "reason": "Same ornate metal beverage urn and room shown at different distances."
+    },
+    {
+      "row_keys": [
+        "positives:P022",
+        "positives:P023",
+        "positives:P024",
+        "positives:P025"
+      ],
+      "reason": "Same exposed component photographed from front and reverse with and without numbered overlays."
+    },
+    {
+      "row_keys": [
+        "positives:P043",
+        "positives:P044",
+        "positives:P045"
+      ],
+      "reason": "Same red small sandwich press on matching outdoor pavement, shown open and from underneath."
+    },
+    {
+      "row_keys": [
+        "positives:P046",
+        "positives:P048"
+      ],
+      "reason": "Same waterfront buildings and bridge from nearby viewpoints."
+    },
+    {
+      "row_keys": [
+        "positives:P061",
+        "positives:P108"
+      ],
+      "reason": "Same silver Viking hand mixer and matching extra beaters on same beige surface, at different angles."
+    },
+    {
+      "row_keys": [
+        "positives:P093",
+        "positives:P097"
+      ],
+      "reason": "Same Hokkaido portable AC product design with distinctive divided front panels; separate views may repeat a product family."
+    },
+    {
+      "row_keys": [
+        "positives:P098",
+        "positives:P100"
+      ],
+      "reason": "Blade arrangements in P100 appear to be details of attachments in P098."
+    },
+    {
+      "row_keys": [
+        "ood:O002",
+        "ood:O003",
+        "ood:O005"
+      ],
+      "reason": "Rocky rapids and waterfall appear to show the same river location from nearby viewpoints."
+    },
+    {
+      "row_keys": [
+        "ood:O034",
+        "ood:O035"
+      ],
+      "reason": "Matching debris-covered glacier and cliff background suggest the same scene series."
+    },
+    {
+      "row_keys": [
+        "ood:O040",
+        "ood:O044"
+      ],
+      "reason": "Matching ribbed ceramic products and studio backdrop suggest the same product collection."
+    },
+    {
+      "row_keys": [
+        "ood:O050",
+        "ood:O053"
+      ],
+      "reason": "Same amber bottle and photographic setup, with added folded material in one view."
+    },
+    {
+      "row_keys": [
+        "ood:O055",
+        "ood:O057",
+        "ood:O059"
+      ],
+      "reason": "Same person, large tyre and bucket-filled outdoor scene in closely related frames."
+    },
+    {
+      "row_keys": [
+        "ood:O075",
+        "ood:O076"
+      ],
+      "reason": "Same person straining liquid beside matching stonework, shown in near-identical frames."
+    },
+    {
+      "row_keys": [
+        "ood:O086",
+        "ood:O088"
+      ],
+      "reason": "Same person, large mortar and outdoor background in different pounding poses."
+    },
+    {
+      "row_keys": [
+        "ood:O091",
+        "ood:O096"
+      ],
+      "reason": "Same mallet and circular emblem on matching dirt, with changed focus and framing."
+    },
+    {
+      "row_keys": [
+        "ood:O109",
+        "ood:O112"
+      ],
+      "reason": "Same castle wall, towers, rocks and trees from almost the same viewpoint."
+    },
+    {
+      "row_keys": [
+        "ood:O117",
+        "ood:O118"
+      ],
+      "reason": "Full and close-up views appear to show the same white lighthouse."
+    },
+    {
+      "row_keys": [
+        "ood:O127",
+        "ood:O128",
+        "ood:O129",
+        "ood:O130",
+        "ood:O131",
+        "ood:O132"
+      ],
+      "reason": "Matching showjumping arena, barriers and branding suggest one event photo family; individual horses or riders may differ."
+    },
+    {
+      "row_keys": [
+        "ood:O139",
+        "ood:O141"
+      ],
+      "reason": "Matching riverside buildings, palms and antenna suggest the same river-village photo series."
+    }
+  ]
+}

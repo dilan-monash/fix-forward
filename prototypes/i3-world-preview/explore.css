@@ -1,3 +1,5 @@
+@import url('../../src/explore-photo-helper.css');
+
 /* Explore is a restrained product studio around a real 3D room. Bright white,
    cool mint and forest tones connect learning with the adult action pages. */
 .explore-page { color: var(--ink, #123b36); padding-top: 42px; padding-bottom: 64px; }
@@ -253,3 +255,21 @@
 .explore-heading-actions .explore-help-link { display: inline-block; padding: 8px 0 5px; font-size: 11px; }
 @media (max-width: 850px) { .explore-heading-actions { display: flex; align-items: end; gap: 20px; margin-top: 17px; } .explore-product-picker { flex: 1; } }
 @media (max-width: 540px) { .explore-heading-actions { display: block; } }
+/* Unmodelled items keep their own identity. Hidden old geometry and adult links
+   cannot look like a substitute model or a supported Take action category. */
+.explore-page [hidden] { display: none !important; }
+/* A compact native group filter makes 32 cards manageable without changing the
+   scene layout or hiding an item from the always-complete top picker. */
+.explore-catalogue-tools { display: flex; align-items: end; flex-wrap: wrap; gap: 12px 20px; margin: 0 0 16px; }
+.explore-catalogue-tools label { display: grid; gap: 6px; font-size: 12px; font-weight: 600; }
+.explore-catalogue-tools select { box-sizing: border-box; min-height: 46px; max-width: 100%; border: 1px solid #a7ccc0; border-radius: 9px; padding: 10px 13px; background: white; color: var(--ink); font: inherit; font-size: 14px; }
+.explore-catalogue-tools select:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+.explore-catalogue-tools p { margin: 0 0 12px; font-size: 12px; color: #647d76; }
+
+/* The selected mesh keeps its materials, planet connection and care together.
+ * A definition list reads naturally to assistive tools and fits narrow screens. */
+.explore-part-context { display: grid; gap: 12px; margin: 16px 0 0; }
+.explore-part-context > div { padding: 12px 14px; border-radius: 12px; background: #f0f5f3; }
+.explore-part-context dt { color: #20554d; font-size: 12px; font-weight: 700; margin-bottom: 5px; }
+.explore-part-context dd { margin: 0; color: #445f58; font-size: 13px; line-height: 1.6; }
+.explore-part-detail > p:not(.eyebrow) { font-size: 13px; line-height: 1.6; color: #677668; }

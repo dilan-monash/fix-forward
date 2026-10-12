@@ -43,7 +43,7 @@ class Settings:
             # RELEASE_VERSION is absent. A configured environment value wins;
             # deploying a new fallback cannot replace a stale Render override.
             release_version=os.getenv(
-                "RELEASE_VERSION", "iteration-3-v3.0.0"
+                "RELEASE_VERSION", "main-v3.0.0"
             ).strip(),
             db_connect_timeout=timeout,
             # These never enter frontend code or the public API. Keep the shared

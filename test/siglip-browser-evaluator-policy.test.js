@@ -5,15 +5,49 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
+import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 
 import {
   acceptsShippedPolicy,
+  buildPolicySummaries,
   summariseEvaluation,
   validateLockedSampleFiles,
 } from "../scripts/evaluate-appliance-siglip-browser.mjs";
 
 const thresholds = { minOodMargin: 0.035, minPositiveMargin: 0.01 };
 const enabledClasses = ["fan"];
+
+test("the frozen candidate thresholds determine the primary result, not the legacy runtime policy", () => {
+  const rows = [prediction("photo", "fan", { oodMargin: 0.06, positiveMargin: 0.02 })];
+  const audit = { audited_operational_positive_ids: { photo: "fan" }, audited_true_ood_ids: [], ood_group_by_id: {} };
+  const candidate = { policy_version: 2, release_ready: false, recognition_enabled: false,
+    enabled_classes: ["fan"], manual_only_classes: ["kettle"],
+    acceptance: { class_thresholds: { fan: { min_ood_margin: 0.05, min_positive_margin: 0.04 } } } };
+  const result = buildPolicySummaries(rows, audit, null, thresholds, enabledClasses, candidate);
+  assert.equal(result.summary.eligible_operational.accepted, 0);
+  assert.equal(result.diagnostic_legacy_policy_summary.audited_enabled_class_positives.accepted, 1);
+});
+
+test("an existing evidence file stops the CLI before model or input loading", async () => {
+  const folder = await fs.mkdtemp(path.join(os.tmpdir(), "siglip-immutable-evidence-"));
+  try {
+    const output = path.join(folder, "predictions.json");
+    const original = '{"frozen":"earlier result"}\n';
+    await fs.writeFile(output, original);
+    const args = [fileURLToPath(new URL("../scripts/evaluate-appliance-siglip-browser.mjs", import.meta.url))];
+    for (const flag of ["manifest", "audited-summary", "policy-manifest", "text-manifest", "transformers-dir", "cache-dir"]) {
+      args.push(`--${flag}`, path.join(folder, "intentionally-missing"));
+    }
+    args.push("--output", output);
+    const run = spawnSync(process.execPath, args, { encoding: "utf8", timeout: 10000 });
+    assert.equal(run.status, 1);
+    assert.match(run.stderr, /Evidence already exists/);
+    assert.equal(await fs.readFile(output, "utf8"), original);
+  } finally {
+    await fs.rm(folder, { recursive: true, force: true });
+  }
+});
 
 function prediction(imageId, predicted, { oodMargin = 0.2, positiveMargin = 0.1 } = {}) {
   return {

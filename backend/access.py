@@ -1,6 +1,7 @@
-# Shared access boundary for both adult and Quest routes; configured once by create_app.
-# Flask signed cookies hold a time-limited access marker and CSRF token, not an account or appliance data.
-# All protected responses are private/no-store; only liveness and the minimal access-page assets bypass the gate.
+# Optional review access boundary; the approved public Main factory disables it.
+# Flask signed cookies hold a time-limited marker, random session ID and CSRF token, not appliance data.
+# The private local session registry makes Lock website revoke copied cookies across application workers.
+# All protected responses are private/no-store; only liveness and minimal access/error styling bypass the gate.
 
 """Shared prototype access gate, enforced before frontend and API responses.
 
@@ -11,26 +12,33 @@ This is deliberately independent of the appliance databases and user accounts.
 from datetime import timedelta
 import hashlib
 import hmac
+import ipaddress
+import os
 from pathlib import Path
+import re
 import secrets
 import time
 
 from flask import (
-    Blueprint, current_app, jsonify, redirect, render_template, request,
+    Blueprint, current_app, jsonify, make_response, redirect, render_template, request,
     send_from_directory, session, url_for,
 )
 
+from .access_limits import AccessLimitUnavailable, LoginAttemptLimiter
+
 
 ACCESS_SECONDS = 4 * 60 * 60
+# A comparison-site cookie must not become a Main review login even if secrets were
+# accidentally reused. Both the browser cookie name and signed marker are scoped.
+ACCESS_AUDIENCE = "fixforward-main"
+RENDER_HOSTNAME = "fix-forward-main.onrender.com"
 access = Blueprint("access", __name__, template_folder="templates")
 
 # The login gate can return only to shipped page entries, never an arbitrary URL
 # or an asset/API endpoint. Exact matching rejects external hosts, backslashes,
 # encoded traversal and control characters without relying on browser URL repair.
 RETURN_PATHS = frozenset({
-    "/", "/index.html", "/quest", "/quest/", "/quest/index.html",
-    "/legacy", "/legacy/",
-    "/quest?view=parents", "/quest/?view=parents", "/quest/index.html?view=parents",
+    "/", "/index.html", "/film.html",
 })
 
 
@@ -39,14 +47,11 @@ def _return_path(value):
     return value if isinstance(value, str) and value in RETURN_PATHS else "/"
 
 
-# Keep the gate enabled except for an explicitly marked internal test/diagnostic application.
+# Main's public release sets this internally; protected test/review apps opt in.
 def _enabled():
-    # The bypass is exclusively for internal diagnostic/test app instances.
-    # There is no request header, URL parameter or environment toggle to bypass.
-    return not (
-        current_app.config.get("TESTING") is True
-        and current_app.config.get("SITE_ACCESS_ENABLED") is False
-    )
+    # Only the app factory can set this. Request data and environment variables
+    # cannot change a protected application's access boundary.
+    return current_app.config.get("SITE_ACCESS_ENABLED") is not False
 
 
 # Require usable password and signing-key settings before allowing the access flow.
@@ -65,21 +70,24 @@ def _password_marker():
     # password or an unkeyed digest that could reveal a short shared password.
     return hmac.new(
         current_app.config["SECRET_KEY"].encode("utf-8"),
-        current_app.config["SITE_PASSWORD"].encode("utf-8"),
+        (ACCESS_AUDIENCE + "\0" + current_app.config["SITE_PASSWORD"]).encode("utf-8"),
         hashlib.sha256,
     ).hexdigest()
 
 
-# Reject missing, expired, future-dated or password-stale session markers.
+# Reject missing, expired, future-dated, password-stale or revoked session markers.
 def _authenticated():
     issued_at = session.get("access_issued_at")
     marker = session.get("access_marker")
-    if not isinstance(issued_at, (int, float)) or not isinstance(marker, str):
+    nonce = session.get("access_id")
+    if not isinstance(issued_at, (int, float)) or not isinstance(marker, str) or not isinstance(nonce, str):
+        return False
+    if re.fullmatch(r"[A-Za-z0-9_-]{43}", nonce) is None:
         return False
     age = time.time() - issued_at
     return 0 <= age < ACCESS_SECONDS and hmac.compare_digest(
         marker.encode("utf-8"), _password_marker().encode("utf-8")
-    )
+    ) and current_app.extensions["access_limiter"].session_is_active(nonce)
 
 
 # Reuse or create the unpredictable token used by this browser session to submit access forms.
@@ -98,6 +106,31 @@ def _valid_csrf():
     return isinstance(expected, str) and bool(supplied) and hmac.compare_digest(
         supplied.encode("utf-8"), expected.encode("utf-8")
     )
+
+
+def _client_address():
+    """Use the documented edge address only on the exact Render I3 service.
+
+    Render's public-service contract overwrites CF-Connecting-IP at Cloudflare:
+    https://render.com/articles/host-pocketbase-on-render
+    X-Forwarded-For is deliberately ignored because callers can prepend values.
+    Local servers never trust either caller-supplied forwarding header.
+    """
+    if current_app.config.get("ACCESS_RENDER_PROXY") is not True:
+        return request.remote_addr
+    value = request.headers.get("CF-Connecting-IP", "")
+    # Accept one bare IP, never a list, scoped address, port or padded value.
+    # Missing edge context fails closed instead of grouping all visitors into
+    # the load balancer's shared login budget or bypassing the limit entirely.
+    if not value or len(value) > 45 or value != value.strip() or "%" in value:
+        raise AccessLimitUnavailable("Trusted client address is unavailable")
+    try:
+        address = ipaddress.ip_address(value)
+    except ValueError as error:
+        raise AccessLimitUnavailable("Trusted client address is unavailable") from error
+    if isinstance(address, ipaddress.IPv6Address) and address.ipv4_mapped is not None:
+        address = address.ipv4_mapped
+    return str(address)
 
 
 # Render one access-page mode and issue a CSRF token only when its form is usable.
@@ -135,15 +168,32 @@ def login():
     if request.method == "POST":
         if not _valid_csrf():
             return _page(error="This form has expired. Please enter the website password again.", status=400, next_path=next_path)
+        limiter = current_app.extensions["access_limiter"]
+        try:
+            client_key = limiter.client_key(_client_address())
+            retry_after = limiter.reserve(client_key)
+        except AccessLimitUnavailable:
+            return _page(error="Website access is temporarily unavailable. Please try again shortly.", status=503, next_path=next_path)
+        if retry_after:
+            response = make_response(_page(error="Too many password attempts. Please wait a few minutes, then try again.", status=429, next_path=next_path))
+            response.headers["Retry-After"] = str(retry_after)
+            return response
         supplied = request.form.get("password", "")
         expected = current_app.config["SITE_PASSWORD"]
         # Bounded input avoids unnecessary work; UTF-8 bytes support any exact
         # user-selected password while compare_digest remains constant-time.
         if len(supplied) <= 1024 and hmac.compare_digest(supplied.encode("utf-8"), expected.encode("utf-8")):
+            nonce = secrets.token_urlsafe(32)
+            issued_at = time.time()
+            try:
+                limiter.begin_session(client_key, nonce, issued_at + ACCESS_SECONDS)
+            except AccessLimitUnavailable:
+                return _page(error="Website access is temporarily unavailable. Please try again shortly.", status=503, next_path=next_path)
             session.clear()
             session.permanent = True
             session["access_marker"] = _password_marker()
-            session["access_issued_at"] = time.time()
+            session["access_issued_at"] = issued_at
+            session["access_id"] = nonce
             session["access_csrf"] = secrets.token_urlsafe(32)
             # Validate again before redirecting, even if a hidden form field was
             # edited. Session renewal and password comparison are unchanged.
@@ -160,6 +210,9 @@ def logout():
     if request.method == "POST":
         if not _valid_csrf():
             return _page(mode="logout", error="This form has expired. Please try locking the website again.", status=400)
+        # Revocation is shared across workers and happens before clearing the
+        # cookie; a copied token cannot reopen the site after Lock website.
+        current_app.extensions["access_limiter"].revoke_session(session["access_id"])
         session.clear()
         return redirect(url_for("access.login"), code=303)
     return _page(mode="logout")
@@ -167,23 +220,45 @@ def logout():
 
 # Configure cookie/session limits and install request and response hooks for every protected route.
 def configure_access(app):
+    # These are built-in server environment markers, not HTTP headers or new
+    # dashboard settings. Only this known public Render service trusts its
+    # documented Cloudflare client-IP field; local and other hosts do not.
+    render_proxy = (
+        os.environ.get("RENDER") == "true"
+        and os.environ.get("RENDER_SERVICE_TYPE") == "web"
+        and os.environ.get("RENDER_EXTERNAL_HOSTNAME") == RENDER_HOSTNAME
+    )
     app.config.update(
         SESSION_COOKIE_HTTPONLY=True,
         SESSION_COOKIE_SAMESITE="Lax",
-        SESSION_COOKIE_NAME="fixforward_access",
+        SESSION_COOKIE_NAME="fixforward_main_access",
         SESSION_COOKIE_PATH="/",
         PERMANENT_SESSION_LIFETIME=timedelta(seconds=ACCESS_SECONDS),
         SESSION_REFRESH_EACH_REQUEST=False,
         MAX_CONTENT_LENGTH=16 * 1024,
+        ACCESS_RENDER_PROXY=render_proxy,
     )
+    app.extensions["access_limiter"] = LoginAttemptLimiter(app, ACCESS_AUDIENCE)
     app.register_blueprint(access)
+
+    @app.errorhandler(AccessLimitUnavailable)
+    # An unavailable registry must never turn a stale cookie into valid access.
+    def access_store_unavailable(_error):
+        if request.path.startswith("/api/"):
+            return jsonify(error={
+                "code": "access_unavailable",
+                "message": "Website access is temporarily unavailable. Please try again later.",
+            }), 503
+        return _page(mode="unavailable", status=503)
 
     @app.before_request
     # Allow the narrow public exceptions, fail closed on missing configuration and otherwise require valid access.
     def require_website_access():
         if not _enabled():
             return None
-        public_asset = request.endpoint == "frontend_asset" and request.path == "/favicon.svg"
+        # A missing-page response must remain styled without granting access to
+        # any application code or data. Only its tiny stylesheet is public.
+        public_asset = request.endpoint == "frontend_asset" and request.path in {"/favicon.svg", "/404.css"}
         if request.endpoint in {"api.health", "access.stylesheet", "access.script"} or public_asset:
             return None
         if not _configured():
@@ -195,18 +270,25 @@ def configure_access(app):
             return _page(mode="unavailable", status=503)
         if request.endpoint == "access.login":
             return None
-        if _authenticated():
+        try:
+            authenticated = _authenticated()
+        except AccessLimitUnavailable as error:
+            # Return here so an API blueprint's generic exception handler
+            # cannot disguise a failed access registry as an ordinary API500.
+            return access_store_unavailable(error)
+        if authenticated:
             return None
         # Remove stale authorization, preserving a pending login form's CSRF.
         # Another tab can request a protected API while that form is open.
         session.pop("access_marker", None)
         session.pop("access_issued_at", None)
+        session.pop("access_id", None)
         if request.path.startswith("/api/"):
             return jsonify(error={
                 "code": "access_required",
                 "message": "Enter the website password to continue.",
             }), 401
-        # Preserve only a known requested page and its supported parent view.
+        # Preserve only a currently shipped page entry.
         # API requests above stay JSON; scripts and unknown paths fall back home.
         next_path = _return_path(request.full_path.removesuffix("?"))
         return redirect(url_for("access.login", next=next_path) if next_path != "/" else url_for("access.login"), code=303)

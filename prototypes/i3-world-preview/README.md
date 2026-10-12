@@ -22,12 +22,16 @@ The local server binds to `127.0.0.1`. It is a review server on this computer, n
 
 ## What is in this version
 
-- A real WebGL room with twelve original geometric models: kettle, fan, toaster, blender, microwave, vacuum cleaner, hair dryer, laptop, rice cooker, air fryer, coffee machine and mixer.
+- All 32 Explore items have their own real WebGL model with selectable and separable parts. The room overview preserves the original twelve-item home; the picker and cards reach all 32. Geometry is created locally without downloading separate model files.
+- Twenty additional models adapt reusable geometry from the reference Site and add new product-specific shapes. See [model and content sources](../../docs/EXPLORE_3D_SOURCES.md) for provenance and care/energy references.
 - Room overview, orbit/zoom, selectable parts, animated separation of parts, and a reset view. The first-person walking controls have been removed from the interface.
 - **Parts / Care / Energy & CO₂e** panels for each product, with continuity into adult actions.
 - Camera AR through WebXR on supported devices, with honest support/permission feedback.
 - A prominent adult action centre for recall checks, repair, recycling and reuse. A personal task/date can be saved on this browser.
-- The existing sorting interaction with practice, picture-only dragging, immediate retries and explanatory feedback.
+- **Learn together** (`#learn`, `learning.js`) is the challenge hub: Fix-it Station, Circular Choices and Circular City, plus a Scrapworks card. Its layout rules come from the Figma reference in `learning-reference.css`.
+- **Fix-it Station** (`#learn?game=fix-it`, `fixit.js`, `fixit-engine.js`, `fixit-3d.js`) is a 3D drag-and-drop game for ages 7–12, designed first for iPads. A first-visit intro teaches it in three steps with Skip. Children read clues about a fictional item (an appliance from `models.js`, or an everyday thing from `waste-models.js`) and drag it to a workshop station (Repair Café, Reuse & Share, E-waste drop-off, Ask an adult) or a kerbside bin (Recycling, Food & garden, Rubbish). It follows the waste ladder: repair and reuse first, then recycling or compost, rubbish last, and never electrical things in a home bin. Every result shows on the workshop itself: a ✗, a shake and a hint for a wrong try; a ✓, fireworks and confetti (`fixit-party.js`) and a bouncing Next button for a right one. On tablets and computers the play screen fits below the header. Music and sounds are synthesised on the device after a tap (`fixit-sound.js`) with their own off switches. Four rounds hold 24 stories and 20 Discovery cards. Each round ends with a "How it went" list, and the grown-ups' learning record shows which items needed more tries and what was chosen, with conversation starters. Progress stays in this browser under `fixforward-fixit-v1`; buttons and keys 1–7 do everything dragging does, and a 2D view remains without WebGL.
+- **Scrapworks** (`#scrapworks`, `scrapworks.js`, `scrapworks-engine.js`) is a strategy game for older children about running an e-waste recovery hub.
+- The earlier sorting station (`#sort`) still opens from existing links, with practice, picture-only dragging, immediate retries and explanatory feedback.
 - Optional activity sounds, reward animation and saved learning cards. No automatic voice, child account or public leaderboard.
 
 Models are simplified educational illustrations. Their separated parts are not instructions to open a real appliance. Care guidance is general; an adult must follow the exact model's manufacturer instructions.
@@ -41,13 +45,14 @@ Models are simplified educational illustrations. Their separated parts are not i
 | Chooses a product card | `explore.js`: `chooseAppliance()` → `world-engine.js`: `setAppliance()` | One product ID selects both its visible model and the matching teaching content in `catalogue.js`. The selected item also travels to Take action. |
 | Taps an actual model or part | `world-engine.js`: `hitAt()`, `findPart()`, `setSelectedPart()` → `explore.js`: `choosePart()` | A ray is cast through the tap into the scene. Mesh metadata identifies the product/part. The same state also drives the accessible text buttons and explanation. |
 | Opens the room overview | `world-engine.js`: `showRoom()` | The camera shows the shared room; selecting an appliance opens its close-up. First-person walking helpers remain in the engine but are not exposed by the current interface. This is separate from camera AR. |
-| Separates the digital parts | `world-engine.js`: `setExploded()` and frame `render()`; `models.js`: `part()` | Each part has its own geometry and an exploded offset. The frame loop moves it towards that offset instead of swapping in a flat picture. |
+| Separates the digital parts | `world-engine.js`: `setExploded()` and frame `render()`; `models.js`: `part()` and `models-expanded-*.js` builders | Each part has its own geometry and an exploded offset. The frame loop moves it towards that offset instead of swapping in a flat picture. |
 | Clicks “View in my room” | `world-engine.js`: `enterAR()` | After support detection and a user action, the browser requests an `immersive-ar` session and surface hit testing. A detected surface positions the reticle; a select event places the model. |
 | Changes power, time or grid | `explore.js`: `renderImpact()` and `updateImpact()` → `catalogue.js`: `calculateImpact()` | Validated numeric inputs produce a transparent electricity-use estimate. No AI guesses the footprint. |
-| Answers a discovery or sorting question | `explore.js` or `../i3-family-preview/sorting.js` → `app.js`: `onLearn()` / `onAward()` | The activity explains the answer. Stable reward IDs in `progress.js` stop repeated clicks from earning the same reward twice. The shell updates the total and animates Sparks. |
+| Answers a discovery, sorting or Learn challenge | `explore.js`, `../i3-family-preview/sorting.js`, `learning.js`, `fixit.js` or `scrapworks.js` → `app.js`: `onLearn()` / `onAward()` | The activity explains the answer. Stable reward IDs in `progress.js` stop repeated clicks from earning the same reward twice. The shell updates the total and animates Sparks. |
 | Checks a brand/model | `action.js`: `bindRecall()` → `showRecall()` → `../../src/logic.js`: `matchRecall()` | The form preserves free text. The existing pure matcher compares supplied identifiers with available recall records. Editing an identifier invalidates the old result immediately. |
 | Searches for a repair/recycling place | `action.js`: `bindServices()` → `showServices()` | The existing suburb index resolves the area. Ambiguous postcodes prompt a suburb choice. Existing location rules filter available data; unavailable data never becomes invented providers. |
 | Saves a personal next step | `action.js`: `bindPlanner()`, `saveActionPlan()` and `readActionPlan()` | Only appliance name, task and optional date are saved locally. This is a personal plan, not a completed repair, booking, reminder or measured carbon saving. |
+| Drags an item in Fix-it Station | `fixit-3d.js`: pointer handlers, `zoneAt()` → `fixit.js`: `choose()` → `fixit-engine.js`: `drop()` | Screen-space zones turn a drop on a station or bin into a choice. The engine judges it and records the try; the UI shows the ✓ or ✗ on the workshop, and the 3D scene plays that place's animation. |
 | Leaves a page | Feature cleanup returned to `app.js`: `renderRoute()` | Event listeners, pending requests, observers, rendering and GPU resources are released. This prevents stale actions and avoids leaving an old scene running. |
 
 Each authored JavaScript file has comments above its main functions and around important state, safety and lifecycle decisions. CSS comments explain layout groups. The small function map above is a guide to those inline comments, not a substitute for them.
@@ -113,3 +118,16 @@ These tests cover model/part contracts, catalogue calculations, UI state, route 
 Also review the running preview on desktop and tablet-sized layouts: open each product, tap a part, separate/reset it, read Care, change the impact inputs, follow Take action, retry a sorting answer, and use browser Back/Forward. A real device is required to validate actual touch feel, GPU performance and camera AR.
 
 When Flask serves this frontend at `/`, its same-origin APIs use the existing read-only backend. Only the optional loopback design server returns the deliberate 503 states described above. Publishing this frontend is restricted to Iteration 3 under the repository's `AGENTS.md` workflow.
+
+## Review the completed 32-item model catalogue locally
+
+For the existing Explore AI review on port 5580, keep its terminal running and open
+`http://127.0.0.1:5580/prototypes/i3-world-preview/#explore`.
+No Main, Iteration 2 or hosted Site deployment is performed by editing these files.
+
+The local-only `models-gallery.html` review page renders all 32 real models into a
+contact sheet with one WebGL renderer. Toggle Whole / Separated parts to inspect
+model silhouettes and interiors. This is a developer check, not a second customer
+journey. `engine.test.js` checks matching semantic parts, finite geometry and a
+per-model triangle budget; `explore.test.js` checks UI/learning/photo-confirmation
+and the adult handoff. Camera AR still requires a supported physical device.

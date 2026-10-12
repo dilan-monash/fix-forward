@@ -1,0 +1,25 @@
+{
+  "frozen_at_utc": "2026-10-09T15:01:28.557444Z",
+  "ground_truth_basis": "Generated pixels contain no appliance; not a photo audit.",
+  "audited_operational_positive_ids": {},
+  "audited_true_ood_ids": [
+    "synthetic:black",
+    "synthetic:white",
+    "synthetic:grey",
+    "synthetic:rgb-noise",
+    "synthetic:grey-noise",
+    "synthetic:fine-checkerboard",
+    "synthetic:coarse-checkerboard",
+    "synthetic:text-only"
+  ],
+  "ood_group_by_id": {
+    "synthetic:black": "synthetic_pattern",
+    "synthetic:white": "synthetic_pattern",
+    "synthetic:grey": "synthetic_pattern",
+    "synthetic:rgb-noise": "synthetic_pattern",
+    "synthetic:grey-noise": "synthetic_pattern",
+    "synthetic:fine-checkerboard": "synthetic_pattern",
+    "synthetic:coarse-checkerboard": "synthetic_pattern",
+    "synthetic:text-only": "synthetic_pattern"
+  }
+}

@@ -1,3 +1,6 @@
+import { EXPANDED_CATALOGUE } from './catalogue-expanded.js';
+import { ORIGINAL_PART_CONTEXT } from './catalogue-part-context.js';
+
 /** The catalogue is teaching content, not a service manual or a model-specific diagnosis.
  * IDs deliberately match the named meshes in world-engine.js so a tap on a mesh
  * and a tap on its accessible text button open exactly the same explanation. */
@@ -247,7 +250,16 @@ export const CATALOGUE = [
     challenge: { question: 'The mixer has stopped. Before cleaning or changing its tool, what should an adult do?', choices: ['Switch off and unplug, then follow the manual', 'Reach into the bowl while it stays connected'], correct: 0, explanation: 'Disconnecting power helps prevent an unexpected start. The adult follows the model’s cleaning and attachment instructions.' },
     energyTip: 'Motor power varies with speed and load. This editable example uses constant power for clarity; measured average use would be more accurate.',
   },
+  // New lessons use the exact semantic IDs exported by the expanded model factories.
+  ...EXPANDED_CATALOGUE,
 ];
+
+// Preserve the original twelve lessons while giving each existing semantic part
+// its own planet and care connection. The coverage tests reject missing notes.
+for (const appliance of CATALOGUE) {
+  const context = ORIGINAL_PART_CONTEXT[appliance.id];
+  if (context) for (const itemPart of appliance.parts) Object.assign(itemPart, context[itemPart.id]);
+}
 
 /** Accept an ID or a familiar appliance label from a family-to-adult route. */
 export function findAppliance(value) {

@@ -19,12 +19,34 @@ class WorldRoutesTests(unittest.TestCase):
             token = re.search(r'name="csrf_token" value="([^"]+)"', page.get_data(as_text=True)).group(1)
         return self.client.post("/login", data={"csrf_token": token, "password": password})
 
-    def test_world_assets_and_legacy_are_protected(self):
-        for path in ("/", "/legacy", "/prototypes/i3-world-preview/app.js", "/prototypes/i3-world-preview/vendor/three.core.js"):
+    def test_world_assets_are_protected(self):
+        for path in ("/", "/prototypes/i3-world-preview/app.js", "/prototypes/i3-world-preview/vendor/three.core.js",
+                     "/prototypes/i3-world-preview/models-expanded-large.js",
+                     "/prototypes/i3-world-preview/models-expanded-devices.js",
+                     "/prototypes/i3-world-preview/catalogue-expanded.js",
+                     "/prototypes/i3-world-preview/catalogue-part-context.js",
+                     "/src/explore-photo-helper.css"):
             with self.client.get(path) as response:
                 self.assertEqual(response.status_code, 303)
         with self.client.get("/api/recalls") as response:
             self.assertEqual(response.status_code, 401)
+
+    def test_learn_games_load_only_after_login(self):
+        # The Learn hub, Fix-it Station and Scrapworks use the same gate as the rest of the world.
+        learn = ("reference/fixit.js", "reference/fixit-3d.js", "reference/fixit-sound.js",
+                 "reference/fixit-party.js", "reference/waste-models.js", "reference/fixit.css", "scrapworks.js")
+        for name in learn:
+            with self.client.get(f"/prototypes/i3-five-games/{name}") as response:
+                self.assertEqual(response.status_code, 303, name)
+        self.login().close()
+        for name in learn:
+            with self.client.get(f"/prototypes/i3-five-games/{name}") as response:
+                self.assertEqual(response.status_code, 200, name)
+                # The JavaScript media type name depends on the server's platform tables.
+                expected = {"text/css"} if name.endswith(".css") else {"text/javascript", "application/javascript"}
+                self.assertIn(response.mimetype, expected, name)
+        with self.client.get("/") as response:
+            self.assertIn(b"/prototypes/i3-five-games/reference/fixit.css", response.data)
 
     def test_wrong_password_and_missing_csrf_cannot_open_world(self):
         with self.login("wrong") as response:
@@ -34,21 +56,31 @@ class WorldRoutesTests(unittest.TestCase):
         with self.client.get("/") as response:
             self.assertEqual(response.status_code, 303)
 
-    def test_login_opens_new_world_and_preserves_previous_entries(self):
+    def test_photo_feedback_stylesheet_keeps_the_same_access_gate(self):
+        # The thumbnail/status styles must load after login without opening other files.
+        with self.client.get("/prototypes/i3-five-games/support/photo-helper.css") as response:
+            self.assertEqual(response.status_code, 303)
+        self.login().close()
+        with self.client.get("/prototypes/i3-five-games/support/photo-helper.css") as response:
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.mimetype, "text/css")
+            self.assertIn(b".photo-feedback", response.data)
+        with self.client.get("/src/private.css") as response:
+            self.assertEqual(response.status_code, 404)
+
+    def test_login_opens_current_world_and_previous_entries_are_missing(self):
         self.login().close()
         for path in ("/", "/index.html"):
             with self.client.get(path) as response:
                 self.assertEqual(response.status_code, 200)
                 self.assertIn(b'id="preview-app"', response.data)
                 self.assertEqual(response.headers["Cache-Control"], "private, no-store")
-                self.assertIn("xr-spatial-tracking=(self)", response.headers["Permissions-Policy"])
-        with self.client.get("/legacy") as response:
-            self.assertIn(b'src="src/app.js"', response.data)
-        with self.client.get("/legacy/") as response:
-            self.assertEqual(response.headers["Location"], "/legacy")
-        with self.client.get("/quest") as response:
-            self.assertEqual(response.status_code, 200)
-            self.assertIn(b'id="quest-app"', response.data)
+                self.assertIn("xr-spatial-tracking=()", response.headers["Permissions-Policy"])
+        for path in ("/legacy", "/legacy/", "/quest"):
+            with self.client.get(path) as response:
+                self.assertEqual(response.status_code, 404)
+                self.assertNotIn("Location", response.headers)
+                self.assertNotIn(b'id="quest-app"', response.data)
 
     def test_exact_runtime_allowlist_excludes_tests_servers_and_traversal(self):
         self.login().close()
@@ -56,7 +88,12 @@ class WorldRoutesTests(unittest.TestCase):
             with self.client.head("/" + asset) as response:
                 self.assertEqual(response.status_code, 200, asset)
                 self.assertEqual(response.headers["X-Content-Type-Options"], "nosniff")
+        # Developer contact sheets and recovered source must remain local-only.
         for path in ("/prototypes/i3-world-preview/serve.mjs", "/prototypes/i3-world-preview/action.test.js",
+                     "/prototypes/i3-world-preview/fixit.test.js", "/prototypes/i3-world-preview/learning.test.js",
+                     "/prototypes/i3-world-preview/scrapworks.test.js",
+                     "/prototypes/i3-world-preview/models-gallery.html", "/prototypes/i3-world-preview/models-gallery.js",
+                     "/tmp/explore-3d/reference-source/web/lab/devices.js",
                      "/prototypes/i3-world-preview/README.md", "/prototypes/i3-world-preview/vendor/README.md",
                      "/src/../prototypes/i3-world-preview/action.test.js",
                      "/src/%2e%2e/prototypes/i3-world-preview/action.test.js",

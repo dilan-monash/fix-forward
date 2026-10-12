@@ -1,0 +1,47 @@
+<!doctype html>
+<!-- Local visual QA contact sheet. This is not a public product route or a photo-upload tool. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FixForward — 32-model visual check</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 24px; color: #183d4b; background: #f3f7fa; font: 16px/1.45 system-ui, sans-serif; }
+    header { max-width: 1360px; margin: 0 auto 20px; }
+    h1 { margin: 8px 0; font-size: 28px; }
+    p { margin: 8px 0; }
+    a { color: #126873; }
+    nav { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
+    button { min-height: 44px; padding: 9px 18px; border: 1px solid #b7cbd3; border-radius: 12px; background: white; color: inherit; font: inherit; cursor: pointer; }
+    button[aria-pressed="true"] { background: #125866; color: white; border-color: #125866; }
+    button:disabled { cursor: progress; opacity: .65; }
+    #status { font-weight: 600; }
+    #gallery { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; max-width: 1360px; margin: auto; }
+    figure { margin: 0; overflow: hidden; border: 1px solid #cbd9e1; border-radius: 12px; background: white; }
+    figure[data-result="error"] { border: 2px solid #a02f33; }
+    img { display: block; width: 100%; aspect-ratio: 320 / 260; object-fit: contain; background: #eef5fa; }
+    figcaption { min-height: 75px; padding: 12px 14px; }
+    figcaption strong, figcaption small { display: block; }
+    figcaption small { color: #526b76; }
+    details { max-width: 1360px; margin: 22px auto; }
+    pre { white-space: pre-wrap; font-size: 12px; background: white; padding: 18px; }
+    @media(max-width: 800px) { body { padding: 14px; } #gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="./#explore">Back to Explore</a>
+    <h1>32 appliances — real 3D render check</h1>
+    <p>Local review only. Every image is rendered from the application’s actual model factory. One WebGL renderer is reused, and each model is disposed after capture. No uploads or external assets.</p>
+    <nav aria-label="Model assembly view">
+      <button type="button" data-view="whole" aria-pressed="true">Whole</button>
+      <button type="button" data-view="separated" aria-pressed="false">Separated parts</button>
+      <span id="status" role="status" aria-live="polite">Preparing local renderer…</span>
+    </nav>
+  </header>
+  <main id="gallery" aria-label="Rendered appliance contact sheet"></main>
+  <details><summary>Rendering check results</summary><pre id="report">No result yet.</pre></details>
+  <script type="module" src="./models-gallery.js"></script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+{
+  "frozen_at_utc": "2026-10-09T15:01:28.557444Z",
+  "scope": "synthetic non-appliance regression controls",
+  "samples": [
+    {
+      "image_id": "synthetic:black",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/synthetic-controls/black.png",
+      "sha256": "a3684197d1fba631f63afa791d1505e6e412fc1c505d3136bf264b8a25fe7118"
+    },
+    {
+      "image_id": "synthetic:white",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/synthetic-controls/white.png",
+      "sha256": "73d7ed9877bc3b373ef42a3cec0d2e94ee1b2f32c7296c6067032d2b3b949d3e"
+    },
+    {
+      "image_id": "synthetic:grey",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/synthetic-controls/grey.png",
+      "sha256": "7ca8f261e7a98cc95c2fcd6ae4c6789e92be104826c0f2313b39aa8e1c2f079a"
+    },
+    {
+      "image_id": "synthetic:rgb-noise",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/synthetic-controls/rgb-noise.png",
+      "sha256": "95c5c4f8b8cb471d625083982ae3910fc32dc783f4c6a1361be634f74e167c31"
+    },
+    {
+      "image_id": "synthetic:grey-noise",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/synthetic-controls/grey-noise.png",
+      "sha256": "727b0dd74dc67739fb6b6c1b8f7cf3a95ea72334e55d8d7e15ab98b9022d8636"
+    },
+    {
+      "image_id": "synthetic:fine-checkerboard",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/synthetic-controls/fine-checkerboard.png",
+      "sha256": "9bf204a4bec9d24e4066cbe0b4263bb3f6558d70894ae7607570ababb7bbe984"
+    },
+    {
+      "image_id": "synthetic:coarse-checkerboard",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/synthetic-controls/coarse-checkerboard.png",
+      "sha256": "d284ee06b7361d5b47bbf760ac4ebd691677f45771f1af40e328afbf3e04d61b"
+    },
+    {
+      "image_id": "synthetic:text-only",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/synthetic-controls/text-only.png",
+      "sha256": "f220e3f847e10a704db9e56bfbe619403913e44504ab0707906a07bdbc77166b"
+    }
+  ]
+}

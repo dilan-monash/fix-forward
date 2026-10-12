@@ -1,0 +1,72 @@
+{
+  "title": "A better next step",
+  "duration": 116.541667,
+  "width": 1920,
+  "height": 1080,
+  "captions": "burned-in with an optional English text track",
+  "scenes": [
+    {
+      "id": "question",
+      "title": "A better story begins",
+      "start": 0.0,
+      "end": 13.24,
+      "narration": "A kettle stops working. A laptop sits forgotten. Then a child asks: does this have to become rubbish? For one family, a better story begins."
+    },
+    {
+      "id": "two_paths",
+      "title": "One place. Two ways to begin.",
+      "start": 13.24,
+      "end": 26.144,
+      "narration": "Meet FixForward. One place to understand everyday electronics and make thoughtful choices about e-waste. Start by learning together, or get help with an item."
+    },
+    {
+      "id": "explore",
+      "title": "Make curiosity visible",
+      "start": 26.144,
+      "end": 37.848,
+      "narration": "Turn a digital appliance around. Discover what its parts do, and explore simple care habits. Big ideas become something your family can see."
+    },
+    {
+      "id": "learning",
+      "title": "Learn the reason behind a choice",
+      "start": 37.848,
+      "end": 53.176,
+      "narration": "Now, try a choice. This working laptop has been checked by an adult. Repair, reuse, or recycle? Reuse could give it another chapter. Every answer explains why."
+    },
+    {
+      "id": "identify",
+      "title": "Start with the item",
+      "start": 53.176,
+      "end": 66.176,
+      "narration": "For a real item, an adult takes the lead. Choose its category, or try the optional photo helper where available. It suggests a type, not a diagnosis."
+    },
+    {
+      "id": "checks",
+      "title": "Ask the important questions",
+      "start": 66.176,
+      "end": 80.064,
+      "narration": "Consider warning signs and check recall information before choosing your next step. Children can spot questions to ask. Adults handle real appliances and arrange qualified help."
+    },
+    {
+      "id": "action",
+      "title": "Find a useful next step",
+      "start": 80.064,
+      "end": 92.064,
+      "narration": "Explore repair when suitable, reuse when an item is safe and wanted, or appropriate recycling. Check the service and what it accepts before visiting."
+    },
+    {
+      "id": "family",
+      "title": "A habit worth sharing",
+      "start": 92.064,
+      "end": 104.064,
+      "narration": "Back at home, the conversation changes. Let's find out before we throw it away. A small discovery becomes a useful habit, shared across the family."
+    },
+    {
+      "id": "close",
+      "title": "Little discoveries. Better choices.",
+      "start": 104.064,
+      "end": 116.536,
+      "narration": "FixForward. Little discoveries. Better choices. Learn together, or get help with an item. A better next step starts here."
+    }
+  ]
+}

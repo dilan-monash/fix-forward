@@ -1,0 +1,1019 @@
+{
+  "schema_version": 1,
+  "manifest_id": "candidate-v3-ood-review-ood-final",
+  "cohort_role": "ood",
+  "frozen_at_utc": "2026-10-09T15:10:20.015595Z",
+  "selection_uses_model_predictions": false,
+  "model_outputs_opened": false,
+  "prediction_scores_opened": false,
+  "rows": [
+    {
+      "row_id": "O001",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-64481445",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O001.jpg",
+      "sha256": "28e607e332fb9d60e4b53daca46339a0be604cc20ceb186c9f750f85df0b37ec"
+    },
+    {
+      "row_id": "O002",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-64845169",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O002.jpg",
+      "sha256": "c5a0465927ddf27dece47a5329c5a79bb8dce313e4cc6e6d5c0ab949d6a1b513"
+    },
+    {
+      "row_id": "O003",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-65437949",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O003.jpg",
+      "sha256": "c12aaf48e75576787a4f8c56dd0e8854dcb077625ab8c2ce090363a4f937be8d"
+    },
+    {
+      "row_id": "O004",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-71609631",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O004.jpg",
+      "sha256": "9919daba6c14cfdf63fa138abd5a4bc8af9eb8a3cb16e00ef953d9a93c5e4eec"
+    },
+    {
+      "row_id": "O005",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-74685255",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O005.jpg",
+      "sha256": "dc5b1b5790f091b1501873659cedf111ef96a16bd636ac249ef63232b7f55802"
+    },
+    {
+      "row_id": "O006",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-136921798",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O006.jpg",
+      "sha256": "0c5aa053726d3f9291670adc00eefd8ab3ad65ae0dde06f5dbc6fa3ec0e2a842"
+    },
+    {
+      "row_id": "O007",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-85063279",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O007.jpg",
+      "sha256": "272d34bdf3eb1e6ff3f1db2af9b5323b4c256ea3ed1cd6fcbfcd91e7cbf53e10"
+    },
+    {
+      "row_id": "O008",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-124149855",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O008.jpg",
+      "sha256": "474caa385e4bced2dfa60cf95210a93195ad91ad15e79dbb94dd34fd66ff8960"
+    },
+    {
+      "row_id": "O009",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-124225214",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O009.jpg",
+      "sha256": "477d318946e280fa10b49895fcbb64be272c78ce504db4451c57548f71a22b3b"
+    },
+    {
+      "row_id": "O010",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-149864567",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O010.jpg",
+      "sha256": "67774f6b8b48796e11f1aaf551b7a980211174ff514d6b867d3a3ba887dcaf84"
+    },
+    {
+      "row_id": "O011",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-158157664",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O011.jpg",
+      "sha256": "3856290d2208e1e515e0d623f26d7b24f91576ebc84d232539147e9ea42cd627"
+    },
+    {
+      "row_id": "O012",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-158279636",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O012.jpg",
+      "sha256": "50265fdbb0e33d96fa05b0697c47b0fff46aed26d766aa6dccf46f0d63be1b82"
+    },
+    {
+      "row_id": "O013",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-16655584",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O013.jpg",
+      "sha256": "795750a12c659db240494f1b728fb395f3dd30dce595f7d4c4ac06c951bc5059"
+    },
+    {
+      "row_id": "O014",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-23434241",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O014.jpg",
+      "sha256": "c39890bd728494732e55c36a5764ad12125c1aa8710466f3fc1f3ab0518ab625"
+    },
+    {
+      "row_id": "O015",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-72266966",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O015.jpg",
+      "sha256": "d9ab10fce007f742f1de23d0c3282ea98e5ede7b4071b05bfacd32972b508f35"
+    },
+    {
+      "row_id": "O016",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-116620179",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O016.jpg",
+      "sha256": "5eca31e84ca610b37b4d81c0f50470ee374590c54711cbcc77b498b0b2402270"
+    },
+    {
+      "row_id": "O017",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-155958658",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O017.jpg",
+      "sha256": "43999c125d7431e93873f5badb7962bb05c7c49ee94a7bcd3943e33464c9152b"
+    },
+    {
+      "row_id": "O018",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-177555241",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O018.jpg",
+      "sha256": "ba8042e062a113df41a8ffe1a8813dd5edc8489ca65083701dea6612273ea52d"
+    },
+    {
+      "row_id": "O019",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-29419435",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O019.jpg",
+      "sha256": "d21e54cf855b946bd1ac99c423462bd770d50480a8dc8fe47a907b6e64864c98"
+    },
+    {
+      "row_id": "O020",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-59611525",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O020.jpg",
+      "sha256": "79521103e43d0f488e721778adb223da5509c2e4734f03729f16508b4082e7d9"
+    },
+    {
+      "row_id": "O021",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-61232548",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O021.jpg",
+      "sha256": "8d011091c9d773fc0234b560cc8e4d24bb39664a0612b0e0ee07a6e98c415872"
+    },
+    {
+      "row_id": "O022",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-99952390",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O022.jpg",
+      "sha256": "da3709d998b6c9d3351b56f779ef84347d2d305fdcb62b32362c94850e2339ad"
+    },
+    {
+      "row_id": "O023",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-140056762",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O023.jpg",
+      "sha256": "0c13d2cd9de17938598243c1d23ea7850ffd4584101d731bb0531e3bd042f9b1"
+    },
+    {
+      "row_id": "O024",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-151774838",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O024.jpg",
+      "sha256": "171fe03b5e82397e0379f68b0b5fff0f9254d1cca19289caec2521a6428c3577"
+    },
+    {
+      "row_id": "O025",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-22143198",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O025.jpg",
+      "sha256": "d2eabfde3019d064e70bcc600e6aee15dfd2df03b91d0f2de011a34f7396c1cd"
+    },
+    {
+      "row_id": "O026",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-49265879",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O026.jpg",
+      "sha256": "f11ddfba11678c41ff0d0166d6ae09b0b0840103e98dcdc497c48db611dff3db"
+    },
+    {
+      "row_id": "O027",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-49832192",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O027.jpg",
+      "sha256": "d7a207670e9cb3342a14d86622f2bb6c79bb3b155728d62d9bf931e30d20595c"
+    },
+    {
+      "row_id": "O028",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-138394204",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O028.jpg",
+      "sha256": "a7d57f608d0d9df9233d3e1b9c34b619815ffe775160c6c50531f18dcee5f4bc"
+    },
+    {
+      "row_id": "O029",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-165944150",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O029.jpg",
+      "sha256": "e6feb4c7befcab63a49e529669a2908a246ff6853d9ba8717f7471b5de7a683f"
+    },
+    {
+      "row_id": "O030",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-179205766",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O030.jpg",
+      "sha256": "f014990c4f869534d8ade966d678a26ba4ad84b70e91eb9b0fb8210059ff7f15"
+    },
+    {
+      "row_id": "O031",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-136018691",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O031.jpg",
+      "sha256": "a5c6f5d83c7e29092bc0b23e3165d572beb034cdadc6c2cdb2f32eabac42cec3"
+    },
+    {
+      "row_id": "O032",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-155491084",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O032.jpg",
+      "sha256": "ac6c378c8935a6421ba805d41898c44c88ddb93b54715b1a9110dc34fff356d6"
+    },
+    {
+      "row_id": "O033",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-156173484",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O033.jpg",
+      "sha256": "7bcae7bdffbbb9508ec80d7267a27b8fc23128d2fb2d13d7d9520d8415db7914"
+    },
+    {
+      "row_id": "O034",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-156312252",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O034.jpg",
+      "sha256": "1bd3a6d735d50687df78759d720c1707410d2a8c2aee236fb9e13858a4784158"
+    },
+    {
+      "row_id": "O035",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-156405288",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O035.jpg",
+      "sha256": "c3ac39637a0edbdf125dd1ef8697fb487e8d5e0b8db0ccf691b7005a9909177b"
+    },
+    {
+      "row_id": "O036",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-156407295",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O036.jpg",
+      "sha256": "8ecff09761ca8201aafc76cb6f2934026f588e1a4811c0845811a9fa393389b8"
+    },
+    {
+      "row_id": "O037",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-182111294",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O037.jpg",
+      "sha256": "ae3d37fa85c9967941213a94392cfec973a30bcf4492b235ea7aa5eb4d116a53"
+    },
+    {
+      "row_id": "O038",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-114290196",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O038.jpg",
+      "sha256": "f397c0490a1a87ff8adca6a159ef16687fe1470771329565c702e0265546de29"
+    },
+    {
+      "row_id": "O039",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-31914538",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O039.jpg",
+      "sha256": "5b3310e578a3c4dd909a7a4bf32ec850685faabbd7f8b62331a2f16239da59f1"
+    },
+    {
+      "row_id": "O040",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-18126027",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O040.jpg",
+      "sha256": "2050445373bf2689f2cad9b87731292bccba4c3f6acae2f9be4dec7fb79af24c"
+    },
+    {
+      "row_id": "O041",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-71377363",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O041.jpg",
+      "sha256": "7af608f23ebac228146b3bba1d19441e57c393b0fbc87519eb3ca6bbe378f03d"
+    },
+    {
+      "row_id": "O042",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-99408689",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O042.jpg",
+      "sha256": "82407a94348ab4ba2f1ab42a4b3bda6a31c2c8457c56b5722700eb9ce693052f"
+    },
+    {
+      "row_id": "O043",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-17805824",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O043.jpg",
+      "sha256": "d81479b1f484f4943304513601c4bf48eba15d9803f2f4dcbc1668eba7aef816"
+    },
+    {
+      "row_id": "O044",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-17813403",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O044.jpg",
+      "sha256": "a4d2ece52a315efd1414af40b677f7d2965940ecf91d4dcf958a2c2988c36d18"
+    },
+    {
+      "row_id": "O045",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-27455191",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O045.jpg",
+      "sha256": "da04c428d54632e6c63d3ed9d9dd015e069811ad76dd9508aa55c4792f891f71"
+    },
+    {
+      "row_id": "O046",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-26636942",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O046.jpg",
+      "sha256": "7de36e2a4e935fa76f437e77e39eff3799421d93d8667c2751f93d8cf9ae21a1"
+    },
+    {
+      "row_id": "O047",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-16686454",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O047.jpg",
+      "sha256": "be19ef6e66c58c1b36750de0180c00505e9e72377c9a44be93db91dd8e0d251b"
+    },
+    {
+      "row_id": "O048",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-17813398",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O048.jpg",
+      "sha256": "ff80df50586f3eb0c0add7b919d0818e2fcc5e294470437b258a56b44d28e63d"
+    },
+    {
+      "row_id": "O049",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-57007498",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O049.jpg",
+      "sha256": "e6a72c2e0de0ac78173a955035fceef57cfaa4386196b4f0f021d8c6e90fe031"
+    },
+    {
+      "row_id": "O050",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-123863409",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O050.jpg",
+      "sha256": "038d8cad4671c572fca501e91e49d574bafe368be71dd8589907e0e0c25c6b56"
+    },
+    {
+      "row_id": "O051",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-5563896",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O051.jpg",
+      "sha256": "03d9850d6ba6b76ea8f9d14090e8751e91240e346aafd77729f23b4feb5e6236"
+    },
+    {
+      "row_id": "O052",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-36211927",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O052.jpg",
+      "sha256": "25123a96e7f59d0e92d461e34e2d4546736b559449fd21c23038c914697bdf98"
+    },
+    {
+      "row_id": "O053",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-123863414",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O053.jpg",
+      "sha256": "66d13f8926b9ee3dd53e43730d45d79acd98cdccc6f3373b390ec3161c26e8ae"
+    },
+    {
+      "row_id": "O054",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-123863428",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O054.jpg",
+      "sha256": "e0291ba579b0f0a4e5fc9ff31c0ea84231de18cbc082bdf2cda2a4cb86dfa6f8"
+    },
+    {
+      "row_id": "O055",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-179528542",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O055.jpg",
+      "sha256": "9482e81c05aa2ec2b8640a81e646fdf7c4851921349bb49fd673fe8151cfb93f"
+    },
+    {
+      "row_id": "O056",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-47643867",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O056.jpg",
+      "sha256": "3c299b03e75e9c328d549857a15c538c35374b359b7303c1167f7d5a305302a4"
+    },
+    {
+      "row_id": "O057",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-179528547",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O057.jpg",
+      "sha256": "69165e41baf5461d64d3602a633d8088c81fab5d1ef5d4123c15f3c2379ef011"
+    },
+    {
+      "row_id": "O058",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-23829800",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O058.jpg",
+      "sha256": "bfb6715e10261e731e65bf61e437062ec0150aa65158d8ef010dc7a1efc728ed"
+    },
+    {
+      "row_id": "O059",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-179528546",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O059.jpg",
+      "sha256": "178f508d1f323205bc8dd895ed18b7ca2ac6414d5a8b06227885748bafc6e9bd"
+    },
+    {
+      "row_id": "O060",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-12504681",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O060.jpg",
+      "sha256": "10f77b7984beb6f50c9e13d337ee51b26cedcede69b47bece8f25cf792e736a5"
+    },
+    {
+      "row_id": "O061",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-196551773",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O061.jpg",
+      "sha256": "cce51cdc3c877470b7f771392b9895c810f7aa0844c14b01e98d8f2c57733ac3"
+    },
+    {
+      "row_id": "O062",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-149843623",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O062.jpg",
+      "sha256": "c25e5e050f1c3f0c2514d4fae8dd9a5e3446594ff76637ac1d1612dcc6796490"
+    },
+    {
+      "row_id": "O063",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-59272890",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O063.jpg",
+      "sha256": "cf994021db67aced850b0c81582e3ac9165e0a26b4951671302123d29baa542b"
+    },
+    {
+      "row_id": "O064",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-28664378",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O064.jpg",
+      "sha256": "5a117a92e6a5dfa2d7219a2ca4e3324811163b4e000a8b7c63a6a83a07aefca0"
+    },
+    {
+      "row_id": "O065",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-26445867",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O065.jpg",
+      "sha256": "e972c8196506eec39abaafd82013ff2100f8b921a6e2c2a650d284fa59a2b1aa"
+    },
+    {
+      "row_id": "O066",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-188894116",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O066.jpg",
+      "sha256": "ebf3b2efff68fc625c037ea1458afd31611bea6fe8a2754b3d5183974a4050c3"
+    },
+    {
+      "row_id": "O067",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-57023058",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O067.jpg",
+      "sha256": "50baa350fd503d4030b1dc701c222dfc98f6d5bf096d14c0a8699f62457cb1be"
+    },
+    {
+      "row_id": "O068",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-59173442",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O068.jpg",
+      "sha256": "1eb7ed663424936b8c3d0096d14193a92f5f164a3113643642b174d92db31147"
+    },
+    {
+      "row_id": "O069",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-170160214",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O069.jpg",
+      "sha256": "fb89c95f86ddec9ffa881a276891e78a6ab781bb2edcab3ef0545d4aa981ab94"
+    },
+    {
+      "row_id": "O070",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-36567354",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O070.jpg",
+      "sha256": "659a61be9dffaa93ce0321fb85c737aea851e270156cc964df494eeef8fc5804"
+    },
+    {
+      "row_id": "O071",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-64160333",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O071.jpg",
+      "sha256": "a3929fea5af7c3375dff44be2d9b5d32943e2b0317abacdefc99ce442623e8d0"
+    },
+    {
+      "row_id": "O072",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-74027613",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O072.jpg",
+      "sha256": "fcb0bed1024ad0294d549df30220288643efb6b5bf84cb2b4753dbf38e32eae0"
+    },
+    {
+      "row_id": "O073",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-80230400",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O073.jpg",
+      "sha256": "41d9f60349261b947fee9287ba309418766c9775221170ffcc1440407a610861"
+    },
+    {
+      "row_id": "O074",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-82145316",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O074.jpg",
+      "sha256": "df409cdd5eae39818fcad7779506d9d607dc7114db783f8e8b457c9dbb521395"
+    },
+    {
+      "row_id": "O075",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-125568789",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O075.jpg",
+      "sha256": "cc5b25c40a0c30f1c7f9f35c3bd7998600e3ae16c756f0b19d048189db922c66"
+    },
+    {
+      "row_id": "O076",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-125568791",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O076.jpg",
+      "sha256": "85ff381835eb2b118f14490e928656e4440304a6965dd49156fbe3fc63b30a17"
+    },
+    {
+      "row_id": "O077",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-35296213",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O077.jpg",
+      "sha256": "36f532226ceb349437d26ed0bdd2d524e5310aae02823622ee612bd8ae653acc"
+    },
+    {
+      "row_id": "O078",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-61849761",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O078.jpg",
+      "sha256": "3b80af2a4d9972b567e8c7c5f3817f940289d6e5518e0bbb818691fbe133684c"
+    },
+    {
+      "row_id": "O079",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-5311066",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O079.jpg",
+      "sha256": "ba0d95f90d8eb0503d75afa6a81a3482ed06400168c84cd2f088e042957871da"
+    },
+    {
+      "row_id": "O080",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-137403425",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O080.jpg",
+      "sha256": "4bb1c18a496e27252db508335411f40a67043c264edf10a4cf21a2b1c66f4256"
+    },
+    {
+      "row_id": "O081",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-178868967",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O081.jpg",
+      "sha256": "446280debfad4ebd3f593ad3d13b938b48fb652a9510ec6b01c2f335938aa1d4"
+    },
+    {
+      "row_id": "O082",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-98696515",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O082.jpg",
+      "sha256": "1c3c8380ef53b42ae852a147e7762fdb365e70a832e95216bcd210bee2483985"
+    },
+    {
+      "row_id": "O083",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-180432796",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O083.jpg",
+      "sha256": "d1dcf920eb21994168af55f029771c3604cd68289b80a8df55767b844d5da8a8"
+    },
+    {
+      "row_id": "O084",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-103671668",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O084.jpg",
+      "sha256": "8b2291ca450fddf0e89b53cca072a1aef0421729f472bbd587fe823b3509e39e"
+    },
+    {
+      "row_id": "O085",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-130082359",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O085.jpg",
+      "sha256": "c55bb7f962eb186292cdcff34bdb83d051502b7dbd828cde7fd082982043db7a"
+    },
+    {
+      "row_id": "O086",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-66832198",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O086.jpg",
+      "sha256": "2837c0cce6e829bd0108561867d5d1041be9a66de8f13207efee81cdccdbe163"
+    },
+    {
+      "row_id": "O087",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-195676908",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O087.jpg",
+      "sha256": "dc448f5a1663322a4416f1d3357691a7a58ceedb7e70778bd9a63a5e3810316a"
+    },
+    {
+      "row_id": "O088",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-66832190",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O088.jpg",
+      "sha256": "565739576417457dd1ddf0fa93aaf5ba1e926868e5e1ee191d1fc4783ad9ab13"
+    },
+    {
+      "row_id": "O089",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-184994003",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O089.jpg",
+      "sha256": "2229fb6817e8019ce70c00b503d92022738439dc656391943c8cae99d9efde5e"
+    },
+    {
+      "row_id": "O090",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-96025981",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O090.jpg",
+      "sha256": "f9256dc5416946042f955289882f7f39a3c8b3fdd10462b5b597b00fc922751d"
+    },
+    {
+      "row_id": "O091",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-49867336",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O091.jpg",
+      "sha256": "7db0d24bc7e46c024dbb3ad5a3e1e58f47b9d79d71a25b80d6f9c160483e3a8e"
+    },
+    {
+      "row_id": "O092",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-59418466",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O092.jpg",
+      "sha256": "33e1aaff09a98db96f1d9196eddf0f771292dadc6d09069d00508fd0343b009d"
+    },
+    {
+      "row_id": "O093",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-2097435",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O093.jpg",
+      "sha256": "3e701ed9b9fa91888dd0343234e4e2cae41b36b45439efa1925b4efc3053b772"
+    },
+    {
+      "row_id": "O094",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-195948352",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O094.jpg",
+      "sha256": "9f77eeb2ded91b1c103468949e94d57e5917e841152f232cb2f6a8ea99d2372f"
+    },
+    {
+      "row_id": "O095",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-75460737",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O095.jpg",
+      "sha256": "de4c12ec805ef93927d99f7314a447ff543d3819a56d122b71588f4f3f3e6f0e"
+    },
+    {
+      "row_id": "O096",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-49867346",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O096.jpg",
+      "sha256": "6531b6ab50da85e2dfcc0002ad1f7ad8723e0c55cc24de97c10bfddc36c2b5c9"
+    },
+    {
+      "row_id": "O097",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-15520872",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O097.jpg",
+      "sha256": "d06316edd1764fc4d941b74505c0c23e08bb1d35a0faae2e342f7d5447207cc8"
+    },
+    {
+      "row_id": "O098",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-163653860",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O098.jpg",
+      "sha256": "8c84d3577d2a05f7c718719c3f2670e63052a862f68c40394d011b76896e4b22"
+    },
+    {
+      "row_id": "O099",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-162519059",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O099.jpg",
+      "sha256": "c1be0841e6d027a356fbd8a6f5de082e5b880b8e9b82741b26b99b9d07e2174b"
+    },
+    {
+      "row_id": "O100",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-148028496",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O100.jpg",
+      "sha256": "7839121a42f3bec0821cfbc5652b0665678436e0c06034e303696febf5bbf2b9"
+    },
+    {
+      "row_id": "O101",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-7173516",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O101.jpg",
+      "sha256": "7cb3e2eb7dca15efbab108fdf7310cc37260b1c5ea2e42563c39d5f7153381ac"
+    },
+    {
+      "row_id": "O102",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-37584435",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O102.jpg",
+      "sha256": "e1d64d2198dbba1019a22ab83ee3b9cdb2eaf8819d8739ee0645a646a65daa58"
+    },
+    {
+      "row_id": "O103",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-87819015",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O103.jpg",
+      "sha256": "f0ea1f3607e4d7bd47b5277a48089caf06b5ff6c3bf73610b4145bc11655a57a"
+    },
+    {
+      "row_id": "O104",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-39109289",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O104.jpg",
+      "sha256": "589271159453b6b4c391f517cb97bed44cc5260fb96d2dee9e4763e064e0501a"
+    },
+    {
+      "row_id": "O105",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-72279590",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O105.jpg",
+      "sha256": "721fdd6ca4d97d1776dcb6ce6375785960179080c4fdf760feb47ca34fe58041"
+    },
+    {
+      "row_id": "O106",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-44047388",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O106.jpg",
+      "sha256": "a05098276debffcc196b6b15c8756aff4d7a64ca22e508a7e416c124d1a0f2dd"
+    },
+    {
+      "row_id": "O107",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-47028204",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O107.jpg",
+      "sha256": "0e8dba8c53ec91b91fcb9e5db808839ac376663f46ab9e30161ee19ce6bb5500"
+    },
+    {
+      "row_id": "O108",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-45178646",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O108.jpg",
+      "sha256": "9c8da3adb205d871a282ecea97b81e9412e6c8b5a50dca196d80cee134b6c0a9"
+    },
+    {
+      "row_id": "O109",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-193360415",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O109.jpg",
+      "sha256": "58882c5cd4a32b37ce7dc0f2264e558cae4369c3651591f789ba36ee6c558feb"
+    },
+    {
+      "row_id": "O110",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-167660867",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O110.jpg",
+      "sha256": "2c5b63dd066db1330cf48c40608c58be4e4379e6c9c731905eefc517cfee1178"
+    },
+    {
+      "row_id": "O111",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-43326412",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O111.jpg",
+      "sha256": "c79e49fab16e176ccbc6cef9c6e9b5b897e406eec090acebf1f195cea412768e"
+    },
+    {
+      "row_id": "O112",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-193360409",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O112.jpg",
+      "sha256": "d1f5f659d8f6a241c27b92ab8d9e0b3bfa43a77ab6e157ae2d5e768ebe32476d"
+    },
+    {
+      "row_id": "O113",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-83931425",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O113.jpg",
+      "sha256": "1112b983b5f57c713f362d001106a828d0923ec1ee92a346cef709ebd94261f6"
+    },
+    {
+      "row_id": "O114",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-80603193",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O114.jpg",
+      "sha256": "3f9825ad54158fccc346236d707356721c12b970df475e356b916795c57e9eaf"
+    },
+    {
+      "row_id": "O115",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-28714729",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O115.jpg",
+      "sha256": "b34b43b0f923a029e69e86bdaf998b375cd5b64bad75153d2a12fc68ac11ecfa"
+    },
+    {
+      "row_id": "O116",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-123617998",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O116.jpg",
+      "sha256": "44609e0b7241e10a9f12f97a68f2d47593485992b1d6b80825bf70b405ce9bcb"
+    },
+    {
+      "row_id": "O117",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-172196239",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O117.jpg",
+      "sha256": "2d943ccdfe91d480c0b69277d4f32d53a5be012e78cdf85db6340d925a21fa75"
+    },
+    {
+      "row_id": "O118",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-172196246",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O118.jpg",
+      "sha256": "756a7f1d6684d59c3d027969262867122e36041ddc1e339cd2a4990d810a17ef"
+    },
+    {
+      "row_id": "O119",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-34012051",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O119.jpg",
+      "sha256": "157e9f64868c8cad27db7870dd32a394127e07c78073a46af83713624e035d1b"
+    },
+    {
+      "row_id": "O120",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-165160422",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O120.jpg",
+      "sha256": "712bd5b2679d2090011dadea1f1aa122dfbf40763f800d9abf30eb364eecab13"
+    },
+    {
+      "row_id": "O121",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-27644435",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O121.jpg",
+      "sha256": "eea9b5b6e04d46e1e702a7131168443afbb133d38ba070e928028c8515ce02c2"
+    },
+    {
+      "row_id": "O122",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-26957501",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O122.jpg",
+      "sha256": "a7758bdbe5dbac329d7a8e8401c2365ade4c8f02e8efe8d7c943e9c07553c140"
+    },
+    {
+      "row_id": "O123",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-26960889",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O123.jpg",
+      "sha256": "c93c67af5ee345f466f3df2e7fe26c0a379aa0b7a5bbc53bb30cd78882de01c9"
+    },
+    {
+      "row_id": "O124",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-33715406",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O124.jpg",
+      "sha256": "162ff7445d348877cfa4aeb1f0874595b90bc5395dc91297ba9ff6337d7fa357"
+    },
+    {
+      "row_id": "O125",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-16560619",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O125.jpg",
+      "sha256": "99e4b67dd8609232e8b83ddb935530f58b428835fd8b06cdc951e4ad142144bb"
+    },
+    {
+      "row_id": "O126",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-26927522",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O126.jpg",
+      "sha256": "a52d171955f6711a4ab44b510bce20e2308647ba8ff1efcae0cc7bb622d15a1e"
+    },
+    {
+      "row_id": "O127",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-29728013",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O127.jpg",
+      "sha256": "8911e572f1039caf4dae98256886c8e69d626198a19d6d40918eb8fead749dbd"
+    },
+    {
+      "row_id": "O128",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-29908801",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O128.jpg",
+      "sha256": "bfcaca962d263aa892c5b4c40e28cbbf1cdda9fecbf5970a0d691da3b17c03e9"
+    },
+    {
+      "row_id": "O129",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-29908786",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O129.jpg",
+      "sha256": "2b820b63a57ecdd6de6269a4b2a07f9cf3789041a8bcaea35fa378eca96f245c"
+    },
+    {
+      "row_id": "O130",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-29893194",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O130.jpg",
+      "sha256": "0b48039aabf7593605a25123d276882988d37ddc8071bb57f5e63df1e05cb0eb"
+    },
+    {
+      "row_id": "O131",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-29727922",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O131.jpg",
+      "sha256": "d4c4f431c8163de718687568f80afad32b1c7827319bdcbcac98ab5c374d1920"
+    },
+    {
+      "row_id": "O132",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-29727615",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O132.jpg",
+      "sha256": "15a964530c822a59c37b8c55bc050beb72998ab5cf97e75d24c6645e98bb526b"
+    },
+    {
+      "row_id": "O133",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-149659206",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O133.jpg",
+      "sha256": "d19cfb3b831f52ddc2e07bc966018e2abd3a01ea6c11a73ba1cdbe2ffdafad40"
+    },
+    {
+      "row_id": "O134",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-2550907",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O134.jpg",
+      "sha256": "2255d0bb9c8e8ccb33ad21a31d58def8f169b3647a5b6f1f95202e24a0341e9e"
+    },
+    {
+      "row_id": "O135",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-10038601",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O135.jpg",
+      "sha256": "2528adf4aaa0d2ba734cf7b8324bd5a640526d35ed81c14b98cf6073833f2aea"
+    },
+    {
+      "row_id": "O136",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-19032268",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O136.jpg",
+      "sha256": "a3550bee6540dcc5ba0a1ef3b34d48ce7cf50affaf716ae92acf2102d8aca603"
+    },
+    {
+      "row_id": "O137",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-18686162",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O137.jpg",
+      "sha256": "0402d00250bc617f0c974c2cd6b650ecc9184295ba6a1ffd03e7c8a932cf389f"
+    },
+    {
+      "row_id": "O138",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-4285503",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O138.jpg",
+      "sha256": "27313f9b833b95cdfa0516a4ce6792158b166fc500e570b135a3cd4bac493a60"
+    },
+    {
+      "row_id": "O139",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-65358731",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O139.jpg",
+      "sha256": "22ae3e557c8a5df5e11a434c9f5ecb2ce1fda11e3c06e56818ef72e28c894e11"
+    },
+    {
+      "row_id": "O140",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-84571239",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O140.jpg",
+      "sha256": "84b490a665556d0e35c6ff4af809de110e8dbb71c383f93aefa65b32ad0788c1"
+    },
+    {
+      "row_id": "O141",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-65358732",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O141.jpg",
+      "sha256": "c8792db7eeb83695fce26547928d0ece7e8eabcf6a3e033549e314cde59cc835"
+    },
+    {
+      "row_id": "O142",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-143699097",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O142.jpg",
+      "sha256": "16d214b5d45cba147e568f7f12a1ffdeabfe3766b6f3c30b00bedb0acae5a69d"
+    },
+    {
+      "row_id": "O143",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-70938102",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O143.jpg",
+      "sha256": "5e98cc68977d82311449c9568d4bd91b08e5f635210c52ae03ac09a5eff53927"
+    },
+    {
+      "row_id": "O144",
+      "source_dataset": "Wikimedia Commons",
+      "source_asset_id": "commons-page-89089685",
+      "downloaded_jpeg": "tmp/appliance-model-v3-fresh-validation/review-ood-final/images/O144.jpg",
+      "sha256": "43b97f464ff4effcae64049719703838c267303c0e7cbff57c57ca574383a113"
+    }
+  ]
+}

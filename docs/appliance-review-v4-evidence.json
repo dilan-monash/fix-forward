@@ -1,0 +1,1229 @@
+{
+  "scope": "development_only_not_fresh_heldout",
+  "release_ready": false,
+  "frozen_policy": {
+    "policy_id": "fixforward-siglip2-confirmation-review-development-v4",
+    "release_ready": false,
+    "scope": "local_development_only",
+    "requires_user_confirmation": true,
+    "class_count": 19,
+    "ood_prompt_count": 10,
+    "max_choices": 3,
+    "min_similarity": 0.1076883765432923,
+    "min_ood_margin": 0.017378100156106337,
+    "max_choice_gap": 0.006854580313702425,
+    "model_sha256": "9e82237d9a1d89948502aff9df02129c28698d793e01f15f62e2267682615499",
+    "selection_rule": "Only independently pixel-audited clear model_selection/calibration positives and semantic-audited true-OOD calibration rows. Maximise eligible positive coverage with zero OOD accepts across observed-score midpoint cuts; ties choose lower absolute floor then lower OOD threshold. Choice gap is largest accepted-positive top-to-correct score gap plus 1e-9, at most three choices. Opened_v3_review scores do not select thresholds.",
+    "frozen_at_utc": "2026-10-10T04:02:38.041805+00:00",
+    "derivation_counts": {
+      "positive": 69,
+      "true_ood": 49,
+      "accepted_positive": 64
+    },
+    "semantic_audit_sha256": "ff22e6e6dfc2b32c319c351ec2e80f1cb79da1af03c3b407c56090cfde20a9ab",
+    "clear_features_sha256": "4098fda6f47690a3dad8239823f99d982adc8dde86ea4384f11cabd64b0ca20c",
+    "derivation_positive_ids": [
+      "air_fryer-565282d79225--clear",
+      "air_fryer-e79a9878f7ce--clear",
+      "air_fryer-6212a8c8caba--clear",
+      "blender-267b085f3bd2--clear",
+      "blender-f6fb2daba59c--clear",
+      "blender-f74ed97fc740--clear",
+      "coffee_machine-e4d76ac99505--clear",
+      "coffee_machine-5418f9e37c4f--clear",
+      "coffee_machine-ce3c45b2721c--clear",
+      "coffee_machine-159eb1fa5069--clear",
+      "coffee_machine-2273cb610235--clear",
+      "dehumidifier-1cf6c6cfa88e--clear",
+      "dehumidifier-8b087b795712--clear",
+      "dehumidifier-3f984ee45963--clear",
+      "fan-285583b983a7--clear",
+      "fan-aa9816b416a4--clear",
+      "fan-24796fce8a2a--clear",
+      "food_processor-77211861c698--clear",
+      "food_processor-c5c8326d6f54--clear",
+      "food_processor-ab135972ba6d--clear",
+      "hair_dryer-5e5a65637ed7--clear",
+      "hair_dryer-34b0ae6e8fba--clear",
+      "hair_dryer-4729cd72e2a5--clear",
+      "kettle-2da3e1ee8e9f--clear",
+      "kettle-63a7a7a6a297--clear",
+      "kettle-dbbcc4bb5f45--clear",
+      "kettle-ab6171bb35b1--clear",
+      "kettle-277840acc491--clear",
+      "microwave-5b8e9e8b20a7--clear",
+      "microwave-150d31bd614b--clear",
+      "microwave-983ca15af2e2--clear",
+      "microwave-a6c8d05ffdbc--clear",
+      "microwave-8f6fd9cdaa89--clear",
+      "microwave-ff53aecc9ea2--clear",
+      "microwave-70feece894a5--clear",
+      "microwave-e5d2b8680e14--clear",
+      "mixer-04924c3f4430--clear",
+      "mixer-7252b85dd2c5--clear",
+      "portable_ac-bc95124d3287--clear",
+      "portable_ac-bd28dc685129--clear",
+      "portable_ac-f2c727cdf112--clear",
+      "portable_heater-5e1516c354d7--clear",
+      "portable_heater-40281ba9f9f2--clear",
+      "portable_heater-cf70686e8f22--clear",
+      "portable_heater-fac2d694ad4a--clear",
+      "portable_heater-6d267220e3e4--clear",
+      "portable_heater-b6189b3d5bd3--clear",
+      "rice_cooker-2fbb9da10504--clear",
+      "rice_cooker-3c9df9d90d2a--clear",
+      "rice_cooker-51e9a8d4c8d1--clear",
+      "rice_cooker-17c61f5d1c42--clear",
+      "shaver-62009690af0f--clear",
+      "steam_cleaner-c9442b6e3edd--clear",
+      "straightener-4ca1a364dfcf--clear",
+      "straightener-f845c52976da--clear",
+      "straightener-3e89e8762283--clear",
+      "toaster-9544eeadec25--clear",
+      "toaster-448e172b78c2--clear",
+      "toaster-19fcb65325ca--clear",
+      "toaster-7be207256aa9--clear",
+      "toaster-76e2bac9d035--clear",
+      "toaster-de8be8a73530--clear",
+      "toaster-f00ede74c55a--clear",
+      "vaccum_cleaner-f61df5e36235--clear",
+      "vaccum_cleaner-5f0898b84a23--clear",
+      "vaccum_cleaner-093a8652330f--clear",
+      "vaccum_cleaner-279a89e2b438--clear",
+      "vaccum_cleaner-55accfe5bd03--clear",
+      "vaccum_cleaner-2f5bfbbbde0a--clear"
+    ],
+    "derivation_ood_paths": [
+      "tmp/appliance-model-data-v3/abo-training-v2/images/ood/chair/B001BQ1Q9G-61JeKISYELS.jpg",
+      "tmp/appliance-model-data-v3/abo-training-v2/images/ood/notebook_computer/B010UMFTRG-41zGG3oaxOL.jpg",
+      "tmp/appliance-model-data-v3/abo-training-v2/images/ood/notebook_computer/B015G1RGGS-41S2+c+t3oL.jpg",
+      "tmp/appliance-model-data-v3/abo-training-v2/images/ood/backpack/B017M6P5AE-A1umI+PwGFL.jpg",
+      "tmp/appliance-model-data-v3/abo-training-v2/images/ood/lamp/B073P3562J-71rQhj8r29L.jpg",
+      "tmp/appliance-model-data-v3/abo-training-v2/images/ood/lamp/B073P3NK7T-81oTHF1PcUL.jpg",
+      "tmp/appliance-model-data-v3/abo-training-v2/images/ood/lamp/B07B4YYC31-71xoCU9ZAyL.jpg",
+      "tmp/appliance-model-data-v3/abo-training-v2/images/ood/desk/B07B7DL3GX-81HI2CE9k-L.jpg",
+      "tmp/appliance-model-data-v3/abo-training-v2/images/ood/bottle/B07C7WV159-81Qi7hZjASL.jpg",
+      "tmp/appliance-model-data-v3/abo-training-v2/images/ood/chair/B07DBHCKHY-81l+UPz-wZL.jpg",
+      "tmp/appliance-model-data-v3/abo-training-v2/images/ood/backpack/B07FP7ZF7P-91bJwoEJYqL.jpg",
+      "tmp/appliance-model-data-v3/abo-training-v2/images/ood/bottle/B07HK75DXN-51TSsQIDEPL.jpg",
+      "tmp/appliance-model-data-v3/abo-training-v2/images/ood/desk/B07K6S2G6J-610yeWPoveL.jpg",
+      "tmp/appliance-model-data-v3/abo-training-v2/images/ood/chair/B07KR9WBN7-916B5JgdShL.jpg",
+      "tmp/appliance-model-data-v3/abo-training-v2/images/ood/lamp/B07MBFDJQ3-51nyDMjCmHL.jpg",
+      "tmp/appliance-model-data-v3/abo-training-v2/images/ood/backpack/B07PGMSL4D-81ctXTw6aDL.jpg",
+      "tmp/appliance-model-data-v3/abo-training-v2/images/ood/desk/B07QC85X9C-71o4-1o39HL.jpg",
+      "tmp/appliance-model-data-v3/abo-training-v2/images/ood/chair/B07QTD9VPM-81EXO8kXnhL.jpg",
+      "tmp/appliance-model-data-v3/abo-training-v2/images/ood/notebook_computer/B07SBG19PC-716X5ss9MzL.jpg",
+      "tmp/appliance-model-data-v3/abo-training-v2/images/ood/backpack/B07T8BLNT3-918OKGODCGL.jpg",
+      "tmp/appliance-model-data-v3/abo-training-v2/images/ood/backpack/B07TPYGS7C-913MqpusGBL.jpg",
+      "tmp/appliance-model-data-v3/abo-training-v2/images/ood/washer_dryer_combination/B07V3SGB3G-71+JK-QC68L.jpg",
+      "tmp/appliance-model-data-v3/abo-training-v2/images/ood/washer_dryer_combination/B07V6Z1HH2-71EYRYzFKIL.jpg",
+      "tmp/appliance-model-data-v3/abo-training-v2/images/ood/television/B082J6Y3GQ-81VnOPdxK-L.jpg",
+      "tmp/appliance-model-data-v3/abo-training-v2/images/ood/toy_figure/B083F2T5YJ-81ABsM1vYvL.jpg",
+      "tmp/appliance-model-data-v3/abo-training-v2/images/ood/toy_figure/B083F2WNX8-810d-gajeRL.jpg",
+      "tmp/appliance-model-data-v3/abo-training-v2/images/ood/toy_figure/B083F3P123-81myAkcu54L.jpg",
+      "tmp/appliance-model-data-v3/abo-training-v2/images/ood/shoes/B0846BTJ34-71kE0ihplPL.jpg",
+      "tmp/appliance-model-data-v3/abo-training-v2/images/ood/countertop_oven/B0846BX9NG-81oZT6EyWCL.jpg",
+      "tmp/appliance-model-data-v3/abo-training-v2/images/supported/hair_dryer/B088Z45FP6-517auCaPzaL.jpg",
+      "tmp/appliance-model-data-v3/images/supported/portable_heater/980c4471-5695-4289-882d-bf1d8f3c1461.jpg",
+      "tmp/appliance-model-data-v3/images/supported/vaccum_cleaner/45879aeb-0fbc-4b28-b1bc-0c12e295a660.jpg",
+      "tmp/appliance-model-data-v3/images/supported/mixer/ca21e260-f71c-41ea-b80b-d27e70db43eb.jpg",
+      "tmp/appliance-model-data-v3/images/supported/air_fryer/f2f3f3b8-2a22-403b-b4ff-4ad753fd36e0.jpg",
+      "tmp/appliance-model-data-v3/images/supported/sandwich_press/2c8b9bff-662d-44c7-9d86-48c18936197b.jpg",
+      "tmp/appliance-model-data-v3/images/supported/shaver/1d453811-8a50-4880-adf6-0dfc64d7930e.jpg",
+      "tmp/appliance-model-data-v3/images/supported/blender/2bf9eba4-7b2b-44c7-97ff-ee226fb2ed4f.jpg",
+      "tmp/appliance-model-data-v3/images/supported/straightener/32ac95f5-4bc5-4679-8c3b-8b7e8bdb0665.jpg",
+      "tmp/appliance-model-data-v3/images/supported/portable_ac/08c5b75c-e073-4211-880d-a81a391f303f.jpg",
+      "tmp/appliance-model-data-v3/images/supported/dehumidifier/6a42c1a0-b5c8-45d1-90be-b3c8feaf9892.jpg",
+      "tmp/appliance-model-data-v3/images/supported/dehumidifier/8da317f3-81d2-4463-8946-f1743daf3fc4.jpg",
+      "tmp/appliance-model-data-v3/images/supported/blender/5be14000-8e36-4db5-a438-8157885b0168.jpg",
+      "tmp/appliance-model-data-v3/images/supported/blender/40b2bd58-d860-4126-8cb9-ad9d01b56b5d.jpg",
+      "tmp/appliance-model-data-v3/images/supported/steam_cleaner/9edf64e6-f3a7-4181-835b-5e7067ae406a.jpg",
+      "tmp/appliance-model-data-v3/images/supported/portable_heater/3ff3b049-d516-4b76-adf3-1a60facfbd85.jpg",
+      "tmp/appliance-model-data-v3/images/supported/blender/8182a232-f8fc-4334-844d-8b089be44b10.jpg",
+      "tmp/appliance-model-data-v3/images/supported/blender/c6a035c3-0205-4afd-8625-6e68e0bda2e3.jpg",
+      "tmp/appliance-model-data-v3/images/supported/dehumidifier/e14090d7-4fb0-4c2b-883b-47e002219548.jpg",
+      "C:\\Users\\sansk\\Downloads\\FixForward-Iteration-3-From-Iteration-2\\tmp\\i3-vision-v4-development\\tmp\\i3-vision-v4-data\\clear-v4\\images\\ood-2b22cc87dfc0--clear.png"
+    ],
+    "limitations": [
+      "All data were previously opened development evidence; not an independent release evaluation.",
+      "Some classes have few clear examples; confirmation does not make guesses accurate.",
+      "These are alternative labels for one item, never detected object counts."
+    ]
+  },
+  "policy_module_sha256": "5b59fddcefddcfe20f510ea1c6bcc5d61543a2de0e02fb03dea4fe55c7218189",
+  "comparison": {
+    "derivation": {
+      "positive": {
+        "n": 69,
+        "offered": 64,
+        "correct_in_choices": 64,
+        "wrong_choice_sets": [],
+        "single_choice": 59,
+        "two_choices": 5,
+        "three_choices": 0
+      },
+      "ood": {
+        "n": 49,
+        "offered": 0
+      },
+      "per_class": {
+        "air_fryer": {
+          "n": 3,
+          "offered": 3,
+          "correct_in_choices": 3,
+          "wrong_choice_sets": [],
+          "single_choice": 3,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "blender": {
+          "n": 3,
+          "offered": 3,
+          "correct_in_choices": 3,
+          "wrong_choice_sets": [],
+          "single_choice": 3,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "coffee_machine": {
+          "n": 5,
+          "offered": 5,
+          "correct_in_choices": 5,
+          "wrong_choice_sets": [],
+          "single_choice": 5,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "dehumidifier": {
+          "n": 3,
+          "offered": 3,
+          "correct_in_choices": 3,
+          "wrong_choice_sets": [],
+          "single_choice": 1,
+          "two_choices": 2,
+          "three_choices": 0
+        },
+        "fan": {
+          "n": 3,
+          "offered": 3,
+          "correct_in_choices": 3,
+          "wrong_choice_sets": [],
+          "single_choice": 3,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "food_processor": {
+          "n": 3,
+          "offered": 2,
+          "correct_in_choices": 2,
+          "wrong_choice_sets": [],
+          "single_choice": 2,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "hair_dryer": {
+          "n": 3,
+          "offered": 2,
+          "correct_in_choices": 2,
+          "wrong_choice_sets": [],
+          "single_choice": 2,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "kettle": {
+          "n": 5,
+          "offered": 5,
+          "correct_in_choices": 5,
+          "wrong_choice_sets": [],
+          "single_choice": 5,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "microwave": {
+          "n": 8,
+          "offered": 7,
+          "correct_in_choices": 7,
+          "wrong_choice_sets": [],
+          "single_choice": 7,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "mixer": {
+          "n": 2,
+          "offered": 1,
+          "correct_in_choices": 1,
+          "wrong_choice_sets": [],
+          "single_choice": 0,
+          "two_choices": 1,
+          "three_choices": 0
+        },
+        "portable_ac": {
+          "n": 3,
+          "offered": 3,
+          "correct_in_choices": 3,
+          "wrong_choice_sets": [],
+          "single_choice": 2,
+          "two_choices": 1,
+          "three_choices": 0
+        },
+        "portable_heater": {
+          "n": 6,
+          "offered": 6,
+          "correct_in_choices": 6,
+          "wrong_choice_sets": [],
+          "single_choice": 5,
+          "two_choices": 1,
+          "three_choices": 0
+        },
+        "rice_cooker": {
+          "n": 4,
+          "offered": 4,
+          "correct_in_choices": 4,
+          "wrong_choice_sets": [],
+          "single_choice": 4,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "sandwich_press": {
+          "n": 0,
+          "offered": 0,
+          "correct_in_choices": 0,
+          "wrong_choice_sets": [],
+          "single_choice": 0,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "shaver": {
+          "n": 1,
+          "offered": 1,
+          "correct_in_choices": 1,
+          "wrong_choice_sets": [],
+          "single_choice": 1,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "steam_cleaner": {
+          "n": 1,
+          "offered": 1,
+          "correct_in_choices": 1,
+          "wrong_choice_sets": [],
+          "single_choice": 1,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "straightener": {
+          "n": 3,
+          "offered": 3,
+          "correct_in_choices": 3,
+          "wrong_choice_sets": [],
+          "single_choice": 3,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "toaster": {
+          "n": 7,
+          "offered": 7,
+          "correct_in_choices": 7,
+          "wrong_choice_sets": [],
+          "single_choice": 7,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "vaccum_cleaner": {
+          "n": 6,
+          "offered": 5,
+          "correct_in_choices": 5,
+          "wrong_choice_sets": [],
+          "single_choice": 5,
+          "two_choices": 0,
+          "three_choices": 0
+        }
+      }
+    },
+    "opened_v3_review": {
+      "positive": {
+        "n": 28,
+        "offered": 25,
+        "correct_in_choices": 24,
+        "wrong_choice_sets": [
+          {
+            "sample_id": "air_fryer-c133104e7052--clear",
+            "target": "air_fryer",
+            "choices": [
+              {
+                "label": "food_processor"
+              }
+            ]
+          }
+        ],
+        "single_choice": 24,
+        "two_choices": 1,
+        "three_choices": 0
+      },
+      "ood": {
+        "n": 31,
+        "offered": 1
+      },
+      "per_class": {
+        "air_fryer": {
+          "n": 1,
+          "offered": 1,
+          "correct_in_choices": 0,
+          "wrong_choice_sets": [
+            {
+              "sample_id": "air_fryer-c133104e7052--clear",
+              "target": "air_fryer",
+              "choices": [
+                {
+                  "label": "food_processor"
+                }
+              ]
+            }
+          ],
+          "single_choice": 1,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "blender": {
+          "n": 2,
+          "offered": 2,
+          "correct_in_choices": 2,
+          "wrong_choice_sets": [],
+          "single_choice": 2,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "coffee_machine": {
+          "n": 0,
+          "offered": 0,
+          "correct_in_choices": 0,
+          "wrong_choice_sets": [],
+          "single_choice": 0,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "dehumidifier": {
+          "n": 1,
+          "offered": 1,
+          "correct_in_choices": 1,
+          "wrong_choice_sets": [],
+          "single_choice": 0,
+          "two_choices": 1,
+          "three_choices": 0
+        },
+        "fan": {
+          "n": 3,
+          "offered": 3,
+          "correct_in_choices": 3,
+          "wrong_choice_sets": [],
+          "single_choice": 3,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "food_processor": {
+          "n": 0,
+          "offered": 0,
+          "correct_in_choices": 0,
+          "wrong_choice_sets": [],
+          "single_choice": 0,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "hair_dryer": {
+          "n": 3,
+          "offered": 2,
+          "correct_in_choices": 2,
+          "wrong_choice_sets": [],
+          "single_choice": 2,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "kettle": {
+          "n": 1,
+          "offered": 1,
+          "correct_in_choices": 1,
+          "wrong_choice_sets": [],
+          "single_choice": 1,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "microwave": {
+          "n": 0,
+          "offered": 0,
+          "correct_in_choices": 0,
+          "wrong_choice_sets": [],
+          "single_choice": 0,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "mixer": {
+          "n": 3,
+          "offered": 3,
+          "correct_in_choices": 3,
+          "wrong_choice_sets": [],
+          "single_choice": 3,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "portable_ac": {
+          "n": 3,
+          "offered": 3,
+          "correct_in_choices": 3,
+          "wrong_choice_sets": [],
+          "single_choice": 3,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "portable_heater": {
+          "n": 2,
+          "offered": 2,
+          "correct_in_choices": 2,
+          "wrong_choice_sets": [],
+          "single_choice": 2,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "rice_cooker": {
+          "n": 1,
+          "offered": 1,
+          "correct_in_choices": 1,
+          "wrong_choice_sets": [],
+          "single_choice": 1,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "sandwich_press": {
+          "n": 2,
+          "offered": 1,
+          "correct_in_choices": 1,
+          "wrong_choice_sets": [],
+          "single_choice": 1,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "shaver": {
+          "n": 3,
+          "offered": 2,
+          "correct_in_choices": 2,
+          "wrong_choice_sets": [],
+          "single_choice": 2,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "steam_cleaner": {
+          "n": 1,
+          "offered": 1,
+          "correct_in_choices": 1,
+          "wrong_choice_sets": [],
+          "single_choice": 1,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "straightener": {
+          "n": 0,
+          "offered": 0,
+          "correct_in_choices": 0,
+          "wrong_choice_sets": [],
+          "single_choice": 0,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "toaster": {
+          "n": 1,
+          "offered": 1,
+          "correct_in_choices": 1,
+          "wrong_choice_sets": [],
+          "single_choice": 1,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "vaccum_cleaner": {
+          "n": 1,
+          "offered": 1,
+          "correct_in_choices": 1,
+          "wrong_choice_sets": [],
+          "single_choice": 1,
+          "two_choices": 0,
+          "three_choices": 0
+        }
+      }
+    },
+    "all_strict_clear_development": {
+      "positive": {
+        "n": 97,
+        "offered": 89,
+        "correct_in_choices": 88,
+        "wrong_choice_sets": [
+          {
+            "sample_id": "air_fryer-c133104e7052--clear",
+            "target": "air_fryer",
+            "choices": [
+              {
+                "label": "food_processor"
+              }
+            ]
+          }
+        ],
+        "single_choice": 83,
+        "two_choices": 6,
+        "three_choices": 0
+      },
+      "ood": {
+        "n": 32,
+        "offered": 1
+      },
+      "per_class": {
+        "air_fryer": {
+          "n": 4,
+          "offered": 4,
+          "correct_in_choices": 3,
+          "wrong_choice_sets": [
+            {
+              "sample_id": "air_fryer-c133104e7052--clear",
+              "target": "air_fryer",
+              "choices": [
+                {
+                  "label": "food_processor"
+                }
+              ]
+            }
+          ],
+          "single_choice": 4,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "blender": {
+          "n": 5,
+          "offered": 5,
+          "correct_in_choices": 5,
+          "wrong_choice_sets": [],
+          "single_choice": 5,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "coffee_machine": {
+          "n": 5,
+          "offered": 5,
+          "correct_in_choices": 5,
+          "wrong_choice_sets": [],
+          "single_choice": 5,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "dehumidifier": {
+          "n": 4,
+          "offered": 4,
+          "correct_in_choices": 4,
+          "wrong_choice_sets": [],
+          "single_choice": 1,
+          "two_choices": 3,
+          "three_choices": 0
+        },
+        "fan": {
+          "n": 6,
+          "offered": 6,
+          "correct_in_choices": 6,
+          "wrong_choice_sets": [],
+          "single_choice": 6,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "food_processor": {
+          "n": 3,
+          "offered": 2,
+          "correct_in_choices": 2,
+          "wrong_choice_sets": [],
+          "single_choice": 2,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "hair_dryer": {
+          "n": 6,
+          "offered": 4,
+          "correct_in_choices": 4,
+          "wrong_choice_sets": [],
+          "single_choice": 4,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "kettle": {
+          "n": 6,
+          "offered": 6,
+          "correct_in_choices": 6,
+          "wrong_choice_sets": [],
+          "single_choice": 6,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "microwave": {
+          "n": 8,
+          "offered": 7,
+          "correct_in_choices": 7,
+          "wrong_choice_sets": [],
+          "single_choice": 7,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "mixer": {
+          "n": 5,
+          "offered": 4,
+          "correct_in_choices": 4,
+          "wrong_choice_sets": [],
+          "single_choice": 3,
+          "two_choices": 1,
+          "three_choices": 0
+        },
+        "portable_ac": {
+          "n": 6,
+          "offered": 6,
+          "correct_in_choices": 6,
+          "wrong_choice_sets": [],
+          "single_choice": 5,
+          "two_choices": 1,
+          "three_choices": 0
+        },
+        "portable_heater": {
+          "n": 8,
+          "offered": 8,
+          "correct_in_choices": 8,
+          "wrong_choice_sets": [],
+          "single_choice": 7,
+          "two_choices": 1,
+          "three_choices": 0
+        },
+        "rice_cooker": {
+          "n": 5,
+          "offered": 5,
+          "correct_in_choices": 5,
+          "wrong_choice_sets": [],
+          "single_choice": 5,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "sandwich_press": {
+          "n": 2,
+          "offered": 1,
+          "correct_in_choices": 1,
+          "wrong_choice_sets": [],
+          "single_choice": 1,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "shaver": {
+          "n": 4,
+          "offered": 3,
+          "correct_in_choices": 3,
+          "wrong_choice_sets": [],
+          "single_choice": 3,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "steam_cleaner": {
+          "n": 2,
+          "offered": 2,
+          "correct_in_choices": 2,
+          "wrong_choice_sets": [],
+          "single_choice": 2,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "straightener": {
+          "n": 3,
+          "offered": 3,
+          "correct_in_choices": 3,
+          "wrong_choice_sets": [],
+          "single_choice": 3,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "toaster": {
+          "n": 8,
+          "offered": 8,
+          "correct_in_choices": 8,
+          "wrong_choice_sets": [],
+          "single_choice": 8,
+          "two_choices": 0,
+          "three_choices": 0
+        },
+        "vaccum_cleaner": {
+          "n": 7,
+          "offered": 6,
+          "correct_in_choices": 6,
+          "wrong_choice_sets": [],
+          "single_choice": 6,
+          "two_choices": 0,
+          "three_choices": 0
+        }
+      }
+    }
+  },
+  "_comment": "Frozen local-only policy research and actual Node policy results. This is not a release gate pass or population accuracy claim.",
+  "raw_text_ranking": {
+    "positive_n": 97,
+    "top1_correct": 91,
+    "top3_contains_correct": 96,
+    "unknown_n": 32,
+    "unknown_best_prompt_is_ood": 26,
+    "unknown_accepted_by_current_policy": 0
+  },
+  "current_policy_clear_baseline": {
+    "n": 129,
+    "top1_accuracy": 0.7054263565891473,
+    "supported_top1_accuracy": 0.9381443298969072,
+    "supported_n": 97,
+    "accepted": 51,
+    "accepted_correct": 51,
+    "wrong_supported_accepts": 0,
+    "unknown_accepts": 0,
+    "supported_correct_coverage": 0.5257731958762887,
+    "per_class": {
+      "air_fryer": {
+        "n": 4,
+        "top1_correct": 3,
+        "accepted": 2,
+        "accepted_correct": 2
+      },
+      "blender": {
+        "n": 5,
+        "top1_correct": 5,
+        "accepted": 0,
+        "accepted_correct": 0
+      },
+      "coffee_machine": {
+        "n": 5,
+        "top1_correct": 5,
+        "accepted": 5,
+        "accepted_correct": 5
+      },
+      "dehumidifier": {
+        "n": 4,
+        "top1_correct": 2,
+        "accepted": 0,
+        "accepted_correct": 0
+      },
+      "fan": {
+        "n": 6,
+        "top1_correct": 6,
+        "accepted": 4,
+        "accepted_correct": 4
+      },
+      "food_processor": {
+        "n": 3,
+        "top1_correct": 3,
+        "accepted": 0,
+        "accepted_correct": 0
+      },
+      "hair_dryer": {
+        "n": 6,
+        "top1_correct": 6,
+        "accepted": 6,
+        "accepted_correct": 6
+      },
+      "kettle": {
+        "n": 6,
+        "top1_correct": 6,
+        "accepted": 6,
+        "accepted_correct": 6
+      },
+      "microwave": {
+        "n": 8,
+        "top1_correct": 8,
+        "accepted": 8,
+        "accepted_correct": 8
+      },
+      "mixer": {
+        "n": 5,
+        "top1_correct": 5,
+        "accepted": 0,
+        "accepted_correct": 0
+      },
+      "portable_ac": {
+        "n": 6,
+        "top1_correct": 5,
+        "accepted": 4,
+        "accepted_correct": 4
+      },
+      "portable_heater": {
+        "n": 8,
+        "top1_correct": 7,
+        "accepted": 7,
+        "accepted_correct": 7
+      },
+      "rice_cooker": {
+        "n": 5,
+        "top1_correct": 5,
+        "accepted": 5,
+        "accepted_correct": 5
+      },
+      "sandwich_press": {
+        "n": 2,
+        "top1_correct": 1,
+        "accepted": 1,
+        "accepted_correct": 1
+      },
+      "shaver": {
+        "n": 4,
+        "top1_correct": 4,
+        "accepted": 0,
+        "accepted_correct": 0
+      },
+      "steam_cleaner": {
+        "n": 2,
+        "top1_correct": 2,
+        "accepted": 0,
+        "accepted_correct": 0
+      },
+      "straightener": {
+        "n": 3,
+        "top1_correct": 3,
+        "accepted": 3,
+        "accepted_correct": 3
+      },
+      "toaster": {
+        "n": 8,
+        "top1_correct": 8,
+        "accepted": 0,
+        "accepted_correct": 0
+      },
+      "vaccum_cleaner": {
+        "n": 7,
+        "top1_correct": 7,
+        "accepted": 0,
+        "accepted_correct": 0
+      },
+      "unsupported_or_unknown": {
+        "n": 32,
+        "top1_correct": 0,
+        "accepted": 0,
+        "accepted_correct": 0
+      }
+    }
+  },
+  "false_ood_rows": [
+    {
+      "sample_id": "ood-02f201bbb8e6--clear",
+      "target": "unsupported_or_unknown",
+      "split": "opened_v3_review",
+      "strict": true,
+      "result": {
+        "status": "suggestions",
+        "reason": "one_possible_type",
+        "choices": [
+          {
+            "label": "portable_ac"
+          }
+        ],
+        "requiresConfirmation": true,
+        "objectCount": null,
+        "policyId": "fixforward-siglip2-confirmation-review-development-v4"
+      }
+    }
+  ],
+  "supervised_experiment": {
+    "source_image_count": 987,
+    "selected_alpha": 10,
+    "finding": "No raw supported top-one improvement; calibrated coverage worsened. Do not integrate head weights.",
+    "model_selection": {
+      "supported_n": 80,
+      "text_top1_correct": 76,
+      "head_top1_correct": 76,
+      "current_policy_correct_offers": 32,
+      "head_correct_offers": 22
+    },
+    "calibration": {
+      "supported_n": 82,
+      "text_top1_correct": 75,
+      "head_top1_correct": 75,
+      "current_policy_correct_offers": 39,
+      "head_correct_offers": 16
+    }
+  },
+  "new_locked_five_after_freeze": {
+    "scope": "five_new_independently_image_reviewed_development_examples_after_policy_freeze_not_a_release_gate",
+    "release_ready": false,
+    "policy_module_sha256": "5b59fddcefddcfe20f510ea1c6bcc5d61543a2de0e02fb03dea4fe55c7218189",
+    "manifest_sha256": "161b57da23b78019334ed5f246d8ce28b43aedac9e331903d4f806c9d7369a68",
+    "summary": {
+      "n": 5,
+      "raw_top1_correct": 5,
+      "raw_top3_contains_correct": 5,
+      "offered": 3,
+      "correct_in_choices": 3
+    },
+    "predictions": [
+      {
+        "sample_id": "commons-page-84630909",
+        "expected": "toaster",
+        "result": {
+          "status": "suggestions",
+          "reason": "one_possible_type",
+          "choices": [
+            {
+              "label": "toaster"
+            }
+          ],
+          "requiresConfirmation": true,
+          "objectCount": null,
+          "policyId": "fixforward-siglip2-confirmation-review-development-v4"
+        },
+        "top3": [
+          {
+            "label": "toaster",
+            "score": 0.1571863075057652
+          },
+          {
+            "label": "sandwich_press",
+            "score": 0.10351359034788749
+          },
+          {
+            "label": "air_fryer",
+            "score": 0.09727834416952705
+          }
+        ]
+      },
+      {
+        "sample_id": "commons-page-4062710",
+        "expected": "food_processor",
+        "result": {
+          "status": "suggestions",
+          "reason": "one_possible_type",
+          "choices": [
+            {
+              "label": "food_processor"
+            }
+          ],
+          "requiresConfirmation": true,
+          "objectCount": null,
+          "policyId": "fixforward-siglip2-confirmation-review-development-v4"
+        },
+        "top3": [
+          {
+            "label": "food_processor",
+            "score": 0.15062570102482728
+          },
+          {
+            "label": "blender",
+            "score": 0.1096755040037035
+          },
+          {
+            "label": "mixer",
+            "score": 0.10159716221559784
+          }
+        ]
+      },
+      {
+        "sample_id": "commons-page-37919493",
+        "expected": "mixer",
+        "result": {
+          "status": "uncertain",
+          "reason": "not_enough_appliance_evidence",
+          "choices": [],
+          "requiresConfirmation": true,
+          "objectCount": null,
+          "policyId": "fixforward-siglip2-confirmation-review-development-v4"
+        },
+        "top3": [
+          {
+            "label": "mixer",
+            "score": 0.13164082327358545
+          },
+          {
+            "label": "blender",
+            "score": 0.12349796878520469
+          },
+          {
+            "label": "fan",
+            "score": 0.09415770811063193
+          }
+        ]
+      },
+      {
+        "sample_id": "commons-page-33633595",
+        "expected": "shaver",
+        "result": {
+          "status": "suggestions",
+          "reason": "one_possible_type",
+          "choices": [
+            {
+              "label": "shaver"
+            }
+          ],
+          "requiresConfirmation": true,
+          "objectCount": null,
+          "policyId": "fixforward-siglip2-confirmation-review-development-v4"
+        },
+        "top3": [
+          {
+            "label": "shaver",
+            "score": 0.1492175317524796
+          },
+          {
+            "label": "hair_dryer",
+            "score": 0.10345446114046251
+          },
+          {
+            "label": "straightener",
+            "score": 0.08730501205957739
+          }
+        ]
+      },
+      {
+        "sample_id": "commons-page-861050",
+        "expected": "shaver",
+        "result": {
+          "status": "uncertain",
+          "reason": "not_enough_appliance_evidence",
+          "choices": [],
+          "requiresConfirmation": true,
+          "objectCount": null,
+          "policyId": "fixforward-siglip2-confirmation-review-development-v4"
+        },
+        "top3": [
+          {
+            "label": "shaver",
+            "score": 0.0908367555589633
+          },
+          {
+            "label": "toaster",
+            "score": 0.07983172111263617
+          },
+          {
+            "label": "hair_dryer",
+            "score": 0.07816629849861051
+          }
+        ]
+      }
+    ]
+  },
+  "frozen_corruption_diagnostics": {
+    "scope": "synthetic_corruption_development_diagnostics_not_new_independent_photos",
+    "retuned": false,
+    "results_path": "E:/FixForward-Vision-V4-Experiment/blur-eval/review-policy-stress-report.json",
+    "comparison": {
+      "clear": {
+        "positive_n": 97,
+        "raw_top1_correct": 91,
+        "raw_top3_correct": 96,
+        "current_correct_offers": 51,
+        "review_offered": 89,
+        "review_correct_choices": 88,
+        "review_wrong_choice_sets": [
+          {
+            "sample_id": "air_fryer-c133104e7052--clear",
+            "target": "air_fryer",
+            "choices": [
+              {
+                "label": "food_processor"
+              }
+            ]
+          }
+        ],
+        "ood_n": 32,
+        "review_ood_offers": [
+          {
+            "sample_id": "ood-02f201bbb8e6--clear",
+            "choices": [
+              {
+                "label": "portable_ac"
+              }
+            ]
+          }
+        ],
+        "current_ood_offers": 0
+      },
+      "blur_mild": {
+        "positive_n": 97,
+        "raw_top1_correct": 93,
+        "raw_top3_correct": 96,
+        "current_correct_offers": 48,
+        "review_offered": 86,
+        "review_correct_choices": 85,
+        "review_wrong_choice_sets": [
+          {
+            "sample_id": "portable_heater-cf70686e8f22--blur_mild",
+            "target": "portable_heater",
+            "choices": [
+              {
+                "label": "portable_ac"
+              }
+            ]
+          }
+        ],
+        "ood_n": 32,
+        "review_ood_offers": [
+          {
+            "sample_id": "ood-02f201bbb8e6--blur_mild",
+            "choices": [
+              {
+                "label": "portable_ac"
+              }
+            ]
+          }
+        ],
+        "current_ood_offers": 0
+      },
+      "blur_moderate": {
+        "positive_n": 97,
+        "raw_top1_correct": 89,
+        "raw_top3_correct": 97,
+        "current_correct_offers": 42,
+        "review_offered": 83,
+        "review_correct_choices": 82,
+        "review_wrong_choice_sets": [
+          {
+            "sample_id": "portable_heater-cf70686e8f22--blur_moderate",
+            "target": "portable_heater",
+            "choices": [
+              {
+                "label": "portable_ac"
+              }
+            ]
+          }
+        ],
+        "ood_n": 32,
+        "review_ood_offers": [
+          {
+            "sample_id": "ood-02f201bbb8e6--blur_moderate",
+            "choices": [
+              {
+                "label": "portable_ac"
+              }
+            ]
+          }
+        ],
+        "current_ood_offers": 0
+      },
+      "downsize_moderate": {
+        "positive_n": 97,
+        "raw_top1_correct": 89,
+        "raw_top3_correct": 96,
+        "current_correct_offers": 40,
+        "review_offered": 83,
+        "review_correct_choices": 82,
+        "review_wrong_choice_sets": [
+          {
+            "sample_id": "portable_heater-cf70686e8f22--downsize_moderate",
+            "target": "portable_heater",
+            "choices": [
+              {
+                "label": "portable_ac"
+              }
+            ]
+          }
+        ],
+        "ood_n": 32,
+        "review_ood_offers": [
+          {
+            "sample_id": "ood-02f201bbb8e6--downsize_moderate",
+            "choices": [
+              {
+                "label": "portable_ac"
+              }
+            ]
+          }
+        ],
+        "current_ood_offers": 0
+      }
+    }
+  }
+}

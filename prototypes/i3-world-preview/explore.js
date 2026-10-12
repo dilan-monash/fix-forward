@@ -1,4 +1,6 @@
 import { CATALOGUE, GRID_FACTORS, SOURCES, findAppliance, calculateImpact } from './catalogue.js';
+import { EXPLORE_ACTIVE_ITEMS } from '../../src/explore-catalogue.js';
+import { mountExplorePhotoHelper } from '../../src/explore-photo-helper.js';
 
 /** Only catalogue text and numeric values enter our templates. This helper also
  * escapes anything coming from a route, so URL text never becomes HTML. */
@@ -48,8 +50,47 @@ export function productIcon(id) {
     airfryer: '<rect x="12" y="8" width="40" height="48" rx="12"/><path d="M15 31h34M26 21h12M24 39h16v8H24ZM22 60h21"/>',
     coffeemachine: '<path d="M13 8h35v47H13V8Zm4 20h27M18 50h25M25 30v6m11-6v6M23 39h16v10H23Z"/><path d="M48 13h9v29h-9M24 17h2m10 0h2M9 59h43"/>',
     mixer: '<path d="M17 12h26a8 8 0 0 1 0 16H17V12ZM19 28v26h28M14 54h37v5H14ZM34 28v10m-8 0h20c0 15-20 15-20 0Z"/><circle cx="23" cy="20" r="3"/>',
+    smartphone: '<rect x="19" y="5" width="26" height="54" rx="5"/><path d="M27 10h10M28 53h8"/>',
+    tablet: '<rect x="11" y="5" width="42" height="54" rx="4"/><path d="M17 12h30v36H17zM29 53h6"/>',
+    television: '<rect x="5" y="11" width="54" height="35" rx="3"/><path d="M11 17h42v23H11zM23 46l-5 9M41 46l5 9"/>',
+    washing_machine: '<rect x="10" y="5" width="44" height="54" rx="4"/><path d="M10 18h44M17 12h12M43 12h3"/><circle cx="32" cy="37" r="13"/><path d="M21 38c9-7 13 7 22 0"/>',
+    // Each navigation drawing leads to its own semantic, interactive 3D model.
+    refrigerator: '<rect x="15" y="4" width="34" height="54" rx="3"/><path d="M15 24h34M21 12v7m0 12v13M20 58v3m24-3v3"/>',
+    food_processor: '<path d="M11 33h28v20H11zM15 30V15h25v17M14 12h29M29 12V5h8v7M40 17h9v12h-9M39 36l10 17H10"/><circle cx="23" cy="43" r="3"/><path d="M24 21h9m-5-6v14"/>',
+    sandwich_press: '<path d="m11 29 6-15h30l7 15H11Zm0 5h43v13H11zM18 51h29M22 20h18M15 29v5m34-5v5M22 40h18"/>',
+    portable_heater: '<rect x="11" y="9" width="42" height="45" rx="4"/><path d="M18 17v27m7-27v27m7-27v27m7-27v27m7-27v27M17 54v6m30-6v6"/>',
+    portable_ac: '<rect x="12" y="7" width="36" height="49" rx="6"/><path d="M20 16h20m-20 6h20m-20 6h20M21 46h18M48 39h6c7 0 7-16 2-16M19 56v4m22-4v4"/>',
+    dehumidifier: '<rect x="14" y="7" width="36" height="50" rx="7"/><path d="M23 14h18M20 23h24m-24 6h24M14 39h36"/><path d="M32 43c-9 10 9 10 0 0Z"/>',
+    headphones: '<path d="M10 36V26a22 22 0 0 1 44 0v10M17 30v-4a15 15 0 0 1 30 0v4"/><rect x="7" y="31" width="12" height="23" rx="5"/><rect x="45" y="31" width="12" height="23" rx="5"/>',
+    games_console: '<path d="M12 7h22v30H12zM17 13h12m-12 5h12M41 7h11v29H41z"/><path d="M20 39h24c5 0 9 14 6 18-3 4-9-7-13-7H27c-4 0-10 11-13 7-3-4 1-18 6-18Z"/><path d="M21 43v7m-4-3h8m13-3h1m5 3h1"/>',
+    printer: '<path d="M17 22V6h30v16M17 45H8V22h48v23h-9M17 36h30v22H17V36ZM23 43h18m-18 7h18"/><circle cx="48" cy="29" r="1"/>',
+    steam_cleaner: '<path d="M30 7h13v6H30zM35 13l-7 24m-6-2 15 4-5 13H18l4-17Zm-8 17h25l8 8H8l6-8Z"/><path d="M44 43c-5-5 5-7 0-12m8 16c-5-5 5-7 0-12"/>',
+    clothes_dryer: '<rect x="10" y="5" width="44" height="54" rx="4"/><path d="M10 18h44M17 12h12M43 12h3"/><circle cx="32" cy="37" r="13"/><path d="M27 45c-5-5 5-7 0-14m9 14c-5-5 5-7 0-14"/>',
+    straightener: '<path d="M15 9h8l14 41-7 3L15 9Zm33 0h-8L29 50l7 3L48 9ZM19 15l7 23m18-23-7 23M32 55v5"/><circle cx="32" cy="52" r="4"/>',
+    shaver: '<rect x="18" y="7" width="28" height="17" rx="5"/><path d="M21 24v25a11 11 0 0 0 22 0V24M24 12v7m8-7v7m8-7v7"/><circle cx="32" cy="37" r="3"/>',
+    electric_toothbrush: '<rect x="27" y="4" width="10" height="16" rx="3"/><path d="M37 7h5m-5 4h5m-5 4h5M30 20v10m5-10v10"/><rect x="25" y="30" width="15" height="30" rx="6"/><circle cx="32.5" cy="39" r="2"/>',
+    cordless_drill: '<path d="M9 12h30l8 7v13H9V12ZM47 19h9v9h-9m9-5h6M22 32l-4 17h16l4-17M14 49h25v10H14V49ZM27 32v6h9"/><path d="M15 18h12m-12 6h12"/>',
+    sewing_machine: '<path d="M9 12h36a8 8 0 0 1 8 8v29H12v-8h24V27H21v9H9V12ZM7 49h50v9H7zM13 36v5m20-29V5h7v7"/><circle cx="46" cy="23" r="4"/>',
   };
-  return `<svg viewBox="0 0 64 64" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${paths[id] || paths.kettle}</svg>`;
+  return `<svg viewBox="0 0 64 64" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${paths[id] || '<rect x="13" y="13" width="38" height="38" rx="6"/><path d="M25 25a7 7 0 0 1 14 0c0 5-7 5-7 11M32 43v1"/>'}</svg>`;
+}
+
+/** The recognition catalogue and current 3D catalogue use different stable IDs.
+ * Only this reviewed mapping joins them; an unsupported item must never fall
+ * through findAppliance() and silently become its default kettle. */
+function exploreItemFor(value) {
+  const key = String(value || '').trim().toLowerCase().replace(/[ _-]+/g, '');
+  return EXPLORE_ACTIVE_ITEMS.find(item => [item.slug, item.worldId, item.label].filter(Boolean).some(name => String(name).toLowerCase().replace(/[ _-]+/g, '') === key));
+}
+
+/** Native groups keep the larger list quick to scan without a custom dropdown.
+ * The original catalogue order and identifiers remain unchanged for the model. */
+const exploreGroups = [...new Set(EXPLORE_ACTIVE_ITEMS.map(item => item.group))];
+function productOptions(selectedValue) {
+  return exploreGroups.map(group => `<optgroup label="${escape(group)}">${EXPLORE_ACTIVE_ITEMS.filter(item => item.group === group).map(item => {
+    const value = item.worldId || item.slug;
+    return `<option value="${value}"${selectedValue === value ? ' selected' : ''}>${escape(item.label)}</option>`;
+  }).join('')}</optgroup>`).join('');
 }
 
 /** Read route formats used by the shared shell without coupling to its router. */
@@ -67,7 +108,8 @@ function routeParams(route) {
 export async function mountExplore(host, options = {}) {
   const { onNavigate = () => {}, onLearn = () => {}, onAward = () => {}, playSound = () => {} } = options;
   const params = routeParams(options.route);
-  let appliance = findAppliance(params.get('appliance'));
+  const initialItem = exploreItemFor(params.get('appliance'));
+  let appliance = findAppliance(initialItem?.worldId || params.get('appliance'));
   let activeTab = ['parts', 'care', 'impact'].includes(params.get('tab')) ? params.get('tab') : 'parts';
   let selectedPart = appliance.parts[0].id;
   let expanded = false;
@@ -75,7 +117,9 @@ export async function mountExplore(host, options = {}) {
   let showingRoom = false;
   let disposed = false;
   let world;
+  let worldLoading = false;
   let worldDisposed = false;
+  let photoHelper;
   let challengeAnswered = false;
   const viewedParts = new Set();
   const Controller = host.ownerDocument.defaultView.AbortController;
@@ -88,6 +132,7 @@ export async function mountExplore(host, options = {}) {
   function cleanup() {
     disposed = true;
     controller.abort();
+    photoHelper?.dispose();
     options.signal?.removeEventListener('abort', cleanup);
     if (world && !worldDisposed) { worldDisposed = true; world.dispose(); }
   }
@@ -95,7 +140,8 @@ export async function mountExplore(host, options = {}) {
   options.signal?.addEventListener('abort', cleanup, { once: true });
 
   host.innerHTML = `<section class="explore-page page-width" aria-labelledby="explore-title">
-    <header class="explore-heading"><div><p class="eyebrow">FF LENS / EXPLORE TO UNDERSTAND</p><h1 id="explore-title">Every object has more to it.</h1><p>Look inside in 3D. Discover how it works, how to care for it and what comes next.</p></div><div class="explore-heading-actions"><label class="explore-product-picker">Choose an appliance <span>${CATALOGUE.length} objects to explore</span><select data-product-picker>${CATALOGUE.map(item => `<option value="${item.id}"${item.id === appliance.id ? ' selected' : ''}>${escape(item.name)}</option>`).join('')}</select></label><a class="explore-help-link" href="#action?kind=repair&appliance=${encodeURIComponent(appliance.category)}">Have a faulty appliance? <span aria-hidden="true">↗</span></a></div></header>
+    <header class="explore-heading"><div><p class="eyebrow">FF LENS / EXPLORE TO UNDERSTAND</p><h1 id="explore-title">Every object has more to it.</h1><p>Choose from ${EXPLORE_ACTIVE_ITEMS.length} familiar items. Explore ${CATALOGUE.length} of them in 3D to discover parts, care and everyday energy use.</p></div><div class="explore-heading-actions"><label class="explore-product-picker">Choose an item <span>${EXPLORE_ACTIVE_ITEMS.length} items · ${CATALOGUE.length} available in 3D</span><select data-product-picker>${productOptions(appliance.id)}</select></label><a class="explore-help-link" href="#action?kind=repair&appliance=${encodeURIComponent(appliance.category)}">Have a faulty appliance? <span aria-hidden="true">↗</span></a></div></header>
+    <div class="explore-photo-slot" data-explore-photo-helper></div>
     <div class="explore-workspace">
       <div class="explore-stage-column">
         <div class="explore-stage" aria-label="Interactive appliance world">
@@ -115,18 +161,44 @@ export async function mountExplore(host, options = {}) {
         <p id="ar-support-status" class="explore-ar-status">Checking this device for camera AR…</p>
       </div>
       <aside class="explore-inspector" aria-labelledby="appliance-title">
-        <div class="explore-appliance-heading"><p class="eyebrow">MEET YOUR EVERYDAY</p><h2 id="appliance-title">${escape(appliance.name)}</h2><p class="explore-device-summary">${escape(appliance.summary)}</p></div>
+        <div class="explore-appliance-heading"><p class="eyebrow">MEET YOUR EVERYDAY</p><h2 id="appliance-title" tabindex="-1">${escape(appliance.name)}</h2><p class="explore-device-summary">${escape(appliance.summary)}</p></div>
         <div class="explore-tabs" role="tablist" aria-label="Explore this appliance">${['parts', 'care', 'impact'].map(tab => `<button type="button" role="tab" id="tab-${tab}" data-tab="${tab}" aria-selected="${tab === activeTab}" aria-controls="explore-panel" tabindex="${tab === activeTab ? 0 : -1}">${{ parts: 'Parts', care: 'Care', impact: 'CO₂e impact' }[tab]}</button>`).join('')}</div>
         <div id="explore-panel" class="explore-panel" role="tabpanel" aria-labelledby="tab-${activeTab}" tabindex="0"></div>
       </aside>
     </div>
-    <section class="explore-catalogue" aria-labelledby="catalogue-title"><div class="explore-section-heading"><h2 id="catalogue-title">Pick something familiar.</h2><span>${CATALOGUE.length} objects. New things to notice.</span></div><div class="explore-product-list">${CATALOGUE.map(item => `<button type="button" class="explore-product" data-product="${item.id}" aria-pressed="${item.id === appliance.id}" style="--product-colour:${item.colour}"><span class="explore-product-art">${productIcon(item.id)}</span><span>${escape(item.name)}</span><small>${escape(item.room)}</small></button>`).join('')}</div></section>
+    <section class="explore-catalogue" aria-labelledby="catalogue-title"><div class="explore-section-heading"><h2 id="catalogue-title">Pick something familiar.</h2><span>Choose directly. No photo needed.</span></div><div class="explore-catalogue-tools"><label>Show items <select data-product-group aria-controls="explore-product-cards"><option value="all">All groups</option>${exploreGroups.map(group => `<option value="${escape(group)}">${escape(group)}</option>`).join('')}</select></label><p data-product-count role="status">${EXPLORE_ACTIVE_ITEMS.length} items</p></div><div class="explore-product-list" id="explore-product-cards">${EXPLORE_ACTIVE_ITEMS.map(item => { const model = CATALOGUE.find(product => product.id === item.worldId); const value = item.worldId || item.slug; return `<button type="button" class="explore-product" data-product="${value}" data-product-group-name="${escape(item.group)}" aria-pressed="${value === (appliance.id)}" style="--product-colour:${model?.colour || '#507769'}"><span class="explore-product-art">${productIcon(value)}</span><span>${escape(item.label)}</span><small>${escape(model.room)}</small></button>`; }).join('')}</div></section>
     <section class="explore-to-action" aria-labelledby="explore-action-title"><div><p class="eyebrow">FROM UNDERSTANDING TO DOING</p><h2 id="explore-action-title">Make your next step a good one.</h2><p>A question for the family: <strong class="explore-family-question">${escape(appliance.question)}</strong></p></div><div class="explore-action-links"></div></section>
   </section>`;
 
   const panel = host.querySelector('#explore-panel');
   const canvas = host.querySelector('canvas');
   const stage = host.querySelector('.explore-stage');
+  const groupPicker = host.querySelector('[data-product-group]');
+  /** Filtering only hides cards; it never changes a lesson or starts recognition.
+   * Native selects and hidden buttons keep keyboard and touch behaviour simple. */
+  function filterProducts() {
+    let visible = 0;
+    host.querySelectorAll('[data-product]').forEach(button => {
+      button.hidden = groupPicker.value !== 'all' && button.dataset.productGroupName !== groupPicker.value;
+      if (!button.hidden) visible++;
+    });
+    host.querySelector('[data-product-count]').textContent = `${visible} items${groupPicker.value === 'all' ? '' : ` · ${groupPicker.value}`}`;
+  }
+  groupPicker.addEventListener('change', filterProducts, { signal: controller.signal });
+  // Photo results never invoke this callback until the visitor confirms. Manual
+  // selection stays available even if availability checks or model loading fail.
+  photoHelper = mountExplorePhotoHelper(host.querySelector('[data-explore-photo-helper]'), {
+    ...options.photoHelperOptions,
+    signal: controller.signal,
+    onConfirm: item => {
+      chooseAppliance(item.slug, false, true);
+      // Confirmation removes its own button; give keyboard users a named focus
+      // target and bring the chosen lesson into view without animated scrolling.
+      host.querySelector('#appliance-title').focus({ preventScroll: true });
+      host.querySelector('.explore-workspace').scrollIntoView?.({ block: 'start', behavior: 'auto' });
+    },
+    onManual: () => host.querySelector('[data-product-picker]').focus(),
+  });
 
   /** Numbered targets sit on the real projected 3D part positions. They use the
    * same part IDs and click handler as the text list, making tapping discoverable. */
@@ -193,7 +265,7 @@ export async function mountExplore(host, options = {}) {
    * buttons open the same part. The current explanation is always visible. */
   function renderParts() {
     const part = appliance.parts.find(item => item.id === selectedPart) || appliance.parts[0];
-    panel.innerHTML = `<p class="explore-panel-intro">Choose a part on the model or below.</p><div class="explore-part-list" aria-label="Parts of the ${escape(appliance.name)}">${appliance.parts.map((item, index) => `<button type="button" data-part="${item.id}" aria-pressed="${item.id === selectedPart}"><span>${String(index + 1).padStart(2, '0')}</span>${escape(item.name)}${viewedParts.has(`${appliance.id}:${item.id}`) ? '<i aria-label="Explored">✓</i>' : ''}</button>`).join('')}</div><div class="explore-part-detail" role="status"><p class="eyebrow">${escape(part.name)}</p><h3>${escape(part.job)}</h3><p>${escape(part.material)}</p></div><p class="explore-model-note">A simplified learning model, not your exact appliance. Explore inside here; keep real electrical enclosures closed.</p><details class="explore-question"${challengeAnswered ? ' open' : ''}><summary>Make a connection <span aria-hidden="true">+</span></summary><p>${escape(appliance.challenge.question)}</p><div class="explore-answers">${appliance.challenge.choices.map((choice, index) => `<button type="button" data-answer="${index}"${challengeAnswered ? ' disabled' : ''}>${escape(choice)}</button>`).join('')}</div><p class="explore-answer-feedback" role="status">${challengeAnswered ? `✓ ${escape(appliance.challenge.explanation)}` : ''}</p></details>`;
+    panel.innerHTML = `<p class="explore-panel-intro">Choose a part on the model or below.</p><div class="explore-part-list" aria-label="Parts of the ${escape(appliance.name)}">${appliance.parts.map((item, index) => `<button type="button" data-part="${item.id}" aria-pressed="${item.id === selectedPart}"><span>${String(index + 1).padStart(2, '0')}</span>${escape(item.name)}${viewedParts.has(`${appliance.id}:${item.id}`) ? '<i aria-label="Explored">✓</i>' : ''}</button>`).join('')}</div><div class="explore-part-detail" role="status"><p class="eyebrow">${escape(part.name)}</p><h3>${escape(part.job)}</h3><p>${escape(part.material)}</p>${part.impact || part.care ? `<dl class="explore-part-context">${part.impact ? `<div><dt>Our planet</dt><dd>${escape(part.impact)}</dd></div>` : ''}${part.care ? `<div><dt>Care connection</dt><dd>${escape(part.care)}</dd></div>` : ''}</dl>` : ''}</div><p class="explore-model-note">A simplified learning model, not your exact appliance. Explore inside here; keep real electrical enclosures closed.</p><details class="explore-question"${challengeAnswered ? ' open' : ''}><summary>Make a connection <span aria-hidden="true">+</span></summary><p>${escape(appliance.challenge.question)}</p><div class="explore-answers">${appliance.challenge.choices.map((choice, index) => `<button type="button" data-answer="${index}"${challengeAnswered ? ' disabled' : ''}>${escape(choice)}</button>`).join('')}</div><p class="explore-answer-feedback" role="status">${challengeAnswered ? `✓ ${escape(appliance.challenge.explanation)}` : ''}</p></details>`;
   }
 
   /** Maintenance is practical adult-led care, never an instruction to take
@@ -214,7 +286,10 @@ export async function mountExplore(host, options = {}) {
    * audiences without claiming that a generic 3D object has a measured footprint. */
   function renderImpact() {
     const values = valuesForProduct();
-    panel.innerHTML = `<p class="explore-panel-intro">See how electricity use adds up.</p><div class="explore-impact-result" aria-live="polite"><span>ESTIMATED ELECTRICITY EMISSIONS</span><strong data-impact-result></strong><small data-impact-energy></small><div class="explore-energy-line" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div></div><p class="explore-example-label">Editable example, not a measurement of your ${escape(appliance.name.toLowerCase())}.</p><form class="explore-impact-form" novalidate><div class="explore-input-grid"><label>Power <span>watts (W)</span><input name="watts" type="number" min="0" max="10000" step="1" inputmode="decimal" value="${escape(values.watts)}"></label><label>Daily active time <span>minutes</span><input name="minutes" type="number" min="0" max="1440" step="0.1" inputmode="decimal" value="${escape(values.minutes)}"></label><label>For how long? <span>days</span><input name="days" type="number" min="0" max="366" step="1" inputmode="numeric" value="${escape(values.days)}"></label><label>Electricity grid <select name="region">${Object.entries(GRID_FACTORS).map(([id, info]) => `<option value="${id}"${id === values.region ? ' selected' : ''}>${info.label}</option>`).join('')}<option value="custom"${values.region === 'custom' ? ' selected' : ''}>Custom factor</option></select></label></div><details class="explore-calculation-details"><summary>Assumptions & calculation</summary><label>Grid factor <span>kg CO₂e per kWh</span><input name="factor" type="number" min="0" max="5" step="0.01" inputmode="decimal" value="${escape(values.factor)}"></label><p>Watts ÷ 1,000 × minutes ÷ 60 × days = kWh.<br>kWh × grid factor = kg CO₂e.</p><p>Default: DCCEEW 2026, Table 1, scope 2. Editing the factor makes this a custom scenario.</p><a class="explore-source-link" href="${SOURCES.grid}" target="_blank" rel="noopener noreferrer">Read the source · Australian Government ↗</a></details><p data-impact-error class="explore-impact-error" role="status"></p></form><div class="explore-impact-tip"><span aria-hidden="true">↗</span><p>${escape(appliance.energyTip)}</p></div><p class="explore-impact-limits"><strong>One part of the picture.</strong> CO₂e combines greenhouse gases into a common measure. This estimates grid electricity generation only. It excludes making, transporting and disposing of the appliance, upstream fuel and network losses. Actual use varies; no saving is claimed.</p><a class="explore-source-link" href="${SOURCES.energy}" target="_blank" rel="noopener noreferrer">Explore household energy habits ↗</a>`;
+    // Charging and continuously cycling appliances must not imply power is constant while used.
+    const powerLabel = appliance.energyMode === 'continuous-average' ? 'Average power' : appliance.energyMode === 'charging' ? 'Charging power' : 'Power';
+    const timeLabel = appliance.energyMode === 'continuous-average' ? 'Daily plugged-in time' : appliance.energyMode === 'charging' ? 'Daily charging time' : 'Daily active time';
+    panel.innerHTML = `<p class="explore-panel-intro">See how electricity use adds up.</p><div class="explore-impact-result" aria-live="polite"><span>ESTIMATED ELECTRICITY EMISSIONS</span><strong data-impact-result></strong><small data-impact-energy></small><div class="explore-energy-line" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div></div><p class="explore-example-label">Editable example, not a measurement of your ${escape(appliance.name.toLowerCase())}.</p><form class="explore-impact-form" novalidate><div class="explore-input-grid"><label>${powerLabel} <span>watts (W)</span><input name="watts" type="number" min="0" max="10000" step="1" inputmode="decimal" value="${escape(values.watts)}"></label><label>${timeLabel} <span>minutes</span><input name="minutes" type="number" min="0" max="1440" step="0.1" inputmode="decimal" value="${escape(values.minutes)}"></label><label>For how long? <span>days</span><input name="days" type="number" min="0" max="366" step="1" inputmode="numeric" value="${escape(values.days)}"></label><label>Electricity grid <select name="region">${Object.entries(GRID_FACTORS).map(([id, info]) => `<option value="${id}"${id === values.region ? ' selected' : ''}>${info.label}</option>`).join('')}<option value="custom"${values.region === 'custom' ? ' selected' : ''}>Custom factor</option></select></label></div><details class="explore-calculation-details"><summary>Assumptions & calculation</summary><label>Grid factor <span>kg CO₂e per kWh</span><input name="factor" type="number" min="0" max="5" step="0.01" inputmode="decimal" value="${escape(values.factor)}"></label><p>Watts ÷ 1,000 × minutes ÷ 60 × days = kWh.<br>kWh × grid factor = kg CO₂e.</p><p>Default: DCCEEW 2026, Table 1, scope 2. Editing the factor makes this a custom scenario.</p><a class="explore-source-link" href="${SOURCES.grid}" target="_blank" rel="noopener noreferrer">Read the source · Australian Government ↗</a></details><p data-impact-error class="explore-impact-error" role="status"></p></form><div class="explore-impact-tip"><span aria-hidden="true">↗</span><p>${escape(appliance.energyTip)}</p></div><p class="explore-impact-limits"><strong>One part of the picture.</strong> CO₂e combines greenhouse gases into a common measure. This estimates grid electricity generation only. It excludes making, transporting and disposing of the appliance, upstream fuel and network losses. Actual use varies; no saving is claimed.</p><a class="explore-source-link" href="${SOURCES.energy}" target="_blank" rel="noopener noreferrer">Explore household energy habits ↗</a>`;
     updateImpact();
   }
 
@@ -239,9 +314,18 @@ export async function mountExplore(host, options = {}) {
 
   /** The 3D engine calls this after a room object is selected; the product strip
    * calls it too. Camera and textual context stay attached to one object. */
-  function chooseAppliance(id, fromWorld = false) {
+  function chooseAppliance(id, fromWorld = false, fromPhoto = false) {
     if (disposed) return;
-    appliance = findAppliance(id);
+    const item = exploreItemFor(id);
+    if (!item) return;
+    // A photo or the top picker can choose an item outside the current card
+    // group. Reveal its selected card rather than leaving it hidden by a filter.
+    if (groupPicker.value !== 'all' && groupPicker.value !== item.group) {
+      groupPicker.value = 'all';
+      filterProducts();
+    }
+    if (!fromPhoto) photoHelper?.cancel({ message: 'Manual choice selected. You can check a photo whenever you like.' });
+    appliance = findAppliance(item.worldId);
     selectedPart = appliance.parts[0].id;
     challengeAnswered = false;
     expanded = false;
@@ -263,6 +347,7 @@ export async function mountExplore(host, options = {}) {
     renderPanel();
     renderActionLinks();
     playSound('tap');
+    if (!world && !worldLoading) void startWorld();
   }
 
   /** Object selection is feedback, not a quiz. We show a clear highlighted part,
@@ -410,7 +495,10 @@ export async function mountExplore(host, options = {}) {
 
   /** Lazy-load WebGL only on this route. Failure leaves all accessible learning,
    * care, carbon calculation and adult links working with an honest message. */
-  try {
+  async function startWorld() {
+    if (disposed || world || worldLoading) return;
+    worldLoading = true;
+    try {
     const createWorld = options.worldFactory || (await import('./world-engine.js')).createWorld;
     if (disposed) return cleanup;
     world = await createWorld(canvas, {
@@ -431,7 +519,12 @@ export async function mountExplore(host, options = {}) {
     if (disposed) return cleanup;
     handleWorldStatus({ type: 'error', message: 'This browser could not start the 3D view. Try a WebGL-capable browser. Parts, care and impact are available beside it.' });
     host.querySelector('#ar-support-status').textContent = 'AR is unavailable because this browser could not start the 3D renderer.';
+  } finally {
+    worldLoading = false;
   }
+  }
+  // Every catalogue route has geometry; the same lazy engine serves all 32.
+  await startWorld();
 
   /** Release GPU resources, animation frames and every DOM listener when the
    * shared shell navigates away. Revisiting Explore starts one fresh scene. */

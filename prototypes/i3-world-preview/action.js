@@ -1,13 +1,14 @@
 // Action centre: adult owners get practical tools without entering a children's game.
 // This file renders only its host. It never changes the existing app, deployment or database.
 // Click -> route -> mountAction -> form event -> pure matching -> visible evidence is the flow.
+import { CATALOGUE } from './catalogue.js';
 import { FAMILIES, CATEGORY_CODE_BY_NAME } from '../../src/data.js';
 import { loadPublicData, getStaticSnapshot } from '../../src/data-service.js';
 import { matchRecall, findSuburbSuggestions, resolveAreaInput, getNearbyLocations } from '../../src/logic.js';
 import { productSuggestions } from '../../src/product-suggestions.js';
 import { SUBURB_POSTCODES } from '../../src/suburb-index.js';
 import { PRICE_SNAPSHOT } from '../../src/price-snapshot.js';
-import { mountPhotoHelper } from '../../src/photo-helper.js';
+import { mountPhotoHelper } from '../../src/photo-helper.js?v=i3-photo-review-v4';
 
 const RECALL_SOURCE = 'https://www.productsafety.gov.au/recalls';
 const RECYCLE_SOURCE = 'https://www.environment.vic.gov.au/household-waste-recycling/ewaste';
@@ -15,11 +16,7 @@ const REPAIR_SOURCE = 'https://www.repaircafe.org/en/visit/';
 const CATEGORIES = FAMILIES.flatMap((family) => family.categories);
 // The world includes items outside our existing reference dataset. Preserve them by
 // name and disclose coverage, instead of changing a laptop into a kettle silently.
-const WORLD_ITEMS = {
-  kettle: 'Kettle', fan: 'Fan', toaster: 'Toaster', blender: 'Blender', microwave: 'Microwave',
-  vacuum: 'Vacuum cleaner', hairdryer: 'Hair dryer', laptop: 'Laptop',
-  ricecooker: 'Rice cooker', airfryer: 'Air fryer', coffeemachine: 'Coffee machine', mixer: 'Mixer',
-};
+const WORLD_ITEMS = Object.fromEntries(CATALOGUE.map(item => [item.id, item.category]));
 const PLAN_KEY = 'fixforward-world-adult-plan-v1';
 // The adult's unfinished identity/location form lives only in this tab's memory.
 // The separate optional planner saves only its task, item name and date.
@@ -200,7 +197,7 @@ export function mountAction(host, { route = 'action?kind=recall', onNavigate = (
       <label class="action-field">Model number <span class="action-optional">if known</span><input name="model" id="action-model" value="${escape(draft.model)}" list="action-models" maxlength="50" autocomplete="off" placeholder="From the appliance label"><datalist id="action-models"></datalist></label></div>
       <p class="action-small">Type your own details or choose a suggestion. A suggested model is not a recall result.</p>
       <details class="action-details"><summary>Where is the model number?</summary><p>Check the packaging, manual or label when accessible. Do not move a hot, damaged or connected appliance to look for it. It may say “Model”, “Model No.” or “Type”.</p></details>
-      <details class="action-details"><summary>About photo suggestions</summary><p>Our optional photo helper suggests an appliance type only. It cannot read brand or model numbers, find a fault, or confirm a recall.</p><p>Photo suggestions are currently paused while accuracy is checked. The form works without them.</p></details>
+      <details class="action-details"><summary>About photo suggestions</summary><p>Our optional photo helper suggests an appliance type only. It cannot read brand or model numbers, find a fault, or confirm a recall.</p><p>The experimental helper can be wrong or unable to suggest a type. You must confirm any suggestion. Selecting an appliance manually always works.</p></details>
       <button type="submit" class="button primary action-submit">Check recall records <span aria-hidden="true">→</span></button>
       <p class="action-small" data-data-status role="status">Checking record availability…</p>
     </form><aside class="action-side-note"><p class="eyebrow">Why check first?</p><h2>The next step may already be set out.</h2><p>A recall notice explains the issue and what the supplier asks owners to do.</p><div class="action-note-rule"></div><p><strong>A clear result takes the right details.</strong></p><p>We search a limited collection of reviewed notices. The official notice is the place to confirm models, dates and instructions.</p>${link(RECALL_SOURCE, 'Open official recall search', 'action-text-link')}</aside></div>

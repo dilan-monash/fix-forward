@@ -1,14 +1,13 @@
-# Render deployment description for the Iteration 3 Flask adult/Quest site; it does not provision or migrate Neon.
-# It documents the existing, manually created fix-forward-iteration-3 Python web service. Do not apply it as a
+# Render deployment description for the approved public Main site; it does not provision or migrate Neon.
+# It documents the existing, manually created fix-forward-main Python web service. Do not apply it as a
 # Blueprint without first comparing it with the live service: that could create a duplicate service or replace settings.
 # Secrets are supplied by hosting configuration, and app.py exposes the WSGI application imported below.
 services:
   - type: web
-    name: fix-forward-iteration-3
+    name: fix-forward-main
     runtime: python
-    # Iteration 3 follows the iteration-3 branch; Main, Iteration 2 and Iteration 1 keep their own services and branches.
-    # The separate fix-forward-iteration-3-link static site only forwards the old address and never runs this code.
-    branch: iteration-3
+    # Publish approved releases from main; the comparison services retain their own branches.
+    branch: main
     # Publish manually after review, matching the existing Render service setting.
     autoDeployTrigger: "off"
     plan: free
@@ -16,18 +15,18 @@ services:
     # The build installs runtime dependencies and rebuilds the local reviewed-price SQLite/JavaScript snapshot.
     # It does not refresh retailer data or invoke the separate hosted-data import pipeline.
     buildCommand: pip install -r requirements.txt && python data/scripts/build_price_catalogue.py
-    # Gunicorn serves app:app on the port provided by Render; Flask uses the existing shared access gate.
+    # Gunicorn serves app:app on the port provided by Render. Main opens publicly without a team password.
     startCommand: gunicorn --workers 2 --threads 2 --timeout 60 --bind 0.0.0.0:$PORT "app:app"
-    # Liveness remains available without login or Neon. Authenticated /api/ready checks the database separately.
+    # Liveness needs no Neon connection; /api/ready checks the read-only database separately.
     healthCheckPath: /api/health
     # sync:false values are configured outside this file; keep credentials out of source and frontend assets.
     envVars:
       - key: DATABASE_URL
         sync: false
       - key: RELEASE_VERSION
-        # Identifies the Iteration 3 release in /api/health. The live service's own Environment value wins,
-        # so change it there (on the I3 service only, never a group shared with I2) to update the live label.
-        value: iteration-3-v3.0.0
+        # Identifies Main in /api/health. The service Environment value wins;
+        # update only Main's label when manually deploying this approved release.
+        value: main-v3.0.0
       - key: SITE_PASSWORD
         sync: false
       - key: SECRET_KEY

@@ -1,5 +1,5 @@
 # Application assembly: app.py, diagnostics and tests call create_app to get a configured Flask instance.
-# This file connects the access gate, read-only API and explicit adult/Quest asset routes; it does not run imports or migrations.
+# This file connects the access gate, read-only API and current family assets; it does not run imports or migrations.
 
 """Flask application factory for the FixForward public-data API."""
 
@@ -8,28 +8,44 @@ import hashlib
 import re
 
 from .config import Settings
+from .family_frontend import (
+    FAMILY_ASSET_MIME, FAMILY_ENTRY, FAMILY_FILM,
+    FAMILY_FRONTEND_ALIASES, FAMILY_FRONTEND_ASSETS,
+)
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-FRONTEND_FILES = {"index.html", "styles.css", "favicon.svg", "404.html", "500.html"}
+# Only the reviewed family shell is an application entry. Older documents stay
+# in Git for comparison, but cannot reopen a retired UI through the Main host.
+FRONTEND_FILES = frozenset({"favicon.svg", "404.html", "404.css", "500.html"})
 
-# The I3 family world is a reviewed entry point, not an open prototype directory.
-# Exact names keep tests, local servers, documentation and future experiments private.
-WORLD_FRONTEND_ASSETS = {
-    f"prototypes/i3-world-preview/{name}" for name in (
-        "index.html", "app.js", "world.css", "world-engine.js", "models.js",
-        "explore.js", "explore.css", "catalogue.js", "action.js", "action.css",
-        "progress.js", "vendor/three.module.js", "vendor/three.core.js",
-        "vendor/OrbitControls.js",
+# The reviewed family modules import exactly this transitive set of shared
+# decision/data helpers. New src files are private until explicitly reviewed.
+SHARED_FRONTEND_ASSETS = frozenset({
+    f"src/{name}" for name in (
+        "config.js", "data.js", "data-service.js", "logic.js",
+        "price-catalogue.js", "price-snapshot.js", "product-suggestions.js",
+        "suburb-index.js",
     )
-} | {"prototypes/i3-family-preview/sorting.js", "prototypes/i3-family-preview/sorting.css"}
+})
 
-# The disabled SigLIP candidate may serve only these reviewed, same-origin files.
+# The new 3D models reuse these vendor bytes. No old world controller, page,
+# styles or game modules are published on I3 under the retired namespace.
+WORLD_FRONTEND_ASSETS = frozenset({
+    f"prototypes/i3-world-preview/vendor/{name}"
+    for name in ("three.module.js", "three.core.js", "OrbitControls.js")
+})
+
+# The I3 SigLIP review helpers may serve only these reviewed, same-origin files.
 # Keeping exact names here prevents the model folders becoming directory servers.
 SIGLIP_PUBLIC_ASSETS = {
     "model/appliance-siglip/model_manifest.json",
     "model/appliance-siglip/text-embeddings.json",
     "model/appliance-siglip/text-embeddings.f32",
+    # Explore owns separate labels, vectors and a kill switch; the encoder is shared.
+    "model/explore-siglip/model_manifest.json",
+    "model/explore-siglip/text-embeddings.json",
+    "model/explore-siglip/text-embeddings.f32",
     "vendor/transformers/transformers.min.js",
     "vendor/transformers/ort-wasm-simd-threaded.jsep.mjs",
     "vendor/transformers/ort-wasm-simd-threaded.jsep.wasm",
@@ -51,6 +67,8 @@ SIGLIP_ASSET_MIME = {
 # hash it. Flask therefore verifies each executable/model artifact once per file
 # version before serving it, then reuses the result while size and mtime match.
 SIGLIP_ASSET_INTEGRITY = {
+    "model/explore-siglip/text-embeddings.json": (4835, "60c91d0d3ee7f2b8864b4a1a517907daf48e42bc9644beadbed17f59fe46f6f2"),
+    "model/explore-siglip/text-embeddings.f32": (129024, "9e0cb396c21d7b40540aa3af20ca60322f4d4ec266db94a5722ba127463021d3"),
     "model/appliance-siglip/text-embeddings.json": (3037, "4b01be52acad78dae1783978e1bc191d50532dc63781a5cd7b96e24f3a390093"),
     "model/appliance-siglip/text-embeddings.f32": (89088, "2e63f55601cf3f011bf13b3c347bd456111c1b8132f9d8164105fff0a29877f2"),
     "vendor/transformers/transformers.min.js": (888173, "aa5002b70e789798da263f5f99c62bd3e8fcd0c119258a493c40c180648365fa"),
@@ -71,7 +89,8 @@ def create_app(test_config=None):
     import time.
     """
 
-    from flask import Flask, jsonify, redirect, request, send_from_directory
+    from flask import Flask, jsonify, request, send_from_directory
+    from werkzeug.exceptions import SecurityError
     from werkzeug.middleware.proxy_fix import ProxyFix
 
     from .api import api
@@ -85,17 +104,43 @@ def create_app(test_config=None):
         DB_CONNECT_TIMEOUT=settings.db_connect_timeout,
         SITE_PASSWORD=settings.site_password,
         SECRET_KEY=settings.secret_key,
-        SITE_ACCESS_ENABLED=True,
+        # This approved Main release is public. This is a source-level setting,
+        # never read from a URL, request header or environment bypass flag.
+        # The separate iteration-3 branch keeps its password gate enabled.
+        SITE_ACCESS_ENABLED=False,
         SESSION_COOKIE_SECURE=settings.session_cookie_secure,
         PRICE_CATALOGUE_STORAGE=settings.price_catalogue_storage,
+        # Main accepts its own domains and local review hosts, not I1/I2/I3
+        # service names. Forwarded headers cannot expand this list.
+        TRUSTED_HOSTS=["fixforward.me", "www.fixforward.me", "fix-forward-main.onrender.com",
+                       "localhost", "127.0.0.1", "[::1]"],
     )
     if test_config:
         app.config.update(test_config)
 
     # Hosting platforms terminate HTTPS before forwarding the request to Gunicorn.
-    # Trust exactly one proxy so Flask can still determine the original scheme/host.
-    app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+    # Trust the TLS scheme from the one hosting proxy, while retaining the
+    # validated Host header. Client-supplied X-Forwarded-Host is never a target.
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=0, x_proto=1, x_host=0)
     app.register_blueprint(api)
+
+    @app.before_request
+    def reject_invalid_host():
+        # Flask rejects an untrusted Host before it creates a URL adapter.
+        # Preserve that rejection before login tries to build a redirect.
+        if isinstance(request.routing_exception, SecurityError):
+            raise request.routing_exception
+
+    @app.before_request
+    def reject_retired_pages():
+        # Removed applications are missing pages even before login. Handle their
+        # whole namespace so old scripts, query strings and slash variants cannot
+        # reopen them or send a visitor through a misleading login/redirect chain.
+        path = request.path.casefold()
+        if (path in {"/legacy", "/quest", "/prototypes/i3-world-preview/index.html"}
+                or path.startswith(("/legacy/", "/quest/"))):
+            return _not_found_response(request.path)
+
     configure_access(app)
     siglip_integrity_cache = {}
 
@@ -130,64 +175,34 @@ def create_app(test_config=None):
 
     @app.get("/")
     @app.get("/index.html")
-    # The same access gate now opens the unified I3 world. Its API calls remain
+    # The approved public Main entry serves the reviewed family site. API calls remain
     # same-origin GET requests to the existing read-only Flask routes below.
     def index():
-        return send_from_directory(PROJECT_ROOT / "prototypes/i3-world-preview", "index.html")
+        return send_from_directory(PROJECT_ROOT, FAMILY_ENTRY)
 
-    @app.get("/legacy")
-    # Keep the approved earlier adult journey available without copying or changing it.
-    def legacy():
-        return send_from_directory(PROJECT_ROOT, "index.html")
-
-    @app.get("/legacy/")
-    def legacy_slash():
-        # Its relative stylesheet/script paths require the slash-free document URL.
-        return redirect("/legacy", code=302)
-
-    @app.get("/quest")
-    @app.get("/quest/")
-    # Serve the separate child document using the same access session as the adult route.
-    def quest():
-        # The existing before_request access gate also protects the child route.
-        return send_from_directory(PROJECT_ROOT / "quest", "index.html")
+    @app.get("/film.html")
+    # A shareable film entry uses the same access policy and external-script CSP as
+    # the site. Flask's file response preserves native byte-range seeking.
+    def family_film():
+        return send_from_directory(PROJECT_ROOT, FAMILY_FILM)
 
     @app.get("/<path:asset_path>")
     # Serve only named public assets, so adding a child module also requires updating this allowlist.
     def frontend_asset(asset_path):
         # Only public frontend assets are served. Backend code, migrations and
         # environment templates must never be downloadable from the website.
-        allowed = asset_path in FRONTEND_FILES or asset_path in WORLD_FRONTEND_ASSETS or (
-            # Only direct app modules are public; src/../prototype tests must
-            # not bypass the exact world allowlist through an alternate path.
-            re.fullmatch(r"src/[A-Za-z0-9_-]+\.js", asset_path) is not None
-        ) or (
-            asset_path in {"quest/index.html", "quest/quest.css", "quest/app.js",
-                           "quest/art.js", "quest/content.js", "quest/engine.js",
-                           "quest/touch-fx.js", "quest/touch-fx.css", "quest/scene-play.css",
-                           "quest/adventure-world.js", "quest/adventure-world.css",
-                           # Local gesture help and still-learning policy stay behind the same access gate.
-                           "quest/sort-demo.js", "quest/sort-demo.css", "quest/motion-context.js", "quest/learning-focus.css",
-                           "quest/storage.js", "quest/drag.js", "quest/play-effects.css",
-                           "quest/postcard.js", "quest/postcard-options.js",
-                           "quest/progression.js", "quest/tablet-play.css",
-                           "quest/navigation.js", "quest/narration.js", "quest/parent-guide.js",
-                           "quest/visual-play.js", "quest/visual-play.css", "quest/word-help.js", "quest/word-help.css", "quest/haptics.js", "quest/reward-voice.js", "quest/reward-fx.js", "quest/sounds.js", "quest/game-feel.css",
-                           "quest/picture-help.js", "quest/feedback.js", "quest/clue-play.css",
-                           "quest/family-guide.css", "quest/story-audio.js", "quest/audio/story-manifest.js",
-                           "quest/audio/KOKORO-LICENSE.txt"}
-        ) or (
-            # Browser inference assets are explicitly allowlisted; arbitrary model
-            # files must never become downloadable through the frontend route.
-            re.fullmatch(
+        family_asset = asset_path in FAMILY_FRONTEND_ASSETS or asset_path in FAMILY_FRONTEND_ALIASES
+        allowed = (
+            family_asset or asset_path in FRONTEND_FILES
+            or asset_path in WORLD_FRONTEND_ASSETS
+            or asset_path in SHARED_FRONTEND_ASSETS
+            or asset_path in SIGLIP_PUBLIC_ASSETS
+            # The optional fallback classifier has only these reviewed file
+            # forms. Neither a directory listing nor arbitrary model is public.
+            or re.fullmatch(
                 r"model/appliance-classifier/(?:model\.json|labels\.json|model_manifest\.json|group\d+-shard\d+of\d+\.bin)",
                 asset_path,
             ) is not None
-        ) or (
-            asset_path in SIGLIP_PUBLIC_ASSETS
-        ) or (
-            # Only generated, content-addressed story audio is public, not arbitrary files.
-            re.fullmatch(r"quest/audio/[a-f0-9]{16}\.mp3", asset_path) is not None
         )
         if not allowed:
             return _not_found_response(request.path)
@@ -195,8 +210,10 @@ def create_app(test_config=None):
             # A generic unavailable response keeps corrupt model details out of
             # the UI; the photo helper converts this into its manual fallback.
             return "Asset unavailable", 503
-        response = send_from_directory(PROJECT_ROOT, asset_path)
-        explicit_mime = SIGLIP_ASSET_MIME.get(Path(asset_path).suffix.lower())
+        served_path = FAMILY_FRONTEND_ALIASES.get(asset_path, asset_path)
+        response = send_from_directory(PROJECT_ROOT, served_path)
+        mime_types = FAMILY_ASSET_MIME if family_asset else SIGLIP_ASSET_MIME
+        explicit_mime = mime_types.get(Path(served_path).suffix.lower())
         if explicit_mime:
             response.headers["Content-Type"] = explicit_mime
         return response
@@ -204,15 +221,15 @@ def create_app(test_config=None):
     @app.after_request
     # Attach browser protections to every response; HTTPS-only HSTS depends on the trusted proxy scheme.
     def add_security_headers(response):
-        # Inline styles remain in the Iteration 1 UI, hence style-src unsafe-inline.
-        # Leaflet 1.9.4 is loaded only on the map screen and pinned with Subresource Integrity.
+        # Game/3D layouts update element styles. Scripts remain external, with
+        # only the SRI-pinned Leaflet file allowed from a third-party CDN.
         # The optional inference runtime is local; WebAssembly compilation gets
         # its narrow CSP token without granting general JavaScript eval.
         response.headers["Content-Security-Policy"] = (
             "default-src 'self'; "
-            "script-src 'self' https://unpkg.com 'wasm-unsafe-eval'; "
-            "style-src 'self' 'unsafe-inline' https://unpkg.com; "
-            "img-src 'self' data: https://tile.openstreetmap.org https://unpkg.com; "
+            "script-src 'self' https://unpkg.com/leaflet@1.9.4/dist/leaflet.js 'wasm-unsafe-eval'; "
+            "style-src 'self' 'unsafe-inline' https://unpkg.com/leaflet@1.9.4/dist/leaflet.css; "
+            "img-src 'self' data: https://tile.openstreetmap.org https://unpkg.com/leaflet@1.9.4/dist/images/; "
             "connect-src 'self'; object-src 'none'; "
             "base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
         )
@@ -220,9 +237,9 @@ def create_app(test_config=None):
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         response.headers["Permissions-Policy"] = (
-            # WebXR may use spatial tracking after an explicit user permission.
-            # Same-origin camera permission does not start capture on page load.
-            "camera=(self), xr-spatial-tracking=(self), microphone=(), geolocation=(self), payment=(), usb=()"
+            # Photo capture and location are explicit user actions. The current
+            # rotatable world has no AR/tracking or microphone feature.
+            "camera=(self), xr-spatial-tracking=(), microphone=(), geolocation=(self), payment=(), usb=()"
         )
         if request.is_secure:
             response.headers["Strict-Transport-Security"] = "max-age=31536000"
@@ -243,7 +260,7 @@ def create_app(test_config=None):
                     "message": "The public-data service could not complete the request.",
                 }
             ), 500
-        return send_from_directory(PROJECT_ROOT, "500.html"), 500
+        return send_from_directory(PROJECT_ROOT, "500.html", conditional=False), 500
 
     # Keep unknown API paths machine-readable while browser paths receive the local 404 page.
     def _not_found_response(path):
@@ -251,6 +268,6 @@ def create_app(test_config=None):
             return jsonify(
                 error={"code": "not_found", "message": "API endpoint not found."}
             ), 404
-        return send_from_directory(PROJECT_ROOT, "404.html"), 404
+        return send_from_directory(PROJECT_ROOT, "404.html", conditional=False), 404
 
     return app

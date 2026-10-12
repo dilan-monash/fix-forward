@@ -19,10 +19,10 @@ class ReleaseConfigTests(unittest.TestCase):
                 load_local_settings.assert_called_once()
                 return settings
 
-    def test_iteration_three_is_the_default_without_an_override(self):
+    def test_main_is_the_default_without_an_override(self):
         settings = self.settings_with_environment({})
 
-        self.assertEqual(settings.release_version, "iteration-3-v3.0.0")
+        self.assertEqual(settings.release_version, "main-v3.0.0")
         self.assertEqual(settings.database_url, "")
 
     def test_explicit_release_setting_overrides_the_branch_default(self):
