@@ -247,10 +247,11 @@ See `API_CONTRACT.md`.
 - CSRF protection for sign-in and sign-out; protected responses use `private, no-store` caching;
 - no journey-answer POST endpoint;
 - read-only application database design;
+- each server worker reuses a successful public-data read for up to 120 seconds (readiness for 10 seconds), so traffic volume cannot multiply connections to the Neon database shared by every site; failed reads are never reused;
 - parameterised SQL;
 - dynamic user/data text escaped before HTML insertion;
 - recall notice URLs restricted to official Product Safety hosts by the backend;
-- CSP and other response security headers;
+- CSP, `Cross-Origin-Opener-Policy: same-origin` and other response security headers;
 - pinned Leaflet 1.9.4 CDN assets with Subresource Integrity;
 - geolocation permission only after an explicit user action;
 - exact coordinates not persisted or sent to Neon;

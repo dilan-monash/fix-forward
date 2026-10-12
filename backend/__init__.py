@@ -107,6 +107,9 @@ def create_app(test_config=None):
         SITE_ACCESS_ENABLED=True,
         SESSION_COOKIE_SECURE=settings.session_cookie_secure,
         PRICE_CATALOGUE_STORAGE=settings.price_catalogue_storage,
+        # Served apps briefly reuse successful public-data reads (backend/api.py).
+        # Test and diagnostic apps read every time unless a test opts in.
+        PUBLIC_DATA_REUSE=not (test_config or {}).get("TESTING", False),
         # I3 accepts its public service name and loopback review hosts only.
         # Host headers must not turn a valid login into a link on another site.
         TRUSTED_HOSTS=["fix-forward-iteration-3-r4sh.onrender.com", "localhost", "127.0.0.1", "[::1]"],
@@ -231,6 +234,9 @@ def create_app(test_config=None):
         )
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
+        # A window from another site cannot keep a handle to this one. External
+        # links already open with noopener, and no flow needs a cross-site opener.
+        response.headers["Cross-Origin-Opener-Policy"] = "same-origin"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         response.headers["Permissions-Policy"] = (
             # Photo capture and location are explicit user actions. The current

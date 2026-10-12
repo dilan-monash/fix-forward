@@ -45,6 +45,13 @@ class RequestBoundaryTests(unittest.TestCase):
         self.assertEqual(response.headers["Cache-Control"], "private, no-store")
         self.assertIn("frame-ancestors 'none'", response.headers["Content-Security-Policy"])
         self.assertEqual(response.headers["X-Content-Type-Options"], "nosniff")
+        self.assertEqual(response.headers["Cross-Origin-Opener-Policy"], "same-origin")
+
+    def test_every_response_type_isolates_its_window_from_other_sites(self):
+        # Login, protected redirects, missing pages and liveness all carry the header.
+        for path in ("/login", "/", "/missing-page", "/api/health"):
+            with self.subTest(path=path), self.client.get(path) as response:
+                self.assertEqual(response.headers["Cross-Origin-Opener-Policy"], "same-origin")
 
     def test_current_pages_offer_the_existing_server_lock_confirmation(self):
         # Only this isolated test app bypasses login to examine the shipped HTML.

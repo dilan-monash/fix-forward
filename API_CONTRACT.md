@@ -42,6 +42,8 @@ Requires website access and checks database readiness.
 
 Database failure returns a generic `503` without credentials or infrastructure detail.
 
+Each server worker reuses a successful readiness query for up to 10 seconds and a successful dataset read for up to 120 seconds. This bounds connections to the shared Neon database. Failed reads are never reused, so the next request tries the database again.
+
 ## `GET /api/recalls`
 
 Returns only manually reviewed structured recall products used by the conservative browser matcher.

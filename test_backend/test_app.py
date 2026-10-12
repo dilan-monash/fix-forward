@@ -208,5 +208,87 @@ class AppTests(unittest.TestCase):
         self.assertEqual(location_response.json["locations"][0]["providerType"], "recycling_facility")
 
 
+# Served apps reuse successful reads so traffic cannot multiply shared-database connections.
+class PublicDataReuseTests(unittest.TestCase):
+    def setUp(self):
+        self.app = create_app({"TESTING": True, "SITE_ACCESS_ENABLED": False,
+                               "DATABASE_URL": "unused-in-fake", "PUBLIC_DATA_REUSE": True})
+        self.client = self.app.test_client()
+
+    def test_served_apps_reuse_and_test_apps_do_not_by_default(self):
+        self.assertTrue(self.app.config["PUBLIC_DATA_REUSE"])
+        self.assertFalse(create_app({"TESTING": True}).config["PUBLIC_DATA_REUSE"])
+        with patch.dict("os.environ", {"SITE_PASSWORD": "", "SECRET_KEY": ""}):
+            self.assertTrue(create_app().config["PUBLIC_DATA_REUSE"])
+
+    @patch("backend.api.repository.relevant_locations", return_value=[])
+    @patch("backend.api.repository.sources", return_value=[])
+    def test_repeated_requests_make_one_read_per_dataset(self, sources, locations):
+        for _ in range(25):
+            self.assertEqual(self.client.get("/api/sources").status_code, 200)
+            self.assertEqual(self.client.get("/api/locations").status_code, 200)
+        self.assertEqual(sources.call_count, 1)
+        self.assertEqual(locations.call_count, 1)
+
+    @patch("backend.api.repository.reviewed_recall_products", return_value=[])
+    @patch("backend.api.repository.recall_metadata", return_value=None)
+    @patch("backend.api.repository.repair_barriers", return_value=[])
+    @patch("backend.api.repository.repair_statistics", return_value=[])
+    def test_multi_query_datasets_are_reused_together(self, statistics, barriers, metadata, products):
+        for _ in range(5):
+            self.assertEqual(self.client.get("/api/recalls").status_code, 200)
+            self.assertEqual(self.client.get("/api/repair-evidence").status_code, 200)
+        for mock in (statistics, barriers, metadata, products):
+            self.assertEqual(mock.call_count, 1)
+
+    @patch("backend.api.repository.sources", side_effect=DatabaseUnavailable("private URL"))
+    def test_failures_are_never_reused(self, sources):
+        for _ in range(3):
+            self.assertEqual(self.client.get("/api/sources").status_code, 503)
+        self.assertEqual(sources.call_count, 3)
+        sources.side_effect = None
+        sources.return_value = []
+        self.assertEqual(self.client.get("/api/sources").status_code, 200)
+        self.assertEqual(self.client.get("/api/sources").status_code, 200)
+        self.assertEqual(sources.call_count, 4)
+
+    @patch("backend.api.repository.sources", return_value=[])
+    def test_reads_are_repeated_after_the_reuse_interval(self, sources):
+        with patch("backend.api.time.monotonic", return_value=1000.0):
+            self.client.get("/api/sources")
+        with patch("backend.api.time.monotonic", return_value=1119.0):
+            self.client.get("/api/sources")
+        self.assertEqual(sources.call_count, 1)
+        with patch("backend.api.time.monotonic", return_value=1121.0):
+            self.client.get("/api/sources")
+        self.assertEqual(sources.call_count, 2)
+
+    @patch("backend.api.repository.health_check", return_value={"ok": 1})
+    def test_readiness_is_reused_only_briefly(self, health_check):
+        with patch("backend.api.time.monotonic", return_value=1000.0):
+            self.assertEqual(self.client.get("/api/ready").status_code, 200)
+            self.assertEqual(self.client.get("/api/ready").status_code, 200)
+        self.assertEqual(health_check.call_count, 1)
+        with patch("backend.api.time.monotonic", return_value=1011.0):
+            self.assertEqual(self.client.get("/api/ready").status_code, 200)
+        self.assertEqual(health_check.call_count, 2)
+
+    @patch("backend.api.repository.health_check", return_value=None)
+    def test_an_empty_readiness_result_is_not_reused(self, health_check):
+        for _ in range(2):
+            response = self.client.get("/api/ready")
+            self.assertEqual(response.status_code, 503)
+            self.assertEqual(response.headers["Cache-Control"], "no-store")
+        self.assertEqual(health_check.call_count, 2)
+
+    def test_separate_apps_never_share_reused_data(self):
+        other = create_app({"TESTING": True, "SITE_ACCESS_ENABLED": False,
+                            "DATABASE_URL": "unused-in-fake", "PUBLIC_DATA_REUSE": True})
+        with patch("backend.api.repository.sources", return_value=[]) as sources:
+            self.client.get("/api/sources")
+            other.test_client().get("/api/sources")
+        self.assertEqual(sources.call_count, 2)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -428,6 +428,14 @@ FodyWeavers.xsd
 *.msm
 *.msp
 
+# --- FixForward: local secrets and hosting CLI state ---
+# "*.env" above covers .env; variants such as .env.local or .env.production
+# hold the same secrets. Only the placeholder template is tracked.
+.env.*
+!.env.example
+# Netlify CLI writes local build/link state here (including a site ID).
+.netlify/
+
 # --- FixForward: Python data pipeline (Iteration 1) ---
 .DS_Store
 .venv/
