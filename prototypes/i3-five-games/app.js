@@ -51,9 +51,12 @@ async function render(){
     else if(name==='parents')mount=()=>parents();
     else if(['about','sources'].includes(name))mount=()=>info(name);
     else mount=()=>mountActivities(host,{...options,route:'learn'});
-    if(token!==renderId)return;host.innerHTML='';const result=await mount();
+    if(token!==renderId)return;host.innerHTML='';window.scrollTo({top:0,behavior:'instant'});const result=await mount();
     if(token!==renderId){if(typeof result==='function')result();return;}cleanup=typeof result==='function'?result:()=>{};
-    host.classList.remove('ff-enter');void host.offsetWidth;host.classList.add('ff-enter');window.scrollTo({top:0,behavior:'instant'});main.focus({preventScroll:true});
+    host.classList.remove('ff-enter');void host.offsetWidth;host.classList.add('ff-enter');
+    // First-visit tutorials own focus until dismissed; route focus must not pull
+    // a child away from their instructions or scroll the page behind the modal.
+    if(!document.querySelector('[role="dialog"][aria-modal="true"]'))main.focus({preventScroll:true});
     if(window.IntersectionObserver){observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('ff-reveal');observer.unobserve(entry.target);}}),{threshold:.08});host.querySelectorAll('.ffh-section,.ffa-card,.ff-record-grid>a').forEach(el=>observer.observe(el));}
   }catch(error){if(token===renderId&&!controller.signal.aborted){host.innerHTML='<section class="ff-info-page"><h1>This page could not open.</h1><p>Try choosing the activity again.</p><a class="ff-link-button" href="#learn">Back to activities →</a></section>';console.error('Page could not open',error);}}
 }

@@ -109,7 +109,7 @@ export function mountFixit(host, { onLearn = () => {}, onAward = () => {}, signa
   const announce = text => { const region = doc.querySelector('#announcement'); if (region) region.textContent = text; };
   const firstUnfinished = () => (ROUNDS.find(r => !save.stars[r.id]) || ROUNDS[0]).id;
 
-  function disposeScene() { sceneToken++; observer?.disconnect(); observer = null; scene?.dispose?.(); scene = null; party?.dispose(); party = null; clearTimers(); intro = null; }
+  function disposeScene() { sceneToken++; observer?.disconnect(); observer = null; scene?.dispose?.(); scene = null; party?.dispose(); party = null; clearTimers(); removeIntro(); }
   /** Leaving a round part-way still keeps its tries for the grown-ups' record. */
   function leavePlay() {
     if (view === 'play' && round && round.attempts.length && !isRoundDone(round)) { recordHistory(save, round, { finished: false }); writeSave(storage, save); }
@@ -156,32 +156,78 @@ export function mountFixit(host, { onLearn = () => {}, onAward = () => {}, signa
     let step = 0;
     const overlay = doc.createElement('div');
     overlay.className = 'fx-intro'; overlay.setAttribute('role', 'dialog'); overlay.setAttribute('aria-modal', 'true'); overlay.setAttribute('aria-labelledby', 'fx-intro-title');
-    intro = { overlay, auto, returnFocus: doc.activeElement, go: n => { step = Math.max(0, Math.min(INTRO.length - 1, n)); sound.play('tap'); draw(); }, get step() { return step; } };
+    // A translated route creates a containing block for fixed descendants. Keep
+    // the tutorial outside that route so it always centres on the tablet screen.
+    const events = new win.AbortController(), modalOn = { signal: events.signal };
+    const returnFocus = doc.activeElement, scrollX = win.scrollX, scrollY = win.scrollY;
+    const background = [...doc.body.children].map(node => [node, node.getAttribute('inert')]);
+    const savedStyles = [];
+    const setStyle = (node, property, value) => {
+      savedStyles.push([node, property, node.style.getPropertyValue(property), node.style.getPropertyPriority(property)]);
+      node.style.setProperty(property, value);
+    };
+    // Fixed-body locking also stops the page moving behind the dialog in iPad
+    // Safari. Restore only properties we own, including existing inline values.
+    setStyle(doc.documentElement, 'overflow', 'hidden');
+    setStyle(doc.body, 'position', 'fixed');
+    setStyle(doc.body, 'top', `${-scrollY}px`);
+    setStyle(doc.body, 'left', `${-scrollX}px`);
+    setStyle(doc.body, 'width', '100%');
+    setStyle(doc.body, 'overflow', 'hidden');
+    for (const [node] of background) node.setAttribute('inert', '');
+    doc.body.append(overlay);
+    intro = { overlay, auto, returnFocus, go: n => { step = Math.max(0, Math.min(INTRO.length - 1, n)); sound.play('tap'); draw(); }, get step() { return step; }, restore: () => {
+      events.abort(); overlay.remove();
+      for (const [node, value] of background) { if (value === null) node.removeAttribute('inert'); else node.setAttribute('inert', value); }
+      for (const [node, property, value, priority] of savedStyles) { if (value) node.style.setProperty(property, value, priority); else node.style.removeProperty(property); }
+      const rootStyle = doc.documentElement.style, behaviour = rootStyle.getPropertyValue('scroll-behavior'), priority = rootStyle.getPropertyPriority('scroll-behavior');
+      rootStyle.setProperty('scroll-behavior', 'auto');
+      try { win.scrollTo(scrollX, scrollY); } catch { /* embedded previews may not scroll */ }
+      if (behaviour) rootStyle.setProperty('scroll-behavior', behaviour, priority); else rootStyle.removeProperty('scroll-behavior');
+    } };
     function draw() {
       const slide = INTRO[step], last = step === INTRO.length - 1;
       overlay.innerHTML = `<div class="fx-intro-card">
         <div class="fx-intro-top"><span class="fx-intro-kicker">How to play</span><button type="button" class="fx-intro-skip" data-intro-skip>Skip</button></div>
+        <div class="fx-intro-content">
         <div class="fx-intro-art" data-step="${step + 1}">${INTRO_ART[step]}</div>
         <div class="fx-intro-body"><span class="fx-intro-num" aria-hidden="true">${step + 1}</span><div><h2 id="fx-intro-title" tabindex="-1">${escape(slide.title)}</h2><p>${escape(slide.text)}</p></div></div>
+        </div>
         <div class="fx-intro-dots" role="group" aria-label="Steps">${INTRO.map((_, n) => `<button type="button" class="fx-intro-dot${n === step ? ' is-on' : ''}" data-intro-dot="${n}" aria-label="Step ${n + 1} of ${INTRO.length}"${n === step ? ' aria-current="step"' : ''}></button>`).join('')}</div>
         <div class="fx-intro-nav">${step ? '<button type="button" class="fx-btn fx-btn-soft" data-intro-back>Back</button>' : '<span></span>'}${last ? `<button type="button" class="fx-btn fx-btn-go" data-intro-play>Let’s play! ${icon('arrow')}</button>` : `<button type="button" class="fx-btn fx-btn-primary" data-intro-next>Next ${icon('arrow')}</button>`}</div>
       </div>`;
       overlay.querySelector('h2').focus({ preventScroll: true });
     }
+    overlay.addEventListener('click', event => {
+      const target = event.target.closest('button'); if (!target || target.disabled) return;
+      if (target.matches('[data-intro-skip]')) { sound.play('tap'); closeIntro(); }
+      else if (target.matches('[data-intro-next]')) intro?.go(intro.step + 1);
+      else if (target.matches('[data-intro-back]')) intro?.go(intro.step - 1);
+      else if (target.matches('[data-intro-dot]')) intro?.go(Number(target.dataset.introDot));
+      else if (target.matches('[data-intro-play]')) { sound.play('tap'); closeIntro({ play: true }); }
+    }, modalOn);
+    doc.addEventListener('focusin', event => {
+      if (!overlay.contains(event.target)) overlay.querySelector('h2')?.focus({ preventScroll: true });
+    }, modalOn);
     // Swipe left or right between steps on a touch screen.
     let startX = null;
-    overlay.addEventListener('pointerdown', event => { startX = event.clientX; }, on);
+    overlay.addEventListener('pointerdown', event => { startX = event.clientX; }, modalOn);
+    overlay.addEventListener('pointercancel', () => { startX = null; }, modalOn);
     overlay.addEventListener('pointerup', event => {
       if (startX === null || event.target.closest('button')) { startX = null; return; }
       const dx = event.clientX - startX; startX = null;
       if (Math.abs(dx) > 60) intro?.go(intro.step + (dx < 0 ? 1 : -1));
-    }, on);
-    host.querySelector('.fx-page')?.append(overlay);
+    }, modalOn);
     draw();
   }
+  // Route changes remove the modal without marking an unfinished tutorial seen.
+  function removeIntro() {
+    if (!intro) return null;
+    const previous = intro; intro = null; previous.restore(); return previous;
+  }
   function closeIntro({ play = false } = {}) {
-    if (!intro) return;
-    const { overlay, returnFocus } = intro; intro = null; overlay.remove();
+    const previous = removeIntro(); if (!previous) return;
+    const { returnFocus } = previous;
     if (!save.intro) { save.intro = true; writeSave(storage, save); }
     if (play && view !== 'play') { startRound(firstUnfinished()); return; }
     (returnFocus && host.contains(returnFocus) ? returnFocus : host.querySelector('h1,h2'))?.focus({ preventScroll: true });
@@ -503,11 +549,6 @@ export function mountFixit(host, { onLearn = () => {}, onAward = () => {}, signa
   host.addEventListener('click', event => {
     const target = event.target.closest('button,a'); if (!target || !host.contains(target) || target.disabled) return;
     if (target.matches('[data-hub]')) return; // ordinary link back to the Learn hub
-    if (target.matches('[data-intro-skip]')) { sound.play('tap'); closeIntro(); return; }
-    if (target.matches('[data-intro-next]')) { intro?.go(intro.step + 1); return; }
-    if (target.matches('[data-intro-back]')) { intro?.go(intro.step - 1); return; }
-    if (target.matches('[data-intro-dot]')) { intro?.go(Number(target.dataset.introDot)); return; }
-    if (target.matches('[data-intro-play]')) { sound.play('tap'); closeIntro({ play: true }); return; }
     if (target.matches('[data-howto]')) { sound.play('tap'); openIntro(); return; }
     if (target.matches('[data-music]')) { sound.setMusic(!sound.musicOn); refreshToggles(); return; }
     if (target.matches('[data-sound]')) { sound.setEnabled(!sound.enabled); refreshToggles(); sound.play('tap'); return; }
@@ -536,7 +577,7 @@ export function mountFixit(host, { onLearn = () => {}, onAward = () => {}, signa
       else if (event.key === 'Tab') {
         // Keep keyboard focus inside the intro while it is open.
         const items = [...intro.overlay.querySelectorAll('button')], first = items[0], last = items.at(-1);
-        if (event.shiftKey && (doc.activeElement === first || !intro.overlay.contains(doc.activeElement))) { event.preventDefault(); last.focus(); }
+        if (event.shiftKey && (doc.activeElement === first || !items.includes(doc.activeElement))) { event.preventDefault(); last.focus(); }
         else if (!event.shiftKey && doc.activeElement === last) { event.preventDefault(); first.focus(); }
       }
       return;

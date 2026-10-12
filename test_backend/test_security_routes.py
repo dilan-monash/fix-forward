@@ -5,7 +5,6 @@ source. An authenticated visitor may open only the reviewed I3 application.
 """
 import re
 import unittest
-from urllib.parse import urlsplit
 
 from backend import PROJECT_ROOT, SHARED_FRONTEND_ASSETS, create_app
 
@@ -24,18 +23,17 @@ class SecurityRoutesTests(unittest.TestCase):
         with self.client.post("/login", data={"csrf_token": token, "password": "synthetic-route-test"}) as response:
             self.assertEqual(response.status_code, 303)
 
-    def test_legacy_and_prototype_bookmarks_only_redirect_within_current_i3(self):
-        for path, destination in (
-            ("/legacy", "/#decide"), ("/legacy/", "/#decide"),
-            ("/prototypes/i3-world-preview/index.html", "/#explore"),
+    def test_legacy_and_prototype_bookmarks_return_404_without_redirects(self):
+        for path in (
+            "/legacy", "/legacy/", "/legacy/index.html",
+            "/prototypes/i3-world-preview/index.html",
         ):
             for query in ("", "?next=https://example.com", "?view=parents&url=//example.com"):
                 for method in ("GET", "HEAD"):
                     with self.subTest(path=path, query=query, method=method):
                         with self.client.open(path + query, method=method) as response:
-                            self.assertEqual(response.status_code, 302)
-                            self.assertEqual(response.headers["Location"], destination)
-                            self.assertEqual(urlsplit(response.headers["Location"]).netloc, "")
+                            self.assertEqual(response.status_code, 404)
+                            self.assertNotIn("Location", response.headers)
                             self.assertEqual(response.headers["Cache-Control"], "private, no-store")
 
     def test_retired_application_assets_cannot_reopen_the_old_ui(self):
@@ -79,7 +77,27 @@ class SecurityRoutesTests(unittest.TestCase):
                      "/prototypes/i3-world-preview/index.html"):
             for method in ("POST", "PUT", "PATCH", "DELETE"):
                 with self.subTest(path=path, method=method), self.client.open(path, method=method) as response:
-                    self.assertEqual(response.status_code, 405)
+                    self.assertEqual(response.status_code, 404)
+
+    def test_retired_namespaces_and_404_styles_work_without_a_session(self):
+        client = self.app.test_client()
+        for path in ("/legacy", "/legacy/old.js", "/quest", "/quest/", "/quest/index.html?view=parents",
+                     "/%71uest", "/%6cegacy", "/QUEST", "/Legacy/", "/quest//app.js",
+                     "/prototypes/i3-world-preview/index.html"):
+            for method in ("GET", "HEAD", "POST", "OPTIONS"):
+                with self.subTest(path=path, method=method), client.open(path, method=method) as response:
+                    self.assertEqual(response.status_code, 404)
+                    self.assertNotIn("Location", response.headers)
+                    self.assertEqual(response.headers["Cache-Control"], "private, no-store")
+                    if method == "GET":
+                        self.assertIn(b"Page not found", response.data)
+                        self.assertNotIn(b'id="preview-app"', response.data)
+        with client.get("/404.css") as response:
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.mimetype, "text/css")
+        # The public missing-page styling does not open any game/runtime module.
+        with client.get("/prototypes/i3-five-games/app.js") as response:
+            self.assertEqual(response.status_code, 303)
 
     def test_error_page_assets_remain_available_after_retiring_old_world(self):
         for name in ("404.html", "500.html"):

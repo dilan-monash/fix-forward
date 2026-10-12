@@ -1,5 +1,5 @@
 # Application assembly: app.py, diagnostics and tests call create_app to get a configured Flask instance.
-# This file connects the access gate, read-only API and explicit adult/Quest asset routes; it does not run imports or migrations.
+# This file connects the access gate, read-only API and current family assets; it does not run imports or migrations.
 
 """Flask application factory for the FixForward public-data API."""
 
@@ -17,7 +17,7 @@ from .family_frontend import (
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 # Only the current I3 shell is an application entry. Older documents stay in
 # Git for comparison, but cannot reopen a retired UI through this I3 host.
-FRONTEND_FILES = frozenset({"favicon.svg", "404.html", "500.html"})
+FRONTEND_FILES = frozenset({"favicon.svg", "404.html", "404.css", "500.html"})
 
 # The reviewed family modules import exactly this transitive set of shared
 # decision/data helpers. New src files are private until explicitly reviewed.
@@ -89,7 +89,7 @@ def create_app(test_config=None):
     import time.
     """
 
-    from flask import Flask, jsonify, redirect, request, send_from_directory
+    from flask import Flask, jsonify, request, send_from_directory
     from werkzeug.exceptions import SecurityError
     from werkzeug.middleware.proxy_fix import ProxyFix
 
@@ -126,6 +126,16 @@ def create_app(test_config=None):
         # Preserve that rejection before login tries to build a redirect.
         if isinstance(request.routing_exception, SecurityError):
             raise request.routing_exception
+
+    @app.before_request
+    def reject_retired_pages():
+        # Removed applications are missing pages even before login. Handle their
+        # whole namespace so old scripts, query strings and slash variants cannot
+        # reopen them or send a visitor through a misleading login/redirect chain.
+        path = request.path.casefold()
+        if (path in {"/legacy", "/quest", "/prototypes/i3-world-preview/index.html"}
+                or path.startswith(("/legacy/", "/quest/"))):
+            return _not_found_response(request.path)
 
     configure_access(app)
     siglip_integrity_cache = {}
@@ -171,26 +181,6 @@ def create_app(test_config=None):
     # the site. Flask's file response preserves native byte-range seeking.
     def family_film():
         return send_from_directory(PROJECT_ROOT, FAMILY_FILM)
-
-    @app.get("/legacy")
-    @app.get("/legacy/")
-    def legacy():
-        # Bookmarks for the old adult UI now open the current I3 decision flow.
-        return redirect("/#decide", code=302)
-
-    @app.get("/quest")
-    @app.get("/quest/")
-    @app.get("/quest/index.html")
-    def quest():
-        # Preserve the useful parent destination, never arbitrary query URLs.
-        # Authentication still runs before any redirect, using the same session.
-        destination = "/#parents" if request.args.get("view") == "parents" else "/#learn"
-        return redirect(destination, code=302)
-
-    @app.get("/prototypes/i3-world-preview/index.html")
-    def retired_world():
-        # A guessed prototype URL must not reopen the previous application.
-        return redirect("/#explore", code=302)
 
     @app.get("/<path:asset_path>")
     # Serve only named public assets, so adding a child module also requires updating this allowlist.

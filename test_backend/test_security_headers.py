@@ -23,11 +23,11 @@ class RequestBoundaryTests(unittest.TestCase):
                 self.assertNotIn("Set-Cookie", response.headers)
 
     def test_forwarded_host_cannot_change_the_destination_or_cookie_domain(self):
-        response = self.client.get("/quest", base_url="https://fix-forward-iteration-3-r4sh.onrender.com",
+        response = self.client.get("/film.html", base_url="https://fix-forward-iteration-3-r4sh.onrender.com",
                                    headers={"X-Forwarded-Host": "attacker.invalid",
                                             "Forwarded": "host=attacker.invalid;proto=http"})
         self.assertEqual(response.status_code, 303)
-        self.assertEqual(response.headers["Location"], "/login?next=/quest")
+        self.assertEqual(response.headers["Location"], "/login?next=/film.html")
         self.assertNotIn("attacker.invalid", response.get_data(as_text=True))
 
     def test_login_cookie_is_secure_httponly_host_only_and_same_site(self):

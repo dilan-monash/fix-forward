@@ -5,12 +5,13 @@
    appears on the workshop itself. Motion is short and decorative and is removed
    for visitors who prefer reduced motion; every action also works with buttons
    and keys. */
-.fx-page{--fx-ink:#16283c;--fx-muted:#4a5a6b;--fx-repair:#1e8e5a;--fx-reuse:#176dc4;--fx-ewaste:#6a4f9a;--fx-adult:#b8650f;--fx-ease:cubic-bezier(.22,1,.36,1);
+.fx-page,.fx-intro{--fx-ink:#16283c;--fx-muted:#4a5a6b;--fx-repair:#1e8e5a;--fx-reuse:#176dc4;--fx-ewaste:#6a4f9a;--fx-adult:#b8650f;--fx-ease:cubic-bezier(.22,1,.36,1)}
+.fx-page{
   position:relative;max-width:1320px;margin:auto;padding:28px 32px 56px;box-sizing:border-box;color:var(--fx-ink);font-family:ui-rounded,"Segoe UI Variable Display","Segoe UI",system-ui,Arial,sans-serif;font-size:17px;line-height:1.5}
-.fx-page *,.fx-page *::before,.fx-page *::after{box-sizing:border-box}
-.fx-page h1,.fx-page h2,.fx-page h3{margin:0;color:var(--fx-ink);letter-spacing:-.02em}
-.fx-page p{margin:0}
-.fx-page button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.fx-page *,.fx-page *::before,.fx-page *::after,.fx-intro,.fx-intro *,.fx-intro *::before,.fx-intro *::after{box-sizing:border-box}
+.fx-page h1,.fx-page h2,.fx-page h3,.fx-intro h2{margin:0;color:var(--fx-ink);letter-spacing:-.02em}
+.fx-page p,.fx-intro p{margin:0}
+.fx-page button,.fx-intro button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .fx-icon{width:24px;height:24px;flex-shrink:0}.fx-icon-sm{width:16px;height:16px;flex-shrink:0}
 .fx-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .fx-kicker{font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--fx-repair);margin-bottom:6px!important}
@@ -82,22 +83,28 @@
 .fx-grownups>div{flex:1;min-width:240px}.fx-grownups h2{font-size:22px}.fx-grownups p{color:#3d4d5f;font-size:16px}
 .fx-grownups .fx-station-icon .fx-icon{color:#6a4f9a}
 
-/* How-to-play intro: three steps over the page, with Skip. */
-.fx-intro{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px;background:#0f2236b8;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);animation:fx-fade .25s ease}
-.fx-intro-card{position:relative;width:min(580px,100%);max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px);overflow:auto;background:linear-gradient(180deg,#eaf4ff 0,#fff 50%);border-radius:30px;padding:18px 24px 22px;box-shadow:0 40px 80px -20px #000a;animation:fx-pop .35s var(--fx-ease);touch-action:pan-y;color:var(--fx-ink)}
+/* The body-level tutorial is independent of page animations. Its artwork scales
+   with screen height; Skip and navigation stay outside the scrollable content
+   fallback used by very small windows or enlarged text. */
+.fx-intro{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;height:100%;height:100dvh;padding:16px;padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));background:#0f2236b8;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);animation:fx-fade .25s ease;font-family:ui-rounded,"Segoe UI Variable Display","Segoe UI",system-ui,Arial,sans-serif;font-size:17px;line-height:1.5;overscroll-behavior:contain}
+.fx-intro-card{position:relative;display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;width:min(580px,100%);max-height:100%;min-height:0;overflow:hidden;background:linear-gradient(180deg,#eaf4ff 0,#fff 50%);border-radius:30px;padding:16px 24px 20px;box-shadow:0 40px 80px -20px #000a;animation:fx-pop .35s var(--fx-ease);color:var(--fx-ink)}
+.fx-intro-content{min-height:0;overflow:auto;overscroll-behavior:contain;touch-action:pan-y;padding-bottom:4px}
 .fx-intro-top{display:flex;justify-content:space-between;align-items:center}
 .fx-intro-kicker{font-weight:800;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--fx-reuse)}
 .fx-intro-skip{min-height:44px;padding:0 20px;border-radius:999px;border:2px solid #c5d2df;background:#fff;font:inherit;font-weight:800;color:var(--fx-ink);cursor:pointer}
 .fx-intro-art{margin:10px 0 6px;border-radius:22px;background:#fff;box-shadow:inset 0 0 0 2px #e3ebf3;padding:10px;animation:fx-slide .45s var(--fx-ease)}
-.fx-art{display:block;width:100%;height:auto;font-family:ui-rounded,"Segoe UI",system-ui,Arial,sans-serif}
+.fx-art{display:block;width:100%;height:clamp(96px,24vh,180px);height:clamp(96px,24dvh,180px);font-family:ui-rounded,"Segoe UI",system-ui,Arial,sans-serif}
 .fx-intro-body{display:flex;gap:14px;align-items:flex-start;margin-top:12px}
 .fx-intro-num{flex:none;width:54px;height:54px;border-radius:16px;background:#f4c431;color:#16283c;font-weight:900;font-size:30px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 0 #c99a10;animation:fx-yay .5s var(--fx-ease)}
 .fx-intro-body h2{font-size:26px;line-height:1.15}.fx-intro-body p{font-size:18px;color:var(--fx-muted);margin-top:4px}
-.fx-intro-dots{display:flex;justify-content:center;gap:2px;margin:12px 0 8px}
+.fx-intro-dots{display:flex;justify-content:center;gap:2px;margin:4px 0}
 .fx-intro-dot{position:relative;width:44px;height:44px;padding:0;border:0;background:none;cursor:pointer}
 .fx-intro-dot::before{content:"";position:absolute;left:50%;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:999px;background:#c9d6e2;transition:width .3s var(--fx-ease),margin .3s var(--fx-ease),background-color .3s}
 .fx-intro-dot.is-on::before{width:36px;margin-left:-18px;background:var(--fx-reuse)}
 .fx-intro-nav{display:flex;gap:12px}.fx-intro-nav>span{display:none}.fx-intro-nav .fx-btn{flex:1}
+/* Short landscape screens keep the picture beside the words, not above them. */
+@media(max-height:540px) and (min-width:650px){.fx-intro-card{width:min(760px,100%);padding:12px 20px 18px}.fx-intro-content{display:grid;grid-template-columns:1fr 1.2fr;gap:20px;align-items:center}.fx-intro-body{margin-top:0}.fx-intro-art{margin:8px 0}.fx-art{height:150px}}
+@media(max-width:480px){.fx-intro-card{padding:12px 16px 18px;border-radius:22px}.fx-intro-body{gap:10px}.fx-intro-num{width:42px;height:42px;font-size:25px}.fx-intro-body h2{font-size:23px}.fx-intro-body p{font-size:17px}}
 .fx-art-glow{transform-box:fill-box;transform-origin:center;animation:fx-glow 1.2s ease-in-out infinite}
 .fx-art-clue{transform-box:fill-box;transform-origin:left center;animation:fx-clue-pop 3.2s var(--fx-ease) infinite}.fx-art-clue.c2{animation-delay:.5s}
 .fx-art-lens{animation:fx-lens 3.2s ease-in-out infinite}

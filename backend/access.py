@@ -1,7 +1,7 @@
-# Shared access boundary for both adult and Quest routes; configured once by create_app.
+# Shared access boundary for the current family site and APIs; configured once by create_app.
 # Flask signed cookies hold a time-limited marker, random session ID and CSRF token, not appliance data.
 # The private local session registry makes Lock website revoke copied cookies across application workers.
-# All protected responses are private/no-store; only liveness and the minimal access-page assets bypass the gate.
+# All protected responses are private/no-store; only liveness and minimal access/error styling bypass the gate.
 
 """Shared prototype access gate, enforced before frontend and API responses.
 
@@ -38,9 +38,7 @@ access = Blueprint("access", __name__, template_folder="templates")
 # or an asset/API endpoint. Exact matching rejects external hosts, backslashes,
 # encoded traversal and control characters without relying on browser URL repair.
 RETURN_PATHS = frozenset({
-    "/", "/index.html", "/quest", "/quest/", "/quest/index.html",
-    "/legacy", "/legacy/", "/film.html",
-    "/quest?view=parents", "/quest/?view=parents", "/quest/index.html?view=parents",
+    "/", "/index.html", "/film.html",
 })
 
 
@@ -261,7 +259,9 @@ def configure_access(app):
     def require_website_access():
         if not _enabled():
             return None
-        public_asset = request.endpoint == "frontend_asset" and request.path == "/favicon.svg"
+        # A missing-page response must remain styled without granting access to
+        # any application code or data. Only its tiny stylesheet is public.
+        public_asset = request.endpoint == "frontend_asset" and request.path in {"/favicon.svg", "/404.css"}
         if request.endpoint in {"api.health", "access.stylesheet", "access.script"} or public_asset:
             return None
         if not _configured():
@@ -291,7 +291,7 @@ def configure_access(app):
                 "code": "access_required",
                 "message": "Enter the website password to continue.",
             }), 401
-        # Preserve only a known requested page and its supported parent view.
+        # Preserve only a currently shipped page entry.
         # API requests above stay JSON; scripts and unknown paths fall back home.
         next_path = _return_path(request.full_path.removesuffix("?"))
         return redirect(url_for("access.login", next=next_path) if next_path != "/" else url_for("access.login"), code=303)

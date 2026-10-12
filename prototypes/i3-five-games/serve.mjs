@@ -27,22 +27,24 @@ for(const name of [
   'model/appliance-siglip/upstream/siglip2-base-patch32-256/onnx/vision_model.9e82237d9a1d89948502aff9df02129c28698d793e01f15f62e2267682615499_q4.onnx',
   'vendor/transformers/transformers.min.js','vendor/transformers/ort-wasm-simd-threaded.jsep.mjs','vendor/transformers/ort-wasm-simd-threaded.jsep.wasm',
 ])expose('/'+name,reviewed+'/'+name);
-expose('/favicon.svg');
+for(const name of ['favicon.svg','404.html','404.css'])expose('/'+name);
 const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml','.woff2':'font/woff2','.mp4':'video/mp4','.vtt':'text/vtt; charset=utf-8','.txt':'text/plain; charset=utf-8','.wasm':'application/wasm','.onnx':'application/octet-stream','.f32':'application/octet-stream'};
 export function parseRange(header,size){const m=/^bytes=(\d*)-(\d*)$/.exec(String(header));if(!m||(!m[1]&&!m[2]))return null;let start=m[1]?Number(m[1]):Math.max(0,size-Number(m[2])),end=m[1]&&m[2]?Math.min(size-1,Number(m[2])):size-1;if(!Number.isSafeInteger(start)||!Number.isSafeInteger(end)||start>end||start<0||start>=size||!m[1]&&Number(m[2])===0)return null;return{start,end};}
 export function createFiveGamesServer(){return http.createServer(async(req,res)=>{
   res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('X-FixForward-Data-Mode','LOCAL-REVIEW-NO-DATABASE');res.setHeader('Permissions-Policy','camera=(self), microphone=(), geolocation=(self), xr-spatial-tracking=()');
+  // Preview missing URLs with the same static 404 document as the Flask service.
+  const notFound=()=>{res.writeHead(404,{'Content-Type':types['.html']});if(req.method==='HEAD'){res.end();return;}const stream=createReadStream(path.join(root,'404.html'));stream.on('error',()=>res.destroy());stream.pipe(res);};
   try{
     if(!['GET','HEAD'].includes(req.method)){res.writeHead(405,{Allow:'GET, HEAD'});res.end();return;}
     const hostname=new URL('http://'+req.headers.host).hostname;if(!['127.0.0.1','localhost','[::1]'].includes(hostname)){res.writeHead(403);res.end();return;}
     const url=new URL(req.url,'http://localhost');let name=decodeURIComponent(url.pathname);
     if(['/','/index.html',own,own.slice(0,-1)].includes(name))name=own+'index.html';if(name==='/film.html')name=own+'film.html';
     if(name.startsWith('/api/')){res.writeHead(503,{'Content-Type':types['.json']});res.end(req.method==='HEAD'?undefined:JSON.stringify({error:{code:'preview_data_unavailable',message:'Live records are not connected in this local review.'}}));return;}
-    const file=publicAssets.get(name);if(!file||!file.startsWith(root+path.sep)||await realpath(file)!==file){res.writeHead(404);res.end();return;}
-    const info=await stat(file);if(!info.isFile()){res.writeHead(404);res.end();return;}
+    const file=publicAssets.get(name);if(!file||!file.startsWith(root+path.sep)||await realpath(file)!==file){notFound();return;}
+    const info=await stat(file);if(!info.isFile()){notFound();return;}
     let range=null;if(req.headers.range){range=parseRange(req.headers.range,info.size);if(!range){res.writeHead(416,{'Content-Range':'bytes */'+info.size});res.end();return;}}
     const headers={'Content-Type':types[path.extname(file)]||'application/octet-stream','Content-Length':range?range.end-range.start+1:info.size,'Accept-Ranges':'bytes'};if(range)headers['Content-Range']=`bytes ${range.start}-${range.end}/${info.size}`;
     res.writeHead(range?206:200,headers);if(req.method==='HEAD'){res.end();return;}const stream=createReadStream(file,range||{});stream.on('error',()=>res.destroy());stream.pipe(res);
-  }catch{if(!res.headersSent)res.writeHead(404);res.end();}
+  }catch{if(!res.headersSent)notFound();else res.end();}
 });}
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){const server=createFiveGamesServer();server.listen(5537,'127.0.0.1',()=>console.log('FixForward five-game review: http://127.0.0.1:5537/'));}

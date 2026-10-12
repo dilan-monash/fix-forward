@@ -1,4 +1,4 @@
-# Retired Quest bookmarks use the current I3 learning journey after the same login gate.
+# Retired Quest bookmarks are missing pages, before and after the login gate.
 # The original Quest source stays in Git but is not downloadable from the I3 host.
 
 """Quest retirement and current-I3 integration with the real access gate.
@@ -11,7 +11,6 @@ import re
 import unittest
 from pathlib import Path
 from unittest.mock import patch
-from urllib.parse import parse_qs, urlsplit
 
 
 WEB_DEPENDENCIES = all(importlib.util.find_spec(name) for name in ("flask", "dotenv"))
@@ -62,28 +61,25 @@ class QuestRouteTests(unittest.TestCase):
             self.assertEqual(response.status_code, 303)
             self.assertEqual(response.headers["Location"], "/")
 
-    def test_quest_entries_and_each_lazy_module_remain_locked(self):
+    def test_retired_quest_entries_and_modules_are_missing_before_login(self):
         for path in QUEST_ENTRIES + QUEST_ASSETS:
             for method in ("GET", "HEAD"):
                 with self.subTest(path=path, method=method):
                     with self.client.open(path, method=method) as response:
-                        self.assertEqual(response.status_code, 303)
-                        login = urlsplit(response.headers["Location"])
-                        self.assertEqual(login.path, "/login")
-                        self.assertEqual(parse_qs(login.query), {"next": [path]} if path in QUEST_ENTRIES else {})
+                        self.assertEqual(response.status_code, 404)
+                        self.assertNotIn("Location", response.headers)
                         self.assertEqual(response.headers["Cache-Control"], "private, no-store")
                         self.assertNotIn(b"quest-app", response.data)
 
-    def test_authenticated_quest_bookmarks_open_current_learning_or_parents(self):
+    def test_authenticated_quest_bookmarks_stay_missing_with_any_query(self):
         self.login()
         for path in QUEST_ENTRIES:
-            for query, destination in (("", "/#learn"), ("?view=parents", "/#parents"),
-                                       ("?view=https://example.com", "/#learn")):
+            for query in ("", "?view=parents", "?view=https://example.com"):
                 for method in ("GET", "HEAD"):
                     with self.subTest(path=path, query=query, method=method):
                         with self.client.open(path + query, method=method) as response:
-                            self.assertEqual(response.status_code, 302)
-                            self.assertEqual(response.headers["Location"], destination)
+                            self.assertEqual(response.status_code, 404)
+                            self.assertNotIn("Location", response.headers)
                             self.assertEqual(response.headers["Cache-Control"], "private, no-store")
                             self.assertNotIn(b'id="quest-app"', response.data)
 
@@ -97,14 +93,16 @@ class QuestRouteTests(unittest.TestCase):
                         self.assertEqual(response.headers["Cache-Control"], "private, no-store")
                         self.assertEqual(response.headers["X-Content-Type-Options"], "nosniff")
 
-    def test_quest_bookmark_finishes_in_current_i3_with_the_same_session(self):
+    def test_missing_bookmarks_do_not_redirect_or_invalidate_current_i3_session(self):
         self.login()
         for path in QUEST_ENTRIES:
             with self.client.get(path, follow_redirects=True) as response:
-                self.assertEqual(response.status_code, 200)
-                self.assertIn(b'/prototypes/i3-five-games/app.js', response.data)
+                self.assertEqual(response.status_code, 404)
+                self.assertEqual(len(response.history), 0)
                 self.assertNotIn(b'id="quest-app"', response.data)
-                self.assertEqual(response.history[0].headers["Location"], "/#learn")
+        with self.client.get("/") as response:
+            self.assertEqual(response.status_code, 200)
+            self.assertIn(b'/prototypes/i3-five-games/app.js', response.data)
         with self.client.get("/src/app.js") as response:
             self.assertEqual(response.status_code, 404)
 
@@ -113,7 +111,7 @@ class QuestRouteTests(unittest.TestCase):
         self.assertTrue(clips, "The archived source still includes its recordings")
         route = f"/quest/audio/{clips[0].name}"
         with self.client.get(route) as response:
-            self.assertEqual(response.status_code, 303)
+            self.assertEqual(response.status_code, 404)
         self.login()
         for method in ("GET", "HEAD"):
             with self.client.open(route, method=method, headers={"Range": "bytes=0-63"}) as response:
@@ -135,7 +133,7 @@ class QuestRouteTests(unittest.TestCase):
                     self.assertNotIn(b"DATABASE_URL=", response.data)
                     self.assertNotIn(b"class QuestRouteTests", response.data)
 
-    def test_expired_cookie_relocks_child_document_and_modules(self):
+    def test_expired_cookie_keeps_quest_missing_and_current_site_locked(self):
         self.login()
         with self.client.session_transaction() as saved:
             issued = saved["access_issued_at"]
@@ -143,17 +141,18 @@ class QuestRouteTests(unittest.TestCase):
             for path in ("/quest", "/quest/content.js", "/"):
                 with self.subTest(path=path):
                     with self.client.get(path) as response:
-                        self.assertEqual(response.status_code, 303)
-                        login = urlsplit(response.headers["Location"])
-                        self.assertEqual(login.path, "/login")
-                        self.assertEqual(parse_qs(login.query), {"next": [path]} if path == "/quest" else {})
+                        self.assertEqual(response.status_code, 303 if path == "/" else 404)
+                        if path == "/":
+                            self.assertEqual(response.headers["Location"], "/login")
+                        else:
+                            self.assertNotIn("Location", response.headers)
 
-    def test_quest_fails_closed_when_access_configuration_is_missing(self):
+    def test_quest_remains_missing_when_access_configuration_is_missing(self):
         self.app.config["SITE_PASSWORD"] = ""
         for path in ("/quest", "/quest/", "/quest/app.js"):
             with self.subTest(path=path):
                 with self.client.get(path) as response:
-                    self.assertEqual(response.status_code, 503)
+                    self.assertEqual(response.status_code, 404)
                     self.assertNotIn(b"quest-app", response.data)
         with self.client.get("/api/health") as health:
             self.assertEqual(health.status_code, 200)
@@ -169,8 +168,11 @@ class QuestRouteTests(unittest.TestCase):
             for path in QUEST_ENTRIES:
                 with self.subTest(path=path):
                     with self.client.get(path, follow_redirects=True) as response:
-                        self.assertEqual(response.status_code, 200)
-                        self.assertIn(b'/prototypes/i3-five-games/app.js', response.data)
+                        self.assertEqual(response.status_code, 404)
+                        self.assertEqual(len(response.history), 0)
+            with self.client.get("/") as response:
+                self.assertEqual(response.status_code, 200)
+                self.assertIn(b'/prototypes/i3-five-games/app.js', response.data)
             sources.assert_called_once_with()
 
 

@@ -19,8 +19,8 @@ class WorldRoutesTests(unittest.TestCase):
             token = re.search(r'name="csrf_token" value="([^"]+)"', page.get_data(as_text=True)).group(1)
         return self.client.post("/login", data={"csrf_token": token, "password": password})
 
-    def test_world_assets_and_legacy_are_protected(self):
-        for path in ("/", "/legacy", "/prototypes/i3-world-preview/app.js", "/prototypes/i3-world-preview/vendor/three.core.js",
+    def test_world_assets_are_protected(self):
+        for path in ("/", "/prototypes/i3-world-preview/app.js", "/prototypes/i3-world-preview/vendor/three.core.js",
                      "/prototypes/i3-world-preview/models-expanded-large.js",
                      "/prototypes/i3-world-preview/models-expanded-devices.js",
                      "/prototypes/i3-world-preview/catalogue-expanded.js",
@@ -68,7 +68,7 @@ class WorldRoutesTests(unittest.TestCase):
         with self.client.get("/src/private.css") as response:
             self.assertEqual(response.status_code, 404)
 
-    def test_login_opens_current_world_and_redirects_previous_entries(self):
+    def test_login_opens_current_world_and_previous_entries_are_missing(self):
         self.login().close()
         for path in ("/", "/index.html"):
             with self.client.get(path) as response:
@@ -76,11 +76,10 @@ class WorldRoutesTests(unittest.TestCase):
                 self.assertIn(b'id="preview-app"', response.data)
                 self.assertEqual(response.headers["Cache-Control"], "private, no-store")
                 self.assertIn("xr-spatial-tracking=()", response.headers["Permissions-Policy"])
-        for path, destination in (("/legacy", "/#decide"), ("/legacy/", "/#decide"),
-                                  ("/quest", "/#learn")):
+        for path in ("/legacy", "/legacy/", "/quest"):
             with self.client.get(path) as response:
-                self.assertEqual(response.status_code, 302)
-                self.assertEqual(response.headers["Location"], destination)
+                self.assertEqual(response.status_code, 404)
+                self.assertNotIn("Location", response.headers)
                 self.assertNotIn(b'id="quest-app"', response.data)
 
     def test_exact_runtime_allowlist_excludes_tests_servers_and_traversal(self):
