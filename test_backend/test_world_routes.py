@@ -33,14 +33,14 @@ class WorldRoutesTests(unittest.TestCase):
 
     def test_learn_games_load_only_after_login(self):
         # The Learn hub, Fix-it Station and Scrapworks use the same gate as the rest of the world.
-        learn = ("learning.js", "learning-reference.css", "fixit.js", "fixit-3d.js", "fixit-sound.js",
-                 "fixit-party.js", "waste-models.js", "fixit.css", "scrapworks.js")
+        learn = ("reference/fixit.js", "reference/fixit-3d.js", "reference/fixit-sound.js",
+                 "reference/fixit-party.js", "reference/waste-models.js", "reference/fixit.css", "scrapworks.js")
         for name in learn:
-            with self.client.get(f"/prototypes/i3-world-preview/{name}") as response:
+            with self.client.get(f"/prototypes/i3-five-games/{name}") as response:
                 self.assertEqual(response.status_code, 303, name)
         self.login().close()
         for name in learn:
-            with self.client.get(f"/prototypes/i3-world-preview/{name}") as response:
+            with self.client.get(f"/prototypes/i3-five-games/{name}") as response:
                 self.assertEqual(response.status_code, 200, name)
                 # The JavaScript media type name depends on the server's platform tables.
                 expected = {"text/css"} if name.endswith(".css") else {"text/javascript", "application/javascript"}
@@ -58,32 +58,30 @@ class WorldRoutesTests(unittest.TestCase):
 
     def test_photo_feedback_stylesheet_keeps_the_same_access_gate(self):
         # The thumbnail/status styles must load after login without opening other files.
-        with self.client.get("/src/photo-helper.css") as response:
+        with self.client.get("/prototypes/i3-five-games/support/photo-helper.css") as response:
             self.assertEqual(response.status_code, 303)
         self.login().close()
-        with self.client.get("/src/photo-helper.css") as response:
+        with self.client.get("/prototypes/i3-five-games/support/photo-helper.css") as response:
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.mimetype, "text/css")
             self.assertIn(b".photo-feedback", response.data)
         with self.client.get("/src/private.css") as response:
             self.assertEqual(response.status_code, 404)
 
-    def test_login_opens_new_world_and_preserves_previous_entries(self):
+    def test_login_opens_current_world_and_redirects_previous_entries(self):
         self.login().close()
         for path in ("/", "/index.html"):
             with self.client.get(path) as response:
                 self.assertEqual(response.status_code, 200)
                 self.assertIn(b'id="preview-app"', response.data)
                 self.assertEqual(response.headers["Cache-Control"], "private, no-store")
-                self.assertIn("xr-spatial-tracking=(self)", response.headers["Permissions-Policy"])
-        with self.client.get("/legacy") as response:
-            # Cache-versioned entry URLs still load the same legacy controller.
-            self.assertRegex(response.data, rb'src="src/app\.js(?:\?[^\"]+)?"')
-        with self.client.get("/legacy/") as response:
-            self.assertEqual(response.headers["Location"], "/legacy")
-        with self.client.get("/quest") as response:
-            self.assertEqual(response.status_code, 200)
-            self.assertIn(b'id="quest-app"', response.data)
+                self.assertIn("xr-spatial-tracking=()", response.headers["Permissions-Policy"])
+        for path, destination in (("/legacy", "/#decide"), ("/legacy/", "/#decide"),
+                                  ("/quest", "/#learn")):
+            with self.client.get(path) as response:
+                self.assertEqual(response.status_code, 302)
+                self.assertEqual(response.headers["Location"], destination)
+                self.assertNotIn(b'id="quest-app"', response.data)
 
     def test_exact_runtime_allowlist_excludes_tests_servers_and_traversal(self):
         self.login().close()

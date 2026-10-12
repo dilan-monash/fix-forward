@@ -103,9 +103,9 @@ class AppTests(unittest.TestCase):
     # The shipped entry point must be able to load its new pure review policy.
     # The unvalidated multi-item detector and research models are not released.
     def test_single_photo_review_assets_are_served_without_multi_item_models(self):
-        for path in ("/src/photo-helper.js?v=i3-photo-review-v4",
-                     "/src/siglip-appliance-classifier.js?v=i3-photo-review-v4",
-                     "/src/appliance-review-policy.js?v=i3-photo-review-v4"):
+        for path in ("/prototypes/i3-five-games/support/photo-helper.js?v=i3-photo-review-v4",
+                     "/prototypes/i3-five-games/support/siglip-appliance-classifier.js?v=i3-photo-review-v4",
+                     "/prototypes/i3-five-games/support/appliance-review-policy.js?v=i3-photo-review-v4"):
             with self.subTest(path=path), self.client.get(path) as response:
                 self.assertEqual(response.status_code, 200)
                 self.assertIn(response.mimetype, ("text/javascript", "application/javascript"))

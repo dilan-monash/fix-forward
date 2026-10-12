@@ -205,22 +205,56 @@ export function learningRecord(history = []) {
 /** Progress lives only in this browser: best stars per round, cards found, whether
  * the how-to-play intro has been seen, and the grown-ups' learning record. */
 export const SAVE_KEY = 'fixforward-fixit-v1';
-function readHistory(list) {
+const MAX_SAVE_CHARACTERS = 1_000_000;
+const MAX_ITEM_TRIES = 120;
+// The three-round version predates Bin day and the two everyday items later
+// inserted in the appliance rounds. Keep its authored sequence on later saves
+// instead of inventing answers for items the child was never shown.
+const LEGACY_STORIES = {
+  1: ['fan-works', 'kettle-switch', 'toaster-dead', 'laptop-battery'],
+  3: ['blender-unwanted', 'vacuum-filter', 'microwave-old', 'hairdryer-cord', 'coffee-pump', 'ricecooker-unknown'],
+  4: ['mixer-moving', 'airfryer-smell', 'toaster-lever', 'fan-motor', 'laptop-cousin', 'kettle-cracked'],
+};
+// Browser records can be edited or damaged. Accept only an ordered prefix of
+// this round, and derive correctness from the authored answer, never a saved
+// `solved` flag. This checks consistency; browser history is not a trusted grade.
+function readHistory(list, oldSave = false) {
   if (!Array.isArray(list)) return [];
-  return list.filter(entry => roundById(entry?.roundId) && typeof entry.at === 'string' && Array.isArray(entry.items)).slice(0, HISTORY_LIMIT).map(entry => ({
-    roundId: Number(entry.roundId), at: entry.at.slice(0, 40), finished: entry.finished !== false,
-    items: entry.items.filter(item => STORIES[item?.story] && Array.isArray(item.tries)).map(item => ({ story: item.story, tries: item.tries.filter(target => targetById(target)).slice(0, 12), solved: item.solved === true })).filter(item => item.tries.length),
-  })).filter(entry => entry.items.length);
+  return list.slice(0, HISTORY_LIMIT).flatMap(entry => {
+    const roundId = oldSave ? [null, 1, 3, 4][Number(entry?.roundId)] : entry?.roundId;
+    const round = roundById(roundId);
+    const legacy = oldSave || entry?.contentVersion === 1;
+    const stories = legacy ? LEGACY_STORIES[round?.id] : round?.stories;
+    if (!round || typeof entry.at !== 'string' || !Array.isArray(entry.items)
+      || !stories || !entry.items.length || entry.items.length > stories.length) return [];
+    const items = [];
+    for (const [index, item] of entry.items.entries()) {
+      if (!item || !Object.hasOwn(STORIES, item.story) || item.story !== stories[index]
+        || !Array.isArray(item.tries) || !item.tries.length || item.tries.length > MAX_ITEM_TRIES
+        || !item.tries.every(target => targetById(target))) return [];
+      const firstCorrect = item.tries.indexOf(STORIES[item.story].answer);
+      // A successful drop advances immediately. Another choice for that item,
+      // or a later item before success, cannot come from an actual playthrough.
+      if (firstCorrect >= 0 && firstCorrect !== item.tries.length - 1) return [];
+      const solved = firstCorrect >= 0;
+      if (!solved && index !== entry.items.length - 1) return [];
+      items.push({ story: item.story, tries: [...item.tries], solved });
+    }
+    const complete = items.length === stories.length && items.every(item => item.solved);
+    return [{ roundId: round.id, ...(legacy ? { contentVersion: 1 } : {}), at: entry.at.slice(0, 40), finished: entry.finished !== false && complete, items }];
+  });
 }
 export function readSave(storage) {
   try {
-    const raw = JSON.parse(storage?.getItem(SAVE_KEY) || '{}');
+    const text = storage?.getItem(SAVE_KEY) || '{}';
+    if (typeof text !== 'string' || text.length > MAX_SAVE_CHARACTERS) throw new Error('Invalid game record');
+    const raw = JSON.parse(text);
     // Version 1 had three rounds; its rounds 2 and 3 are now rounds 3 and 4.
     const saved = raw?.version === 1 ? { 1: raw.stars?.[1], 3: raw.stars?.[2], 4: raw.stars?.[3] } : raw?.stars;
     const stars = {};
     for (const round of ROUNDS) { const value = saved?.[round.id]; if (Number.isInteger(value) && value >= 1 && value <= 3) stars[round.id] = value; }
     const cards = Array.isArray(raw?.cards) ? [...new Set(raw.cards.filter(id => cardById(id)))] : [];
-    return { stars, cards, intro: raw?.intro === true, history: readHistory(raw?.history) };
+    return { stars, cards, intro: raw?.intro === true, history: readHistory(raw?.history, raw?.version === 1) };
   } catch { return { stars: {}, cards: [], intro: false, history: [] }; }
 }
 export function writeSave(storage, save) {

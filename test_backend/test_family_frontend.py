@@ -5,7 +5,7 @@ import re
 import unittest
 from urllib.parse import parse_qs, urljoin, urlsplit
 
-from backend import PROJECT_ROOT, create_app
+from backend import PROJECT_ROOT, SHARED_FRONTEND_ASSETS, create_app
 from backend.family_frontend import (
     FAMILY_ASSET_MIME, FAMILY_ENTRY, FAMILY_FILM,
     FAMILY_FRONTEND_ALIASES, FAMILY_FRONTEND_ASSETS,
@@ -95,7 +95,13 @@ class FamilyFrontendTests(unittest.TestCase):
         self.login()
         imports = re.compile(r'''(?:^\s*(?:import|export)\b\s*(?!function\b|class\b|const\b|let\b|var\b|default\b)[^;]*?\bfrom\s*|^\s*import\s*|\bimport\s*\(\s*)["']([^"'\r\n]+)["']''', re.MULTILINE)
         loaded_urls = set()
-        for asset in FAMILY_FRONTEND_ASSETS | FAMILY_FRONTEND_ALIASES.keys():
+        pending = list(FAMILY_FRONTEND_ASSETS | FAMILY_FRONTEND_ALIASES.keys())
+        scanned = set()
+        while pending:
+            asset = pending.pop()
+            if asset in scanned:
+                continue
+            scanned.add(asset)
             source = PROJECT_ROOT / FAMILY_FRONTEND_ALIASES.get(asset, asset)
             if source.suffix == ".js":
                 references = imports.findall(source.read_text(encoding="utf-8"))
@@ -108,7 +114,14 @@ class FamilyFrontendTests(unittest.TestCase):
                 continue
             for reference in references:
                 self.assertTrue(reference.startswith((".", "/")), (asset, reference))
-                loaded_urls.add(urlsplit(urljoin("/" + asset, reference)).path)
+                resolved = urlsplit(urljoin("/" + asset, reference)).path
+                loaded_urls.add(resolved)
+                if resolved.endswith((".js", ".html")):
+                    pending.append(resolved.lstrip("/"))
+        # This catches missing transitive imports and accidental exposure of an
+        # unrelated future src file, rather than duplicating a hand-picked list.
+        self.assertEqual({url.lstrip("/") for url in loaded_urls if url.startswith("/src/")},
+                         set(SHARED_FRONTEND_ASSETS))
         self.assertIn("/prototypes/i3-five-games/reference/vendor/three.core.js", loaded_urls)
         for url in sorted(loaded_urls):
             with self.subTest(url=url), self.client.head(url) as response:

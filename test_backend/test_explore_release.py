@@ -33,7 +33,7 @@ class ExploreReleaseTests(unittest.TestCase):
             self.assertEqual(response.status_code, 303)
 
     def test_all_explore_assets_require_the_existing_site_login(self):
-        for path in self.ASSETS + ("/src/explore-classifier.js", "/src/explore-photo-helper.css"):
+        for path in self.ASSETS + ("/prototypes/i3-five-games/support/explore-classifier.js", "/prototypes/i3-five-games/support/explore-photo-helper.css"):
             with self.client.get(path) as response:
                 self.assertEqual(response.status_code, 303, path)
 

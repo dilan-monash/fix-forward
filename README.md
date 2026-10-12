@@ -8,7 +8,9 @@
 
 The protected `/` entry serves `prototypes/i3-five-games/index.html`: Home, Learn together, Explore and Decide. The original navy/cyan FixForward logo appears in the header and footer. Learn contains Fix-it Station, Materials Rescue, Care Crew, Scrapworks and Circular Choices, with on-screen practice and parent learning records. Explore retains the confirmed photo/manual selection and rotatable device world; photo results in Explore and Decide reveal themselves automatically.
 
-The runtime and score map is in [the family frontend README](prototypes/i3-five-games/README.md). Flask exposes only the exact assets in `backend/family_frontend.py`; its existing authentication, read-only APIs, model integrity rules, `/legacy` and `/quest` routes remain in place. The optional narrated film is available at `/film.html`. `npm run check` includes the family tests as well as the earlier repository suite.
+The runtime and score map is in [the family frontend README](prototypes/i3-five-games/README.md). Flask exposes only reviewed runtime assets and retains the protected read-only APIs and model integrity checks. Old I3 `/quest` bookmarks now redirect to `/#learn` (or `/#parents` for `view=parents`); `/legacy` opens `/#decide`. The separate I2 website is unchanged. The optional narrated film is available at `/film.html`. `npm run check` includes the family tests as well as the earlier repository suite.
+
+The [website access guide](docs/WEBSITE_ACCESS.md#security-review-12-october-2026) records the security review, regression tests and release verification boundaries. The login limiter uses Render's documented Cloudflare client address only on the exact I3 public service; local requests cannot opt into that trust using a header. Source changes and a GitHub push alone do not establish a live deployment.
 
 ## Branches and websites
 

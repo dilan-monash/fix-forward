@@ -1,4 +1,7 @@
 Flask>=3.1,<4
+# 3.1.9 closes the Windows device-path denial-of-service advisory; exact asset
+# allowlists remain the application's first file-access boundary on every OS.
+Werkzeug>=3.1.9,<4
 gunicorn>=23,<24
 psycopg[binary]>=3.2,<4
 python-dotenv>=1.0,<2

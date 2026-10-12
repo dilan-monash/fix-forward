@@ -167,7 +167,7 @@ class AccessTests(unittest.TestCase):
         result = self.login()
         self.assertEqual(result.status_code, 303)
         self.assertEqual(result.headers["Location"], "/")
-        for path in ("/", "/src/app.js", "/src/price-snapshot.js", "/api/sources"):
+        for path in ("/", "/prototypes/i3-five-games/app.js", "/src/price-snapshot.js", "/api/sources"):
             with self.subTest(path=path):
                 response = self.client.get(path)
                 self.assertEqual(response.status_code, 200)
@@ -288,10 +288,15 @@ class AccessTests(unittest.TestCase):
                     self.assertEqual(success.status_code, 303)
                     self.assertEqual(success.headers["Location"], destination)
                 with self.client.get(destination) as target:
-                    self.assertEqual(target.status_code, 200)
                     self.assertEqual(target.headers["Cache-Control"], "private, no-store")
                     if destination.startswith("/quest"):
-                        self.assertIn(b'id="quest-app"', target.data)
+                        # Old bookmarks still work, but stay inside the I3
+                        # learning or parent page instead of opening I2's UI.
+                        self.assertEqual(target.status_code, 302)
+                        expected = "/#parents" if "view=parents" in destination else "/#learn"
+                        self.assertEqual(target.headers["Location"], expected)
+                    else:
+                        self.assertEqual(target.status_code, 200)
 
     def test_destination_survives_csrf_password_errors_and_other_tab_requests(self):
         token = self.token("/login?next=/quest")

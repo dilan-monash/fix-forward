@@ -223,7 +223,9 @@ export function mountDecide(host, { route = 'decide', signal, services = {} } = 
 
   const params = readParams(route);
   const requested = (params.get('appliance') || '').trim().toLowerCase();
-  const routeCategory = WORLD_ITEMS[requested] || CATEGORIES.find(item => item.toLowerCase() === requested) || '';
+  // A URL is untrusted input. Object prototype names are not catalogue items.
+  const routeCategory = (Object.hasOwn(WORLD_ITEMS, requested) ? WORLD_ITEMS[requested] : '')
+    || CATEGORIES.find(item => item.toLowerCase() === requested) || '';
   let tipsOn = true;
   try { tipsOn = storage?.getItem(TIPS_KEY) !== 'off'; } catch { /* keep the default */ }
 
